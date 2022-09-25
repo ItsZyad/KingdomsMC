@@ -1,0 +1,12 @@
+influenceType:li@weapons|mercenary|
+ChatMode:global
+currNPC:n@927
+\exAdminTools:map@[__value=map@[]]
+lastLocMainWorld:l@-1567.9059256330486,95.14207709463962,-73.20597463697432,0.90003127,77.99557495,KingdomsUTD
+BuildItemList:li@i@oak_planks|i@spruce_planks|i@birch_planks|i@jungle_planks|i@acacia_planks|i@dark_oak_planks|i@oak_log|i@spruce_log|i@birch_log|i@jungle_log|i@acacia_log|i@dark_oak_log|i@stripped_oak_log|i@stripped_spruce_log|i@stripped_birch_log|i@stripped_jungle_log|i@stripped_acacia_log|i@stripped_dark_oak_log|i@oak_slab|i@spruce_slab|i@birch_slab|i@jungle_slab|i@acacia_slab|i@dark_oak_slab|i@dark_oak_slab|i@petrified_oak_slab|i@oak_stairs|i@spruce_stairs|i@birch_stairs|i@jungle_stairs|i@acacia_stairs|i@dark_oak_stairs|[itemArray].get[<[value]>]|[itemArray].get[<[value]>]|[itemArray].get[<[value]>]|[itemArray].get[<[value]>]|
+kingdom:cambrian
+lastLocBuildWorld:l@-1934.8907547384913,140.2426670160725,716.2975970524253,36.45007324,244.70269775,Kingdoms
+DidIntro:1
+outpostToBeSpeced:test-2
+foundAreas:li@polygon@internal_story_port_liberty|polygon@INTERNAL_STORY_Ports_District|polygon@internal_story_fyndalin_old_town|polygon@internal_story_port_allegra|cu@INTERNAL_STORY_The_Pit|polygon@internal_story_fyndalin_castle|
+OpenedSpawnWindow:true

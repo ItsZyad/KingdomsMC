@@ -1,0 +1,212 @@
+##ignorewarning invalid_data_line_quotes
+
+NPCLevelProgress:
+    type: procedure
+    definitions: level
+    script:
+    - define justDecimal <[Level].round_down.sub[<[Level]>].abs.mul[100]>
+    - define levelGraphic <list>
+
+    - repeat <[justDecimal].div[5].round_to_precision[5]>:
+        - define levelGraphic:->:█
+
+    - repeat <element[20].sub[<[justDecimal].div[5].round_to_precision[5]>]>:
+        - define levelGraphic:->:░
+
+    - determine "<[levelGraphic].unseparated> - <[justDecimal].round_to_precision[0.01]><&pc>"
+
+# Process of adding a new kingdom:
+# Add new kingdom data to kingdoms.yml such as balance etc.
+# Add influence data for new kingdom to powerstruggle.yml
+# Add new kingdom name to kingdoms.yml -> kingdom_real_names
+# Copy real kingdom name to KingdomRealNames in this file
+
+GetKingdomList:
+    type: procedure
+    debug: false
+    definitions: isCodeNames
+    script:
+    - define kingdomRealNames <script[KingdomRealNames].data_key[].values.exclude[data]>
+    - define kingdomCodeNames <script[KingdomRealNames].data_key[].keys.exclude[type]>
+    - define isCodeNames <[isCodeNames].if_null[true]>
+
+    - if <[isCodeNames]>:
+        - determine <[kingdomCodeNames]>
+
+    - determine <[kingdomRealNames]>
+
+KingdomRealNames:
+    type: data
+    centran: "Dominion of Muspelheim"
+    viridian: "Commonwealth of Viriditas"
+    raptoran: "Republic of Altea"
+    cambrian: "Grovelian Empire"
+    fyndalin: "Fyndalin Trust Territory"
+
+KingdomRealShortNames:
+    type: data
+    centran: "Muspelheim"
+    viridian: "Viridia"
+    raptoran: "Altea"
+    cambrian: "Grovelia"
+    fyndalin: "Fyndalin"
+
+KingdomTextColors:
+    type: data
+    centran: blue
+    viridian: lime
+    raptoran: red
+    cambrian: gold
+    fyndalin: gray
+
+KingdomNameReplacer:
+    type: procedure
+    definitions: playerKingdom
+    script:
+    - determine passively <proc[YamlSpaceAdder].context[<script[KingdomRealNames].data_key[<[playerKingdom]>]>]>
+
+YamlSpaceAdder:
+    type: procedure
+    definitions: yamlVal
+    script:
+    - determine <definition[yamlVal].replace[/sp/].with[<&sp>]>
+
+YamlSpaceSerilizer:
+    type: procedure
+    definitions: Val
+    script:
+    - determine <definition[Val].replace[<&sp>].with[/sp/]>
+
+Paginate:
+    type: procedure
+    definitions: itemArrayMap|itemsPerPage|page
+    script:
+    - define outArray <list>
+    - define startPoint <element[<[page]>].mul[<[itemsPerPage]>]>
+
+    - define itemArray <[itemArrayMap].get[items]>
+
+    - narrate format:debug ARR:<[itemArray]>
+
+    - repeat <[itemsPerPage]>:
+        - if <[itemArray].size.is[LESS].than[<[value]>]>:
+            - define outArray:->:<[itemArray].get[<element[<[value]>].add[<[startPoint]>]>]>
+            - narrate format:debug <[itemArray].get[<element[<[value]>].add[<[startPoint]>]>]>
+
+        - else:
+            - repeat stop
+
+    - determine <[outArray]>
+
+New_Paginate_Task:
+    type: task
+    definitions: itemList|itemsPerPage|page
+    script:
+    - define outList <list>
+    - define highestStartPoint <[itemList].size.sub[<[itemsPerPage]>]>
+    - define startPoint <[page].sub[1].mul[<[itemsPerPage]>]>
+
+    #- narrate HIGHEST:<[highestStartPoint]>
+    #- narrate START:<[startPoint]>
+
+    - if <[startPoint].is[LESS].than[1]>:
+        - define startPoint 1
+
+    - else if <[startPoint].is[MORE].than[<[highestStartPoint]>]>:
+        - define startPoint <[highestStartPoint]>
+
+    - repeat <[itemsPerPage]> from:<[startPoint]>:
+        - define outList:->:<[itemList].get[<[value]>]>
+
+    - determine <[outList]>
+
+Paginate_Task:
+    ## HOW TO USE:
+    # - run Paginate_Task ... save:paginate
+    # - ... <entry[paginate].created_queue.determination.get[1]>
+
+    type: task
+    definitions: itemArray|itemsPerPage|page
+    script:
+    - define outArray <list>
+    - define startPoint <[page].mul[<[itemsPerPage]>].sub[<[itemsPerPage]>].add[1]>
+
+    - if <[page]> == 1 || <[page].is[LESS].than[1]>:
+        - define startPoint 1
+
+    - repeat <[itemsPerPage]> from:<[startPoint]>:
+        - define outArray:->:<[itemArray].get[<[value]>]>
+
+    - determine <[outArray]>
+
+Page_Forward:
+    type: item
+    material: player_head
+    display name: "Next Page"
+    mechanisms:
+        skull_skin: 925b071a-7c83-43e7-9d83-8f231c8217d4|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjJmM2EyZGZjZTBjM2RhYjdlZTEwZGIzODVlNTIyOWYxYTM5NTM0YThiYTI2NDYxNzhlMzdjNGZhOTNiIn19fQ==
+
+Page_Back:
+    type: item
+    material: player_head
+    display name: "Previous Page"
+    mechanisms:
+        skull_skin: 2fad8146-186b-4c9c-8c62-7d5ccb083faa|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmIwZjZlOGFmNDZhYzZmYWY4ODkxNDE5MWFiNjZmMjYxZDY3MjZhNzk5OWM2MzdjZjJlNDE1OWZlMWZjNDc3In19fQ==
+
+Main_Menu:
+    type: item
+    material: player_head
+    display name: "Main Menu"
+    mechanisms:
+        skull_skin: 7e06b124-31bd-4163-b703-ac749b3d431d|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTJkN2E3NTFlYjA3MWUwOGRiYmM5NWJjNWQ5ZDY2ZTVmNTFkYzY3MTI2NDBhZDJkZmEwM2RlZmJiNjhhN2YzYSJ9fX0=
+
+OutpostNameEscaper:
+    type: procedure
+    definitions: outpostName
+    script:
+    - define escaped <[outpostName].replace[<&sp>].with[-]>
+
+    - determine <[escaped]>
+
+isBetween:
+    type: procedure
+    definitions: value|num1|num2|inclusive
+    script:
+    - define comparison <list[MORE|LESS]>
+
+    - if <[inclusive].if_null[true]>:
+        - define comparison <list[OR_MORE|OR_LESS]>
+
+    - if <[value].is[<[comparison].get[1]>].than[<[num1]>]> && <[value].is[<[comparison].get[2]>].than[<[num2]>]>:
+        - determine true
+
+    - determine false
+
+DataType:
+    type: procedure
+    definitions: object
+    script:
+    - if <[object].as[entity]> == <[object]>:
+        - if <[object].is_player>:
+            - determine player
+
+        - else:
+            - determine entity
+
+    # Either map or list
+    - if <[object].size.exists>:
+        - if <[object].insert[1].at[1].exists>:
+            - determine list
+
+        - else:
+            - determine map
+
+    # ElementTag of some kind
+    - else:
+        - if <[object].add[1].exists>:
+            - determine number
+
+        - else:
+            - determine string
+
+    - determine null

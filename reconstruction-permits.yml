@@ -1,0 +1,53 @@
+centran:
+  permits:
+    approved:
+    - '1639946474180'
+    - '1659562360137'
+    pending: []
+permits:
+  permit-1639946474180:
+    requestedplotsize: '50'
+    requestingkingdom: centran
+    requestdate: '2021-12-19'
+    estimatedpayout: '5850'
+    requeststatus: approved
+    requestingplayer:
+      name: ZyadTheBoss
+      uuid: 4b6b7b70-3c0e-4080-b48f-8ab12aa903d2
+    plotcuboid: None
+  permit-1659557600437:
+    requestingplayer:
+      name: EchosBattalion
+      uuid: 01add177-bd0a-4721-9651-77d78ceb8943
+    requestingkingdom: cambrian
+    estimatedpayout: '4260'
+    requestedplotsize: '60'
+    requeststatus: approved
+    requestdate: '2022-08-03'
+    plotcuboid: cu@KingdomsCurrent,-1794,70,272,-1777,97,296
+  permit-1659562360137:
+    requestingplayer:
+      name: Mxchapz
+      uuid: 10a684fc-8419-440e-b7e9-9ee4a0c5260f
+    requestingkingdom: centran
+    estimatedpayout: '0'
+    requestedplotsize: '0'
+    requeststatus: approved
+    requestdate: '2022-08-03'
+    plotcuboid: None
+  permit-1659648423487:
+    requestingplayer:
+      name: ZyadTheBoss
+      uuid: 4b6b7b70-3c0e-4080-b48f-8ab12aa903d2
+    requestingkingdom: cambrian
+    estimatedpayout: '6900'
+    requestedplotsize: '60'
+    requeststatus: approved
+    requestdate: '2022-08-04'
+    plotcuboid: cu@KingdomsCurrent,-1794,70,272,-1777,96,296
+cambrian:
+  permits:
+    pending: []
+    approved:
+    - '1659557600437'
+    - '1659648423487'

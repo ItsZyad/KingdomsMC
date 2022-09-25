@@ -1,0 +1,54 @@
+centran:
+  squad2:
+    squadsize: '3'
+    name: Second/sp/Squad
+    npclist:
+    - n@300
+    - n@301
+    - n@307
+  squad3:
+    squadsize: '3'
+    name: Third/sp/Squad
+    npclist:
+    - n@400
+    - n@401
+    - n@407
+  squad4:
+    squadsize: '3'
+    name: Fourth/sp/Squad
+    npclist:
+    - n@500
+    - n@501
+    - n@507
+  squad5:
+    squadsize: '3'
+    name: Fifth/sp/Squad
+    npclist:
+    - n@600
+    - n@601
+    - n@607
+  squad1:
+    squadsize: '4'
+    name: First/sp/Squad
+    npclist:
+    - n@200
+    - n@201
+    - n@207
+    - n@209
+  newsquad:
+    squadSize: '3'
+    squadLead: n@142
+    npclist:
+    - n@141
+    - n@142
+    - n@143
+viridian: ''
+raptoran:
+  test1:
+    squadSize: '3'
+    name: test1
+    npclist:
+    - n@864
+    - n@865
+    - n@866
+cambrian: ''

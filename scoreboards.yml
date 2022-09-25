@@ -1,0 +1,55 @@
+Scoreboards:
+  LEAVESPLACED:
+    Viewers: []
+    Objectives:
+      deaths:
+        Criteria: deathCount
+        Display slot: BELOW_NAME
+        Scores:
+          Spaggyboidotcom: 9
+          ultraroar101: 1
+          DEATH: 1
+          Syren_H: 10
+          OVERPOWERED: 1
+          ZyadTheBoss: 7
+          Annxxyy: 8
+          Mxchapz: 12
+          blincbee: 5
+          fuzzysloth: 1
+          Hysicist: 1
+          Enterthed: 3
+          Denokit: 3
+          lyx3: 8
+          EchosBattalion: 11
+          Shadow53911: 3
+      anything:
+        Criteria: deathCount
+        Display slot: NONE
+        Scores:
+          Spaggyboidotcom: 9
+          ultraroar101: 1
+          DEATH: 1
+          Syren_H: 10
+          OVERPOWERED: 1
+          ZyadTheBoss: 7
+          Annxxyy: 8
+          Mxchapz: 12
+          blincbee: 5
+          fuzzysloth: 1
+          Hysicist: 1
+          Enterthed: 3
+          Denokit: 3
+          lyx3: 8
+          EchosBattalion: 11
+          Shadow53911: 3
+  DEATHS:
+    Viewers: []
+    Objectives:
+      Deaths:
+        Criteria: deathCount
+        Display slot: BELOW_NAME
+        Scores:
+          Mxchapz: 10
+          Hysicist: 1
+          EchosBattalion: 3
+          ZyadTheBoss: 5

@@ -1,0 +1,197 @@
+Players:
+  4B:
+    4B6B7B703C0E4080B48F8AB12AA903D2:
+      Flags:
+        CLEAR: 'true'
+        ZOMBIE_KILL_QUEST_COOLDOWN: 'true'
+        DONEFIRSTTIME: 'true'
+        DOINGQUEST: 'true'
+        CALLOUTS: 'true'
+        FIGHTBACK: 'true'
+        KINGDOM: centran
+        ACTIVEWINDOW: SoldierCommands
+        CORECLAIMING: 'true'
+      Scripts:
+        SOLDIERCREATOR:
+          Cooldown Time: 1595329451031
+  '26':
+    261461CC4F454BCEAB36041BE74A98D5:
+      Flags:
+        DONEFIRSTTIME: 'true'
+        KILL_ZOMBIE_QUEST_COOLDOWN: 'true'
+        KILL_ZOMBIE_QUEST_COOLDOWN-expiration: 1597338943536
+  A3:
+    A3413CE178294101A9E224A1784C6B39:
+      Flags:
+        DONEFIRSTTIME: 'true'
+        DOINGQUEST: 'true'
+        KILL_ZOMBIE_QUEST_COOLDOWN: 'true'
+        KILL_ZOMBIE_QUEST_COOLDOWN-expiration: 1597344017386
+  AE:
+    AE7EB9AD603D472FA36FC602568AFBB2:
+      Flags: {}
+  '36':
+    36C32D2077AD45FE868AFE82D96DEC7E:
+      Flags: {}
+  E1:
+    E198B50693694C468A2E321AE2408024:
+      Flags:
+        DOINGQUEST: 'true'
+        SOLDIERCREATE: 'true'
+  '63':
+    6392AC4F63F3468CB0DB8B9CB983E68F:
+      Flags:
+        SOLDIERCREATE: 'true'
+  '05':
+    0589E712997A44E3A4B25D7473A24CE2:
+      Flags:
+        DOINGQUEST: 'true'
+        KILL_ZOMBIE_QUEST_COOLDOWN: 'true'
+        KILL_ZOMBIE_QUEST_COOLDOWN-expiration: 1596519755468
+  '01':
+    01ADD177BD0A4721965177D78CEB8943:
+      Flags:
+        DOINGQUEST: 'true'
+  '61':
+    61632C6ED8B04A2E8B38A036AC7EAA68:
+      Flags: {}
+  '10':
+    10A684FC8419440EB7E99EE4A0C5260F:
+      Flags:
+        DOINGQUEST: 'true'
+  '88':
+    8817E9F7860F4C05A4503BD170FDEF63:
+      Flags:
+        DOINGQUEST: 'true'
+Global:
+  Flags:
+    NPCID: '30'
+    SQUAD1: '[n@28|n@31]'
+    SELECTEDNPC: n@44
+    LATESTKINGDOMNPC: n@80
+NPCs:
+  '30':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+  '44':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+      CHASECLOSE: 'true'
+  '50':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+      CHASECLOSE: 'true'
+      TYPE: Conscript
+      KINGDOM: Centran
+      SQUAD: squad1
+  '9':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+      SQUAD: squad1
+  '51':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+      KINGDOM: Raptoran
+      TYPE: Militia
+      CHASECLOSE: 'true'
+  '17':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+  '55':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+      TYPE: Conscript
+      KINGDOM: Centran
+      CHASECLOSE: 'false'
+      SQUAD: squad1
+  '54':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+  '53':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+  '16':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+  '52':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+  '8':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+  '11':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+  '18':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+  '19':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'
+  '10':
+    Flags:
+      FIGHTBACK: 'true'
+      RUNAWAY: 'false'
+      AUTOSWITCH: 'true'
+      CHASCLOSE: 'false'
+      SAFESHOT: 'true'

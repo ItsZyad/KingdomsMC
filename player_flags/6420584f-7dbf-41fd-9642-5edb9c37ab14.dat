@@ -1,0 +1,9 @@
+factionInfo:context.item.flag[factionInfo]
+ChatMode:global
+foundAreas:li@polygon@internal_story_port_liberty|polygon@INTERNAL_STORY_Ports_District|polygon@internal_story_port_allegra|polygon@internal_story_fyndalin_old_town|cu@INTERNAL_STORY_The_Pit|
+InteractingWith:n@876
+currNPC:n@942
+\exAdminTools:map@[__value=map@[]]
+transferData:li@context.item.flag[transferType]|iron_sword|
+kingdom:el@cambrian
+DidIntro:1

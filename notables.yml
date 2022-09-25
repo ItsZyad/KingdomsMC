@@ -1,0 +1,25 @@
+Inventories:
+  '%gui%':
+    object: in@generic[contents=li@i@air|i@chest[display=§fQuest Trophies;inventory_contents=li@;lore=li@§5----------------&pipe&pipe§7See
+      all of your&pipe§7shiny Trophies&pipe]|i@bookshelf[display=§fCompleted;lore=li@§5----------------&pipe&pipe§7Check
+      stats for&pipe§7completed quests&pipe;quantity=2]|i@air|i@air|i@air|i@air|i@air|i@air|i@air|i@air|i@air|i@air|i@air|i@air|i@air|i@air|i@barrier[display=§fClose
+      QuestGUI]|;size=18;title=§1QuestGUI Menu]
+    flags: ''
+  testinv:
+    object: in@generic[contents=li@i@cookie|i@sand|i@splash_potion[potion_effects=li@map@[type=INSTANT_DAMAGE;upgraded=true;extended=false]&pipe]|i@white_banner[display=§6§[translate=block.minecraft.ominous_banner];hides=li@ITEM_DATA&pipe;patterns=li@CYAN/RHOMBUS_MIDDLE&pipeLIGHT_GRAY/STRIPE_BOTTOM&pipeGRAY/STRIPE_CENTER&pipeLIGHT_GRAY/BORDER&pipeBLACK/STRIPE_MIDDLE&pipeLIGHT_GRAY/HALF_HORIZONTAL&pipeLIGHT_GRAY/CIRCLE_MIDDLE&pipeBLACK/BORDER&pipe;quantity=3]|i@splash_potion[potion_effects=li@map@[type=POISON;upgraded=true;extended=false]&pipe]|i@gunpowder[quantity=12]|i@bone[quantity=11]|i@villager_spawn_egg|i@netherite_sword[enchantments=map@[sharpness=1]]|i@ice|i@rotten_flesh[quantity=27]|i@coal[quantity=9]|i@emerald[quantity=9]|i@carrot|i@cactus|i@iron_ingot[quantity=28]|i@player_head[display="something";lore=li@"NPCs:"&pipe]|i@string[quantity=4]|i@sand|i@air|i@air|i@air|i@stick[quantity=20]|i@air|i@air|i@map|i@arrow[quantity=64]|i@air|i@air|i@air|i@air|i@air|i@bread[quantity=6]|i@air|i@air|i@arrow[quantity=8]|;holder=player;title=Inventory]
+    flags: ''
+Cuboids:
+  mine_raptoran_218:
+    object: cu@KingdomsUTD,-1425,61,1151,-1405,81,1171
+    flags: ''
+  farm_centran_146:
+    object: cu@KingdomsUTD,-103,93,-249,-83,97,-230
+    flags: ''
+  mine_centran_163:
+    object: cu@KingdomsUTD,-77,76,-240,-75,86,-226
+    flags: ''
+  startlocation:
+    object: cu@KingdomsUTD,132,31,-126,162,53,-85
+    flags: ''
+Locations:
+  testloc: 6840.8316543112,66.0,-4935.948860341135,24.34082,102.168335,KingdomsUTD

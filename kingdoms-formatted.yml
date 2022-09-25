@@ -1,0 +1,73 @@
+version: "0.0.4 Pre-Alpha"
+
+centran:
+  castle_territory: 0
+  core_claims: 0
+  core_claim_amount: 0
+  castle_territory_amount: 1
+
+  core_max: 20
+  castle_max: 10
+
+  location: null
+  warp_location: null
+  balance: 0
+  upkeep: 0
+  troop_count: 0
+  outpost_count: 1
+  description: "Default Description"
+  war_status: false
+
+cambrian:
+  castle_territory: 0
+  core_claims: 0
+  core_claim_amount: 0
+  castle_territory_amount: 1
+
+  core_max: 20
+  castle_max: 10
+
+  location: null
+  warp_location: null
+  balance: 0
+  upkeep: 0
+  troop_count: 0
+  outpost_count: 1
+  description: "Default Description"
+  war_status: false
+
+raptoran:
+  castle_territory: 0
+  core_claims: 0
+  core_claim_amount: 0
+  castle_territory_amount: 1
+
+  core_max: 20
+  castle_max: 10
+
+  location: null
+  warp_location: null
+  balance: 0
+  upkeep: 0
+  troop_count: 0
+  outpost_count: 1
+  description: "Default Description"
+  war_status: false
+
+viridian:
+  castle_territory: 0
+  core_claims: 0
+  core_claim_amount: 0
+  castle_territory_amount: 1
+
+  core_max: 20
+  castle_max: 10
+
+  location: null
+  warp_location: null
+  balance: 0
+  upkeep: 0
+  troop_count: 0
+  outpost_count: 1
+  description: "Default Description"
+  war_status: false

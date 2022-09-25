@@ -1,0 +1,9 @@
+factionInfo:li@orama|2|
+ChatMode:global
+foundAreas:li@polygon@internal_story_port_liberty|polygon@internal_story_ports_district|cu@internal_story_the_pit|polygon@internal_story_fyndalin_old_town|polygon@internal_story_port_allegra|polygon@internal_story_fyndalin_castle|
+currNPC:n@218
+\exAdminTools:map@[__value=map@[]]
+TradeInitiate:el@player
+TradeInitiator:el@true
+kingdom:el@raptoran
+DidIntro:1

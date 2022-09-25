@@ -1,0 +1,23 @@
+Kingdoms - Whats Done [Overall]:
+______________________________________
+
+##Misc Functions##
+- Universal Torch Light
+- Sidebar
+
+##Territory##
+- Outpost:
+    claim
+    redefine
+    delete
+    showborder
+
+- Core claim
+- Castle claim
+
+Kingdoms Todo [In the Near Future]:
+______________________________________
+
+##Territory##
+- Restricted Creative
+- 

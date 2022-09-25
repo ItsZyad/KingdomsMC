@@ -1,0 +1,144 @@
+##################################################################
+# FILE:   CommandHandler.dsc
+# SCRIPT: Kingdom_Command
+# STATUS: Dormant // Might need later
+##################################################################
+
+    - if <context.raw_args> == soldier:
+        - if <player.has_flag[SoldierMode]>:
+            - flag player SoldierMode:!
+            - if <player.has_flag[Callouts]>:
+                - narrate format:callout "You have exited soldier configuration"
+        - else:
+            - flag player SoldierMode
+            - if <player.has_flag[Callouts]>:
+                - narrate format:callout "You are now in soldier configuration mode. Click on a spawned soldier for options."
+
+##################################################################
+# FILE: Farmer.dsc
+# SCRIPT: FarmerExperienceHandler
+# STATUS: Dormant // Might need later
+##################################################################
+
+                    - flag <[npc]> exp:+:<[expGain]>
+                    - flag <[npc]> Level:<[npc].flag[Level].round_down.add[<[npc].flag[exp].div[100]>]>
+
+                    - if <[npc].flag[Level].add[<[expGain]>].is[OR_MORE].than[100]>:
+                        - rename t:<[npc]> <[npc].nickname.substring[1,<[npc].nickname.length.sub[1]>]><[npc].flag[Level].round_down>
+
+                        - flag <[npc]> exp:<element[100].sub[<[npc].flag[exp]>]>
+
+                        - yaml load:kingdoms.yml id:kingdoms
+
+                        - flag <[npc]> outputMod:<yaml[kingdoms].read[<[npc].flag[kingdom]>.prestige].div[10].mul[<[npc].flag[Level].sub[1]>].div[1000]>
+
+                        - yaml id:kingdoms unload
+
+##################################################################
+# FILE: CastleGuard.dsc
+# SCRIPT: GuardTickEvent_Handler
+# STATUS: Dead
+##################################################################
+
+        #on custom event id:GuardChangedEngagement:
+        #- define engagementRule <context.engagement_rule>
+
+        #- choose engagementRule:
+        #    - case always
+
+        #on custom event id:GuardAcquiredTarget:
+        #- narrate format:debug targets:<server.online_ops> YOS
+
+        #on custom event id:GuardLostTarget:
+        #- narrate format:debug targets:<server.online_ops> NOS
+
+        #on tick every:10:
+        #- if <server.online_players.size> != 0:
+            #- define prevTick <server.flag[CastleGuardsPrevTick]>
+
+            #- foreach <server.flag[CastleGuards]> as:guard:
+                # - define engagementRule <[guard].flag[engagementRule]>
+                # - define seesTarget <[prevTick].deep_get[<[guard]>.seesTarget].if_null[false]>
+                # - define target <[prevTick].deep_get[<[guard]>.chasingTarget]>
+                # - define lastSeen <[prevTick].deep_get[<[guard]>.lastSeenLoc]>
+
+                # - narrate format:debug SEES:<[seesTarget]>
+                # - narrate format:debug GUAR:<[guard]>
+
+                # - if <[target].exists>:
+                #     - define LOS <[guard].location.line_of_sight[<[target].location>]>
+
+                #     - if !<[seesTarget]> && <[LOS]> && <[target].location.find_path[<[guard].location>].size.is[OR_LESS].than[<[guard].sentinel.chase_range>]>:
+                #         - customevent id:GuardAcquiredTarget
+                #         - flag server CastleGuardsPrevTick.<[guard]>.seesTarget:true expire:10s
+
+                #     - else if <[seesTarget]> && !<[LOS]> || <[target].location.find_path[<[guard].location>].size.is[MORE].than[<[guard].sentinel.chase_range>]>:
+                #         - customevent id:GuardLostTarget
+                #         - flag server CastleGuardsPrevTick.<[guard]>.seesTarget:false expire:10s
+
+                # - if <[seesTarget]> && <[target].gamemode> == survival:
+                #     - narrate format:debug <[guard]> targets:<server.online_ops>
+
+                #     - if !<[guard].location.line_of_sight[<[target]>]>:
+                #         - if <[guard].location.find_path[<[lastSeen]>].size.is[OR_MORE].than[100]>:
+                #             - flag server CastleGuardsPrevTick.<[guard]>.seesTarget:false
+                #             - flag server CastleGuardsPrevTick.<[guard]>.chasingTarget:null
+                #             - flag server CastleGuardsPrevTick.<[guard]>.lastSeenLoc:null
+                #             - narrate format:debug check1 targets:<server.online_ops>
+
+                #         - else:
+                #             - ~run GuardStaggeredPathfind def.npc:<[guard]> def.endLocation:<[prevTick].get[lastSeenLoc]> def.recursionDepth:0
+                #             - narrate format:debug check2 targets:<server.online_ops>
+
+                #     - else:
+                #         - flag server CastleGuardsPrevTick.lastSeenLoc:<[prevTick].get[chasingTarget].location>
+                #         - narrate format:debug check3 targets:<server.online_ops>
+
+                # - else:
+                #     - define nearPlayers <[guard].location.find_players_within[50]>
+                #     - define acquiredTarget <[nearPlayers].get[1]>
+
+                #     - if <[nearPlayers].size> != 0:
+                #         - ~run GuardStaggeredPathfind def.npc:<[guard]> def.endLocation:<[acquiredTarget].get[lastSeenLoc]> def.recursionDepth:0
+
+                #- choose <[engagementRule]>:
+                    # - case always:
+
+
+                    # - case kingdom:
+
+
+                    # - case report:
+
+
+                    # - case none:
+
+##################################################################
+# FILE: TerritoryManager.dsc
+# SCRIPT: Claim_Command
+# STATUS: Dead
+##################################################################
+
+    - if <yaml[kingdoms].read[<[kingdom]>.core_claims].size.if_null[0]> != 0:
+        - foreach <yaml[kingdoms].read[<[kingdom]>.core_claims]>:
+            - define chunkX <[value].x>
+            - define chunkZ <[value].z>
+            - define chunkDiff <player.location.chunk.sub[<[chunkX]>,<[chunkZ]>]>
+
+            - if <[chunkDiff].x.add[<[chunkDiff].z>].abs> == 1:
+                - define chunkConnectedCore true
+
+    - else:
+        - define chunkConnectedCore true
+
+    - if <yaml[kingdoms].read[<[kingdom]>.castle_territory].size.if_null[0]> != 0:
+        - foreach <yaml[kingdoms].read[<[kingdom]>.castle_territory]>:
+            - define chunkX <[value].x>
+            - define chunkZ <[value].z>
+            - define chunkDiff <player.location.chunk.sub[<[chunkX]>,<[chunkZ]>]>
+
+            - if <[chunkDiff].x.add[<[chunkDiff].z>].abs> == 1:
+                - define chunkConnectedCastle true
+
+    - else:
+        - define chunkConnectedCastle true

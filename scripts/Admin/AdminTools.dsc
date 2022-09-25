@@ -1,0 +1,395 @@
+##
+## * Conatins the umbrella command for all things related to
+## * the kingdoms admin command
+##
+## @Author: Zyad (ITSZYAD#9280)
+## @Date: Aug 2020
+## @Updated: Jul 2022 - In Progress
+## @Script Ver: v1.0
+##
+##ignorewarning invalid_data_line_quotes
+## ----------------END HEADER-----------------
+
+AdminTools_Command:
+    type: command
+    usage: /kadmin
+    name: kadmin
+    description: Umbrella command for all things kingdoms admin.
+    permission: kingdoms.admin
+    tab completions:
+        1: id|influence|loans|purgeflag|seeflag|buildplayerlists
+
+    tab complete:
+    - define mostFlags <list[]>
+
+    - choose <context.args.get[1]>:
+        - case purgeflag:
+            - if <context.args.size> >= 2:
+                - define target <context.args.get[2]>
+
+                - if <[target]> == *:
+                    - foreach <server.players> as:player:
+                        - define flagList <[player].list_flags>
+
+                        - if <[flagList].size.is[MORE].than[<[mostFlags].size>]>:
+                            - define mostFlags <[flagList]>
+
+                    - determine <[mostFlags].include[*]>
+
+                - else:
+                    - if <context.args.get[3].ends_with[,]>:
+                        - define concatFlags <list[]>
+
+                        - foreach <[target].as[player].list_flags.exclude[<context.args.get[3].replace_text[,].with[|].as[list]>]>:
+                            - define concatFlags:->:<list[<context.args.get[3]>|<[value]>].unseparated>
+
+                        - determine <[concatFlags]>
+
+                    - else:
+                        - determine <context.args.get[2].as[player].list_flags.include[*]>
+
+            - determine <server.players.parse_tag[<[parse_value].name>].include[*]>
+
+        - case seeflag:
+            - if <context.args.size> == 1:
+                - determine "<list[server|player|[flaggable object]]>"
+
+            - else if <context.args.size> >= 2:
+                - define object <context.args.get[2]>
+
+                - if <[object].starts_with[<&lt>]>:
+                    - define object <[object].replace_text[<&lt>].replace_text[<&gt>]>
+
+                - define flagList <element[<&lt><[object]><&gt>].parsed.list_flags>
+                - define flagList <server.list_flags> if:<[object].equals[server]>
+                - determine <[flagList].if_null[<list[]>]>
+
+    script:
+    - define args <context.raw_args.split_args.get[1]>
+
+    # ---------------------- START SHORT SUBCOMMANDS ----------------------#
+
+    - choose <[args]>:
+        - case id:
+            - if <player.has_flag[AdminTools.id]>:
+                - flag player AdminTools.id:!
+                - narrate format:admincallout "Exited ID Checker"
+
+            - else:
+                - flag player AdminTools.id
+                - narrate format:admincallout "Entered ID Checker"
+
+        - case influence:
+            - yaml load:powerstruggle.yml id:ps
+            - flag server powerstruggleFile:<util.parse_yaml[<yaml[ps].to_text>]>
+
+            - yaml unload id:ps
+
+            - inventory open d:AdminOverallInfluence
+
+        - case loans:
+            - inventory open d:LoanAdmin_Window
+
+        # - case swapworld:
+        #     - define loc <player.location>
+
+        #     - if <player.location.world.name> == KingdomsCurrent:
+        #         - teleport <player> <location[<[loc].x>,<[loc].y>,<[loc].z>,<[loc].pitch>,<[loc].yaw>,Kingdoms]>
+
+        #     - else if <player.location.world.name> == Kingdoms:
+        #         - teleport <player> <location[<[loc].x>,<[loc].y>,<[loc].z>,<[loc].pitch>,<[loc].yaw>,KingdomsCurrent]>
+
+        - case buildplayerlists:
+            - foreach <server.players>:
+                - if <[value].has_flag[kingdom]>:
+                    - define kingdom <[value].flag[kingdom]>
+
+                    - flag server <[kingdom]>.members:->:<[value]>
+                    - narrate format:admincallout "Added player: <[value].name> to kingdom flag: <[kingdom]>"
+
+                - else:
+                    - narrate format:admincallout "No kingdom found for: <[value].name>"
+
+    # ---------------------- START INJECTED SUBCOMMANDS ----------------------#
+
+        - case purgeflag:
+            - define purgeTarget <[args].get[2]>
+            - define flagTargets <[args].get[3].split[,]>
+
+            - clickable save:confirm_purge until:30s usages:1:
+                - narrate format:admincallout "Starting flag purge..."
+                - run PurgeFlags_Subcommand def.player:<[purgeTarget]> def.flag:<[flagTargets]>
+
+            - clickable save:cancel_purge until:30s usages:1:
+                - narrate format:admincallout "Action cancelled!"
+                - determine cancelled
+
+            - narrate format:admincallout "Please confirm that you wish to clear the following flags:"
+            - narrate <[flagTargets].comma_separated>
+            - narrate format:admincallout "From the following players:"
+            - narrate <[purgeTarget].comma_separated>
+
+        - case seeflag:
+            - if <player.is_op> || <player.has_permission[kingdoms.developer]>:
+                - define args <context.raw_args.split_args>
+                - define objectParam <[args].get[2]>
+
+                - definemap objectRef:
+                    player: <player>
+                    world: <player.location.world>
+
+                - define object <[objectRef].get[<[objectParam]>].if_null[<[args].get[2].parsed>]>
+                - define flagName <[args].get[3]>
+                - define flag <[object].flag[<[flagName]>]>
+
+                # Can't put server: <server> in objectRef since the server
+                # is a pseudo-tag that cannot be used on its own :/
+                - if <[objectParam]> == server:
+                    - define flag <server.flag[<[flagName]>]>
+
+                - if <[flag].exists>:
+                    - narrate "<element[                                                     ].strikethrough>"
+                    - inject FlagVisualizer
+
+                    - if <script.queues.get[1].determination.get[1].exists>:
+                        - narrate "<element[<[flagName]>: ].color[green].italicize><script.queues.get[1].determination.get[1]>"
+
+                    - narrate "<element[                                                     ].strikethrough>"
+
+                - else:
+                    - narrate format:admincallout "Object: <[object]> does not have flag with name: <[flagName]>"
+
+            - else:
+                - narrate format:admincallout "This subcommand can only be used by server developers!"
+
+KingdomSwitcher_Command:
+    type: command
+    usage: /kswitch
+    name: kswitch
+    description: Allows admins to switch their kingdom tag for debug purposes
+    permission: kingdoms.admin.kingdomswitch
+    tab completions:
+        1: centran|viridian|raptoran|cambrian
+    script:
+    - yaml load:kingdoms.yml id:kingdoms
+    - define kingdomList <proc[GetKingdomList].context[true]>
+    - yaml id:kingdoms unload
+
+    - if <[kingdomList].contains[<context.args.get[1]>]>:
+        - if <context.args.length> == 2:
+            - flag <context.args.get[2]> kingdom:<context.args.get[1]>
+            - narrate format:admincallout "<context.args.get[2]> are now flagged as: <player.flag[kingdom]>"
+        - else:
+            - flag player kingdom:<context.args.get[1]>
+            - narrate format:admincallout "you are now flagged as: <player.flag[kingdom]>"
+
+        - run SidebarLoader def:<player>
+
+    - else:
+        - narrate format:admincallout "That is not a valid kingdom"
+
+idCheck_Handler:
+    type: world
+    events:
+        on player right clicks npc:
+        - if <player.has_flag[AdminTools.id]>:
+            - ratelimit <player> 1t
+            - narrate format:admincallout "NPC Has ID: <npc.id>"
+
+        on player quits:
+        - flag <player> AdminTools.id:!
+
+AdminOverallInfluence:
+    type: inventory
+    inventory: chest
+    title: "Overall Influence"
+    gui: true
+    slots:
+    - [] [] [] [] [] [] [] [] []
+    - [] [AdminInfluence_K1] [] [AdminInfluence_K2] [] [AdminInfluence_K3] [] [AdminInfluence_K4] []
+    - [] [] [] [] [] [] [] [] []
+
+AdminInfluence_K1:
+    type: item
+    material: green_banner
+    display name: "Imperium Viriditas:: Overall"
+    lore:
+    - <proc[InfluenceGetter_Admin].context[viridian]>
+
+AdminInfluence_K2:
+    type: item
+    material: red_banner
+    display name: "Dynastus Raptores:: Overall"
+    lore:
+    - <proc[InfluenceGetter_Admin].context[raptoran]>
+
+AdminInfluence_K3:
+    type: item
+    material: blue_banner
+    display name: "Centra Australis:: Overall"
+    lore:
+    - <proc[InfluenceGetter_Admin].context[centran]>
+
+AdminInfluence_K4:
+    type: item
+    material: orange_banner
+    display name: "Cambrian Empire:: Overall"
+    lore:
+    - <proc[InfluenceGetter_Admin].context[cambrian]>
+
+# arrowRain:
+#     type: world
+#     debug: false
+#     events:
+#         on player clicks block:
+#         - if <context.item> == <item[spectral_arrow]>:
+#             - if <player.has_permission[kingdoms.admin]>:
+#                 - define arrowList <list[]>
+#                 - define variance <util.random.int[100].to[250]>
+
+#                 - repeat <[variance]>:
+#                     - shoot arrow speed:2 shooter:<player> no_rotate origin:<player.location.simple.up[30]> destination:<player.cursor_on.random_offset[5]> spread:3 script:ArrowRainScript save:arrow
+#                     - define arrowList:->:<entry[arrow].shot_entity>
+
+#                 - playsound <player> sound:ENTITY_ARROW_SHOOT
+#                 - wait 10s
+
+#                 - foreach <[arrowList]>:
+#                     - remove <[value]>
+
+#         - if <context.item.material.name> == tipped_arrow:
+#              - if <player.has_permission[kingdoms.admin]>:
+#                 - define circle <player.location.up[1].forward_flat[1].points_around_y[radius=3;points=30]>
+#                 - define smallerCircle <player.location.up[1].forward_flat[1].points_around_y[radius=2;points=15]>
+#                 - define startCursor <player.cursor_on>
+
+#                 - foreach <[circle].include[<[smallerCircle]>]>:
+#                     - if <[loop_index].mod[2]> == 0:
+#                         - playsound <player> sound:ENTITY_ARROW_SHOOT pitch:2
+
+#                     - shoot arrow speed:2 shooter:<player> no_rotate origin:<[value]> destination:<[startCursor]>
+#                     - wait 1t
+
+# EntityList:
+#     type: data
+#     targets:
+#     - pig
+#     - sheep
+#     - cow
+#     - zombie
+
+# ArrowRainScript:
+#     type: task
+#     script:
+#     - define closestEntities <[location].find_entities[<script[EntityList].data_key[targets]>].within[20]>
+#     - define randomEntity <util.random.int[1].to[<[closestEntities].size>]>
+
+#     ################################################################
+#     ## I CAN MAKE THE SECOND INSTANCE ARROWS FUCKING HEATSEAKING!!!!
+#     ################################################################
+
+#     - if <[closestEntities].size> != 0:
+#         - shoot arrow speed:2 origin:<[location]> destination:<[closestEntities].get[<[randomEntity]>].location.up[1]> shooter:<player> save:arrow
+
+#     - else:
+#         - shoot arrow speed:2 origin:<[location]> destination:<[location].up[30]> shooter:<player> save:arrow
+
+#     - wait 10s
+#     - remove <entry[arrow].shot_entity>
+
+# TPArrow:
+#     type: world
+#     events:
+#         on player clicks block:
+#         - if <context.item> == <item[arrow]>:
+#             - ratelimit <player> 1s
+
+#             - if <player.has_permission[kingdoms.admin]>:
+#                 - define prevLoc <player.location>
+
+#                 - repeat 200:
+#                     - shoot arrow speed:2 shooter:<player> no_rotate origin:<player.location.up[1].random_offset[3]> destination:<player.cursor_on.random_offset[5]> script:TPArrowScript save:arrow def:<[prevLoc]>
+
+#                 - wait 10s
+#                 - remove <entry[arrow].shot_entity>
+
+# TPArrowScript:
+#     type: task
+#     definitions: loc
+#     script:
+#     - foreach <[shot_entities]>:
+#         - adjust <[value]> damage:0
+#         - narrate format:debug <[value].damage>
+
+#     - teleport <[hit_entities]> <[loc]>
+
+yamlHasAll:
+    type: procedure
+    definitions: file|values
+    script:
+    - yaml load:<definition[file]> id:data
+
+    - foreach <definition[values]>:
+        - if !<yaml[data].contains[<[value]>]>:
+            - determine false
+
+    - determine true
+
+NPCYeet_Item:
+    type: item
+    material: blaze_rod
+    display name: "NPC YEETER"
+
+NPCYeet_Handler:
+    type: world
+    events:
+        on player right clicks entity with:NPCYeet_Item:
+        - if <context.entity.entity_type> == PLAYER:
+            - if <context.entity.name.starts_with[Miner]> || <context.entity.name.starts_with[Farmer]>:
+                - narrate "Removed entity: <context.entity.id>"
+                - remove <context.entity>
+
+SuperWheat_Item:
+    type: item
+    material: wheat
+    display name: "<bold><light_purple>Super Wheat Tool"
+    mechanisms:
+        enchantments:
+        - fortune:1
+
+SuperWheat_Handler:
+    type: world
+    debug: false
+    events:
+        on player clicks block with:SuperWheat_Item:
+        - ratelimit <player> 1t
+        - define acceptableBlocks <list[grass_block|dirt|corse_dirt|podzol|farmland]>
+
+        - if <[acceptableBlocks].contains_text[<player.cursor_on[10].block.material.name>]>:
+            - modifyblock <player.cursor_on[10]> farmland
+            - modifyblock <player.cursor_on[10].up[1]> wheat
+            - adjustblock <player.cursor_on[10]> age:7
+
+NetherKey_Item:
+    type: item
+    material: carrot_on_a_stick
+    display name: "<light_purple><bold>Nether Key"
+    lore:
+        - "A mysterious key, that"
+        - "shimmers in the sunlight"
+    mechanisms:
+        custom_model_data: 123456
+
+KillForbiddenFunction:
+    type: world
+    debug: false
+    events:
+        on command:
+        - define forbiddenCommands <list[kill|killall|nuke]>
+
+        - if <[forbiddenCommands].contains[<context.command>]>:
+            - determine cancelled
+
+admincallout:
+    type: format
+    format: "<light_purple>Kingdoms <light_purple>Admin:: <[text]>"

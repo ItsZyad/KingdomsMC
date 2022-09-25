@@ -1,0 +1,292 @@
+factiondata:
+  totalist:
+    name: The Totalist Faction
+    color: <white>
+  orama:
+    name: The Orama Crime Family
+    color: <red>
+  syndicates:
+    name: The Combined Syndicates
+    color: <light_purple>
+  opinions:
+    centran:
+      totalist: '0.89'
+      orama: '0.89'
+      syndicates: '0.75'
+      blackstone: '0.9493413415040342'
+    viridian:
+      totalist: '1'
+      orama: '1'
+      syndicates: '0.899535336238697'
+      blackstone: '1'
+    raptoran:
+      totalist: '0.9'
+      orama: '0.947207390571472'
+      syndicates: '0.69'
+      blackstone: '0.85'
+    cambrian:
+      totalist: '0.881208300760006'
+      orama: '0.8886977710905792'
+      syndicates: '0.9132136097883041'
+      blackstone: '0.9678983112532384'
+      player:
+        flag: '0.009107803478916512'
+  blackstone:
+    name: The Blackstone Faction
+    color: <gray>
+spawnlocation:
+  alchemist:
+  - l@-1808.5,65.5,541.5,KingdomsCurrent
+  - l@-1801.5,65.5,541.5,KingdomsCurrent
+  - l@-1797.5,65.5,541.5,KingdomsCurrent
+  - l@-1813.5,65.5,541.5,KingdomsCurrent
+  pyromaniac:
+  - l@-1809.5,65.5,537.5,KingdomsCurrent
+  - l@-1801.5,65.5,537.5,KingdomsCurrent
+  - l@-1796.5,65.5,537.5,KingdomsCurrent
+  - l@-1813.5,65.5,537.5,KingdomsCurrent
+  librarian:
+  - l@-1809.5,65.5,533.5,KingdomsCurrent
+  - l@-1801.5,65.5,533.5,KingdomsCurrent
+  - l@-1797.5,65.5,533.5,KingdomsCurrent
+  - l@-1813.5,65.5,533.5,KingdomsCurrent
+  hunter: ''
+  fisherman: ''
+  factions:
+    totalist:
+    - l@-1813.4779200858263,65,533.4542430135184,-1.66139412,90.67840576,KingdomsCurrent
+    - l@-1813.3945796537432,65,537.3088363236221,1.73273063,88.67474365,KingdomsCurrent
+    - l@-1813.6617266889461,65,541.3671674690157,1.51505899,89.58477783,KingdomsCurrent
+    - l@-1813.4507239143293,65,545.5918390408962,2.21130657,90.45349121,KingdomsCurrent
+    orama:
+    - l@-1809.4080650318388,65,545.5301992467229,0.73052692,270.23886108,KingdomsCurrent
+    - l@-1808.7108815206307,65,541.4047912926973,1.60137177,270.92871094,KingdomsCurrent
+    - l@-1809.2625222729487,65,537.4681634670702,2.42750764,271.05267334,KingdomsCurrent
+    - l@-1809.7380289914588,65,533.4894788481254,0.38263187,270.5536499,KingdomsCurrent
+    syndicates:
+    - l@-1797.4613414965497,65,545.4647742084358,11.30553722,269.09283447,KingdomsCurrent
+    - l@-1797.450412068743,65,541.576260909874,-1.3130281,270.74780273,KingdomsCurrent
+    - l@-1796.5830929565411,65,537.473486514155,1.73285532,270.05029297,KingdomsCurrent
+    - l@-1797.2080475482644,65,533.3227242718166,1.60215092,270.09362793,KingdomsCurrent
+    blackstone:
+    - l@-1801.3811206275784,65,545.3647130579435,2.29713297,89.97277832,KingdomsCurrent
+    - l@-1801.8871528986624,65,541.3969842860649,3.4298501,89.17749023,KingdomsCurrent
+    - l@-1801.5509746373905,65,537.3286977659351,6.34525156,87.26391602,KingdomsCurrent
+    - l@-1801.1576980723848,65,533.4400713698742,3.16893721,89.56732178,KingdomsCurrent
+  collector:
+  - l@-1809.5,65.5,545.5,KingdomsCurrent
+  - l@-1801.5,65.5,545.5,KingdomsCurrent
+  - l@-1797.5,65.5,545.5,KingdomsCurrent
+  - l@-1813.5,65.5,545.5,KingdomsCurrent
+merchant_items:
+  alchemist:
+    items:
+      milk_bucket[display=Todd]: '0.01'
+      potion[potion_effects=li@el@INSTANT_DAMAGE,false,false|]: '0.09'
+      potion[potion_effects=li@el@FIRE_RESISTANCE,false,false|]: '0.02'
+      potion[potion_effects=li@el@REGENERATION,false,false|]: '0.04'
+      golden_carrot: '0.21'
+      potion[potion_effects=li@el@SLOW_FALLING,false,false|]: '0.05'
+      experience_bottle: '0.24'
+      cauldron: '0.4'
+      blaze_powder: '0.18'
+      potion[potion_effects=li@el@WATER_BREATHING,false,false|]: '0.07'
+      potion[potion_effects=li@el@SPEED,false,false|]: '0.05'
+      ghast_tear: '0.05'
+      magma_cream: '0.24'
+      potion[potion_effects=li@el@STRENGTH,false,true|]: '0.03'
+      glistering_melon_slice: '0.25'
+      potion[potion_effects=li@el@INSTANT_HEAL,false,false|]: '0.13'
+      brewing_stand[inventory_contents=li@]: '0.36'
+      potion[potion_effects=li@el@SLOWNESS,false,true|]: '0.1'
+      rabbit_foot: '0.13'
+      fermented_spider_eye: '0.5'
+      potion: '1200'
+  pyromaniac:
+    items:
+      firework_star: '0.5'
+      tripwire_hook: '0.95'
+      tnt_minecart: '0.37'
+      tnt: '0.45'
+      milk_bucket[display=Steve]: '0.01'
+      redstone_torch: '0.9'
+      fire_charge: '0.76'
+      flint_and_steel: '0.82'
+      lava_bucket: '0.87'
+      detector_rail: '0.45'
+      activator_rail: '0.47'
+      lightning_rod: '0.35'
+  librarian:
+    items:
+      book: '0.35'
+      enchanted_book[enchantments=map@protection/el@1|]: '0.03'
+      enchanted_book[enchantments=map@impaling/el@1|]: '0.09'
+      paper: '0.65'
+      feather[display=Quil]: '0.95'
+      enchanted_book[enchantments=map@power/el@1|]: '0.02'
+      enchanted_book[enchantments=map@efficiency/el@1|]: '0.02'
+      enchanted_book[enchantments=map@infinity/el@1|]: '0.01'
+      enchanted_book[enchantments=map@bane_of_arthropods/el@1|]: '0.16'
+      enchanted_book[enchantments=map@bane_of_arthropods/el@2|]: '0.12'
+      enchanted_book[enchantments=map@bane_of_arthropods/el@3|]: '0.09'
+      enchanted_book[enchantments=map@feather_falling/el@1|]: '0.05'
+      enchanted_book[enchantments=map@bane_of_arthropods/el@4|]: '0.05'
+      bookshelf: '1'
+      enchanted_book[enchantments=map@piercing/el@1|]: '0.04'
+      flint: '0.85'
+      lapis_lazuli: '45'
+      enchanted_book[enchantments=map@aqua_affinity/el@1|]: '0.06'
+      enchanting_table: '0.5'
+      writable_book[book=map@]: '0.3'
+      ink_sac: '0.9'
+      leather: '0.75'
+      enchanted_book[enchantments=map@sharpness/el@1|]: '0.06'
+      enchanted_book[enchantments=map@sharpness/el@2|]: '0.05'
+      enchanted_book[enchantments=map@sharpness/el@3|]: '0.04'
+      enchanted_book[enchantments=map@sharpness/el@4|]: '0.03'
+  hunter:
+    items:
+      creeper_head: '0.09'
+      wither_skeleton_skull: '0.02'
+      slime_ball: '0.25'
+      zombie_head: '0.1'
+      name_tag: '0.1'
+      egg: '0.8'
+      armor_stand: '0.23'
+      player_head: '0.19'
+      feather: '0.7'
+      rabbit_hide: '0.45'
+      lead: '0.3'
+      leather: '0.9'
+      skeleton_skull: '0.1'
+      bone: '0.95'
+      glow_berries: '0.23'
+  fisherman:
+    items:
+      dried_kelp_block: '0.87'
+      cooked_salmon: '0.95'
+      fishing_rod[enchantments=map@luck_of_the_sea/el@1]: '0.27'
+      fishing_rod[enchantments=map@luck_of_the_sea/el@2]: '0.21'
+      conduit: '0.01'
+      fishing_rod[enchantments=map@luck_of_the_sea/el@3]: '0.13'
+      prismarine_block: '0.23'
+      tropical_fish: '0.87'
+      sponge: '0.55'
+      prismarine_shard: '0.46'
+      pufferfish: '0.69'
+      cooked_cod: '0.95'
+      sea_lantern: '0.2'
+      nautillus_shell: '0.04'
+  collector:
+    items:
+      deepslate: '0.95'
+      cobbled_deepslate: '0.95'
+      amethyst_shard: '0.57'
+      quartz: '0.6'
+      waxed_oxidized_cut_copper_slab: '0.62'
+      waxed_oxidized_cut_copper_stairs: '0.62'
+      waxed_oxidized_copper: '0.62'
+      waxed_oxidized_cut_copper: '0.62'
+      amethyst_block: '0.5'
+      budding_amethyst: '0.24'
+      quartz_block: '0.65'
+      glowstone_dust: '0.85'
+prices:
+  book: '100'
+  creeper_head: '1350'
+  enchanted_book[enchantments=map@protection/el@1|]: '9500'
+  cooked_salmon: '12'
+  tnt: '145'
+  zombie_head: '1000'
+  armor_stand: '4000'
+  paper: '12'
+  enchanted_book[enchantments=map@power/el@1|]: '7000'
+  fishing_rod[enchantments=map@luck_of_the_sea/el@2]: '4500'
+  cauldron: '250'
+  potion[potion_effects=li@el@WATER_BREATHING,false,false|]: '2000'
+  ghast_tear: '150'
+  sponge: '2000'
+  glistering_melon_slice: '175'
+  enchanted_book[enchantments=map@infinity/el@1|]: '12000'
+  rabbit_foot: '220'
+  enchanted_book[enchantments=map@bane_of_arthropods/el@1|]: '5000'
+  enchanted_book[enchantments=map@bane_of_arthropods/el@3|]: '11000'
+  bookshelf: '0.54'
+  tnt_minecart: '90'
+  enchanted_book[enchantments=map@piercing/el@1|]: '8500'
+  flint: '10'
+  lapis_lazuli: '0.45'
+  name_tag: '60'
+  redstone_torch: '10'
+  potion[potion_effects=li@el@SLOW_FALLING,false,false|]: '3000'
+  conduit: '10000'
+  fishing_rod[enchantments=map@luck_of_the_sea/el@3]: '7000'
+  experience_bottle: '850'
+  blaze_powder: '350'
+  potion[potion_effects=li@el@SPEED,false,false|]: '3100'
+  tropical_fish: '30'
+  feather: '13'
+  writable_book[book=map@]: '90'
+  prismarine_shard: '350'
+  pufferfish: '70'
+  ink_sac: '20'
+  lead: '55'
+  leather: '30'
+  enchanted_book[enchantments=map@sharpness/el@1|]: '10000'
+  enchanted_book[enchantments=map@sharpness/el@3|]: '16000'
+  nautillus_shell: '6000'
+  brewing_stand[inventory_contents=li@]: '750'
+  dried_kelp_block: '60'
+  milk_bucket[display=Todd]: '1000000'
+  potion[potion_effects=li@el@INSTANT_DAMAGE,false,false|]: '1200'
+  slime_ball: '80'
+  enchanted_book[enchantments=map@impaling/el@1|]: '4500'
+  egg: '5'
+  feather[display=Quil]: '15'
+  lava_bucket: '225'
+  tripwire_hook: '15'
+  enchanted_book[enchantments=map@efficiency/el@1|]: '9000'
+  magma_cream: '400'
+  cooked_cod: '12'
+  bone: '9'
+  firework_star: '70'
+  enchanted_book[enchantments=map@bane_of_arthropods/el@2|]: '7000'
+  enchanted_book[enchantments=map@feather_falling/el@1|]: '11000'
+  enchanted_book[enchantments=map@bane_of_arthropods/el@4|]: '15500'
+  wither_skeleton_skull: '16000'
+  fishing_rod[enchantments=map@luck_of_the_sea/el@1]: '3000'
+  potion[potion_effects=li@el@FIRE_RESISTANCE,false,false|]: '4700'
+  potion[potion_effects=li@el@REGENERATION,false,false|]: '3500'
+  enchanted_book[enchantments=map@aqua_affinity/el@1|]: '13000'
+  golden_carrot: '250'
+  flint_and_steel: '105'
+  prismarine_block: '1250'
+  player_head: '1650'
+  enchanting_table: '1900'
+  rabbit_hide: '15'
+  skeleton_skull: '1500'
+  potion[potion_effects=li@el@STRENGTH,false,true|]: '4500'
+  milk_bucket[display=Steve]: '500000'
+  enchanted_book[enchantments=map@sharpness/el@2|]: '12500'
+  sea_lantern: '5500'
+  fire_charge: '135'
+  enchanted_book[enchantments=map@sharpness/el@4|]: '18000'
+  potion[potion_effects=li@el@INSTANT_HEAL,false,false|]: '1100'
+  potion[potion_effects=li@el@SLOWNESS,false,true|]: '900'
+  fermented_spider_eye: '300'
+  deepslate: '5'
+  cobbled_deepslate: '5'
+  amethyst_shard: '100'
+  quartz: '175'
+  waxed_oxidized_cut_copper_slab: '28'
+  waxed_oxidized_cut_copper_stairs: '60'
+  waxed_oxidized_copper: '45'
+  waxed_oxidized_cut_copper: '55'
+  detector_rail: '35'
+  activator_rail: '40'
+  lightning_rod: '125'
+  glow_berries: '45'
+  amethyst_block: '415'
+  budding_amethyst: '475'
+  quartz_block: '710'
+  glowstone_dust: '30'

@@ -1,0 +1,13 @@
+factionInfo:context.item.flag[factionInfo]
+influenceType:li@weapons|mercenary|
+ChatMode:global
+InteractingWith:n@870
+currNPC:n@969
+\exAdminTools:map@[__value=map@[]]
+lastLocMainWorld:l@-52.448622446137605,66.86859856141189,194.17328555975624,13.1319046,282.87994385,KingdomsUTD
+BuildItemList:li@i@oak_planks|i@spruce_planks|i@birch_planks|i@jungle_planks|i@acacia_planks|i@dark_oak_planks|i@dark_oak_planks|i@oak_log|i@spruce_log|i@birch_log|i@jungle_log|i@acacia_log|i@dark_oak_log|i@dark_oak_log|i@stripped_oak_log|i@stripped_spruce_log|i@stripped_birch_log|i@stripped_jungle_log|i@stripped_acacia_log|i@stripped_dark_oak_log|i@stripped_dark_oak_log|i@oak_slab|i@spruce_slab|i@birch_slab|i@jungle_slab|i@acacia_slab|i@dark_oak_slab|i@dark_oak_slab|i@petrified_oak_slab|i@oak_stairs|i@spruce_stairs|i@birch_stairs|i@jungle_stairs|i@acacia_stairs|i@dark_oak_stairs|i@dark_oak_stairs|
+kingdom:el@raptoran
+lastLocBuildWorld:l@-1768.6302479219887,91,465.72298642968826,39.99415207,357.00372314,Kingdoms
+DidIntro:true
+foundAreas:li@el@cu@internal_story_test_area|polygon@internal_story_port_liberty|polygon@internal_story_ports_district|polygon@internal_story_fyndalin_old_town|polygon@internal_story_fyndalin_castle|cu@internal_story_the_pit|
+OpenedSpawnWindow:true
