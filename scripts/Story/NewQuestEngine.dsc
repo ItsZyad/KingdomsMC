@@ -323,12 +323,13 @@ DataHandler_CISK:
             - define targetID <[targetName].split[<&at>].get[2]>
             - define lookupList <list>
 
-            - case player:
-                - define lookupList <server.players.parse_tag[<[parse_value].name>]>
-                - define dataTarget <player[<[targetID]>]>
-            - case npc:
-                - define lookupList <server.npcs.parse_tag[<[parse_value].id>]>
-                - define dataTarget <npc[<[targetID]>]>
+            - choose <[targetType]>:
+                - case player:
+                    - define lookupList <server.players.parse_tag[<[parse_value].name>]>
+                    - define dataTarget <player[<[targetID]>]>
+                - case npc:
+                    - define lookupList <server.npcs.parse_tag[<[parse_value].id>]>
+                    - define dataTarget <npc[<[targetID]>]>
 
             - if <[dataTarget].exists> || <[dataTarget]> == null:
                 - define errMsg "Invalid target specified: '<[targetName]>'"
