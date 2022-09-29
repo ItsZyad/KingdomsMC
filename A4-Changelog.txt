@@ -1,7 +1,0 @@
-- Adjusted mason/militia item order algorithm to favour more requests
-- Prevented general thorvald from starting two dialogues with you at the same time
-- [Technical] Folded all flags that prevent the player from chatting (for inputting values and such) into a single flag (noChat) to improve stability
-- Fixed material transfer chest issue where the sign wouldn't generate depending on which chest side you place it on
-- Allowed possibility for kingdoms to have more than 3 influence points at a time
-- Players can now see all the active material/weapon transfer requests made by their kingdom
-    - TODO: Allow players to take over certain requests that weren't originally made by them
