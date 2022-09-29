@@ -2,7 +2,7 @@ factionInfo:context.item.flag[factionInfo]
 influenceType:li@weapons|mercenary|
 ChatMode:global
 currNPC:n@973
-\exAdminTools:map@[__value=map@[]]
+\exAdminTools:map@[&lb__value=el@map@&lb&rb&rb;__value=map@[]]
 lastLocMainWorld:l@-77.41794986730847,69,454.93111599542374,42.04759598,114.72741699,KingdomsUTD
 QuestList:li@i@book[display=§dActive Quest;flag_map=map@[name=A Sailor's Story;desc=li@Go to the Half Cut Glass tavern&pipeSpeak to the captain&pipe;expires=null];lore=li@§bName: §r§lA Sailor's Story&pipe§bDescription:&pipe- Go to the Half Cut Glass tavern&pipe- Speak to the captain&pipe§bTime to Finish: §7N/A&pipe]|
 HelpAccepted:2
