@@ -44,13 +44,13 @@ InfluenceBonusReference:
 
 SidebarLoader:
     type: task
-    debug: false
+    #debug: false
     definitions: target|changeSBState
     script:
     - define war-true <red><bold>
     - define war-false <green>
     - define changeSBState <[changeSBState].if_null[true]>
-    - yaml load:kingdoms.yml id:kingdoms
+    - yaml load:kingdoms.yml id:k
     - yaml load:powerstruggle.yml id:ps
     - yaml load:outposts.yml id:outp
 
@@ -58,7 +58,7 @@ SidebarLoader:
         - define target <list[<[target]>]>
 
     - foreach <[target]>:
-        - define kingdomData <yaml[kingdoms].read[<[value].flag[kingdom]>]>
+        - define kingdomData <yaml[k].read[<[value].flag[kingdom]>]>
         - define totalOutpostUpkeep <yaml[outp].read[<[value].flag[kingdom]>.totalupkeep]>
 
         - if !<[value].sidebar_lines.exists> && !<[changeSBState]>:
@@ -69,7 +69,7 @@ SidebarLoader:
             # Initialize and set Balance line
             - define kingdom <[value].flag[kingdom]>
             - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
-            - sidebar set title:<bold><[kingdomName].color[<script[KingdomColors].data_key[<[value].flag[kingdom]>]>]> "values:<&r>|<&sp>Balance: <yellow>$<proc[CommaAdder].context[<[kingdomData].get[balance].round_down>]>" players:<[value]>
+            - sidebar set title:<bold><[kingdomName].color[<script[KingdomTextColors].data_key[<[value].flag[kingdom]>]>]> "values:<&r>|<&sp>Balance: <yellow>$<proc[CommaAdder].context[<[kingdomData].get[balance].round_down>]>" players:<[value]>
 
             # Set Upkeep Line
             - if !<server.has_flag[PauseUpkeep]>:
@@ -104,7 +104,7 @@ SidebarLoader:
             - sidebar add values:<&sp> players:<[value]>
 
             # Set Quests Title
-            - sidebar add "values:<&sp><bold><element[ACTIVE QUESTS:].color[<script[KingdomColors].data_key[<[value].flag[kingdom]>]>]>" players:<[value]>
+            - sidebar add "values:<&sp><bold><element[ACTIVE QUESTS:].color[<script[KingdomTextColors].data_key[<[value].flag[kingdom]>]>]>" players:<[value]>
 
         - else:
             - sidebar set title:<bold><gray>KINGDOMLESS
@@ -138,8 +138,9 @@ SidebarLoader:
 
         #     - sidebar add "values:<&sp>Balance<&co> <yellow>$<server.flag[bd.balance].if_null[0].format_number>" players:<[value]>
 
-    - yaml id:kingdoms unload
+    - yaml id:k unload
     - yaml id:ps unload
+    - yaml id:outp unload
 
     - if <server.has_flag[RestrictedCreative]>:
         - bossbar remove resCre
@@ -165,14 +166,6 @@ SidebarSeparator:
 
     - define outLine:->:<&n.end_format>
     - determine <[outLine].unseparated>
-
-KingdomColors:
-    type: data
-    centran: aqua
-    cambrian: yellow
-    raptoran: red
-    viridian: green
-    fyndalin: white
 
 ToggleSidebar_Command:
     type: command

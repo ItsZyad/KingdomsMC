@@ -38,7 +38,7 @@ SidebarLoader_Individual_OLD:
         #- narrate format:debug <[target]>
 
         # Initialize and set Balance line
-        - sidebar set title:<bold><proc[YamlSpaceAdder].context[<proc[KingdomNameReplacer].context[<[target].flag[kingdom]>]>].color[<script[KingdomColors].data_key[<[target].flag[kingdom]>]>]> "values:<&r>|Balance: <yellow>$<proc[CommaAdder].context[<yaml[kingdoms].read[<[target].flag[kingdom]>.balance].round_down>]>" players:<[target]>
+        - sidebar set title:<bold><proc[YamlSpaceAdder].context[<proc[KingdomNameReplacer].context[<[target].flag[kingdom]>]>].color[<script[KingdomTextColors].data_key[<[target].flag[kingdom]>]>]> "values:<&r>|Balance: <yellow>$<proc[CommaAdder].context[<yaml[kingdoms].read[<[target].flag[kingdom]>.balance].round_down>]>" players:<[target]>
 
         # Set Upkeep Line
         - if !<server.has_flag[PauseUpkeep]>:

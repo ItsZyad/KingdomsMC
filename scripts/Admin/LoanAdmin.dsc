@@ -41,7 +41,7 @@ LoanAdminGeneration_Proc:
         - define amount <[offer].get[amount]>
         - define kingdom <[offer].get[kingdom]>
         - define expiry <[offer].get[expiry]>
-        - define kingdomColor <script[KingdomColors].data_key[<[kingdom]>]>
+        - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
 
         - define lore "<bold><element[Offer Amount: ].color[white]><[amount].color[aqua]>|<element[Kingdom: ].color[white]><[kingdom].color[<[kingdomColor]>]>|<element[Expiry Date: ].color[white]><[expiry].color[aqua]>"
 

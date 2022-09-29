@@ -134,7 +134,7 @@ DynmapTask:
     script:
     - define world <player.location.world>
     - define kingdomList <list[centran|cambrian|viridian|raptoran]>
-    - definemap kingdomColors:
+    - definemap KingdomTextColors:
         raptoran: f14|812
         centran: 34c|16a
         viridian: 181|571
@@ -156,7 +156,7 @@ DynmapTask:
             - execute as_op "dmarker addcorner <[area].max.simple.replace_text[,].with[<&sp>]>" silent
             - execute as_op "dmarker deletearea id:<[ID]> set:outposts" silent
             - execute as_op "dmarker addarea id:<[ID]> set:outposts label:"[Outpost] <script[KingdomRealNames].data_key[<[kingdom]>]>"" silent
-            - execute as_op "dmarker updatearea id:<[ID]> set:outposts color:<[kingdomColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[kingdomColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2" silent
+            - execute as_op "dmarker updatearea id:<[ID]> set:outposts color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2" silent
             - execute as_op "dmarker clearcorners" silent
 
         - define ID main_region_<[kingdom]>
@@ -169,7 +169,7 @@ DynmapTask:
         - execute as_op "dmarker addcorner <[region].max.simple.replace_text[,].with[ ]>" silent
         - execute as_op "dmarker deletearea id:<[ID]> set:regions"
         - execute as_op "dmarker addarea id:<[ID]> set:regions label:"[Kingdom] <script[KingdomRealNames].data_key[<[kingdom]>]>""
-        - execute as_op "dmarker updatearea id:<[ID]> set:regions color:<[kingdomColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[kingdomColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2"
+        - execute as_op "dmarker updatearea id:<[ID]> set:regions color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2"
         - execute as_op "dmarker clearcorners"
 
     - narrate format:admincallout "Successfully refreshed Dynmap for world: <[world]>"
