@@ -29,7 +29,7 @@ Claim_Command:
                 - define chunkConnected true
                 - foreach stop
 
-    - foreach <server.notes.filter_tag[<[filter_value].starts_with[INTERNAL_STORY]>]> as:area:
+    - foreach <util.notes.filter_tag[<[filter_value].starts_with[INTERNAL_STORY]>]> as:area:
         - if <[area].bounding_box.intersects[<player.location.chunk.cuboid>]>:
             - narrate format:callout "You are not allowed to claim a chunk here. This area is a point of interest!"
             - determine cancelled

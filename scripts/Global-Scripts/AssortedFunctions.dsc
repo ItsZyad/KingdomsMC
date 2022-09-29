@@ -45,11 +45,11 @@ KingdomRealNames:
 
 KingdomRealShortNames:
     type: data
-    centran: "Muspelheim"
-    viridian: "Viridia"
-    raptoran: "Altea"
-    cambrian: "Grovelia"
-    fyndalin: "Fyndalin"
+    centran: Muspelheim
+    viridian: Viridia
+    raptoran: Altea
+    cambrian: Grovelia
+    fyndalin: Fyndalin
 
 KingdomTextColors:
     type: data
