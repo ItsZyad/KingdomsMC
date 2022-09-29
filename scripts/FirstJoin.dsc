@@ -14,7 +14,7 @@ KingdomSelection_Handler:
     events:
         on player joins:
         # Get players out of the pre-migration world
-        - if <player.location.world.name> != KingdomsCurrent:
+        - if <server.worlds.contains[KingdomsCurrent]> && <player.location.world.name> != KingdomsCurrent:
             - teleport <player> <world[KingdomsCurrent].spawn_location>
 
         - if !<player.has_flag[kingdom]>:

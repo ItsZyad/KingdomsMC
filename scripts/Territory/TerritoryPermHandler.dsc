@@ -1,5 +1,6 @@
 DoorInteractCode:
     type: task
+    debug: false
     script:
     - if !<player.has_permission[kingdoms.admin.bypassclickcheck]>:
         - yaml load:kingdoms.yml id:kingdoms
