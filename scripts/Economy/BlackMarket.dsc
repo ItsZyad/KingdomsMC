@@ -210,126 +210,124 @@ BMMerchant_I:
 BMMerchant_Handler:
     type: world
     events:
-        on player clicks in inventory:
+        on player clicks in inventory flagged:BMInteract:
         - ratelimit player 3t
+        - define price <context.item.flag[price]>
+        - define amount <context.item.flag[amount]>
 
-        - if <player.has_flag[BMInteract]>:
-            - define price <context.item.flag[price]>
-            - define amount <context.item.flag[amount]>
+        # If player shift clicks, buy 10 of the item instead of
+        # just 1
 
-            # If player shift clicks, buy 10 of the item instead of
-            # just 1
+        - if <context.click> == SHIFT_LEFT:
+            - define purchaseAmount 10
+        - else:
+            - define purchaseAmount 1
 
-            - if <context.click> == SHIFT_LEFT:
-                - define purchaseAmount 10
-            - else:
-                - define purchaseAmount 1
+        # If there are enough items to buy and the player has
+        # enough money to buy them all;
 
-            # If there are enough items to buy and the player has
-            # enough money to buy them all;
+        - if <[amount].is[OR_MORE].than[<[purchaseAmount]>]>:
+            - if <player.money.is[OR_MORE].than[<[price].mul[<[purchaseAmount]>]>]>:
 
-            - if <[amount].is[OR_MORE].than[<[purchaseAmount]>]>:
-                - if <player.money.is[OR_MORE].than[<[price].mul[<[purchaseAmount]>]>]>:
+                - inventory flag slot:<context.slot> amount:-:<[purchaseAmount]> d:<context.inventory>
 
-                    - inventory flag slot:<context.slot> amount:-:<[purchaseAmount]> d:<context.inventory>
+                # take the appropriate amount of money and give
+                # the player the items;
 
-                    # take the appropriate amount of money and give
-                    # the player the items;
+                - take money quantity:<[price].mul[<[purchaseAmount]>]>
 
-                    - take money quantity:<[price].mul[<[purchaseAmount]>]>
+                # Create item without any of the BM Item's flags or lore
 
-                    # Create item without any of the BM Item's flags or lore
+                - define selectedItem <context.item>
+                - adjust def:selectedItem lore:<list[]>
+                - adjust def:selectedItem flag_map:<map[]>
 
-                    - define selectedItem <context.item>
-                    - adjust def:selectedItem lore:<list[]>
-                    - adjust def:selectedItem flag_map:<map[]>
+                - if <context.item.material.name> == milk_bucket && <[price].is[MORE].than[50000]>:
+                    - random:
+                        - adjust def:selectedItem "lore:You are an idiot."
+                        - adjust def:selectedItem "lore:I am a worthless waste of money."
+                        - adjust def:selectedItem "lore:There are starving kids in Africa who|could have used that money..."
+                        - adjust def:selectedItem "lore:For real? A bucket of milk named <context.item.display>?"
+                        - adjust def:selectedItem "lore:<player.nameplate> wasted a total of:|<red>$<proc[CommaAdder].context[<[price]>]> <italic><dark_purple>on me."
 
-                    - if <context.item.material.name> == milk_bucket && <[price].is[MORE].than[50000]>:
-                        - random:
-                            - adjust def:selectedItem "lore:You are an idiot."
-                            - adjust def:selectedItem "lore:I am a worthless waste of money."
-                            - adjust def:selectedItem "lore:There are starving kids in Africa who|could have used that money..."
-                            - adjust def:selectedItem "lore:For real? A bucket of milk named <context.item.display>?"
-                            - adjust def:selectedItem "lore:<player.nameplate> wasted a total of:|<red>$<proc[CommaAdder].context[<[price]>]> <italic><dark_purple>on me."
+                - give <[selectedItem]> quantity:<[purchaseAmount]>
 
-                    - give <[selectedItem]> quantity:<[purchaseAmount]>
+                # change the display in the GUI to reflect the
+                # purchase
 
-                    # change the display in the GUI to reflect the
-                    # purchase
+                - inventory adjust slot:<context.slot> "lore:|<&color[#ffffff]>Amount Available<&co> <green><[amount].sub[<[purchaseAmount]>]>|<&color[#ffffff]>Price<&co> <red>$<proc[CommaAdder].context[<[price]>]>" d:<context.inventory>
 
-                    - inventory adjust slot:<context.slot> "lore:|<&color[#ffffff]>Amount Available<&co> <green><[amount].sub[<[purchaseAmount]>]>|<&color[#ffffff]>Price<&co> <red>$<proc[CommaAdder].context[<[price]>]>" d:<context.inventory>
+                # If the player has made a promise to the faction
+                # the npc is a part of them fullfill a part of the
+                # promised trade. [SEE 'BlackMarketInfluence.dsc']
 
-                    # If the player has made a promise to the faction
-                    # the npc is a part of them fullfill a part of the
-                    # promised trade. [SEE 'BlackMarketInfluence.dsc']
+                - define kingdom <player.flag[kingdom]>
 
-                    - define kingdom <player.flag[kingdom]>
+                - foreach <server.flag[promisedTrade<[kingdom]>]>:
+                    - define currAmount <[value].get[1]>
+                    - define currFaction <[value].get[2]>
 
-                    - foreach <server.flag[promisedTrade<[kingdom]>]>:
-                        - define currAmount <[value].get[1]>
-                        - define currFaction <[value].get[2]>
+                    #- narrate format:debug CF:<[currFaction]>
 
-                        #- narrate format:debug CF:<[currFaction]>
+                    - if <server.has_flag[promisedTrade<[kingdom]>]>:
+                        - if <[currFaction]> == <context.inventory.id_holder.flag[faction]>:
 
-                        - if <server.has_flag[promisedTrade<[kingdom]>]>:
-                            - if <[currFaction]> == <context.inventory.id_holder.flag[faction]>:
+                            # I have to define the new amount as a
+                            # separate variable since I can't modify
+                            # certain list indexes directly when their
+                            # inside flags
 
-                                # I have to define the new amount as a
-                                # separate variable since I can't modify
-                                # certain list indexes directly when their
-                                # inside flags
+                            - define newTradeQuota <[value].get[1].sub[<[price]>]>
+                            #- narrate format:debug <[newTradeQuota]>
 
-                                - define newTradeQuota <[value].get[1].sub[<[price]>]>
-                                #- narrate format:debug <[newTradeQuota]>
+                            # If the resultant of the transaction is that
+                            # the trade quota remains above 0 then just
+                            # change the value of the flag;
 
-                                # If the resultant of the transaction is that
-                                # the trade quota remains above 0 then just
-                                # change the value of the flag;
+                            - if <[newTradeQuota].is[MORE].than[0]>:
+                                - define originalAmount <[value].get[3]>
+                                #- <list[<[newTradeQuota]>|<[currFaction]>|<[originalAmount]>]>
+                                #- flag server promisedTrade<[kingdom]>:<server.flag[promisedTrade<[kingdom]>].overwrite[<list[<[newTradeQuota]>|<[currFaction]>|<[originalAmount]>]>].at[loop_index]>
 
-                                - if <[newTradeQuota].is[MORE].than[0]>:
-                                    - define originalAmount <[value].get[3]>
-                                    #- <list[<[newTradeQuota]>|<[currFaction]>|<[originalAmount]>]>
-                                    #- flag server promisedTrade<[kingdom]>:<server.flag[promisedTrade<[kingdom]>].overwrite[<list[<[newTradeQuota]>|<[currFaction]>|<[originalAmount]>]>].at[loop_index]>
+                                - define newQuotaList <list>
+                                - define insertIndex <[loop_index]>
 
-                                    - define newQuotaList <list>
-                                    - define insertIndex <[loop_index]>
+                                - foreach <server.flag[promisedTrade<[kingdom]>]>:
+                                    - if <[loop_index]> == <[insertIndex]>:
+                                        - define newQuotaList <[newQuotaList].include_single[<list[<[newTradeQuota]>|<[currFaction]>|<[originalAmount]>]>]>
 
-                                    - foreach <server.flag[promisedTrade<[kingdom]>]>:
-                                        - if <[loop_index]> == <[insertIndex]>:
-                                            - define newQuotaList <[newQuotaList].include_single[<list[<[newTradeQuota]>|<[currFaction]>|<[originalAmount]>]>]>
+                                    - else:
+                                        - define newQuotaList <[newQuotaList].include_single[<server.flag[promisedTrade<[kingdom]>].get[<[loop_index]>]>]>
 
-                                        - else:
-                                            - define newQuotaList <[newQuotaList].include_single[<server.flag[promisedTrade<[kingdom]>].get[<[loop_index]>]>]>
+                                #- narrate format:debug NQL:<[newQuotaList]>
 
-                                    #- narrate format:debug NQL:<[newQuotaList]>
+                                - flag server promisedTrade<[kingdom]>:<[newQuotaList]>
 
-                                    - flag server promisedTrade<[kingdom]>:<[newQuotaList]>
+                            # if not, then clear the flag and give the
+                            # player a message - then recalculate the
+                            # kingdom's influence.
 
-                                # if not, then clear the flag and give the
-                                # player a message - then recalculate the
-                                # kingdom's influence.
+                            - else:
+                                - yaml load:blackmarket-formatted.yml id:bmf
+                                - narrate format:callout "Promised trade quota with <red><bold><yaml[bmf].read[factiondata.<[currFaction]>.name]><&6> has been met!"
 
-                                - else:
-                                    - yaml load:blackmarket-formatted.yml id:bmf
-                                    - narrate format:callout "Promised trade quota with <red><bold><yaml[bmf].read[factiondata.<[currFaction]>.name]><&6> has been met!"
+                                #- narrate format:debug "excess: <[newTradeQuota].sub[<[currAmount]>].abs>"
 
-                                    #- narrate format:debug "excess: <[newTradeQuota].sub[<[currAmount]>].abs>"
-
-                                    - run BMInfluenceRecalculate def:<[value].get[3]>|<[newTradeQuota].sub[<[currAmount]>].abs>|<[currFaction]>
-                                    - flag server promisedTrade<[kingdom]>:!
-                                    - yaml id:bmf unload
-
-                - else:
-                    # Clicking outside the window returns -998 for some reason
-                    - if <context.slot> != -998 || <context.slot.is[OR_LESS].than[36]>:
-                        - if <context.item> != <item[air]>:
-                            - narrate format:callout "You do not have enough money to buy this item."
+                                - run BMInfluenceRecalculate def:<[value].get[3]>|<[newTradeQuota].sub[<[currAmount]>].abs>|<[currFaction]>
+                                - flag server promisedTrade<[kingdom]>:!
+                                - yaml id:bmf unload
 
             - else:
-                - if <context.item> != <item[air]>:
-                    - narrate format:callout "There is not enough of this item to buy."
+                # Clicking outside the window returns -998 for some reason
+                - if <context.slot> != -998 || <context.slot.is[OR_LESS].than[36]>:
+                    - if <context.item> != <item[air]>:
+                        - narrate format:callout "You do not have enough money to buy this item."
 
-            - determine cancelled
+        - else:
+            - if <context.item> != <item[air]>:
+                - narrate format:callout "There is not enough of this item to buy."
+
+        - determine cancelled
 
         on player closes inventory:
         - if <player.has_flag[BMInteract]>:
