@@ -144,7 +144,7 @@ WeaponTransferOption_Handler:
                     # amount/transferData subflag (which is deleted
                     # if they go through) with the transaction and completed
 
-                    - runlater DidTransferFail delay:24h def:<player>|<player.flag[transferData.amount]>
+                    - runlater DidTransferFail delay:24h def:<player>|transferData.amount
 
                     - if <[transferType]> != masons:
                         - narrate format:callout "To fullfill this order, go to the Fyndalin City Militia office and hand the item(s) over to General Thorvald within 24 hours"
