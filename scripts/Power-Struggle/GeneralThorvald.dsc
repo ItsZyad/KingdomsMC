@@ -159,5 +159,5 @@ ChestTransferInfluenceCalc:
     - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
 
     - flag player transferData:!
-    - flag player influenceType:!
+    #- flag player influenceType:!
 

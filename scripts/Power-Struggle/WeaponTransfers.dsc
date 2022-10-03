@@ -123,22 +123,24 @@ WeaponTransferOption_Handler:
                 # new flag which also has the amount of items to be tran-
                 # sfered
 
-                - define transferType <player.flag[transferData].get[transferType]>
-                - define transferItem <player.flag[transferData].get[material]>
+                - define transferType <player.flag[transferData.transferType]>
+                - define transferItem <player.flag[transferData.material]>
 
                 - if <yaml[ps].read[transferItemsToday.<[transferItem]>].is[OR_MORE].than[<context.message>]>:
 
                     - flag <player> transferData.amount:<context.message>
-                    - flag <player> influenceType:<list[weapons|mercenary]>
+                    #- flag <player> influenceType:<list[weapons|mercenary]>
 
                     - define kingdom <player.flag[kingdom]>
-                    - define UTCNow <util.current_time_millis.split[]>
-                    - define transferID <player.name>-<[UTCNow].get[1|2|3].unseparated><[UTCNow].get[-1|-2|-3].unseparated><util.random.int[1].to[20]>
+                    - define sameMaterialTransfers <server.flag[<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<player.flag[transferData].get[material]>]>].exclude[false].size>
+                    - define transferID <player.name>-<player.flag[transferData].get[material]><[sameMaterialTransfers]>
                     - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.influenceType:<player.flag[transferData].get[transferType]>
                     - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.material:<player.flag[transferData].get[material]>
                     - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.amount:<context.message>
                     - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.due:<util.time_now.add[1d]>
-                    - runlater def:<[transferID]>|<[kingdom]> RemoveTransferAfterDue id:<[transferID]>
+                    - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.madeBy:<player>
+
+                    - runlater RemoveTransferAfterDue def:<[transferID]>|<[kingdom]> id:<[transferID]>
 
                     # Just checks if the player still has the
                     # amount/transferData subflag (which is deleted

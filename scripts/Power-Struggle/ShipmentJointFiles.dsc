@@ -171,6 +171,110 @@ DailyOrderRefresh_Handler:
         on system time hourly every:24:
         - run DailyOrderRefresh
 
+TransferTakeoverChecker:
+    type: task
+    definitions: originalPlayer|newPlayer|transferInfo
+    script:
+    - define transferID <[transferInfo].get[transferID]>
+
+    - if !<[originalPlayer].has_flag[maintainedTransferRights.<[transferID]>]>:
+        - flag <[newPlayer]> transferData:<[originalPlayer].flag[transferData]>
+        - flag <[originalPlayer]> transferData:!
+
+        - define kingdom <player.flag[kingdom]>
+        - define sameMaterialTransfers <server.flag[<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<[newPlayer].flag[transferData].get[material]>]>].exclude[false].size>
+        - define newTransferID <[newPlayer].name>-<[newPlayer].flag[transferData].get[material]><[sameMaterialTransfers]>
+
+        - flag server <[kingdom]>.powerstruggle.activeTransfers.<[newTransferID]>:<[transferInfo]>
+
+    - else:
+        - flag <[originalPlayer]> maintainedTransferRights.<[transferID]>:!
+
+        - if <[originalPlayer].is_online>:
+            - narrate format:callout targets:<[originalPlayer]> "Player: <[newPlayer].name.color[red].bold> made a request to takeover a material/weapon transfer request you made with ID: <[transferID].color[red]>. Due to your inactivity they have taken over this request."
+
+TransferClaimConfirm_Window:
+    type: inventory
+    inventory: chest
+    gui: true
+    title: Confirm Claim?
+    slots:
+    - [] [] [TransferClaimYes_Item] [] [] [] [TransferClaimNo_Item] [] []
+
+TransferClaimYes_Item:
+    type: item
+    material: green_wool
+    display name: <green><bold>Confirm
+    lore:
+    - Doing this will allow you take over this player's transfer
+    - request, allowing you to do it for them if they don't
+    - contest your claim in 24 hours.
+
+TransferClaimNo_Item:
+    type: item
+    material: red_wool
+    display name: <red><bold>Cancel
+
+TransferClaimConfirm_Handler:
+    type: world
+    events:
+        on player clicks TransferClaimNo_Item in TransferClaimConfirm_Window:
+        - inventory close
+        - narrate format:callout Cancelled!
+        - flag <player> transferInfo:!
+
+        on player clicks TransferClaimYes_Item in TransferClaimConfirm_Window:
+        - define transferInfo <player.flag[transferInfo]>
+        - define transferID <[transferInfo].get[transferID]>
+        - define originalPlayer <[transferInfo].get[madeBy]>
+
+        - clickable usages:1 until:10m save:AllowTransferTO:
+            - run TransferTakeoverChecker def.originalPlayer:<[originalPlayer]> def.newPlayer:<player> def.transferInfo:<[transferInfo]>
+            - narrate format:callout targets:<[originalPlayer]> "Transfer request: <[transferID].bold> is now the responsibility of player: <player.name.color[red].bold>"
+            - narrate format:callout "You have taken over the transfer request: <[transferID].bold>. See the <element[/transfer].color[aqua]> menu for information."
+            - clickable cancel:DenyTransferTO
+
+        - clickable usages:1 until:10m save:DenyTransferTO:
+            - narrate format:callout targets:<[originalPlayer]> "Denied transfer request takeover!"
+            - narrate format:callout "Player: <[originalPlayer].name.color[red].bold> has denied your transfer takeover request!"
+            - clickable cancel:AllowTransferTO
+
+        - if <[originalPlayer].is_online>:
+            - narrate format:callout targets:<[originalPlayer]> "Another player from your kingdom (<player.name.color[gray].italicize>) is requesting to take over your material/weapon transfer with ID: <[transferID].color[red].bold><n>Do you wish to allow them?"
+            - narrate "<element[YES].color[green].bold.on_click[<entry[AllowTransferTO].command>]> / <element[NO].color[red].bold.on_click[<entry[DenyTransferTO].command>]>"
+            - narrate <n>
+            - narrate format:callout "<gray><italic>You may also use the command: <element[/transfer takeover [<green>allow<aqua>/<red>deny]].color[aqua].italicize>"
+            - narrate format:callout "Sent material transfer takeover request to: <[originalPlayer].name.color[red].bold>. They have 24 hours to accept."
+
+        - else:
+            - narrate format:callout "This player is not online. If they do not join the server within 24 hours and deny your request, this transfer request will be automatically made your responsibility."
+            - flag <[originalPlayer]> maintainedTransferRights.<[transferID]> expire:24h
+            - runlater TransferTakeoverChecker def.originalPlayer:<[originalPlayer]> def.newPlayer:<player> def.transferInfo:<[transferInfo]> delay:24h
+
+        on player joins flagged:maintainedTransferRights:
+        - define transferID <player.flag[maintainedTransferRights]>
+        - define kingdom <player.flag[kingdom]>
+        - define transferInfo <server.flag[<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>]>
+        - define originalPlayer <[transferInfo].get[madeBy]>
+
+        - clickable usages:1 until:10m save:AllowTransferTO:
+            - run TransferTakeoverChecker def.originalPlayer:<[originalPlayer]> def.newPlayer:<player> def.transferInfo:<[transferInfo]>
+            - narrate format:callout targets:<[originalPlayer]> "Transfer request: <[transferID].bold> is now the responsibility of player: <player.name.color[red].bold>"
+            - narrate format:callout "You have taken over the transfer request: <[transferID].bold>. See the <element[/transfer].color[aqua]> menu for information."
+            - clickable cancel:DenyTransferTO
+
+        - clickable usages:1 until:10m save:DenyTransferTO:
+            - narrate format:callout targets:<[originalPlayer]> "Denied transfer request takeover!"
+            - narrate format:callout "Player: <[originalPlayer].name.color[red].bold> has denied your transfer takeover request!"
+            - clickable cancel:AllowTransferTO
+
+        - narrate format:callout targets:<[originalPlayer]> "Another player from your kingdom (<player.name.color[gray].italicize>) is requesting to take over your material/weapon transfer with ID: <[transferID].color[red].bold><n>Do you wish to allow them?"
+        - narrate "<element[YES].color[green].bold.on_click[<entry[AllowTransferTO].command>]> / <element[NO].color[red].bold.on_click[<entry[DenyTransferTO].command>]>"
+        - narrate "<gray><italic>You have <player.flag_expiration[maintainedTransferRights].format.color[red]> left to take this decision."
+        - narrate <n>
+        - narrate "<gray><italic>You may also use the command: <element[/transfer takeover [<green>allow<aqua>/<red>deny]].color[aqua].italicize>"
+
+
 TransferTracker_Window:
     type: inventory
     inventory: chest
@@ -187,6 +291,14 @@ TransferTracker_Window:
     - [] [] [] [] [] [] [] [] []
 
 TransferWindow_Handler:
+    type: world
+    events:
+        on player clicks item in TransferTracker_Window:
+        - if <context.item.has_flag[claimable]>:
+            - flag <player> transferInfo:<context.item.flag[transferInfo]>
+            - inventory open d:TransferClaimConfirm_Window
+
+TransferTracker_Command:
     type: command
     name: transfers
     usage: /transfers
@@ -197,12 +309,19 @@ TransferWindow_Handler:
     - define transferItemList <list[]>
 
     - foreach <[transferFlag]> as:request:
-        - narrate format:debug <[request].get[material].as[item]>
+        - narrate format:debug <[request].get[madeBy]>
 
         - define transferItem <[request].get[material].as[item]>
-        - adjust def:transferItem "lore:<element[Transfer ID: ].color[aqua]><[key].color[gray]>|<element[Amount: ].color[aqua]><element[$<[request].get[amount].format_number>].color[red]>|<element[Due by: ].color[aqua]><element[<[request].get[due].to_local.format>]>"
+        - adjust def:transferItem "lore:<element[Transfer ID: ].color[aqua]><[key].color[gray]>|<element[Request Originally Made By: ].color[aqua]><[request].get[madeBy].name.color[gray].italicize>|<element[Amount: ].color[aqua]><element[$<[request].get[amount].format_number>].color[red]>|<element[Due by: ].color[aqua]><element[<[request].get[due].to_local.format>]>"
+        - flag <[transferItem]> transferInfo:<[request].include[transferID=<[key]>]>
+
+        #- if <[request].get[madeBy]> != <player>:
+        - adjust def:transferItem "lore:<[transferItem].lore.include_single[<element[CLICK TO CLAIM].color[green].bold>]>"
+        - flag <[transferItem]> claimable:true
+
         - define transferItemList:->:<[transferItem]>
 
         - flag <player> transferItemList:<[transferItemList]>
+        - inventory adjust title:something d:TransferTracker_Window
         - inventory open d:TransferTracker_Window
         - flag <player> transferItemList:!
