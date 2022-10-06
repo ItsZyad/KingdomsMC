@@ -390,6 +390,25 @@ KillForbiddenFunction:
         - if <[forbiddenCommands].contains[<context.command>]>:
             - determine cancelled
 
+AddEssentialsWorthItems:
+    type: task
+    script:
+    - define allItems <server.material_types.parse_tag[<[parse_value].name.as[item]>]>
+    - yaml load:economy_data/price-info.yml id:prices
+
+    #- narrate format:debug ALL:<[allItems]>
+
+    - foreach <[allItems]> as:item:
+        - if <[item].worth.exists>:
+            #- narrate format:debug ITM:<[item].worth>
+            #- yaml id:prices set price_info.items.<[item].material.name>.price:<[item].worth>
+            - yaml id:prices set price_info.items.<[item].material.name>.base:<yaml[prices].read[price_info.items.<[item].material.name>.price]>
+            - yaml id:prices set price_info.items.<[item].material.name>.price:!
+            #- yaml id:prices set price_info.items.<[item].material.name>.gov_cap:<[item].worth.mul[1.4]>
+
+    - yaml id:prices savefile:economy_data/price-info.yml
+    - yaml id:prices unload
+
 admincallout:
     type: format
     format: "<light_purple>Kingdoms <light_purple>Admin:: <[text]>"
