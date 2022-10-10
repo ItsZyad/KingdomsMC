@@ -4,7 +4,7 @@
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Oct 2022
-## @Script Ver: INDEV
+## @Script Ver: v1.0
 ##
 ## ----------------END HEADER-----------------
 
@@ -22,6 +22,47 @@ PriceExtrapolationHelper_Command:
 
     ## Generates the final stats from the allStats variable
     GenerateFinalStatsFromScratch:
+    # This code does what it is written to do, however still has logical issues.
+    # It accounts for crafting value in one direction only. EXAMPLE;
+
+    # oak_log --> 4 oak_planks
+    # If you want to set the price of oak_planks it looks at the price of one oak_log
+    # but does not account for the fact that oak_planks should be a 1/4 the value of
+    # oak_logs. So before this can be committed, the process must be checked in reverse
+    # too, to every item in allRecipes.
+
+    # There's also a design consideration on whether this code is even necessary. It assumes
+    # that the prices of related goods are prefectly relational and balanced in real life.
+    # which is simply untrue as the market is generally chaotic and in constant flux. Should
+    # the supply/demand balance mechanic be implemented properly, any attempt to exploit any
+    # potential mismatch between buy and sell prices should be met, by the market, with an
+    # appropriate response of raising or reducing prices.
+
+    # - define allRecipes <item[<[item]>].recipe_ids>
+
+    # - yaml load:economy_data/price-info.yml id:prices
+
+    # - define highestCraftingVal -1
+
+    # - foreach <[allRecipes]>:
+    #     - define craftingValueMin 0
+    #     - define craftingMaterials <server.recipe_items[<[value]>].split[MATERIAL:].get[2]>
+
+    #     - narrate format:debug CRF:<[craftingMaterials]>
+
+    #     - foreach <[craftingMaterials]> as:material:
+    #         #- narrate format:debug MAT:<[searchItems].contains[<[material].to_lowercase>]>
+    #         - if <[searchItems].contains[<[material].to_lowercase>]>:
+    #             - define materialData <yaml[prices].read[price_info.items].to_pair_lists.parse_tag[<[parse_value].get[2].get[<[material].to_lowercase>].if_null[-1]>].exclude[-1]>
+    #             - define craftingValueMin <[craftingValueMin].add[<[materialData].get[1].get[base]>]>
+
+    #     - if <[craftingValueMin]> > <[highestCraftingVal]>:
+    #         - define highestCraftingVal <[craftingValueMin]>
+
+    # - narrate format:debug CRAFTING_VAL:<[highestCraftingVal]>
+
+    # - yaml id:prices unload
+
     - foreach <[allStats.sums]>:
         - if <[consistentDatapointsOnly]> && <[value].get[occurances]> != <[extrapolatedItems].size>:
             - foreach next
@@ -66,14 +107,11 @@ PriceExtrapolationHelper_Command:
 
     AcceptFinalOutput:
     - yaml load:economy_data/price-info.yml id:prices
-
-    - narrate format:debug GROUP:<[group]>
-    - narrate format:debug ITEM:<[item]>
-    - narrate format:debug FINAL:<[finalStats]>
-
     - yaml id:prices set price_info.items.<[group]>.<[item]>:<[finalStats]>
     - yaml id:prices savefile:economy_data/price-info.yml
     - yaml id:prices unload
+
+    - narrate format:admincallout "Saved data for item: <[item].color[aqua]>"
 
     ## Writes out all items that matched the player's query and allows them to adjust the items that will be extrapolated from
     WriteItemList:
@@ -103,9 +141,11 @@ PriceExtrapolationHelper_Command:
 
         - yaml id:prices unload
 
+    #- narrate format:debug EXT:<[extrapolatedItems]>
+
     - foreach <[extrapolatedItems]> as:entry:
-        # Clickable attached to the end of every line allowing the player to change the value of certain stat
-        - clickable save:item_clickable until:1m for:<player>:
+        # Clickable attached to the end of every line allowing the player to remove an item from extrapolation
+        - clickable save:item_clickable until:1m for:<player> usages:1:
             - define target <[entry]>
             - define extrapolatedItems:<-:<[target]>
 
@@ -114,13 +154,32 @@ PriceExtrapolationHelper_Command:
 
             - inject PriceExtrapolationHelper_Command path:WriteItemList
 
+        - clickable save:weight_item until:1m for:<player> usages:1:
+            - define target <[entry]>
+            - flag <player> noChat.admin.weightingItem
+            - narrate format:admincallout "Please type the weight you would like to assign this item:"
+
+            - waituntil <player.has_flag[noChat.admin.weightingItem].not> rate:10t
+
+            - if <player.has_flag[itemWeight]>:
+                - define weights.<[target]>:<player.flag[itemWeight]>
+
+            - foreach <[clickableList]>:
+                - clickable cancel:<[value]>
+
+            - inject PriceExtrapolationHelper_Command path:WriteItemList
+
         - define clickableList:->:<entry[item_clickable].id>
+        - define clickableList:->:<entry[weight_item].id>
 
-        - narrate "<element[[Remove Item]].on_click[<entry[item_clickable].command>].color[red].underline>.....<[entry].color[gray].italicize>"
+        - narrate "<element[[Remove Item]].on_click[<entry[item_clickable].command>].color[red].underline> <element[[Weight]].on_click[<entry[weight_item].command>].color[aqua].underline>.....<[entry].color[gray].italicize>.....<element[Weight: ].color[aqua]><[weights].get[<[entry]>].if_null[1]>"
 
+    - narrate <n>
     - narrate "<element[Calculate New Item Averages].color[green].bold.underline.on_click[<entry[save_new_items].command>]>"
+    - inject PriceExtrapolationHelper_Command path:AddItemToExtrapolation
     - define clickableList:<-:<entry[save_new_items].id>
 
+    ## Inserts a clickable that allows the player to add a new item to extrapolatedItems using the chat (see the handler below)
     AddItemToExtrapolation:
     - clickable save:add_item for:<player> usages:1 until:1m:
         - flag <player> noChat.admin.addItem
@@ -152,6 +211,7 @@ PriceExtrapolationHelper_Command:
     - define searchItems <list[]>
     - define clickableList <list[]>
     - define consistentDatapointsOnly false
+    - define weights <map[]>
 
     # the -r flag restricts the search for like terms to extrapolate from to the current group
     - if <[flags].contains[-r]>:
@@ -168,8 +228,8 @@ PriceExtrapolationHelper_Command:
     - if <[item].contains[_]>:
         - define itemSplit <[item].split[_]>
 
-        - foreach <[itemSplit].size>:
-            - define extrapolatedItems <[extrapolatedItems].if_null[<list[]>].include[<[searchItems].find_partial[<[value]>]>]>
+        - foreach <[itemSplit]>:
+            - define extrapolatedItems <[extrapolatedItems].if_null[<list[]>].include[<[searchItems].find_all_partial[<[value]>].as[list].parse_tag[<[searchItems].get[<[parse_value]>]>].exclude[<[value]>]>]>
 
     - else:
         - define extrapolatedItems <[searchItems].find_all_partial[<[item]>].as[list].parse_tag[<[searchItems].get[<[parse_value]>]>].exclude[<[item]>]>
@@ -180,7 +240,6 @@ PriceExtrapolationHelper_Command:
     - else:
         - narrate format:admincallout "Cannot find any item similar to this in price-info.yml. You can add similar items to the file manually. Or add any item from the file using the button below:"
         - inject PriceExtrapolationHelper_Command path:AddItemToExtrapolation
-        - narrate "<red><underline>WARNING: this part of the command is yet to be thoroughly tested!"
 
     - yaml id:prices unload
 
@@ -211,14 +270,28 @@ PriceExtrapolation_Handler:
             - narrate format:admincallout "Cancelled operation"
 
         - else if <context.message.as[material].exists>:
-            - if <util.parse_yaml[<yaml[prices].read[price_info.items]>].deep_keys.parse_tag[<[parse_value].ends_with[<context.message>]>].contains[true]>:
-                - flag <player> noChat.admin.addItem:!
+            - if <util.parse_yaml[<yaml[prices].read[price_info.items]>].deep_keys.parse_tag[<[parse_value].ends_with[<context.message>.base]>].contains[true]>:
                 - flag <player> newItem:<context.message>
+                - flag <player> noChat.admin.addItem:!
 
             - else:
                 - narrate format:admincallout "The value: <context.message> does not appear in price-info.yml. Please try again or type 'cancel'."
 
         - else:
             - narrate format:admincallout "This is not a valid item. Please enter the item as it appears in the advanced tooltips (F3+H) or type 'cancel':"
+
+        - determine cancelled
+
+        on player chats flagged:noChat.admin.weightingItem:
+        - if <context.message> == cancel:
+            - flag <player> noChat.admin.weightingItem:!
+            - narrate format:admincallout "Cancelled Operation"
+
+        - else if <context.message.div[2].exists>:
+            - flag <player> itemWeight:<context.message>
+            - flag <player> noChat.admin.weightingItem:!
+
+        - else:
+            - narrate format:admincallout "This is not a valid integer or decimal. Please enter a valid value or type 'cancel':"
 
         - determine cancelled
