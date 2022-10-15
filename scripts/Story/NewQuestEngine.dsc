@@ -114,7 +114,7 @@ SpeechHandler_CISK:
 
         - define waitTime <proc[WaitTime_CISK].context[<[line]>|<[talkSpeed]>].round_to_precision[0.01]>
 
-        - if <[line].as_map.exists>:
+        - if <[line].as[map].exists>:
             - choose <[line].keys.get[1].to_uppercase>:
                 - case OPTIONS:
                     - inject OptionsHandler_CISK
@@ -177,7 +177,7 @@ CommandHandler_CISK:
     #- inject SpeechHandler_CISK path:InitializeVars
     - inject SpeechHandler_CISK
 
-    - define currentHandler <[currentHandler_orig]>
+    - define currentHandler <[currentBlock_orig]>
     - determine cancelled
 
     WaitCommand:
@@ -221,7 +221,7 @@ OptionsHandler_CISK:
     ## Defs carried from SPEECHHANDLER_CISK:
     ## waitTime, currentBlock, interactionAmounts, talkSpeed, shouldEngage, speech, hasBroken, line
 
-    - define optionList <list[]>
+    - define optionList <[optionList].if_null[<list[]>]>
 
     - narrate <&sp>
     - narrate <aqua><bold>OPTIONS<&co>
@@ -232,8 +232,8 @@ OptionsHandler_CISK:
         - define speech <[value].get[actions]>
 
         - clickable save:option until:1m for:<[player]>:
-            #- narrate format:debug SPC:<[speech]>
-            - inject SpeechHandler_CISK
+            - ~run SpeechHandler_CISK defmap:<queue.definition_map>
+            - narrate format:debug <script.queues>
             - flag <[player]> clickedOption
 
         - narrate "- <underline><element[<[prompt]>].on_click[<entry[option].command>]>"
@@ -241,7 +241,7 @@ OptionsHandler_CISK:
 
     - narrate <n>
 
-    - waituntil <[player].has_flag[clickedOption]>
+    - waituntil <[player].has_flag[clickedOption]> rate:1s
 
     - foreach <[optionList]>:
         - clickable cancel:<[value]>
