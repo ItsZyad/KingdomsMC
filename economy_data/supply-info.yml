@@ -1,0 +1,225 @@
+supply_info:
+    global_supply_mod: 1
+    items:
+        # items which do not have an amount_mod are assumed to have a mod of 1.
+        diamond:
+            supply_prob: '0.6'
+            amount_mod: '0.9'
+        lapis_ore:
+            supply_prob: '0.5'
+            amount_mod: '1.3'
+        diamond_ore:
+            supply_prob: '0.35'
+        coal_ore:
+            supply_prob: '0.9'
+            amount_mod: '1.2'
+        iron_ore:
+            supply_prob: '0.45'
+        gold_ore:
+            supply_prob: '0.3'
+        redstone_ore:
+            supply_prob: '0.33'
+        iron_block:
+            supply_prob: '0.25'
+        gold_block:
+            supply_prob: '0.19'
+        diamond_block:
+            supply_prob: '0.14'
+        lapis_block:
+            supply_prob: '0.34'
+        iron_ingot:
+            supply_prob: '0.65'
+            amount_mod: '1.1'
+        gold_ingot:
+            supply_prob: '0.45'
+        redstone:
+            supply_prob: '0.55'
+            amount_mod: '1.5'
+        stone:
+            supply_prob: '4.2'
+        dirt:
+            supply_prob: '1.4'
+        cobblestone:
+            supply_prob: '1.4'
+        bedrock:
+            supply_prob: '140'
+        sand:
+            supply_prob: '1.4'
+        gravel:
+            supply_prob: '1.4'
+        sponge:
+            supply_prob: '112'
+        glass:
+            supply_prob: '4.2'
+        sandstone:
+            supply_prob: '4.2'
+        grass:
+            supply_prob: '1.4'
+        brown_mushroom:
+            supply_prob: '2.8'
+        red_mushroom:
+            supply_prob: '2.8'
+        sugar_cane:
+            supply_prob: '14'
+        bookshelf:
+            supply_prob: '196'
+        mossy_cobblestone:
+            supply_prob: '126'
+        obsidian:
+            supply_prob: '182'
+        torch:
+            supply_prob: '5.6'
+        chest:
+            supply_prob: '5.6'
+        furnace:
+            supply_prob: '11.9'
+        ladder:
+            supply_prob: '0.7'
+        cobblestone_stairs:
+            supply_prob: '2.1'
+        cactus:
+            supply_prob: '14'
+        clay:
+            supply_prob: '16.8'
+        pumpkin:
+            supply_prob: '70'
+        jack_o_lantern:
+            supply_prob: '78.4'
+        redstone:
+            supply_prob: '44.8'
+        dispenser:
+            supply_prob: '81.2'
+        lever:
+            supply_prob: '1.4'
+        tnt:
+            supply_prob: '140'
+        note_block:
+            supply_prob: '50.4'
+        stone_button:
+            supply_prob: '8.4'
+        iron_door:
+            supply_prob: '30.8'
+        saddle:
+            supply_prob: '140'
+        minecart:
+            supply_prob: '32.2'
+        apple:
+            supply_prob: '14'
+        bow:
+            supply_prob: '21'
+        arrow:
+            supply_prob: '4.9'
+        coal:
+            supply_prob: '21'
+        stone_sword:
+            supply_prob: '3.5'
+        stone_pickaxe:
+            supply_prob: '5.6'
+        stone_axe:
+            supply_prob: '4.2'
+        stone_hoe:
+            supply_prob: '3.5'
+        iron_sword:
+            supply_prob: '30.8'
+        iron_pickaxe:
+            supply_prob: '30.8'
+        iron_axe:
+            supply_prob: '30.8'
+        iron_hoe:
+            supply_prob: '30.8'
+        diamond_sword:
+            supply_prob: '588'
+        diamond_pickaxe:
+            supply_prob: '910'
+        diamond_axe:
+            supply_prob: '910'
+        diamond_hoe:
+            supply_prob: '560'
+        stick:
+            supply_prob: '0.35'
+        bowl:
+            supply_prob: '0.7'
+        string:
+            supply_prob: '7'
+        feather:
+            supply_prob: '4.2'
+        wheat:
+            supply_prob: '12.6'
+        bread:
+            supply_prob: '42'
+        leather_helmet:
+            supply_prob: '72.8'
+        leather_chestplate:
+            supply_prob: '119'
+        leather_leggings:
+            supply_prob: '105'
+        leather_boots:
+            supply_prob: '58.8'
+        chainmail_helmet:
+            supply_prob: '56'
+        chainmail_chestplate:
+            supply_prob: '56'
+        chainmail_leggings:
+            supply_prob: '70'
+        chainmail_boots:
+            supply_prob: '42'
+        iron_helmet:
+            supply_prob: '30.8'
+        iron_chestplate:
+            supply_prob: '30.8'
+        iron_leggings:
+            supply_prob: '30.8'
+        iron_boots:
+            supply_prob: '30.8'
+        diamond_helmet:
+            supply_prob: '1400'
+        diamond_chestplate:
+            supply_prob: '2450'
+        diamond_leggings:
+            supply_prob: '2100'
+        diamond_boots:
+            supply_prob: '1190'
+        painting:
+            supply_prob: '35'
+        golden_apple:
+            supply_prob: '140'
+        bucket:
+            supply_prob: '30.8'
+        water_bucket:
+            supply_prob: '56'
+        lava_bucket:
+            supply_prob: '56'
+        snowball:
+            supply_prob: '1.4'
+        leather:
+            supply_prob: '14'
+        milk_bucket:
+            supply_prob: '56'
+        brick:
+            supply_prob: '29.4'
+        clay_ball:
+            supply_prob: '4.2'
+        paper:
+            supply_prob: '14'
+        book:
+            supply_prob: '63'
+        slime_ball:
+            supply_prob: '70'
+        egg:
+            supply_prob: '1.4'
+        compass:
+            supply_prob: '30.8'
+        fishing_rod:
+            supply_prob: '14'
+        glowstone_dust:
+            supply_prob: '14'
+        bone:
+            supply_prob: '2.8'
+        sugar:
+            supply_prob: '14'
+        cake:
+            supply_prob: '252'
+        water:
+            supply_prob: '1.4'
+        lava:
+            supply_prob: '35'

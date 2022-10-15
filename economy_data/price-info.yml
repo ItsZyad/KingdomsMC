@@ -134,6 +134,25 @@ price_info:
       mangrove_stairs:
         base: '2'
         gov_cap: '3'
+      diorite:
+        base: '1.5'
+        gov_cap: '2.7'
+        supply_prob: '0.89'
+      andesite:
+        base: '2.25'
+        gov_cap: '3.45'
+        supply_prob: '0.92'
+      red_sand:
+        base: '1'
+        gov_cap: '1.4'
+        supply_prob: '1'
+        amount_mod: '1'
+      oak_planks:
+        base: '1.5'
+        gov_cap: '2'
+      oak_log:
+        base: '1.5'
+        gov_cap: '2'
     general:
       sponge:
         base: '80'
