@@ -198,14 +198,18 @@ CommandHandler_CISK:
     ## Defs carried from SPEECHHANDLER_CISK:
     ## waitTime, currentBlock, interactionAmounts, talkSpeed, shouldEngage, speech, hasBroken
 
-    - if <[value]> == /break/:
-        - define commandRes <map[script=CommandHandler_CISK;path=BreakCommand]>
+    - definemap commandRes:
+        script: <script.name>
+        path: BreakCommand
 
-    - else if <[value].starts_with[/goto]>:
-        - define commandRes <map[script=CommandHandler_CISK;path=GotoCommand]>
+    - if <[value].starts_with[/goto]>:
+        - define commandRes.path:GotoCommand
 
     - else if <[value].starts_with[/wait]>:
-        - define commandRes <map[script=CommandHandler_CISK;path=WaitCommand]>
+        - define commandRes.path:WaitCommand
+
+    - else if <[value].starts_with[/dataget]>:
+        - define commandRes.path:DataCommand
 
     - else:
         - define errMsg "Unrecognized command '<[line]>'"
@@ -270,12 +274,13 @@ ConditionalHandler_CISK:
             - define targetID <[targetName].split[<&at>].get[2]>
             - define lookupList <list>
 
-            - case player:
-                - define lookupList <server.players.parse_tag[<[parse_value].name>]>
-                - define conditionTarget <player[<[targetID]>]>
-            - case npc:
-                - define lookupList <server.npcs.parse_tag[<[parse_value].id>]>
-                - define conditionTarget <npc[<[targetID]>]>
+            - choose <[targetType]>:
+                - case player:
+                    - define lookupList <server.players.parse_tag[<[parse_value].name>]>
+                    - define conditionTarget <player[<[targetID]>]>
+                - case npc:
+                    - define lookupList <server.npcs.parse_tag[<[parse_value].id>]>
+                    - define conditionTarget <npc[<[targetID]>]>
 
             - if <[conditionTarget].exists> || <[conditionTarget]> == null:
                 - define errMsg "Invalid target specified: '<[targetName]>'"
@@ -313,6 +318,7 @@ DataHandler_CISK:
 
     - define dataBlock <[line].get[DATA]>
     - define targetName <[dataBlock].get[target]>
+    - define dataName <[dataBlock].get[varName]>
     - define dataVal <[dataBlock].get[data]>
     - define isPersistent <[dataBlock].get[persistent]>
     - define isPlayerSpecific <[dataBlock].get[playerSpecific]>
@@ -347,7 +353,7 @@ DataHandler_CISK:
     # - narrate format:debug TARN:<[targetName]>
     # - narrate format:debug DATA:<[dataVal]>
 
-    - flag <[dataTarget]> <[targetName]>:<[dataVal]>
+    - flag <[dataTarget]> KQuests.data.<[dataName]>:<[dataVal]>
 
 WriteCiskError:
     type: task
