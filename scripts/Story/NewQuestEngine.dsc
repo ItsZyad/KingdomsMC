@@ -12,6 +12,7 @@
 #ignorewarning invalid_data_line_quotes
 ## ---------------------------END HEADER----------------------------
 
+#TODO: Make var handler change every script so that error messages reflect correctly
 
 RequiredKeys_CISK:
     type: data
@@ -191,6 +192,32 @@ CommandHandler_CISK:
         - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
         - determine cancelled
 
+    DataCommand:
+    - define valueSplit "<[value].split[ ]>"
+    - define dataTargetRaw <[valueSplit].filter_tag[<[filter_value].starts_with[t:].or[<[filter_value].starts_with[target:]>]>].get[1].replace_text[regex:/$]>
+    - define dataName <[valueSplit].filter_tag[<[filter_value].starts_with[n:].or[<[filter_value].starts_with[name:]>]>].get[1].replace_text[regex:/$].split[:].get[2]>
+    - define dataDefaultRaw <[valueSplit].filter_tag[<[filter_value].starts_with[def:].or[<[filter_value].starts_with[default:]>]>].get[1].replace_text[regex:/$]>
+
+    - if !<[dataName].exists> || !<[dataTargetRaw].exists>:
+        - define errMsg "Must specify data variable name and a data target."
+        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
+        - determine cancelled
+
+    - define dataTarget <[dataTargetRaw].split[:].get[2].as[entity]>
+    - narrate format:debug FLAG:<[dataTarget].flag[KQuests]>
+
+    - if !<[dataTarget].flag_map.exists>:
+        - define errMsg "The data target: '<[dataTarget].color[red]>' provided is not a valid flaggable entity."
+        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
+        - determine cancelled
+
+    - define return <[dataTarget].flag[KQuests.data.<[dataName]>]>
+
+    - if !<[return].exists> && <[dataDefaultRaw].exists>:
+        - determine <[dataDefaultRaw].split[:].get[2]>
+
+    - determine <[return]>
+
     script:
     ## Defs carried from MAINPARSER_CISK:
     ## file, schema, handler, npc, player
@@ -237,7 +264,6 @@ OptionsHandler_CISK:
 
         - clickable save:option until:1m for:<[player]>:
             - ~run SpeechHandler_CISK defmap:<queue.definition_map>
-            - narrate format:debug <script.queues>
             - flag <[player]> clickedOption
 
         - narrate "- <underline><element[<[prompt]>].on_click[<entry[option].command>]>"
@@ -254,6 +280,55 @@ OptionsHandler_CISK:
 
 
 ConditionalHandler_CISK:
+    type: task
+    script:
+    ## Defs carried from MAINPARSER_CISK:
+    ## file, schema, handler, npc, player
+
+    ## Defs carried from SPEECHHANDLER_CISK:
+    ## waitTime, currentBlock, interactionAmounts, talkSpeed, shouldEngage, speech, hasBroken, line
+
+    - define handler <[line].keys.get[1]>
+    - define ifBlock <[line].get[CONDITIONAL]>
+    - define compOperation <[line].deep_get[CONDITIONAL.condition.comparison]>
+    - define compOperands <[line].deep_get[CONDITIONAL.condition.operands]>
+    - define parsedOperands <list[]>
+
+    - foreach <[compOperands]> as:operand:
+        - if <[operand].starts_with[/]> && <[operand].ends_with[/]>:
+            - define value <[operand]>
+            - inject CommandHandler_CISK
+
+            - define commandScript <[commandRes].get[script]>
+            - define commandPath <[commandRes].get[path]>
+
+            - run <[commandScript]> path:<[commandPath]> defmap:<queue.definition_map> save:command
+            - define result <entry[command].created_queue.determination.get[1]>
+
+        - if <[result].exists>:
+            - define parsedOperands:->:<[result]>
+            - define result:!
+
+        - else:
+            - define parsedOperands:->:<[operand]>
+
+        - narrate format:debug PAR:<[parsedOperands]>
+
+    - define ifTrue <[line].deep_get[CONDITIONAL.ifTrue.actions]>
+    - define ifFalse <[line].deep_get[CONDITIONAL.ifFalse.actions]>
+    - define speech null
+
+    - if <[parsedOperands].get[1].is[<[compOperation]>].than[<[parsedOperands].get[2]>]>:
+        - define speech <[ifTrue]>
+
+    - else:
+        - define speech <[ifFalse]>
+
+    #- run FlagVisualizer def.flag:<[line]> def.flagName:LINE
+    - inject SpeechHandler_CISK
+
+
+OLD_ConditionalHandler_CISK:
     type: task
     script:
     ## Defs carried from MAINPARSER_CISK:
