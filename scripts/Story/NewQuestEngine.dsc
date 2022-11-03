@@ -6,9 +6,9 @@
 ## * to write quests and dialogue stubs for Kingdoms.
 ##
 ## @Author: Zyad (ITSZYAD#9280)
-## @Date: Aug - Oct 2022
+## @Date: Aug - Nov 2022
 ## @Status: INDEV
-## @Version: v0.3
+## @Version: v0.5
 #ignorewarning invalid_data_line_quotes
 ## ---------------------------END HEADER----------------------------
 
@@ -444,6 +444,16 @@ WriteCiskError:
     - narrate format:ciskerror_noheader <[message]>
     - narrate format:ciskerror_noheader "Please fix this error and re-run the parser."
     - narrate <n>
+
+
+ciskerror:
+    type: format
+    format: <&gt><&gt> <bold>CISK ERROR: <gray><[text]>
+
+
+ciskerror_noheader:
+    type: format
+    format: <red><&gt><&gt> <gray><[text]>
 
 
 CISKAssignment:

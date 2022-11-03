@@ -242,14 +242,6 @@ MainParser_CISK_OLD:
         - flag <[npc]> dialogueData:!
 
 
-ciskerror:
-    type: format
-    format: "<&gt><&gt> <bold>CISK ERROR: <gray><[text]>"
-
-ciskerror_noheader:
-    type: format
-    format: "<red><&gt><&gt> <gray><[text]>"
-
 Debugger_CISK:
     type: task
     script:
