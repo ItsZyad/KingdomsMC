@@ -46,7 +46,7 @@ Debugger:
 
                 - define beforeWaitTime <util.time_now.epoch_millis>
 
-                - waituntil <player.has_flag[adminTools.debugMode].not.or[<player.is_online.not>]>
+                - waituntil <player.has_flag[adminTools.debugMode].not.or[<player.is_online.not>]> rate:1s
 
                 - define afterWaitTime <util.time_now.epoch_millis>
                 - define waitTime <[afterWaitTime].sub[<[beforeWaitTime]>]>
