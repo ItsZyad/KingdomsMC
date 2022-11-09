@@ -43,7 +43,7 @@ Bribe_Handler:
             - narrate format:callout "Your kingdom has exhausted its influence actions for today <&co><&bs>"
 
         on player chats:
-        - if <player.has_flag[noChat]>:
+        - if <player.has_flag[noChat.bribe]>:
             - if <context.message.to_lowercase> == cancel:
                 - narrate format:callout "Transaction cancelled!"
                 - flag player bribeAmount:!
