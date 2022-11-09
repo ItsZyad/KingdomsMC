@@ -170,12 +170,12 @@ CommandHandler_CISK:
     - define currentBlock_orig <[currentBlock]>
     - define currentHandler <[playerDefinedBlock]>
     - define speech <[currentHandler].get[actions]>
+    - define talkSpeed <[currentHandler].get[talkSpeed].if_null[1]>
 
     # - narrate format:debug CUR:<[currentHandler]>
     # - narrate format:debug BLO:<[currentBlock_orig]>
     # - narrate format:debug SPC:<[speech]>
 
-    #- inject SpeechHandler_CISK path:InitializeVars
     - inject SpeechHandler_CISK
 
     - define currentHandler <[currentBlock_orig]>
@@ -227,16 +227,19 @@ CommandHandler_CISK:
 
     - definemap commandRes:
         script: <script.name>
-        path: BreakCommand
+        path: null
 
-    - if <[value].starts_with[/goto]>:
-        - define commandRes.path:GotoCommand
+    - definemap commandToPathRef:
+        /goto: GotoCommand
+        /wait: WaitCommand
+        /dataget: DataCommand
+        /give: GiveCommand
+        /end: BreakCommand
 
-    - else if <[value].starts_with[/wait]>:
-        - define commandRes.path:WaitCommand
+    - define commandStart "<[value].split[ ].get[1]>"
 
-    - else if <[value].starts_with[/dataget]>:
-        - define commandRes.path:DataCommand
+    - if <[commandStart].is_in[<[commandToPathRef].keys>]>:
+        - define commandRes.path:<[commandToPathRef].get[<[commandStart]>]>
 
     - else:
         - define errMsg "Unrecognized command '<[line]>'"
