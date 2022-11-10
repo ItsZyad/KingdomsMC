@@ -218,6 +218,30 @@ CommandHandler_CISK:
 
     - determine <[return]>
 
+    GiveCommand:
+    - define valueSplit "<[value].split[ ]>"
+    - define giveItem <[valueSplit].filter_tag[<[filter_value].starts_with[i:].or[<[filter_value].starts_with[item:]>]>].get[1].trim.replace_text[regex:/$].split[:].get[2].if_null[null]>
+    - define quantity <[valueSplit].filter_tag[<[filter_value].starts_with[q:].or[<[filter_value].starts_with[quantity:]>]>].get[1].trim.replace_text[regex:/$].split[:].get[2].if_null[null]>
+    - define toPlayer <[valueSplit].filter_tag[<[filter_value].starts_with[to:]>].get[1].trim.replace_text[regex:/$].split[:].get[2].as[player].if_null[null]>
+    - define asDrop <[valueSplit].filter_tag[<[filter_value].trim.contains_text[as_drop]>].get[1].replace_text[regex:/$].if_null[null]>
+
+    - if !<[giveItem].exists>:
+        - define errMsg "Must specify item to give to player"
+        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
+        - determine cancelled
+
+    - if <[quantity]> == null:
+        - define quantity 1
+
+    - if <[toPlayer]> == null:
+        - define toPlayer <[player]>
+
+    - if <[asDrop]> == as_drop:
+        - drop <[giveItem].as[item]> quantity:<[quantity]> <[npc].as[entity].location.forward[1]>
+
+    - else:
+        - give <[giveItem].as[item]> quantity:<[quantity]> to:<[toPlayer].inventory>
+
     script:
     ## Defs carried from MAINPARSER_CISK:
     ## file, schema, handler, npc, player
@@ -505,5 +529,6 @@ CISKCommand:
     - flag <[npc]> file:<[file]>
     - flag <[npc]> schema:<[schema]>
 
+    - assignment clear to:<[npc]>
     - assignment set CISKAssignment to:<[npc]>
     - narrate format:admincallout "Assigned quest: <[schema]> to npc: <[npc].name>"
