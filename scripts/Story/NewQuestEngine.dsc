@@ -31,9 +31,6 @@ MainParser_CISK:
     - define questKeyList <[questRaw].list_keys>
     - define foundRequiredKeys <list[]>
 
-    #- narrate format:debug SCH:<[schema]>
-    #- narrate format:debug RAW:<[questRaw]>
-
     - foreach <script[RequiredKeys_CISK].data_key[top]>:
         - if <[questKeyList].contains[<[value]>]>:
             - define foundRequiredKeys:->:<[value]>
@@ -84,10 +81,6 @@ SpeechHandler_CISK:
     - define interactionAmounts <[interactionsAmounts].if_null[0]>
     - define currentBlock <[handlerBlock].get[<[interactionAmounts]>].if_null[<[handlerBlock]>]>
 
-    # - narrate format:debug INT:<[interactionAmounts]>
-    # - narrate format:debug HAN:<[handlerBlock]>
-    # - narrate format:debug CUR:<[currentBlock]>
-
     - if !<[currentBlock].exists>:
         - define errMsg "Handler: <[handler]> is missing default case."
         - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[currentBlock]> def.message:<[errMsg]>
@@ -95,8 +88,6 @@ SpeechHandler_CISK:
     - define talkSpeed <[currentBlock].get[talkSpeed].if_null[1]>
     - define shouldEngage <[currentBlock].get[blockingInteraction].if_null[false]>
     - define speech <[currentBlock].get[actions]>
-
-    # - narrate format:debug SPC:<[speech]>
 
     script:
     ## Defs carried from MAINPARSER_CISK:
@@ -107,9 +98,6 @@ SpeechHandler_CISK:
 
     # Reminder to self: When passing in player defined branches, pass the player branch
     # not the parent one named 'branches'
-
-    #- run FlagVisualizer def.flag:<queue.definition_map.get[interactionAmounts]> def.flagName:intAmnts
-    #- narrate <[handler]> format:debug
 
     - if <[shouldEngage]> && !<[npc].engaged>:
         - engage
@@ -142,14 +130,10 @@ SpeechHandler_CISK:
         - else if <[line].starts_with[/]> && <[line].ends_with[/]>:
             - define waitTime 0
             - define value <[line]>
-            # - narrate format:debug VAL:<[value]>
             - inject CommandHandler_CISK
 
             - define commandScript <[commandRes].get[script]>
             - define commandPath <[commandRes].get[path]>
-
-            # - narrate format:debug SCR:<[commandScript]>
-            # - narrate format:debug PAT:<[commandPath]>
 
             - inject <[commandScript]> path:<[commandPath]>
 
@@ -176,17 +160,10 @@ CommandHandler_CISK:
     - define gotoScript "<[value].split[/goto ].get[2].replace_text[/].with[]>"
     - define playerDefinedBlock <yaml[ciskFile].read[<[schema]>.branches.<[gotoScript]>]>
 
-    # - narrate format:debug SCH:<[schema]>
-    # - narrate format:debug SCR:<[gotoscript]>
-
     - define currentBlock_orig <[currentBlock]>
     - define currentHandler <[playerDefinedBlock]>
     - define speech <[currentHandler].get[actions]>
     - define talkSpeed <[currentHandler].get[talkSpeed].if_null[1]>
-
-    # - narrate format:debug CUR:<[currentHandler]>
-    # - narrate format:debug BLO:<[currentBlock_orig]>
-    # - narrate format:debug SPC:<[speech]>
 
     - inject SpeechHandler_CISK
 
@@ -395,8 +372,6 @@ ConditionalHandler_CISK:
         - else:
             - define parsedOperands:->:<[operand]>
 
-        - narrate format:debug PAR:<[parsedOperands]>
-
     - define ifTrue <[line].deep_get[CONDITIONAL.ifTrue.actions]>
     - define ifFalse <[line].deep_get[CONDITIONAL.ifFalse.actions]>
     - define speech null
@@ -407,7 +382,6 @@ ConditionalHandler_CISK:
     - else:
         - define speech <[ifFalse]>
 
-    #- run FlagVisualizer def.flag:<[line]> def.flagName:LINE
     - inject SpeechHandler_CISK
 
 
@@ -505,10 +479,6 @@ DataHandler_CISK:
         - define errMsg "Internal error occured while calculating data target result"
         - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
         - determine cancelled
-
-    # - narrate format:debug DTAR:<[dataTarget]>
-    # - narrate format:debug TARN:<[targetName]>
-    # - narrate format:debug DATA:<[dataVal]>
 
     - flag <[dataTarget]> KQuests.data.<[dataName]>.value:<[dataVal]>
 
