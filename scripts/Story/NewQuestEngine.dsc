@@ -64,6 +64,12 @@ MainParser_CISK:
     - if <[npc].has_flag[dialogueData]>:
         - flag <[npc]> dialogueData:!
 
+    - foreach <list[<[npc]>|<[player]>]> as:dataTarget:
+        - foreach <[dataTarget].flag[KQuests.data]>:
+            - if !<[value].keys.contains[persistent]>:
+                - narrate format:debug <[key]>
+                - flag <[dataTarget]> KQuests.data.<[key]>:!
+
 
 SpeechHandler_CISK:
     type: task
@@ -287,6 +293,7 @@ CommandHandler_CISK:
         - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
         - determine cancelled
 
+    - flag <[dataTarget]> KQuests.data.<[dataName]>:!
     - flag <[dataTarget]> KQuests.data.<[dataName]>.value:<[dataVal]>
     - flag <[dataTarget]> KQuests.data.<[dataName]>.persistent if:<[isPersistent].equals[null].not>
 
