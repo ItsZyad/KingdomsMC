@@ -17,9 +17,9 @@
 RequiredKeys_CISK:
     type: data
     top:
-        - "questName"
-        - "questDesc"
-        - "questIcon"
+        - questName
+        - questDesc
+        - questIcon
 
 
 MainParser_CISK:
@@ -114,6 +114,7 @@ SpeechHandler_CISK:
             - determine cancelled
 
         - define waitTime <proc[WaitTime_CISK].context[<[line]>|<[talkSpeed]>].round_to_precision[0.01]>
+        - define waitOverride null
 
         - if <[line].as[map].exists>:
             - choose <[line].keys.get[1].to_uppercase>:
@@ -146,6 +147,8 @@ SpeechHandler_CISK:
 
         - else:
             - chat targets:<[player]> talkers:<[npc]> <[line]>
+
+        - if !<[waitOverride].exists> || <[waitOverride]> == null:
             - wait <[waitTime]>s
 
     - if <[shouldEngage]> && <[npc].engaged>:
@@ -182,10 +185,12 @@ CommandHandler_CISK:
     - determine cancelled
 
     WaitCommand:
-    - define waitTime "<[value].split[/wait ].get[2].replace_text[/].with[]>"
+    - define valueSplit "<[value].split[ ]>"
+    - define extraWaitTime <[valueSplit].filter_tag[<[filter_value].is_integer.or[<[filter_value].is_decimal>]>].get[1].trim.replace_text[regex:/$]>
+    - define waitOverride <[valueSplit].filter_tag[<[filter_value].trim.contains_text[override]>].get[1].replace_text[regex:/$].if_null[null]>
 
-    - if <[waitTime].is_integer.or[<[waitTime].is_decimal>]>:
-        - wait <[waitTime]>s
+    - if <[extraWaitTime].is_integer.or[<[extraWaitTime].is_decimal>]>:
+        - wait <[extraWaitTime]>s
 
     - else:
         - define errMsg "Expected decimal or integer argument in wait command."
@@ -423,7 +428,6 @@ DataHandler_CISK:
     - define dataName <[dataBlock].get[varName]>
     - define dataVal <[dataBlock].get[data]>
     - define isPersistent <[dataBlock].get[persistent]>
-    - define isPlayerSpecific <[dataBlock].get[playerSpecific]>
 
     - if <[targetName].regex_matches[^npc|player]>:
         - if <[targetName].contains_text[<&at>]>:
