@@ -113,12 +113,13 @@ SpeechHandler_CISK:
             - disengage
             - determine cancelled
 
-        - define waitTime <proc[WaitTime_CISK].context[<[line]>|<[talkSpeed]>].round_to_precision[0.01]>
+        - define waitTime <[waitTime].if_null[1]>
         - define waitOverride null
 
         - if <[line].as[map].exists>:
             - choose <[line].keys.get[1].to_uppercase>:
                 - case OPTIONS:
+                    - define waitTime 0
                     - inject OptionsHandler_CISK
 
                 - case DATA:
@@ -133,6 +134,7 @@ SpeechHandler_CISK:
                     - determine cancelled
 
         - else if <[line].starts_with[/]> && <[line].ends_with[/]>:
+            - define waitTime 0
             - define value <[line]>
             # - narrate format:debug VAL:<[value]>
             - inject CommandHandler_CISK
@@ -146,6 +148,7 @@ SpeechHandler_CISK:
             - inject <[commandScript]> path:<[commandPath]>
 
         - else:
+            - define waitTime <proc[WaitTime_CISK].context[<[line]>|<[talkSpeed]>].round_to_precision[0.01]>
             - chat targets:<[player]> talkers:<[npc]> <[line]>
 
         - if !<[waitOverride].exists> || <[waitOverride]> == null:
@@ -209,7 +212,6 @@ CommandHandler_CISK:
         - determine cancelled
 
     - define dataTarget <[dataTargetRaw].split[:].get[2].as[entity]>
-    - narrate format:debug FLAG:<[dataTarget].flag[KQuests]>
 
     - if !<[dataTarget].flag_map.exists>:
         - define errMsg "The data target: '<[dataTarget].color[red]>' provided is not a valid flaggable entity."
@@ -309,7 +311,7 @@ CommandHandler_CISK:
 
     - define commandStart "<[value].split[ ].get[1]>"
 
-    - if <[commandStart].is_in[<[commandToPathRef].keys>]>:
+    - if <[commandStart].is_in[<[commandToPathRef].keys>]> && <[value].ends_with[/]>:
         - define commandRes.path:<[commandToPathRef].get[<[commandStart]>]>
 
     - else:
