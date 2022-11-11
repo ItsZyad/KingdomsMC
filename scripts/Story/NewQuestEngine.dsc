@@ -128,7 +128,7 @@ SpeechHandler_CISK:
                     - inject ConditionalHandler_CISK
 
                 - default:
-                    - define errMsg "Unrecognized block '<[line].key.get[1]>'. Could this be a typo?"
+                    - define errMsg "Unrecognized block '<[line].key>'. Could this be a typo?"
                     - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[currentBlock]> def.message:<[errMsg]>
                     - determine cancelled
 
@@ -197,7 +197,7 @@ CommandHandler_CISK:
         - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
         - determine cancelled
 
-    DataCommand:
+    DataGetCommand:
     - define valueSplit "<[value].split[ ]>"
     - define dataTargetRaw <[valueSplit].filter_tag[<[filter_value].starts_with[t:].or[<[filter_value].starts_with[target:]>]>].get[1].replace_text[regex:/$]>
     - define dataName <[valueSplit].filter_tag[<[filter_value].starts_with[n:].or[<[filter_value].starts_with[name:]>]>].get[1].replace_text[regex:/$].split[:].get[2]>
@@ -216,7 +216,7 @@ CommandHandler_CISK:
         - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
         - determine cancelled
 
-    - define return <[dataTarget].flag[KQuests.data.<[dataName]>]>
+    - define return <[dataTarget].flag[KQuests.data.<[dataName]>.value]>
 
     - if !<[return].exists> && <[dataDefaultRaw].exists>:
         - determine <[dataDefaultRaw].split[:].get[2]>
@@ -247,6 +247,47 @@ CommandHandler_CISK:
     - else:
         - give <[giveItem].as[item]> quantity:<[quantity]> to:<[toPlayer].inventory>
 
+    DataStoreCommand:
+    - define valueSplit "<[value].split[ ]>"
+    - define targetName <[valueSplit].filter_tag[<[filter_value].starts_with[t:].or[<[filter_value].starts_with[target:]>]>].get[1].trim.replace_text[regex:/$].split[:].get[2].if_null[null]>
+    - define dataName <[valueSplit].filter_tag[<[filter_value].starts_with[n:].or[<[filter_value].starts_with[name:]>]>].get[1].trim.replace_text[regex:/$].split[:].get[2].if_null[null]>
+    - define dataVal <[valueSplit].filter_tag[<[filter_value].starts_with[v:].or[<[filter_value].starts_with[value:]>]>].get[1].trim.replace_text[regex:/$].split[:].get[2].if_null[null]>
+    - define isPersistent <[valueSplit].filter_tag[<[filter_value].trim.contains_text[persistent]>].get[1].replace_text[regex:/$].if_null[null]>
+
+    ## Maybe turn this into its own module for checking if an object is
+    ## actually flaggable
+    ## --- ##
+    - if <[targetName].regex_matches[^npc|player]>:
+        - if <[targetName].contains_text[<&at>]>:
+            - define targetType <[targetName].split[<&at>].get[1]>
+            - define targetID <[targetName].split[<&at>].get[2]>
+            - define lookupList <list>
+
+            - choose <[targetType]>:
+                - case player:
+                    - define lookupList <server.players.parse_tag[<[parse_value].name>]>
+                    - define dataTarget <player[<[targetID]>]>
+                - case npc:
+                    - define lookupList <server.npcs.parse_tag[<[parse_value].id>]>
+                    - define dataTarget <npc[<[targetID]>]>
+
+            - if <[dataTarget].exists> || <[dataTarget]> == null:
+                - define errMsg "Invalid target specified: '<[targetName]>'"
+                - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
+                - determine cancelled
+
+        - else:
+            - define dataTarget <queue.definition_map.get[<[targetName]>]>
+    ## --- ##
+
+    - if !<[dataTarget].exists>:
+        - define errMsg "Internal error occured while calculating data target result"
+        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
+        - determine cancelled
+
+    - flag <[dataTarget]> KQuests.data.<[dataName]>.value:<[dataVal]>
+    - flag <[dataTarget]> KQuests.data.<[dataName]>.persistent if:<[isPersistent].equals[null].not>
+
     script:
     ## Defs carried from MAINPARSER_CISK:
     ## file, schema, handler, npc, player
@@ -261,9 +302,10 @@ CommandHandler_CISK:
     - definemap commandToPathRef:
         /goto: GotoCommand
         /wait: WaitCommand
-        /dataget: DataCommand
         /give: GiveCommand
         /end: BreakCommand
+        /dataget: DataGetCommand
+        /datastore: DataStoreCommand
 
     - define commandStart "<[value].split[ ].get[1]>"
 
@@ -459,7 +501,7 @@ DataHandler_CISK:
     # - narrate format:debug TARN:<[targetName]>
     # - narrate format:debug DATA:<[dataVal]>
 
-    - flag <[dataTarget]> KQuests.data.<[dataName]>:<[dataVal]>
+    - flag <[dataTarget]> KQuests.data.<[dataName]>.value:<[dataVal]>
 
 WriteCiskError:
     type: task
