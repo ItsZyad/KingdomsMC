@@ -7,7 +7,13 @@
 ## @Updated: May 2022
 ## @Script Ver: N/A
 ##
+##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------
+
+CustomJoinMessages:
+    type: data
+    player_list:
+        fuzzysloth: "the trident king has returned!"
 
 KingdomSelection_Handler:
     type: world
@@ -21,7 +27,7 @@ KingdomSelection_Handler:
             - wait 1s
 
             - narrate "<gold><bold>Sorry to Bother!"
-            - narrate "Welcome to Kingdoms! Before you get playing, please just ensure that you have adjusted your video settings so that your GUI size is 2 or 1."
+            - narrate "<underline>Welcome to Kingdoms!<underline.end_format> Before you get playing, please just ensure that you have adjusted your video settings so that your GUI size is 2 or 1."
             - narrate "<gray><italic>Minecraft does a poor job of scaling text based on screen resolution and UI size. By adjusting the size of your UI you will avoid a bunch of issues relating to text running off the screen that may occur while playing."
             - narrate <&sp>
             - narrate "<gold><bold>Thank you!"
@@ -33,8 +39,9 @@ KingdomSelection_Handler:
             - define joinColor <red>
 
         - define joinMsg null
-        - if <player.uuid> == a1fc814b-c1fa-42a8-b578-0990f554c1ce:
-            - define joinMsg "the trident king has returned!"
+        - foreach <script[CustomJoinMessages].data_key[player_list]>:
+            - if <[key]> == <player.name>:
+                - define joinMsg <[value]>
 
         - else:
             - random:
