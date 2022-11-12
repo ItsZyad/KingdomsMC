@@ -55,7 +55,7 @@ NegativeBalanceAlert:
     type: world
     events:
         on player joins:
-        - wait 1s
+        - wait 10t
         - yaml load:kingdoms.yml id:kingdoms
         - define kingdom <player.flag[kingdom]>
 
