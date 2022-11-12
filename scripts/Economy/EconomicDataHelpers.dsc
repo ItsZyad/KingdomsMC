@@ -218,8 +218,8 @@ PriceExtrapolationHelper_Command:
         - define searchItems <yaml[prices].read[price_info.items.<[group]>].keys>
 
     - else:
-        - foreach <yaml[prices].read[price_info.items]> as:group:
-            - define searchItems <[searchItems].include[<[group].keys>]>
+        - foreach <yaml[prices].read[price_info.items]>:
+            - define searchItems <[searchItems].include[<[value].keys>]>
 
     - if <[flags].contains[-c]>:
         - define consistentDatapointsOnly true
