@@ -316,7 +316,7 @@ TransferTracker_Command:
         - flag <[transferItem]> transferInfo:<[request].include[transferID=<[key]>]>
 
         #- if <[request].get[madeBy]> != <player>:
-        - adjust def:transferItem "lore:<[transferItem].lore.include_single[<element[CLICK TO CLAIM].color[green].bold>]>"
+        - adjust def:transferItem "lore:<[transferItem].lore.include[|<element[CLICK TO CLAIM].color[green].bold>]>"
         - flag <[transferItem]> claimable:true
 
         - define transferItemList:->:<[transferItem]>
