@@ -221,6 +221,29 @@ PriceExtrapolationHelper_Command:
         - foreach <yaml[prices].read[price_info.items]>:
             - define searchItems <[searchItems].include[<[value].keys>]>
 
+    - if <[item].is_in[<[searchItems]>]>:
+        - clickable save:Confirm_ExistingItem for:<player> usages:1 until:10m:
+            - define searchItems <[searchItems].exclude[<[item]>]>
+            - narrate format:admincallout "Proceeding... Adjusting extrapolation data to prevent contamination."
+            - narrate <n>
+            - flag <player> noChat.admin.existingItemSelection:confirm
+
+        - clickable save:Cancel_ExistingItem for:<player> usages:1 until:10m:
+            - narrate format:admincallout "Cancelled item price extrapolation."
+            - flag <player> noChat.admin.existingItemSelection:cancel
+
+        - narrate format:admincallout "This item already exists. Do you want to proceed anyways and overwrite its price data?"
+        - narrate <n>
+        - narrate "<element[YES].bold.underline.color[green].on_click[<entry[Confirm_ExistingItem].command>]> / <element[NO].bold.underline.color[red].on_click[<entry[Cancel_ExistingItem].command>]>"
+
+        - waituntil <player.has_flag[noChat.admin.existingItemSelection]>
+
+        - define didCancel <player.flag[noChat.admin.existingItemSelection]>
+        - flag <player> noChat.admin.existingItemSelection:!
+
+        - if <[didCancel]> == cancel:
+            - determine cancelled
+
     - if <[flags].contains[-c]>:
         - define consistentDatapointsOnly true
 

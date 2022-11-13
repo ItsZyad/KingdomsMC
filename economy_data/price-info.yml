@@ -71,6 +71,11 @@ price_info:
         gov_cap: '42'
         supply_prob: '0.55'
         amount_mod: '1.5'
+      copper_ingot:
+        base: '12'
+        gov_cap: '20'
+        supply_prob: '0.67'
+        amount_mod: '1.1'
     building_blocks:
       stone:
         base: '3'
@@ -111,6 +116,7 @@ price_info:
       glass_pane:
         base: '2.5'
         gov_cap: '3.5'
+        supply_prob: '0.95'
       sandstone:
         base: '3'
         gov_cap: '4.2'
@@ -153,6 +159,9 @@ price_info:
       oak_log:
         base: '1.5'
         gov_cap: '2'
+      glowstone:
+        base: '70'
+        gov_cap: '98'
     general:
       sponge:
         base: '80'
