@@ -132,7 +132,7 @@ PriceExtrapolationHelper_Command:
                 - define allStats.<[entry]>.<[key]>:<[value]>
 
                 - if <[value].div[2].exists>:
-                    - define allStats.sums.<[key]>.value:+:<[value]>
+                    - define allStats.sums.<[key]>.value:+:<[value].mul[<[weights].get[<[entry]>].if_null[1]>]>
                     - define allStats.sums.<[key]>.occurances:++
 
         - define finalStats <map[]>
@@ -162,7 +162,7 @@ PriceExtrapolationHelper_Command:
             - waituntil <player.has_flag[noChat.admin.weightingItem].not> rate:10t
 
             - if <player.has_flag[itemWeight]>:
-                - define weights.<[target]>:<player.flag[itemWeight]>
+                - define weights.<[target]>:<player.flag[itemWeight].if_null[<[weights].get[<[target]>].if_null[1]>]>
 
             - foreach <[clickableList]>:
                 - clickable cancel:<[value]>
@@ -311,7 +311,13 @@ PriceExtrapolation_Handler:
             - narrate format:admincallout "Cancelled Operation"
 
         - else if <context.message.div[2].exists>:
-            - flag <player> itemWeight:<context.message>
+            - if <context.message> <= 1:
+                - flag <player> itemWeight:<context.message>
+
+            - else:
+                - narrate format:admincallout "<element[Warning!].color[red].bold> Item weight values must be between 0 and 1!"
+                - flag <player> itemWeight:!
+
             - flag <player> noChat.admin.weightingItem:!
 
         - else:
