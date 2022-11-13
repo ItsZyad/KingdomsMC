@@ -139,8 +139,6 @@ PriceExtrapolationHelper_Command:
         - inject PriceExtrapolationHelper_Command path:GenerateFinalStatsFromScratch
         - inject PriceExtrapolationHelper_Command path:RegenerateFinalStats
 
-        - yaml id:prices unload
-
     #- narrate format:debug EXT:<[extrapolatedItems]>
 
     - foreach <[extrapolatedItems]> as:entry:
@@ -172,7 +170,16 @@ PriceExtrapolationHelper_Command:
         - define clickableList:->:<entry[item_clickable].id>
         - define clickableList:->:<entry[weight_item].id>
 
-        - narrate "<element[[Remove Item]].on_click[<entry[item_clickable].command>].color[red].underline> <element[[Weight]].on_click[<entry[weight_item].command>].color[aqua].underline>.....<[entry].color[gray].italicize>.....<element[Weight: ].color[aqua]><[weights].get[<[entry]>].if_null[1]>"
+        - yaml load:economy_data/price-info.yml id:prices
+
+        - foreach <yaml[prices].read[price_info.items].keys> as:key:
+            - if <yaml[prices].contains[price_info.items.<[key]>.<[entry]>]>:
+                - define itemInfo "<yaml[prices].read[price_info.items.<[key]>.<[entry]>].to_list[ : ].separated_by[<n>]>"
+                - foreach stop
+
+        - yaml id:prices unload
+
+        - narrate "<element[[Remove Item]].on_click[<entry[item_clickable].command>].color[red].underline> <element[[Weight]].on_click[<entry[weight_item].command>].color[aqua].underline>.....<[entry].color[gray].italicize.underline.on_hover[<[itemInfo]>]>.....<element[Weight: ].color[aqua]><[weights].get[<[entry]>].if_null[1]>"
 
     - narrate <n>
     - narrate "<element[Calculate New Item Averages].color[green].bold.underline.on_click[<entry[save_new_items].command>]>"
