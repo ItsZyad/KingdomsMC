@@ -99,11 +99,21 @@ PriceExtrapolationHelper_Command:
 
         - define clickableList:->:<entry[refresh_all_stats].id>
 
-    - clickable save:accept_final usages:1 for:<player> until:1m:
+    - clickable save:accept_final usages:1 for:<player> until:5m:
+        - clickable cancel:<entry[reject_final].id>
         - inject PriceExtrapolationHelper_Command path:AcceptFinalOutput
+
+    - clickable save:reject_final usages:1 for:<player> until:5m:
+        - define finalStats:!
+        - define allStats:!
+        - narrate <n>
+        - narrate format:admincallout "Discarded all pending changes for item: <[item].color[aqua]>"
+        - clickable cancel:<entry[accept_final].id>
+        - determine cancelled
 
     - narrate <n>
     - narrate "<element[ACCEPT FINAL OUTPUT].color[green].bold.underline.on_click[<entry[accept_final].command>].on_hover[This will write the above data to price-info.yml]>"
+    - narrate "<element[REJECT FINAL OUTPUT].color[red].bold.underline.on_click[<entry[reject_final].command>]>"
 
     AcceptFinalOutput:
     - yaml load:economy_data/price-info.yml id:prices
