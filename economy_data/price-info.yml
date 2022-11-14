@@ -8,7 +8,7 @@ price_info:
         gov_cap: '280'
         complements: ''
         substitutes: g:ores
-        supply_prob: '0.6'
+        supply_prob: '0.5'
         amount_mod: '0.9'
       lapis_ore:
         base: '100'
@@ -18,7 +18,7 @@ price_info:
       diamond_ore:
         base: '200'
         gov_cap: '280'
-        supply_prob: '0.35'
+        supply_prob: '0.25'
       coal_ore:
         base: '15'
         gov_cap: '21'
@@ -74,8 +74,18 @@ price_info:
       copper_ingot:
         base: '12'
         gov_cap: '20'
-        supply_prob: '0.67'
+        supply_prob: '0.69'
         amount_mod: '1.1'
+      emerald:
+        base: '143'
+        gov_cap: '214'
+        supply_prob: '0.43'
+        amount_mod: '0.9'
+      charcoal:
+        base: '2.5'
+        gov_cap: '4'
+        supply_prob: '0.8'
+        amount_mod: '2'
     building_blocks:
       stone:
         base: '3'
@@ -162,6 +172,34 @@ price_info:
       glowstone:
         base: '70'
         gov_cap: '98'
+    food:
+      pumpkin:
+        base: '50'
+        gov_cap: '70'
+      apple:
+        base: '10'
+        gov_cap: '14'
+      wheat:
+        base: '9'
+        gov_cap: '12.6'
+      bread:
+        base: '30'
+        gov_cap: '42'
+      golden_apple:
+        base: '100'
+        gov_cap: '140'
+      milk_bucket:
+        base: '40'
+        gov_cap: '56'
+      egg:
+        base: '1'
+        gov_cap: '1.4'
+      sugar:
+        base: '10'
+        gov_cap: '14'
+      cake:
+        base: '180'
+        gov_cap: '252'
     general:
       sponge:
         base: '80'
@@ -199,9 +237,6 @@ price_info:
       clay:
         base: '12'
         gov_cap: '16.8'
-      pumpkin:
-        base: '50'
-        gov_cap: '70'
       jack_o_lantern:
         base: '56'
         gov_cap: '78.4'
@@ -229,9 +264,6 @@ price_info:
       minecart:
         base: '23'
         gov_cap: '32.2'
-      apple:
-        base: '10'
-        gov_cap: '14'
       bow:
         base: '15'
         gov_cap: '21'
@@ -286,12 +318,6 @@ price_info:
       feather:
         base: '3'
         gov_cap: '4.2'
-      wheat:
-        base: '9'
-        gov_cap: '12.6'
-      bread:
-        base: '30'
-        gov_cap: '42'
       leather_helmet:
         base: '52'
         gov_cap: '72.8'
@@ -343,9 +369,6 @@ price_info:
       painting:
         base: '25'
         gov_cap: '35'
-      golden_apple:
-        base: '100'
-        gov_cap: '140'
       bucket:
         base: '22'
         gov_cap: '30.8'
@@ -361,9 +384,6 @@ price_info:
       leather:
         base: '10'
         gov_cap: '14'
-      milk_bucket:
-        base: '40'
-        gov_cap: '56'
       brick:
         base: '21'
         gov_cap: '29.4'
@@ -379,9 +399,6 @@ price_info:
       slime_ball:
         base: '50'
         gov_cap: '70'
-      egg:
-        base: '1'
-        gov_cap: '1.4'
       compass:
         base: '22'
         gov_cap: '30.8'
@@ -394,12 +411,6 @@ price_info:
       bone:
         base: '2'
         gov_cap: '2.8'
-      sugar:
-        base: '10'
-        gov_cap: '14'
-      cake:
-        base: '180'
-        gov_cap: '252'
       water:
         base: '1'
         gov_cap: '1.4'

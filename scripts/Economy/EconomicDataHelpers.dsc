@@ -233,17 +233,22 @@ PriceExtrapolationHelper_Command:
             - define searchItems <[searchItems].exclude[<[item]>]>
             - narrate format:admincallout "Proceeding... Adjusting extrapolation data to prevent contamination."
             - narrate <n>
+            - clickable cancel:<entry[Cancel_ExistingItem].id>
             - flag <player> noChat.admin.existingItemSelection:confirm
 
         - clickable save:Cancel_ExistingItem for:<player> usages:1 until:10m:
             - narrate format:admincallout "Cancelled item price extrapolation."
+            - clickable cancel:<entry[Confirm_ExistingItem].id>
             - flag <player> noChat.admin.existingItemSelection:cancel
 
-        - narrate format:admincallout "This item already exists. Do you want to proceed anyways and overwrite its price data?"
+        - define existingItemInfo <yaml[prices].read[price_info.items.<[group]>.<[item]>]>
+        - narrate format:admincallout "This item already exists with the following data: "
+        - narrate "    <[existingItemInfo].to_list[ : ].separated_by[<n>    ].italicize>"
         - narrate <n>
+        - narrate format:admincallout "Do you want to proceed anyways and overwrite its price data?"
         - narrate "<element[YES].bold.underline.color[green].on_click[<entry[Confirm_ExistingItem].command>]> / <element[NO].bold.underline.color[red].on_click[<entry[Cancel_ExistingItem].command>]>"
 
-        - waituntil <player.has_flag[noChat.admin.existingItemSelection]>
+        - waituntil <player.has_flag[noChat.admin.existingItemSelection]> rate:10t
 
         - define didCancel <player.flag[noChat.admin.existingItemSelection]>
         - flag <player> noChat.admin.existingItemSelection:!
