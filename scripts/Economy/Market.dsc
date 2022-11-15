@@ -12,7 +12,7 @@
 MarketCreation_Command:
     type: command
     name: market
-    usage: /market create|remove [name] [attractiveness] [OPTIONAL max size]
+    usage: /market create|remove [name] [attractiveness] [max size]
     permission: kingdoms.admin.markets
     description: Designates a market with a given name and area
     tab completions:
@@ -122,3 +122,53 @@ MarketCreation_Handler:
             - showfake cancel <[point]>
 
         - flag <player> marketPoints:!
+
+
+MerchantCreation_Command:
+    type: command
+    name: merchant
+    usage: /merchant create|remove [market]|[ID] [name]
+    permission: kingdoms.admin.merchants
+    description: Creates, removes, or edits regular Kingdoms merchants
+    script:
+    - define args <context.raw_args.split_args>
+    - define action <[args].get[1]>
+
+    - choose <[action]>:
+        - case create:
+            - define market <[args].get[2]>
+            - define mercName <[args].get[3]>
+
+        - case remove:
+            - define mercID <[args].get[2]>
+
+MerchantPlacement_Item:
+    type: item
+    material: armor_stand
+    display name: <blue><bold>Merchant Placement Stand
+    mechanisms:
+        hides: ALL
+    enchantments:
+    - sharpness: 1
+
+MerchantPlacement_Handler:
+    type: world
+    debug: false
+    events:
+        # When player selects merchant tool for the first time
+        on player holds item item:MerchantPlacement_Item:
+        - if !<player.has_flag[PlacingMerchant]>:
+            - flag <player> PlacingMerchant
+
+        # When player deselects merchant tool
+        on player holds item flagged:PlacingMerchant:
+        - if <player.inventory.slot[<context.new_slot>].script.name.to_lowercase.if_null[null]> != merchantplacement_item:
+            - fakespawn cancel <player.flag[PlacingMerchant].get[1]>
+            - flag <player> PlacingMerchant:!
+
+        on player walks flagged:PlacingMerchant:
+        - ratelimit <player> 1t
+        - if <player.flag[PlacingMerchant].get[2].if_null[<player.cursor_on>]> != <player.cursor_on.up[1].add[0.5,0,0.5]>:
+            - fakespawn armor_stand <player.cursor_on.up[1].add[0.5,0,0.5]> save:fake_stand
+            - fakespawn cancel <player.flag[PlacingMerchant].get[1]> if:<player.flag[PlacingMerchant].get[1].exists>
+            - flag <player> PlacingMerchant:<list[<entry[fake_stand].faked_entity>|<player.cursor_on.up[1].add[0.5,0,0.5]>]>
