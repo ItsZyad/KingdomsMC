@@ -13,29 +13,24 @@
 MarketCreation_Command:
     type: command
     name: market
-    usage: /market create|remove [name]
+    usage: /market create|remove [name] [attractiveness] [OPTIONAL max size]
     permission: kingdoms.admin.markets
     description: Designates a market with a given name and area
     tab completions:
         1: create|remove
         2: [Name]
-
-    tab complete:
-    - define args <context.raw_args.split_args>
-
-    - if <[args].get[1]> == create:
-         - choose <[args].size>:
-            - case 2:
-                - determine <list[[Market Size]]>
-            - case 3:
-                - determine <list[[Attractiveness]]>
-
+        3: [Attractiveness]
+        4: [?MaxSize]
     script:
     - define args <context.raw_args.split_args>
     - define action <[args].get[1]>
     - define name <[args].get[2]>
-    - define size <[args].get[3]>
-    - define attractiveness <[args].get[4]>
+    - define attractiveness <[args].get[3]>
+    - define maxSize <[args].get[4].if_null[n/a]>
+
+    - if <[args].size> < 3:
+        - narrate format:admincallout "You must provide all the details for market creation as shown in the command's tab-complete"
+        - determine cancelled
 
     - if <server.has_flag[economy.markets.<[name]>]>:
         - narrate format:admincallout "There already exists a market with that name. Please choose a different name."
@@ -44,17 +39,23 @@ MarketCreation_Command:
     - if <[action].exists> && <[name].exists>:
         - choose <[action].to_lowercase>:
             - case create:
-                - flag server economy.markets.<[name]>.ID:<server.flag[economy.markets].size.add[1]>
-                - flag server economy.markets.<[name]>.size:<[size]>
+                - flag server economy.markets.<[name]>.ID:<server.flag[economy.markets].size.if_null[0].add[1]>
+                - flag server economy.markets.<[name]>.size:0
                 - flag server economy.markets.<[name]>.attractiveness:<[attractiveness]>
+                - flag server economy.markets.<[name]>.maxSize:<[maxSize]> if:<[maxSize].equals[n/a].not>
+                #- flag server economy.markets.<[name]>.supplyMap:<entry[supplyAmount].created_queue.determination.get[1]>
 
                 - clickable save:make_area until:10m usages:1 for:<player>:
                     - give to:<player.inventory> MarketCreation_Item
                     - narrate format:admincallout "Click the blocks you would like to constitute the borders of the market area. Drop the market wand to cancel the process.<n>Type <element[/market complete].color[green]> to finish the process."
+                    - narrate format:admincallout "<gray><italic>Note: This does not need to be an exact area. You will still be able to determine where individual merchants can go."
+
+                - clickable save:no_make_area until:10m usages:1 for:<player>:
+                    - narrate "<green>Created market area: '<[name].bold.underline>'"
 
                 - narrate format:admincallout "You may optionally define an area that a market operates in. This will restrict the places where merchants can spawn."
                 - narrate "<blue>Would you like to do that?"
-                - narrate "<n><element[Yes].color[green].on_click[<entry[make_area].command>]> / <element[No].color[red].on_click[<green>Created market area: '<[name]>']>"
+                - narrate "<n><element[Yes].color[green].on_click[<entry[make_area].command>]> / <element[No].color[red].on_click[<entry[no_make_area].command>]>"
 
             - case complete:
                 - define minY 999
@@ -146,3 +147,4 @@ SupplyAmountCalculator:
 
     - yaml id:prices unload
     - run FlagVisualizer def.flag:<[spawnChances]> def.flagName:SpawnChances
+    - determine <[spawnChances]>
