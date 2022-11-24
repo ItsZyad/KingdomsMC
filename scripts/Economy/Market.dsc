@@ -12,11 +12,11 @@
 MarketCreation_Command:
     type: command
     name: market
-    usage: /market create|remove [name] [attractiveness] [max size]
+    usage: /market create|remove|init [name] [Attractiveness]|... [Max Size]|...
     permission: kingdoms.admin.markets
     description: Designates a market with a given name and area
     tab completions:
-        1: create|remove
+        1: create|remove|init
         2: [Name]
         3: [Attractiveness]
         4: [?MaxSize]
@@ -27,27 +27,31 @@ MarketCreation_Command:
     - define attractiveness <[args].get[3]>
     - define maxSize <[args].get[4].if_null[n/a]>
 
-    - if <[args].size> < 3:
-        - narrate format:admincallout "You must provide all the details for market creation as shown in the command's tab-complete"
-        - determine cancelled
+    - if <[action]> == name:
+        - if <[args].size> < 3:
+            - narrate format:admincallout "You must provide all the details for market creation as shown in the command's tab-complete"
+            - determine cancelled
+
+        - if <server.has_flag[economy.markets.<[name]>]>:
+            - narrate format:admincallout "There already exists a market with that name. Please choose a different name."
+            - determine cancelled
 
     - if !<[name].char_at[1].to_lowercase.matches_character_set[abcdefghijklmnopqrstuvwxyz1234567890]>:
         - narrate format:admincallout "Market name must start with an alphanumeric character"
         - determine cancelled
 
-    - if <server.has_flag[economy.markets.<[name]>]>:
-        - narrate format:admincallout "There already exists a market with that name. Please choose a different name."
-        - determine cancelled
-
-
     - if <[action].exists> && <[name].exists>:
         - choose <[action].to_lowercase>:
+            - case init:
+                - define merchantAmount <server.flag[economy.markets.<[name]>.size]>
+                - run SupplyAmountCalculator def.marketSize:<[merchantAmount]> save:supplyAmount
+                - flag server economy.markets.<[name]>.supplyMap:<entry[supplyAmount].created_queue.determination.get[1]>
+
             - case create:
                 - flag server economy.markets.<[name]>.ID:<server.flag[economy.markets].size.if_null[0].add[1]>
                 - flag server economy.markets.<[name]>.size:0
                 - flag server economy.markets.<[name]>.attractiveness:<[attractiveness]>
                 - flag server economy.markets.<[name]>.maxSize:<[maxSize]> if:<[maxSize].equals[n/a].not>
-                #- flag server economy.markets.<[name]>.supplyMap:<entry[supplyAmount].created_queue.determination.get[1]>
 
                 - clickable save:make_area until:10m usages:1 for:<player>:
                     - give to:<player.inventory> MarketCreation_Item
@@ -264,6 +268,7 @@ MerchantPlacement_Handler:
                 - flag <[newMerc]> merchantData.spec:null
                 - flag <player> noChat.economy.spawningMerchant:!
                 - flag <player> merchantRef:<[newMerc]>
+                - flag server economy.markets.<[marketName]>.size:++
 
                 - inventory open d:MerchantWealthSelector_Window
 
