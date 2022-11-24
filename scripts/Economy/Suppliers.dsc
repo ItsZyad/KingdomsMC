@@ -15,7 +15,7 @@ SupplyAmountCalculator:
     script:
     - yaml load:economy_data/price-info.yml id:prices
     - define rawItems <yaml[prices].read[price_info.items]>
-    - define globalMod <yaml[prices].read[price_info.global_supply_mod]>
+    - define globalMod <yaml[prices].read[price_info.global_supply_mod].if_null[1]>
     - define spawnChances <map[]>
     - define marketSize <[marketSize].round.if_null[1]>
     - define spawnChance <util.random.decimal[0].to[1]>
