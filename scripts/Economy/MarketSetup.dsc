@@ -43,15 +43,16 @@ MarketCreation_Command:
     - if <[action].exists> && <[name].exists>:
         - choose <[action].to_lowercase>:
             - case init:
-                - define merchantAmount <server.flag[economy.markets.<[name]>.size]>
+                - define merchantAmount <server.flag[economy.markets.<[name]>.merchants].size>
                 - run SupplyAmountCalculator def.marketSize:<[merchantAmount]> save:supplyAmount
                 - flag server economy.markets.<[name]>.supplyMap:<entry[supplyAmount].created_queue.determination.get[1]>
 
             - case create:
                 - flag server economy.markets.<[name]>.ID:<server.flag[economy.markets].size.if_null[0].add[1]>
-                - flag server economy.markets.<[name]>.size:0
+                - flag server economy.markets.<[name]>.merchants:<list[]>
                 - flag server economy.markets.<[name]>.attractiveness:<[attractiveness]>
                 - flag server economy.markets.<[name]>.maxSize:<[maxSize]> if:<[maxSize].equals[n/a].not>
+                - flag server economy.markets.<[name]>.supplierPriceMod:0.6
 
                 - clickable save:make_area until:10m usages:1 for:<player>:
                     - give to:<player.inventory> MarketCreation_Item
@@ -143,6 +144,8 @@ MerchantCreation_Command:
     script:
     - define args <context.raw_args.split_args>
     - define action <[args].get[1]>
+
+    # TODO: finish
 
     - choose <[action]>:
         - case create:
@@ -239,6 +242,8 @@ MerchantPlacement_Handler:
                     - define newMerc <entry[newMerchant].created_npc>
                     - flag <[newMerc]> merchantData.linkedMarket:<[marketName]>
                     - flag <[newMerc]> merchantData.spec:null
+                    - flag <[newMerc]> merchantData.quantityBias:<util.random.decimal[0].to[1]>
+                    - flag <[newMerc]> merchantData.spendBias:<util.random.decimal[0].to[1]>
                     - flag <player> noChat.economy.spawningMerchant:!
 
                     - determine cancelled
@@ -264,11 +269,12 @@ MerchantPlacement_Handler:
 
                 - adjust <[newMerc]> lookclose:true
 
+                # TODO: Implement sell bias
                 - flag <[newMerc]> merchantData.linkedMarket:<[marketName]>
                 - flag <[newMerc]> merchantData.spec:null
                 - flag <player> noChat.economy.spawningMerchant:!
                 - flag <player> merchantRef:<[newMerc]>
-                - flag server economy.markets.<[marketName]>.size:++
+                - flag server economy.markets.<[marketName]>.merchants:->:<[newMerc]>
 
                 - inventory open d:MerchantWealthSelector_Window
 
