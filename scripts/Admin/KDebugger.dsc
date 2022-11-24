@@ -17,6 +17,7 @@
 
 Debugger:
     type: task
+    debug: false
     script:
     - if <queue.player.exists>:
         - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
