@@ -65,34 +65,40 @@ MerchantPurchaseDecider:
         - define qControlledItems <[qControlledItems].filter_tag[<[filter_value].get[base].mul[<[qBias]>].is[OR_LESS].than[<[qSensitivity].mul[<[qBias]>].add[<[qBias]>]>]>]>
         - define qControlledItems <[qControlledItems].sort_by_value[get[base]]>
         - define qControlledItems <[qControlledItems].reverse> if:<[qBias].is[OR_MORE].than[0.5]>
-        - define spendableBalance <[balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
+        - define spendableBalance <[balance].sub[<[balance].mul[<util.random.decimal[<[sBias]>].to[<util.random.decimal[<[sBias].add[1]>].to[1]>]>]>]>
         - define itemAmount <[qControlledItems].size>
 
         #TODO: VERY IMPORTANT!!!
         #TODO: Remove this line before going into prod.
         - flag <[merchant]> merchantData.supply:!
 
-        #- while <[merchant].flag[merchantData.balance].is[MORE].than[<[spendableBalance]>]> || <[loop_index]> < 29:
-        - foreach <[qControlledItems]> as:item:
-            - define base <[item].get[base]>
-            - define balance <[merchant].flag[merchantData.balance]>
-            - define spendableBalance <[balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
-            - define reasonablePurchaseAmount <[spendableBalance].div[<[itemAmount]>].div[<[base]>].round>
-            - define supplyPrice <[reasonablePurchaseAmount].mul[<[base].mul[<[supplyPriceMod]>]>]>
+        - define iterations 0
 
-            - narrate format:debug NAM:<[item].get[name]>
-            - narrate format:debug RPA:<[reasonablePurchaseAmount]>
-            - narrate format:debug SUP:<[supplyPrice]>
-            - narrate format:debug SPB:<[spendableBalance]>
-            - narrate format:debug ----------------------
+        - while <[merchant].flag[merchantData.balance].is[MORE].than[<[spendableBalance]>]> && <[iterations]> < 5:
+            - foreach <[qControlledItems]> as:item:
+                - define base <[item].get[base]>
+                - define balance <[merchant].flag[merchantData.balance]>
+                - define spendableBalance <[balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
+                - define reasonablePurchaseAmount <[spendableBalance].div[<[itemAmount]>].div[<[base]>].round>
+                - define supplyPrice <[reasonablePurchaseAmount].mul[<[base].mul[<[supplyPriceMod]>]>]>
 
-            - if <[spendableBalance].is[OR_MORE].than[<[supplyPrice]>]>:
-                - flag <[merchant]> merchantData.balance:-:<[supplyPrice]>
-                - flag <[merchant]> merchantData.supply.<[item].get[name]>.quantity:+:<[reasonablePurchaseAmount]>
+                # - narrate format:debug NAM:<[item].get[name]>
+                # - narrate format:debug RPA:<[reasonablePurchaseAmount]>
+                # - narrate format:debug SUP:<[supplyPrice]>
+                # - narrate format:debug SPB:<[spendableBalance]>
+                # - narrate format:debug ----------------------
 
-            - else:
-                - foreach stop
+                - if <[spendableBalance].is[OR_MORE].than[<[supplyPrice]>]>:
+                    - flag <[merchant]> merchantData.balance:-:<[supplyPrice]>
+                    - flag <[merchant]> merchantData.supply.<[item].get[name]>.quantity:+:<[reasonablePurchaseAmount]>
+                    - flag <[merchant]> merchantData.supply.<[item].get[name]>.price:<[base]>
+
+                - else:
+                    - foreach stop
+
+                - define iterations:+:1
 
         - narrate format:debug SPM:<[supplyPriceMod]>
+        - narrate format:debug SPEN:<[spendableBalance]>
 
     - yaml id:prices unload
