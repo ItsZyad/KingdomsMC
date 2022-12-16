@@ -9,7 +9,19 @@ FlagVisualizer:
         - narrate format:admincallout "Recursion depth exceeded 50! Killing queue: <script.queues.get[1]>"
         - determine cancelled
 
-    - if <[flag].as[map]> == <[flag]>:
+    - if <[flag].as[entity].exists>:
+        - define name <[flag].name.color[aqua]>
+        - define uuid <[flag].uuid>
+
+        - determine passively "<[name]> <element[[uuid]].color[light_purple].on_hover[<[uuid].color[light_purple]>]>"
+
+    - else if <[flag].time_zone_id.exists>:
+        - define ESTTime <[flag].to_zone[America/New_York]>
+        - define formattedTime <[ESTTime].format[YYYY-MM-dd/hh:mm]>
+
+        - determine passively "<[flag].color[light_purple].on_hover[<[formattedTime]> UTC]>"
+
+    - else if <[flag].as[map]> == <[flag]>:
         - narrate "<proc[MakeTabbed].context[<element[MAP :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>"
 
         - foreach <[flag]>:
@@ -44,18 +56,6 @@ FlagVisualizer:
             - if <entry[Recur].created_queue.determination.get[1].as[list].size> == 1:
                 - define formattedIndex <[loop_index].pad_left[<[longestNumber].length.sub[1]>].with[0]>
                 - narrate "<proc[MakeTabbed].context[<element[<[formattedIndex].color[gray]>: <entry[Recur].created_queue.determination.get[1].color[white]>]>|<[tabWidth]>]>"
-
-    - else if <[flag].as[player].exists>:
-        - define name <[flag].name.color[aqua]>
-        - define uuid <[flag].uuid>
-
-        - determine passively "<[name]> <element[[uuid]].color[light_purple].on_hover[<[uuid].color[light_purple]>]>"
-
-    - else if <[flag].time_zone_id.exists>:
-        - define ESTTime <[flag].to_zone[America/New_York]>
-        - define formattedTime <[ESTTime].format[YYYY-MM-dd/hh:mm]>
-
-        - determine passively "<[flag].color[light_purple].on_hover[<[formattedTime]> UTC]>"
 
     - else:
         - determine passively <[flag]>
