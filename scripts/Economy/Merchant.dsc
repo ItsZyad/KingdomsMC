@@ -25,15 +25,18 @@ KMerchant_Assignment:
 
         - flag <player> dataHold.interactingMerchant:<npc>
         - flag <npc> dataHold.interactingPlayers:->:<player>
-        - run OpenMerchantInterface def.merchant:<npc> def.player:<player>
+        - run RunMerchantInterface def.merchant:<npc> def.player:<player>
 
     #interact scripts:
     #- KMerchant_Interact
 
 
-OpenMerchantInterface:
+RunMerchantInterface:
     type: task
     definitions: merchant|player
+    OpenInterface:
+    - foreach <[interactingPlayers]> as:target:
+        - inventory open d:<[windowInstance]> player:<[target]>
     script:
     - define windowInstance <inventory[KMerchant_Menu]>
     - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
@@ -50,9 +53,7 @@ OpenMerchantInterface:
         - adjust def:item "lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>"
         - give to:<[windowInstance]> <[item]>
 
-    - foreach <[interactingPlayers]> as:target:
-        - inventory open d:<[windowInstance]> player:<[target]>
-
+    - inject RunMerchantInterface path:OpenInterface
 
 # KMerchant_Interact:
 #     type: interact
@@ -68,20 +69,24 @@ KMerchantWindow_Handler:
         on player clicks in KMerchant_Menu:
         - ratelimit player 3t
         - define price <context.item.flag[price]>
-        - define quantity <context.item.flag[quantity]>
         - define merchant <player.flag[dataHold.interactingMerchant]>
+        - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
+        - define market <[merchant].flag[merchantData.linkedMarket]>
+
+        - narrate format:debug <[quantity]>
 
         # If player shift clicks, buy 10 of the item instead of
         # just 1
 
         - if <context.click> == SHIFT_LEFT:
             - define purchaseAmount 10
+
         - else:
             - define purchaseAmount 1
 
         - if <[quantity].is[OR_MORE].than[<[purchaseAmount]>]>:
             - if <player.money.is[OR_MORE].than[<[price].mul[<[purchaseAmount]>]>]>:
-                - flag <[merchant]> merchantData.supply.<context.item.material.name>.quantity:-:1
+                - flag <[merchant]> merchantData.supply.<context.item.material.name>.quantity:-:<[purchaseAmount]>
 
                 # take the appropriate amount of money and give
                 # the player the items;
@@ -96,11 +101,17 @@ KMerchantWindow_Handler:
 
                 - give <[selectedItem]> quantity:<[purchaseAmount]>
 
-                - run OpenMerchantInterface def.merchant:<[merchant]> def.player:<player>
+                - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
+                - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
+
+                - foreach <[interactingPlayers]> as:target:
+                    - narrate format:debug <[target]>
+                    - inventory adjust d:<[target].open_inventory> slot:<context.slot> "lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>" player:<[target]>
+
+                - run MarketDemandScript def.price:<[price]> def.item:<context.item.material.name> def.amount:<[purchaseAmount]> def.merchant:<[merchant]> def.player:<player> def.market:<[market]>
 
             - else:
                 # Clicking outside the window returns -998 for some reason
-
                 - if <context.slot> != -998 || <context.slot.is[OR_LESS].than[36]>:
                     - if <context.item> != <item[air]>:
                         - narrate format:callout "You do not have enough money to buy this item."
@@ -113,7 +124,8 @@ KMerchantWindow_Handler:
 
         on player closes KMerchant_Menu:
         - wait 2t
-        - if !<player.open_inventory.exists>:
+        - if <player.open_inventory> == <player.inventory>:
+            - narrate format:debug CLOSED_INV_DETECTED
             - define merchant <player.flag[dataHold.interactingMerchant]>
             - flag <[merchant]> dataHold.interactingPlayers:<-:<player>
             - flag <player> dataHold.interactingMerchant:!
