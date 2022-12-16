@@ -47,8 +47,13 @@ MerchantPurchaseDecider:
         - define group items.<[spec]>
 
     - if <[market].keys.contains[purchaseData]>:
+        # TODO: Finish after completing MarketDemandAnalyzer
         #- define qControlledItems <[qControlledItems].random[<[qControlledItems].size>]>
         - narrate format:debug WIP
+
+        # Run through in-demand items and if the merchant still has money left then run through
+        # the while loop in the else block. Copy over priceControlledItems and qControlledItems
+        # as needed.
 
     - else:
         - define allItemsRaw <yaml[prices].read[price_info.<[group]>]>
@@ -69,8 +74,9 @@ MerchantPurchaseDecider:
         - define itemAmount <[qControlledItems].size>
 
         #TODO: VERY IMPORTANT!!!
-        #TODO: Remove this line before going into prod.
+        #TODO: Remove these two lines before going into prod.
         - flag <[merchant]> merchantData.supply:!
+        - flag server economy.markets.<[merchant].flag[merchantData.linkedMarket]>.supplyAmounts:!
 
         - define iterations 0
 
@@ -93,6 +99,8 @@ MerchantPurchaseDecider:
                     - flag <[merchant]> merchantData.supply.<[item].get[name]>.quantity:+:<[reasonablePurchaseAmount]>
                     - flag <[merchant]> merchantData.supply.<[item].get[name]>.price:<[base]>
 
+                    - flag server economy.markets.<[merchant].flag[merchantData.linkedMarket]>.supplyAmounts.<[item]>:+:<[reasonablePurchaseAmount]>
+
                 - else:
                     - foreach stop
 
@@ -102,3 +110,60 @@ MerchantPurchaseDecider:
         - narrate format:debug SPEN:<[spendableBalance]>
 
     - yaml id:prices unload
+
+
+MarketDemandScript:
+    type: task
+    definitions: price|item|amount|merchant|player|market
+    StandardDevCalculator:
+    - define mean <[marketDemand].get[totalValue].div[<[marketDemand].get[<[item]>].size>]>
+    - define n <[marketDemand].get[<[item]>].size>
+    - define sum 0
+
+    - foreach <[allPrices]> as:price:
+        - define sum:+:<[price].sub[<[mean]>].power[2]>
+
+    - define stDev <[sum].div[<[n].sub[1]>].sqrt>
+
+    MarketDemandAnalyzer:
+    # TODO: UNCOMMENT WHEN IN PROD!
+    #- define supplyAmounts <server.flag[economy.markets.<[market]>.supplyAmounts]>
+    - define supplyAmounts <server.flag[economy.markets.<[market]>.supplyMap]>
+    - define marketDemand <server.flag[economy.markets.<[market]>.marketDemand]>
+
+    # This value is a ratio between the amount of an item that was sold in the past week
+    # and the average amount of that item that gets spawned in merchant inventories weekly
+    - define saleToAmountRatio <[marketDemand].get[totalAmount].div[<[supplyAmounts].get[<[item]>]>]>
+    - define averageSellPrice <[marketDemand].get[totalValue].div[<[marketDemand].get[<[item]>].size>]>
+    - define allPrices <[marketDemand].get[<[item]>].parse_tag[<[parse_value].get[price]>]>
+    - inject MarketDemandScript path:StandardDevCalculator
+
+    - definemap marketAnalysis:
+        saleToAmountRatio: <[saleToAmountRatio].round_to_precision[0.0001]>
+        totalAmount: <[marketDemand].get[totalAmount]>
+        totalValue: <[marketDemand].get[totalValue]>
+        sellPriceInfo:
+            average: <[averageSellPrice]>
+            stDev: <[stDev].round_to_precision[0.0001]>
+            max: <[allPrices].highest>
+            min: <[allPrices].lowest>
+
+    - run FlagVisualizer def.flag:<[marketAnalysis]> def.flagName:Market
+
+    script:
+    - flag server economy.markets.<[market]>.marketDemand.<[item]>:->:<map[price=<[price]>;amount=<[amount]>;merchant=<[merchant]>]>
+    - flag server economy.markets.<[market]>.marketDemand.totalAmount:+:<[amount]>
+    - flag server economy.markets.<[market]>.marketDemand.totalValue:+:<[price]>
+
+
+## Save previous market tendancies to YAML
+## perhaps also save along with it global
+## market demand figures for analysis by
+## blackmarket factions or other omni-present
+## economic forces.
+# MarketDemandHandler:
+#     type: world
+#     events:
+#         on system time hourly every:24:
+#         - foreach <server.flag[economy.markets].keys> as:market:
+#             - flag server economy.markets.<[market]>.marketDemand:!
