@@ -46,6 +46,7 @@ MarketCreation_Command:
                 - define merchantAmount <server.flag[economy.markets.<[name]>.merchants].size>
                 - run SupplyAmountCalculator def.marketSize:<[merchantAmount]> save:supplyAmount
                 - flag server economy.markets.<[name]>.supplyMap:<entry[supplyAmount].created_queue.determination.get[1]>
+                - flag server economy.markets.<[name]>.supplyAmounts:<entry[supplyAmount].created_queue.determination.get[1]>
 
             - case create:
                 - flag server economy.markets.<[name]>.ID:<server.flag[economy.markets].size.if_null[0].add[1]>
