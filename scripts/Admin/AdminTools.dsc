@@ -51,18 +51,63 @@ AdminTools_Command:
             - determine <server.players.parse_tag[<[parse_value].name>].include[*]>
 
         - case seeflag:
-            - if <context.args.size> == 1:
+            - define object <context.args.get[2]>
+
+            - if <context.args.size> <= 2:
+                - if <[object].regex_matches[^<&lt>.*\<&lb>.*\<&rb><&gt>$]>:
+                    - define flagList <[object].parsed.list_flags>
+                    - define flagList <server.list_flags> if:<[object].equals[server]>
+                    - determine <[flagList].if_null[<list[]>]>
+
+                - else if <[object]> == server:
+                    - determine <server.list_flags>
+
                 - determine "<list[server|player|[flaggable object]]>"
 
-            - else if <context.args.size> >= 2:
-                - define object <context.args.get[2]>
+            - else if <context.args.size> == 3:
+                - if <context.args.get[3].contains[.]>:
+                    - define keyList <context.args.get[3].split[.]>
+                    - define currentKey <[keyList].last>
+                    - define firstKey <[keyList].first>
 
-                - if <[object].starts_with[<&lt>]>:
-                    - define object <[object].replace_text[<&lt>].replace_text[<&gt>]>
+                    # Example textbox:
+                    # /kadmin seeflag server economy.markets.
+                    # /kadmin seeflag server fyndalin.loanOffers
+                    - if <[currentKey]> != <[firstKey]>:
+                        - define adjustedKeyList <[keyList].remove[last].separated_by[.]>
+                        - define adjustedKeyList <[keyList].separated_by[.]> if:<context.args.get[3].ends_with[.]>
+                        - define currentKey * if:<context.args.get[3].ends_with[.]>
 
-                - define flagList <element[<&lt><[object]><&gt>].parsed.list_flags>
-                - define flagList <server.list_flags> if:<[object].equals[server]>
-                - determine <[flagList].if_null[<list[]>]>
+                        - define keys <[object].parsed.flag[<[adjustedKeyList]>].keys.filter_tag[<[filter_value].advanced_matches[<[currentKey]>].or[<[filter_value].starts_with[<[currentKey]>]>]>]>
+                        - define keys <server.flag[<[adjustedKeyList]>].keys.filter_tag[<[filter_value].advanced_matches[<[currentKey]>].or[<[filter_value].starts_with[<[currentKey]>]>]>]> if:<[object].equals[server]>
+
+                        - if <[keys].exists>:
+                            - determine <[keys].parse_tag[<[adjustedKeyList]>.<[parse_value]>]>
+
+                        - else:
+                            - determine <list[]>
+
+                    # Example textbox:
+                    # /kadmin seeflag server economy.
+                    # /kadmin seeflag server fyndalin
+                    - else:
+                        - define keys <[object].parsed.flag[<[currentKey]>].keys>
+                        - define keys <server.flag[<[currentKey]>].keys> if:<[object].equals[server]>
+
+                        - if <[keys].exists>:
+                            - determine <[keys].parse_tag[<[keyList].separated_by[.]>.<[parse_value]>]>
+
+                        - else:
+                            - determine <list[]>
+
+                - else:
+                    - if <[object].regex_matches[^<&lt>.*\<&lb>.*\<&rb><&gt>$]>:
+                        - define flagList <[object].parsed.list_flags>
+                        - define flagList <server.list_flags> if:<[object].equals[server]>
+                        - determine <[flagList].if_null[<list[]>]>
+
+                    - else if <[object]> == server:
+                        - determine <server.list_flags>
 
     script:
     - define args <context.raw_args.split_args.get[1]>
