@@ -12,14 +12,14 @@
 MarketCreation_Command:
     type: command
     name: market
-    usage: /market create|remove|init [name] [Attractiveness]|... [Max Size]|...
+    usage: /market create|remove|init [name] [Attractiveness]|...|[Spawn Chance] [Max Size]|...
     permission: kingdoms.admin.markets
     description: Designates a market with a given name and area
     tab completions:
         1: create|remove|init
-        2: [Name]
-        3: [Attractiveness]
-        4: [?MaxSize]
+        2: (Name)
+        3: (Attractiveness)|...|(Spawn Chance)
+        4: (?MaxSize)|...|...
     script:
     - define args <context.raw_args.split_args>
     - define action <[args].get[1]>
@@ -43,10 +43,16 @@ MarketCreation_Command:
     - if <[action].exists> && <[name].exists>:
         - choose <[action].to_lowercase>:
             - case init:
+                - define spawnChance <util.random.decimal[0].to[1]>
+
+                - if <[args].get[3].is_decimal>:
+                    - define spawnChance <[args].get[3]>
+
                 - define merchantAmount <server.flag[economy.markets.<[name]>.merchants].size>
-                - run SupplyAmountCalculator def.marketSize:<[merchantAmount]> save:supplyAmount
-                - flag server economy.markets.<[name]>.supplyMap:<entry[supplyAmount].created_queue.determination.get[1]>
-                - flag server economy.markets.<[name]>.supplyAmounts:<entry[supplyAmount].created_queue.determination.get[1]>
+                - run SupplyAmountCalculator def.marketSize:<[merchantAmount]> def.spawnChance:<[spawnChance]> save:supplyAmount
+                - define supply <entry[supplyAmount].created_queue.determination.get[1]>
+                - flag server economy.markets.<[name]>.supplyMap.original:<[supply]>
+                - flag server economy.markets.<[name]>.supplyMap.current:<[supply]>
 
             - case create:
                 - flag server economy.markets.<[name]>.ID:<server.flag[economy.markets].size.if_null[0].add[1]>
@@ -139,14 +145,12 @@ MarketCreation_Handler:
 MerchantCreation_Command:
     type: command
     name: merchant
-    usage: /merchant create|remove [market]|[ID] [name]
+    usage: /merchant create|remove|resetstat ...|[ID]
     permission: kingdoms.admin.merchants
     description: Creates, removes, or edits regular Kingdoms merchants
     script:
     - define args <context.raw_args.split_args>
     - define action <[args].get[1]>
-
-    # TODO: finish
 
     - choose <[action]>:
         - case create:
@@ -156,6 +160,18 @@ MerchantCreation_Command:
 
         - case remove:
             - define mercID <[args].get[2]>
+            - define npc <npc[<[mercID]>]>
+
+            - if <[npc].exists> && <[npc].has_flag[merchantData]>:
+                - remove <[npc]>
+
+            - else:
+                - narrate format:admincallout "This is not a valid merchant npc! The npc selected either does not exist or is not a valid merchant."
+
+        - case resetstat:
+            - narrate format:debug WIP
+            #TODO: Add a subcommand which allows you to enter the name of a merchantData sub-flag
+            #TODO: that will get reset to a default value.
 
 
 MerchantPlacement_Item:
@@ -174,7 +190,7 @@ MerchantPlacement_Handler:
     type: world
     debug: false
     subpaths:
-        SpawnMerchant:
+        SpawnMerchantPrompt:
         - define marketsFlag <server.flag[economy.markets]>
 
         - if <[marketsFlag].size> == 0:
@@ -186,6 +202,22 @@ MerchantPlacement_Handler:
         - narrate format:admincallout "Enter the name of the market this merchant should belong to. Type: <element[*auto].color[aqua]> to automatically assign it based on the market area it is currently in."
         - narrate format:admincallout "Type <element['cancel'].color[red]> to stop creating a merchant at this location."
         - flag <player> noChat.economy.spawningMerchant
+
+        CreateMerchant:
+        - create player "<element[Unspecialized Merchant].color[gray]>" <[merchantPos]> save:newMerchant
+
+        - adjust <[newMerc]> lookclose:true
+
+        - define newMerc <entry[newMerchant].created_npc>
+        - flag <[newMerc]> merchantData.linkedMarket:<[marketName]>
+        - flag <[newMerc]> merchantData.spec:null
+        - flag <[newMerc]> merchantData.quantityBias:<util.random.decimal[0].to[1]>
+        - flag <[newMerc]> merchantData.spendBias:<util.random.decimal[0].to[1]>
+        - flag <player> noChat.economy.spawningMerchant:!
+        - flag <player> merchantRef:<[newMerc]>
+        - flag server economy.markets.<[marketName]>.merchants:->:<[newMerc]>
+
+        - inventory open d:MerchantWealthSelector_Window
 
     events:
         # When player selects merchant tool for the first time
@@ -220,12 +252,12 @@ MerchantPlacement_Handler:
             - flag <player> PlacingMerchant:<list[<entry[fake_stand].faked_entity>|<player.cursor_on.up[1].add[0.5,0,0.5]>]>
 
         on player clicks block with:MerchantPlacement_Item:
-        - inject MerchantPlacement_Handler.subpaths.SpawnMerchant
+        - inject MerchantPlacement_Handler.subpaths.SpawnMerchantPrompt
         - determine cancelled
 
         on player clicks fake entity flagged:PlacingMerchant:
         - if <context.entity.name> == armor_stand:
-            - inject MerchantPlacement_Handler.subpaths.SpawnMerchant
+            - inject MerchantPlacement_Handler.subpaths.SpawnMerchantPrompt
             - determine cancelled
 
         on player chats flagged:noChat.economy.spawningMerchant:
@@ -238,15 +270,7 @@ MerchantPlacement_Handler:
                 - define marketArea <[market].get[marketArea]>
 
                 - if <[marketArea].contains[<[merchantPos]>]>:
-                    - create player "<element[Unspecialized Merchant].color[gray]>" <[merchantPos]> save:newMerchant
-
-                    - define newMerc <entry[newMerchant].created_npc>
-                    - flag <[newMerc]> merchantData.linkedMarket:<[marketName]>
-                    - flag <[newMerc]> merchantData.spec:null
-                    - flag <[newMerc]> merchantData.quantityBias:<util.random.decimal[0].to[1]>
-                    - flag <[newMerc]> merchantData.spendBias:<util.random.decimal[0].to[1]>
-                    - flag <player> noChat.economy.spawningMerchant:!
-
+                    - inject MerchantPlacement_Handler.subpaths.CreateMerchant
                     - determine cancelled
 
             - narrate format:admincallout "The merchant is not currently inside any defined market area. Please manually specify the name of the market or type <element['cancel'].color[red]>."
@@ -261,24 +285,8 @@ MerchantPlacement_Handler:
             - define markets <server.flag[economy.markets]>
             - define merchantPos <player.flag[PlacingMerchant].get[2]>
 
-            - narrate format:debug <[merchantPos]>
-
             - if <[marketName].is_in[<[markets].keys>]>:
-                - create player "&7Unspecialized Merchant" <[merchantPos]> save:newMerchant
-
-                - define newMerc <entry[newMerchant].created_npc>
-
-                - adjust <[newMerc]> lookclose:true
-
-                # TODO: Implement sell bias
-                - flag <[newMerc]> merchantData.linkedMarket:<[marketName]>
-                - flag <[newMerc]> merchantData.spec:null
-                - flag <player> noChat.economy.spawningMerchant:!
-                - flag <player> merchantRef:<[newMerc]>
-                - flag server economy.markets.<[marketName]>.merchants:->:<[newMerc]>
-
-                - inventory open d:MerchantWealthSelector_Window
-
+                - inject MerchantPlacement_Handler.subpaths.CreateMerchant
                 - determine cancelled
 
             - else:
@@ -346,8 +354,10 @@ MerchantWealthSelector_Handler:
         # wealth level will be somewhere between 3000 and 8000.
         - define merchantWealth <util.random.int[<[wealthList].get[<[wealthIndex].sub[1].if_null[0]>].get[2]>].to[<[wealthList].get[<[wealthIndex].add[1]>].get[2].if_null[16000]>]>
         - flag <[merchant]> merchantData.wealth:<[merchantWealth]>
+        - flag <[merchant]> merchantData.balance:<[merchantWealth]>
 
         - narrate format:admincallout "Merchant wealth is: $<[merchantWealth].color[aqua].bold>"
+        - run LoadTempInventory def.player:<player>
 
         - inventory close
         - determine cancelled
