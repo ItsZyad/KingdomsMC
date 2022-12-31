@@ -99,7 +99,7 @@ IntimidationInfluence_Handler:
                 - define influenceAmounts <entry[inf].created_queue.determination.get[1]>
                 - define influencePercentages <[influenceAmounts].parse[round_to_precision[0.001].mul[100]]>
 
-                - inventory adjust slot:<[loop_index]> "lore:|<white>Cost<&co> <element[$<proc[CommaAdder].context[<[campaignMod].mul[500]>]>].color[red].bold>|<white>Estimated Impact on Rival Kingdom<&co> <element[-<[influencePercentages].get[1]><&pc>].color[red].bold>|<white>Estimated Impact on us<&co> <element[-<[influencePercentages].get[2]><&pc>].color[red].bold>|<white>Time Period: <element[<[timePeriod]> days].color[red].bold>" d:<context.inventory>
+                - inventory adjust slot:<[loop_index]> "lore:|<white>Cost<&co> <element[$<[campaignMod].mul[500]>].format_number.color[red].bold>|<white>Estimated Impact on Rival Kingdom<&co> <element[-<[influencePercentages].get[1]><&pc>].color[red].bold>|<white>Estimated Impact on us<&co> <element[-<[influencePercentages].get[2]><&pc>].color[red].bold>|<white>Time Period: <element[<[timePeriod]> days].color[red].bold>" d:<context.inventory>
 
         on player clicks item in Intimidation_Window:
         #- narrate format:debug <context.item.script.name>

@@ -69,7 +69,7 @@ SidebarLoader:
             # Initialize and set Balance line
             - define kingdom <[value].flag[kingdom]>
             - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
-            - sidebar set title:<bold><[kingdomName].color[<script[KingdomTextColors].data_key[<[value].flag[kingdom]>]>]> "values:<&r>|<&sp>Balance: <yellow>$<proc[CommaAdder].context[<[kingdomData].get[balance].round_down>]>" players:<[value]>
+            - sidebar set title:<bold><[kingdomName].color[<script[KingdomTextColors].data_key[<[value].flag[kingdom]>]>]> "values:<&r>|<&sp>Balance: <yellow>$<[kingdomData].get[balance].round_down.format_number>" players:<[value]>
 
             # Set Upkeep Line
             - if !<server.has_flag[PauseUpkeep]>:
@@ -79,7 +79,7 @@ SidebarLoader:
                 - sidebar add "values:<&sp>Upkeep: <aqua>Frozen!" players:<[value]>
 
             - if <server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax].exists>:
-                - sidebar add "values:<&sp>Fyndalin Tax Bonus: <green>$<proc[CommaAdder].context[<server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax]>]>" players:<[value]>
+                - sidebar add "values:<&sp>Fyndalin Tax Bonus: <green>$<server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax].format_number>" players:<[value]>
 
             # Set Core Claim amount line
             - sidebar add "values:<&sp>Core Claims: <[kingdomData].get[core_claims].size.if_null[0]> / <[kingdomData].get[core_max]>" players:<[value]>

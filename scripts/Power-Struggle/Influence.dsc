@@ -120,7 +120,7 @@ InfluenceBonusDisplay_Handler:
                         - if <[influenceAmount].is[OR_MORE].than[0.5]>:
                             - define newLine "<element[<aqua>- ]>"
 
-                        - define newLine "<element[<aqua>- Additional $<proc[CommaAdder].context[<[bonusTax]>]> of Fyndalin's tax money]>"
+                        - define newLine "<element[<aqua>- Additional $<[bonusTax].format_number> of Fyndalin's tax money]>"
                         - define newLore:->:<[newLine]>
 
                     - case totalinfluence:
@@ -479,7 +479,7 @@ FyndalinTakeover_Handler:
 
             - yaml id:king unload
 
-            - adjust def:inventoryItem "lore:<white>If you were to annex Fyndalin now, your kingdom would:|<&sp>|<green><bold>[GAIN] <&r><red>$<proc[CommaAdder].context[<[fyndalinBalance]>]> <white>from Fyndalin's coffers instantly,|<green><bold>[GAIN] <&r><red>$<proc[CommaAdder].context[<[fyndalinDailyTax]>]> <white>from Fyndalin's tax money daily,|<&sp>|<red><bold>[LOSE] <&r><red>$<proc[CommaAdder].context[<[fyndalinUpkeep]>]> <white>As upkeep for your Kingdom's new territories."
+            - adjust def:inventoryItem "lore:<white>If you were to annex Fyndalin now, your kingdom would:|<&sp>|<green><bold>[GAIN] <&r><red>$<[fyndalinBalance].format_number> <white>from Fyndalin's coffers instantly,|<green><bold>[GAIN] <&r><red>$<[fyndalinDailyTax].format_number> <white>from Fyndalin's tax money daily,|<&sp>|<red><bold>[LOSE] <&r><red>$<[fyndalinUpkeep].format_number> <white>As upkeep for your Kingdom's new territories."
 
         - flag <player> FyndalinTakeoverList:<list[air|air|air|air|<[inventoryItem]>|air|air|air|air]>
         - inventory open d:FyndalinTakeoverWindow
