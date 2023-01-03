@@ -40,7 +40,7 @@ RunMerchantInterface:
     type: task
     definitions: merchant|player
     CacheInterface:
-    - flag <[merchant]> cachedInterface:<player.open_inventory>
+    - flag <[merchant]> cachedInterface:<[player].open_inventory>
 
     OpenInterface:
     - foreach <[interactingPlayers]> as:target:
@@ -99,12 +99,16 @@ KMerchantWindow_Handler:
         - if <context.click> == SHIFT_LEFT:
             - define purchaseAmount 10
 
+            - if <[quantity]> < 10:
+                - define purchaseAmount <[quantity]>
+
         - else:
             - define purchaseAmount 1
 
         - if <[quantity].is[OR_MORE].than[<[purchaseAmount]>]>:
             - if <player.money.is[OR_MORE].than[<[price].mul[<[purchaseAmount]>]>]>:
                 - flag <[merchant]> merchantData.supply.<context.item.material.name>.quantity:-:<[purchaseAmount]>
+                - flag <[merchant]> merchantData.balance:+:<[price].mul[<[purchaseAmount]>]>
 
                 # take the appropriate amount of money and give
                 # the player the items;
