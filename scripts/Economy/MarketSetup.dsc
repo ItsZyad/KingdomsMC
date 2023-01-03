@@ -145,9 +145,21 @@ MarketCreation_Handler:
 MerchantCreation_Command:
     type: command
     name: merchant
-    usage: /merchant create|remove|resetstat ...|[ID]
+    usage: /merchant create|remove|resetstat ...|[ID]|... [Spec]|...|...
     permission: kingdoms.admin.merchants
     description: Creates, removes, or edits regular Kingdoms merchants
+    tab completions:
+        1: create|remove|resetstats
+    tab complete:
+    - define args <context.raw_args.split_args>
+
+    - if <[args].get[1]> == create:
+        - yaml load:economy_data/price-info.yml id:prices
+        - define groups <yaml[prices].read[price_info.items].keys>
+        - yaml id:prices unload
+
+        - determine <[groups]>
+
     script:
     - define args <context.raw_args.split_args>
     - define action <[args].get[1]>
@@ -157,6 +169,7 @@ MerchantCreation_Command:
             - run TempSaveInventory def.player:<player>
             - give to:<player.inventory> MerchantPlacement_Item
             - flag <player> PlacingMerchant
+            - flag <player> dataHold.merchantSpec:<[args].get[2].if_null[null]>
 
         - case remove:
             - define mercID <[args].get[2]>
@@ -204,18 +217,22 @@ MerchantPlacement_Handler:
         - flag <player> noChat.economy.spawningMerchant
 
         CreateMerchant:
-        - create player "<element[Unspecialized Merchant].color[gray]>" <[merchantPos]> save:newMerchant
-
-        - adjust <[newMerc]> lookclose:true
+        - create player "&7Unspecialized Merchant" <[merchantPos]> save:newMerchant
 
         - define newMerc <entry[newMerchant].created_npc>
+        - adjust <[newMerc]> lookclose:true
+        - adjust def:newMerc lookclose:true
+
         - flag <[newMerc]> merchantData.linkedMarket:<[marketName]>
-        - flag <[newMerc]> merchantData.spec:null
-        - flag <[newMerc]> merchantData.quantityBias:<util.random.decimal[0].to[1]>
+        - flag <[newMerc]> merchantData.spec:<player.flag[dataHold.merchantSpec]>
         - flag <[newMerc]> merchantData.spendBias:<util.random.decimal[0].to[1]>
         - flag <player> noChat.economy.spawningMerchant:!
+        - flag <player> PlacingMerchant:!
+        - flag <player> dataHold.merchantSpec:!
         - flag <player> merchantRef:<[newMerc]>
         - flag server economy.markets.<[marketName]>.merchants:->:<[newMerc]>
+
+        - assignment set script:KMerchant_Assignment to:<[newMerc]>
 
         - inventory open d:MerchantWealthSelector_Window
 
@@ -300,6 +317,7 @@ MerchantPoor_Item:
     flags:
         wealth: low
 
+
 MerchantNormal_Item:
     type: item
     material: orange_wool
@@ -333,6 +351,7 @@ MerchantWealthSelector_Window:
     - [] [MerchantPoor_Item] [] [MerchantNormal_Item] [] [MerchantWealthy_Item] [] [MerchantVeryWealthy_Item] []
     - [] [] [] [] [] [] [] [] []
 
+
 MerchantWealthSelector_Handler:
     type: world
     events:
@@ -355,6 +374,12 @@ MerchantWealthSelector_Handler:
         - define merchantWealth <util.random.int[<[wealthList].get[<[wealthIndex].sub[1].if_null[0]>].get[2]>].to[<[wealthList].get[<[wealthIndex].add[1]>].get[2].if_null[16000]>]>
         - flag <[merchant]> merchantData.wealth:<[merchantWealth]>
         - flag <[merchant]> merchantData.balance:<[merchantWealth]>
+
+        # QBias Calculation:
+        # q = ((wealth + 1000) ^ 2 / 10000 ^ 2) - 0.01
+        - define qBias <element[<[merchantWealth].add[1000]>].power[2].div[<element[10000].power[2]>].sub[0.01]>
+        - define qBias 0.99 if:<[qBias].is[OR_MORE].than[1]>
+        - flag <[merchant]> merchantData.quantityBias:<[qBias]>
 
         - narrate format:admincallout "Merchant wealth is: $<[merchantWealth].color[aqua].bold>"
         - run LoadTempInventory def.player:<player>
