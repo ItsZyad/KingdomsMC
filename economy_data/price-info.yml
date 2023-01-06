@@ -86,6 +86,12 @@ price_info:
                 gov_cap: '4'
                 supply_prob: '0.8'
                 amount_mod: '2'
+        tools:
+            diamond_pickaxe:
+                base: '540'
+                gov_cap: '1000'
+                supply_prob: '0.35'
+                amount_mod: '0.7'
         building_blocks:
             stone:
                 base: '3'
@@ -130,7 +136,7 @@ price_info:
             sandstone:
                 base: '3'
                 gov_cap: '4.2'
-            grass:
+            grass_block:
                 base: '1'
                 gov_cap: '1.4'
             obsidian:
@@ -140,13 +146,17 @@ price_info:
                 base: '1.5'
                 gov_cap: '2'
             acacia_stairs:
-                mirror: oak_stairs
+                base: '1.5'
+                gov_cap: '2'
             jungle_stairs:
-                mirror: oak_stairs
+                base: '1.5'
+                gov_cap: '2'
             dark_oak_stairs:
-                mirror: oak_stairs
+                base: '1.5'
+                gov_cap: '2'
             birch_stairs:
-                mirror: oak_stairs
+                base: '1.5'
+                gov_cap: '2'
             mangrove_stairs:
                 base: '2'
                 gov_cap: '3'
