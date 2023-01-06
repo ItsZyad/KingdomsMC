@@ -23,7 +23,7 @@ TempSaveInventory:
             - inventory set slot:<[value]> origin:<item[air]>
 
     - else:
-        - narrate format:callout "You are already in outpost mode!"
+        - narrate format:debug "You are already in outpost mode!" if:<player.has_permission[kingdoms.admin]>
 
 LoadTempInventory:
     type: task
@@ -36,7 +36,7 @@ LoadTempInventory:
         - flag <[player]> inventory_hold_outposts:!
 
     - else:
-        - narrate format:callout "There is no saved inventory!"
+        - narrate format:debug "There is no saved inventory!" if:<player.has_permission[kingdoms.admin]>
 
 ##############################################################################
 

@@ -1,5 +1,6 @@
 FlagVisualizer:
     type: task
+    debug: false
     definitions: flag|flagName|recursionDepth
     script:
     - define recursionDepth <[recursionDepth].if_null[0]>

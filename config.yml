@@ -221,6 +221,9 @@ Commands:
         # and that none of Denizen, the Denizen team, Spigot, Mojang, etc. in any way support or endorse abusing these tools.
         # Enable at your own risk.
         Allow restricted actions: false
+    Mongo:
+        # Whether to allow the Mongo command.
+        Allow: true
 # GENERAL SECURITY NOTE: Always run your server on a user with access to nothing but the minecraft folder
 # Otherwise, a bad script or plugin could potentially damage things (though being careful with these settings should reduce the risk of a script doing so)
 # ALSO: Always read scripts you download for anything suspicious looking, EG the log command, the file_delete mechanism, ...
@@ -248,6 +251,8 @@ Tags:
     # The benefit of enabling this is it prevents locking the server thread to download the data from Mojang servers.
     # The risk is that it may interfere with other plugins or systems that expect correct data to be set.
     Nullify skull skin ids: false
+    # If true, polygons default to WorldEdit style block-inclusive logic. If false, use precise 'exclusive' logic.
+    Polygon default inclusive: false
 Packets:
     # Whether to allow Denizen to intercept packets from and to player clients.
     # This enables access to certain ScriptEvents, such as PlayerSteers and PlayerReceivesMessage.
@@ -270,6 +275,10 @@ Saves:
     Skip flag cleaning: false
     # When set to 'true', skips flag cleaning for ChunkTag and LocationTag flags.
     Skip chunk flag cleaning: false
+    # When set to 'true', player flag autosaving will be delayed whenever world saves are disabled (eg via '/save-off').
+    # Player flags will still save as normal during shutdown, or when world saving is enabled.
+    # This checks based on your default world (server.worlds.first).
+    Only save if world save is on: false
 #----------- Important! -----------
 # Your configuration file was outdated.
 # It has been automatically updated.
@@ -280,7 +289,7 @@ Saves:
 # The below value is how many times automatic updates have been applied
 # since you last cleaned this file.
 # ----------- End Important! -----------
-times_changed: 6
+times_changed: 7
 # This is a special map of custom colors by name, for the '&' tag base to use. 'default' is used when the name is unrecognized. You can add extra keys here.
 # Tags work here and will be pre-parsed at load time. RGB color codes work here.
 Colors:
