@@ -21,10 +21,34 @@ PaginatedInterface_Window:
     - [] [] [] [Page_Back] [] [Page_Forward] [] [] []
 
 
+GetTrueInterface_Proc:
+    type: procedure
+    definitions: inventory
+    debug: false
+    script:
+    - define outList <list[]>
+
+    - repeat <[inventory].size> as:index:
+        - define outList:->:<[inventory].slot[<[index]>]>
+
+    - determine <[outList]>
+
 PaginatedInterface:
     type: task
     debug: false
-    definitions: itemList|page|player
+    definitions: itemList|page|player|footer
+    ChangeFooter:
+    - if <[footer].exists> && <[footer].size> == 9:
+        - define interfaceBody <proc[GetTrueInterface_Proc].context[<[interface]>].get[1].to[<[itemsPerPage]>]>
+        - define interfaceFooter <proc[GetTrueInterface_Proc].context[<[interface]>].get[<[itemsPerPage].add[1]>].to[last]>
+
+        - foreach <[footer].list_contents> as:item:
+            - if <[item].material.name> != air:
+                - define interfaceFooter <[interfaceFooter].overwrite[<[item]>].at[<[loop_index]>]>
+
+        - define newInterfaceItems <[interfaceBody].include[<[interfaceFooter]>]>
+        - adjust def:interface contents:<[newInterfaceItems]>
+
     script:
     - flag <[player]> dataHold.paginated.itemList:<[itemList]> if:<player.has_flag[dataHold.paginated.itemList].not>
 
@@ -32,6 +56,9 @@ PaginatedInterface:
     - define itemList <player.flag[dataHold.paginated.itemList]>
     - define interface <inventory[PaginatedInterface_Window]>
     - define itemsPerPage <[interface].size.sub[9]>
+
+    - inject PaginatedInterface path:ChangeFooter
+
     - define maxPages <[itemList].size.div[<[itemsPerPage]>].round_up>
     - define startPoint <[page].sub[1].mul[<[itemsPerPage]>]>
 
