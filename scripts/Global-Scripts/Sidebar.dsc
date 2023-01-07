@@ -59,7 +59,7 @@ SidebarLoader:
 
     - foreach <[target]>:
         - define kingdomData <yaml[k].read[<[value].flag[kingdom]>]>
-        - define totalOutpostUpkeep <yaml[outp].read[<[value].flag[kingdom]>.totalupkeep]>
+        - define totalOutpostUpkeep <yaml[outp].read[<[value].flag[kingdom]>.totalupkeep].if_null[0]>
 
         - if !<[value].sidebar_lines.exists> && !<[changeSBState]>:
             - foreach next
@@ -88,7 +88,7 @@ SidebarLoader:
             - sidebar add "values:<&sp>Castle Claims: <[kingdomData].get[castle_territory].size.if_null[0]> / <[kingdomData].get[castle_max]>" players:<[value]>
 
             # Set War Status Line
-            - sidebar add "values:<&sp>War Status: <[war-<[kingdomData].get[war_status]>]><[kingdomData].get[war_status]>" players:<[value]>
+            - sidebar add "values:<&sp>War Status: <[war-<[kingdomData].get[war_status]>]><[kingdomData].get[war_status].if_true[At War].if_false[At Peace]>" players:<[value]>
 
             # Set Outpost Count Line
             - sidebar add "values:<&sp>Outpost Count: <[kingdomData].get[outpost_count]>" players:<[value]>
