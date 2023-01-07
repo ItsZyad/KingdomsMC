@@ -97,3 +97,12 @@ UsableBookshelf_Handler:
             - flag server Bookshelves.open.<player.flag[BookshelfLocation]>:!
 
         - flag <player> BookshelfLocation:!
+
+#TODO: FIND SOMEONE TO TEST THIS WITH; SEE IF THIS ACTUALLY MAKES THEM SEE THE SAME INVENTORY!
+BookshelfClone:
+    type: procedure
+    #definitions: inventoryName
+    script:
+    - define tempTradeInv <inventory[UsableBookshelf_GUI]>
+
+    - determine <[tempTradeInv]>
