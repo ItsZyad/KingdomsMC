@@ -11,14 +11,15 @@
 
 SupplyAmountCalculator:
     type: task
+    debug: false
     definitions: marketSize|spawnChance
     script:
     - yaml load:economy_data/price-info.yml id:prices
     - define rawItems <yaml[prices].read[price_info.items]>
     - define globalMod <yaml[prices].read[price_info.global_supply_mod].if_null[1]>
-    - define spawnChances <map[]>
-    - define marketSize <[marketSize].round.if_null[1]>
+    - define marketSize <[marketSize].round.if_null[1].mul[5]>
     - define spawnChance <[spawnChance].if_null[<util.random.decimal[0].to[1]>]>
+    - define spawnChances <map[]>
 
     - foreach <[rawItems]> as:group key:groupName:
         - foreach <[group]> as:item key:itemName:
