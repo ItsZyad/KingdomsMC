@@ -62,6 +62,9 @@ AdminTools_Command:
                 - else if <[object]> == server:
                     - determine <server.list_flags>
 
+                - else if <[object]> == player:
+                    - determine <player.list_flags>
+
                 - determine "<list[server|player|[flaggable object]]>"
 
             - else if <context.args.size> == 3:
