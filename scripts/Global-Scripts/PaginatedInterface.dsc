@@ -49,12 +49,12 @@ PaginatedInterface:
     - adjust def:interface "title:<[interface].title> (page <[page]>/<[maxPages]>)"
 
     - definemap determination:
-        newPageContents: <[interface]>
+        newPageContents: <[interface].list_contents.get[1].to[<[itemsPerPage]>]>
         newPageNumber: <[page]>
 
     - flag <[player]> dataHold.paginated.page:<[page]>
 
-    - inventory open d:<[interface]>
+    - inventory open d:<[interface]> player:<[player]>
     - determine <[determination]>
 
 
@@ -74,6 +74,8 @@ PaginatedInterface_Handler:
         - else:
             - run PaginatedInterface def.itemList:<[itemList]> def.page:<[maxPages]> def.player:<player>
 
+        - determine cancelled
+
         on player clicks Page_Forward in PaginatedInterface_Window:
         - define pageNum <player.flag[dataHold.paginated.page]>
         - define itemList <player.flag[dataHold.paginated.itemList]>
@@ -86,13 +88,9 @@ PaginatedInterface_Handler:
         - else:
             - run PaginatedInterface def.itemList:<[itemList]> def.page:1 def.player:<player>
 
+        - determine cancelled
+
         on player closes PaginatedInterface_Window:
         - wait 2t
         - if <player.open_inventory> == <player.inventory>:
             - flag <player> dataHold.paginated:!
-
-DEBUG_PaginatedInterfaceTest:
-    type: task
-    script:
-    - define testItemList <server.flag[economy.markets.Fyndalin-1.supplyMap.original].keys.get[1].to[55]>
-    - run PaginatedInterface def.itemList:<[testItemList]> def.player:<player> def.page:1

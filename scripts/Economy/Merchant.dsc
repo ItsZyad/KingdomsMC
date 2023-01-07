@@ -1,17 +1,3 @@
-KMerchant_Menu:
-    type: inventory
-    inventory: chest
-    gui: true
-    title: Merchant
-    slots:
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [] [] [] [] [] []
-
-
 KMerchant_Assignment:
     type: assignment
     actions:
@@ -19,8 +5,8 @@ KMerchant_Assignment:
         - trigger name:click state:true
 
         on click:
-        - if <server.has_flag[RestrictedCreative]>:
-            - narrate format:callout "Trading with the market is disabled when restricted creative is on."
+        - if <server.has_flag[PreGameStart]>:
+            - narrate format:callout "Trading with the market is disabled when build mode is active."
             - determine cancelled
 
         - flag <player> dataHold.interactingMerchant:<npc>
@@ -28,8 +14,7 @@ KMerchant_Assignment:
 
         - if <npc.has_flag[cachedInterface]>:
             - define interactingPlayers <npc.flag[dataHold.interactingPlayers]>
-            - define windowInstance <inventory[KMerchant_Menu]>
-            - adjust def:windowInstance contents:<npc.flag[cachedInterface]>
+            - define itemList <npc.flag[cachedInterface]>
             - inject RunMerchantInterface path:OpenInterface
 
         - else:
@@ -38,17 +23,15 @@ KMerchant_Assignment:
 
 RunMerchantInterface:
     type: task
+    debug: false
     definitions: merchant|player
-    CacheInterface:
-    - flag <[merchant]> cachedInterface:<[player].open_inventory>
-
     OpenInterface:
     - foreach <[interactingPlayers]> as:target:
-        - inventory open d:<[windowInstance]> player:<[target]>
+        - run PaginatedInterface def.itemList:<[itemList]> def.player:<[target]> def.page:1
 
     script:
-    - define windowInstance <inventory[KMerchant_Menu]>
     - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
+    - define itemList <list[]>
 
     - foreach <[merchant].flag[merchantData.supply]>:
         - define quantity <[value].get[quantity]>
@@ -71,7 +54,7 @@ RunMerchantInterface:
             - define pDElement <element[<[percentageDiff]>%].color[red]> if:<[percentageDiff].is[OR_MORE].than[0]>
             - adjust def:item "lore:<[item].lore.include[<element[Price Change From Last Week: ].bold><[pDElement]>]>"
 
-        - give to:<[windowInstance]> <[item]>
+        - define itemList:->:<[item]>
 
     - inject RunMerchantInterface path:OpenInterface
 
@@ -85,9 +68,14 @@ RunMerchantInterface:
 
 KMerchantWindow_Handler:
     type: world
+    debug: false
     events:
-        on player clicks in KMerchant_Menu:
+        on player clicks in PaginatedInterface_Window flagged:dataHold.interactingMerchant:
         - ratelimit player 3t
+
+        - if !<context.item.has_flag[price]>:
+            - determine cancelled
+
         - define price <context.item.flag[price]>
         - define merchant <player.flag[dataHold.interactingMerchant]>
         - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
@@ -143,11 +131,12 @@ KMerchantWindow_Handler:
 
         - determine cancelled
 
-        on player closes KMerchant_Menu:
+        on player closes PaginatedInterface_Window flagged:dataHold.interactingMerchant:
         - wait 2t
         - if <player.open_inventory> == <player.inventory>:
-            - define inventoryContents <context.inventory>
+            - define inventoryContents <context.inventory.list_contents>
             - define merchant <player.flag[dataHold.interactingMerchant]>
-            - flag <[merchant]> cachedInterface:<[inventoryContents].list_contents>
+
+            - flag <[merchant]> cachedInterface:<[inventoryContents].get[1].to[<[inventoryContents].size.sub[9]>]>
             - flag <[merchant]> dataHold.interactingPlayers:<-:<player>
             - flag <player> dataHold.interactingMerchant:!
