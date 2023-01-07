@@ -7,6 +7,7 @@
 ## @Date: Jan 2022
 ## @Script Ver: Indev
 ##
+##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------
 
 MerchantTutorial_Handler:

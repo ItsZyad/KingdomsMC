@@ -1,4 +1,5 @@
 ##ignorewarning invalid_data_line_quotes
+##ignorewarning uneven_tags
 
 FyndalinTreatyInformation:
     type: data

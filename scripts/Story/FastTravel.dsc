@@ -25,9 +25,9 @@ FastTravel:
             - else:
                 - define warpName "<context.raw_args.split[travel ].get[2].trim>"
                 - define warpNameUnderscored "INTERNAL_STORY_<[warpName].replace[ ].with[_]>"
-                - define regionIndex <server.notes.find[<polygon[<[warpNameUnderscored]>]>]>
-                - define regionIndex <server.notes.find[<cuboid[<[warpNameUnderscored]>]>]> if:<[regionIndex].equals[-1]>
-                - define region <server.notes.get[<[regionIndex]>]>
+                - define regionIndex <util.notes.find[<polygon[<[warpNameUnderscored]>]>]>
+                - define regionIndex <util.notes.find[<cuboid[<[warpNameUnderscored]>]>]> if:<[regionIndex].equals[-1]>
+                - define region <util.notes.get[<[regionIndex]>]>
 
                 # - narrate format:debug RAW:<[warpName]>
                 # - narrate format:debug UND:<[warpNameUnderscored]>

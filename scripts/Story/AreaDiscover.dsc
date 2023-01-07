@@ -7,6 +7,7 @@
 ## @Date: Apr 2022
 ## @Script Ver: v1.0
 ##
+##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------
 
 AreaAlert_Handler:
@@ -106,9 +107,9 @@ AreaCreation_Command:
             - foreach <player.flag[areaCreation].get[points]>:
                 - showfake cancel <[value]> players:<player>
 
-            - define index <server.notes.find[<cuboid[INTERNAL_STORY_<[name]>]>]>
+            - define index <util.notes.find[<cuboid[INTERNAL_STORY_<[name]>]>]>
 
-            - define region <server.notes.get[<[index]>]>
+            - define region <util.notes.get[<[index]>]>
 
             - narrate format:debug NAME:<[name]>
             - narrate format:debug AREA:<[area]>
@@ -118,12 +119,12 @@ AreaCreation_Command:
             - note <[area]> as:INTERNAL_STORY_<[name]>
 
             - if <[index]> == -1:
-                - define index <server.notes.find[<polygon[INTERNAL_STORY_<[name]>]>]>
+                - define index <util.notes.find[<polygon[INTERNAL_STORY_<[name]>]>]>
 
             - narrate format:debug INDEX:<[index]>
 
-            - flag <server.notes.get[<[index]>]> teleport:<player.location>
-            - flag <server.notes.get[<[index]>]> name:<[name]>
+            - flag <util.notes.get[<[index]>]> teleport:<player.location>
+            - flag <util.notes.get[<[index]>]> name:<[name]>
 
             - determine cancelled
 

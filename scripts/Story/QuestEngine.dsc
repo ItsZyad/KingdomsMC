@@ -8,6 +8,8 @@
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Jun 2022
 ## @Version: v0.1
+##
+##ignorewarning invalid_data_line_quotes
 ## ---------------------------END HEADER----------------------------
 
 #ValidKeys_CISK:
@@ -163,7 +165,7 @@ SpeechParser_CISK_OLD:
     - foreach <[speech]>:
         - define waitTime <proc[WaitTime_CISK].context[<[value]>|<[talkSpeedMultiplier]>].round_to_precision[0.01]>
 
-        - if <[value].as_map.exists>:
+        - if <[value].as[map].exists>:
             - choose <[value].keys.get[1].to_uppercase>:
                 - case OPTIONS:
                     - run OptionsParser_CISK def.npc:<[npc]> def.optionsBlock:<[value]> def.handlerBlock:<[handlerBlock]> def.handlerType:<[handlerType]> def.schema:<[schema]> def.player:<[player]> def.stopPoint:<[loop_index]> def.talkSpeed:<[talkSpeedMultiplier]> def.file:<[file]>

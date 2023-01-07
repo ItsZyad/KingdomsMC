@@ -1,3 +1,5 @@
+##ignorewarning invalid_data_line_quotes
+
 ArmyBartenderNPC:
     type: assignment
     actions:

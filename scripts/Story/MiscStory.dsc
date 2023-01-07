@@ -5,6 +5,7 @@
 ## @Date: Dec 2021
 ## @Script Ver: N/A
 ##
+##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------
 
 ParseStoryOptions:

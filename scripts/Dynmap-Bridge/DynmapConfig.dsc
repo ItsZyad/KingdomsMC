@@ -15,8 +15,8 @@ dynmap_config:
             #If no label is provided, there wont be one.
             #<[area]> will return the relevant AreaObject.
             label:
-            - "=-=-= Kingdoms Region =-=-="
-            - Owners: "The Republic of Altea"
+            - =-=-= Kingdoms Region =-=-=
+            - Owners: The Republic of Altea
             #- Flags: <[area].flag[dPrevention.flags].to_pair_lists.parse_tag[<[parse_value].first>:<[parse_value].last>].space_separated.if_null[NONE]>
             ##All configs should have this key.
             #Example: If a marker set was added via "/dmarker addset dPrevention" you should set marker-set to "dPrevention"

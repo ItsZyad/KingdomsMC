@@ -7,6 +7,7 @@
 ## @Date: Jul 2021
 ## @Script Ver: v1.0
 ##
+##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------
 
 #TODO: Comment this!
@@ -372,7 +373,7 @@ OutpostWand_Handler:
             - if <player.has_flag[canNameOutpost]>:
                 - if !<yaml[outpost].contains[<[kingdom]>.<context.message>]>:
 
-                    - note <cuboid[<player.world.name>,<[PosOne].as_location.x>,0,<[PosOne].as_location.z>,<[PosTwo].as_location.x>,255,<[PosTwo].as_location.z>]> as:<context.message>
+                    - note <cuboid[<player.world.name>,<[PosOne].as[location].x>,0,<[PosOne].as[location].z>,<[PosTwo].as[location].x>,255,<[PosTwo].as[location].z>]> as:<context.message>
 
                     - define escapedName <proc[OutpostNameEscaper].context[<context.message>]>
                     #- narrate format:debug "ESCAPED: <[escapedName]>"
@@ -380,8 +381,8 @@ OutpostWand_Handler:
                     # Set data in outposts.yml
 
                     - yaml id:outpost set outposts.<[escapedName]>:<[kingdom]>
-                    - yaml id:outpost set <[kingdom]>.<[escapedName]>.cornerone:<[PosOne].as_location>
-                    - yaml id:outpost set <[kingdom]>.<[escapedName]>.cornertwo:<[PosTwo].as_location>
+                    - yaml id:outpost set <[kingdom]>.<[escapedName]>.cornerone:<[PosOne].as[location]>
+                    - yaml id:outpost set <[kingdom]>.<[escapedName]>.cornertwo:<[PosTwo].as[location]>
                     - yaml id:outpost set <[kingdom]>.<[escapedName]>.size:<player.flag[size].round>
                     - yaml id:outpost set <[kingdom]>.<[escapedName]>.upkeep:<yaml[outpost].read[<[kingdom]>.<[escapedName]>.size].mul[<yaml[kingdoms].read[<[kingdom]>.outposts.outpost_upkeep]>].round>
                     - yaml id:outpost set <[kingdom]>.<[escapedName]>.name:<context.message>
@@ -401,10 +402,10 @@ OutpostWand_Handler:
 
                     - define outpostName <player.flag[redefiningOutpost]>
 
-                    - note <cuboid[<player.world.name>,<[PosOne].as_location.x>,0,<[PosOne].as_location.z>,<[PosTwo].as_location.x>,255,<[PosTwo].as_location.z>]> as:<context.message>
+                    - note <cuboid[<player.world.name>,<[PosOne].as[location].x>,0,<[PosOne].as[location].z>,<[PosTwo].as[location].x>,255,<[PosTwo].as[location].z>]> as:<context.message>
 
-                    - yaml id:outpost set <[kingdom]>.<[outpostName]>.cornerone:<[PosOne].as_location>
-                    - yaml id:outpost set <[kingdom]>.<[outpostName]>.cornertwo:<[PosTwo].as_location>
+                    - yaml id:outpost set <[kingdom]>.<[outpostName]>.cornerone:<[PosOne].as[location]>
+                    - yaml id:outpost set <[kingdom]>.<[outpostName]>.cornertwo:<[PosTwo].as[location]>
                     - yaml id:outpost set <[kingdom]>.<[outpostName]>.size:<player.flag[size].round>
 
                     - define newUpkeep <yaml[outpost].read[<[kingdom]>.<[outpostName]>.size].mul[<yaml[kingdoms].read[<[kingdom]>.outposts.outpost_upkeep]>].round>

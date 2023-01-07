@@ -1,3 +1,5 @@
+##ignorewarning invalid_data_line_quotes
+
 OutpostSpec_Window:
     type: inventory
     inventory: chest

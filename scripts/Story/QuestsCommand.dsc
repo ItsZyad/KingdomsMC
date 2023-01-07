@@ -2,7 +2,7 @@ Quests_Command:
     type: command
     name: quests
     usage: /quests
-    description: "Shows all the player's current and finished quests."
+    description: Shows all the player's current and finished quests.
     tab completions:
         1: active|completed
     script:
@@ -68,7 +68,7 @@ QuestsGUI:
     type: inventory
     inventory: chest
     gui: true
-    title: "<player.name>'s Quests"
+    title: <player.name>'s Quests
     procedural items:
     - determine <player.flag[QuestList]>
     slots:

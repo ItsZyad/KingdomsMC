@@ -65,7 +65,7 @@ DEBUG_RefreshGarrisonArea:
 DEBUG_GarrisonBrush_ITEM:
     type: item
     material: spectral_arrow
-    display name: "<light_purple><bold>Garrison Brush"
+    display name: <light_purple><bold>Garrison Brush
 
 DEBUG_GarrisonBrush_HANDLER:
     type: world

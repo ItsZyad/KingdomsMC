@@ -6,7 +6,7 @@ FlagPurge_Command:
     type: command
     name: flagpurge
     usage: /flagpurge
-    description: "Wipes every flag with the specified name off the server (WARNING: VERY POWERFUL COMMAND)"
+    description: Wipes every flag with the specified name off the server (WARNING: VERY POWERFUL COMMAND)
     script:
     - if <context.raw_args> == yes && !<player.has_flag[flagPurgeConfirm]>:
         - flag player flagPurgeConfirm

@@ -1,3 +1,5 @@
+##ignorewarning invalid_data_line_quotes
+
 ClerkNPC:
     type: assignment
     actions:

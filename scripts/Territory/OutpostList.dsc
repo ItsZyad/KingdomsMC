@@ -7,6 +7,7 @@
 ## @Date: Nov 2021
 ## @Script Ver: v1.0
 ##
+##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------
 
 Old_OutpostManager_Command:

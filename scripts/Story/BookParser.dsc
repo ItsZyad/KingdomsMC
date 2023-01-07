@@ -25,7 +25,7 @@ FileFetcher:
         - if <context.args.get[1].ends_with[.txt]>:
             - define fileName <context.args.get[1]>
 
-            - if <server.has_file[story_texts/<[fileName]>]>:
+            - if <util.has_file[story_texts/<[fileName]>]>:
                 - flag player fetchedText:<[fileName]>
 
                 - narrate format:admincallout "Fetched <aqua><[fileName]><light_purple>!"
@@ -40,7 +40,7 @@ ParseBook:
     type: command
     name: parsebook
     usage: /parsebook
-    description: "Turns a string of plain text into one that is formatted like a minecraft book using Denizen lists."
+    description: Turns a string of plain text into one that is formatted like a minecraft book using Denizen lists.
     # If another use is designed for the fetch command, make a
     # different permission node for this command
     permission: kingdoms.admin.fetchtext
