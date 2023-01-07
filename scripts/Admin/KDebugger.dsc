@@ -13,10 +13,11 @@
 
 ## DEBUGGER MUST BE INJECTED!
 ## Running this script regularly may appear to make it work regularly
-## however, WILL have unforseen side-effects.
+## however, WILL have odd side-effects.
 
 Debugger:
     type: task
+    debug: false
     script:
     - if <queue.player.exists>:
         - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
@@ -41,8 +42,14 @@ Debugger:
                 - clickable until:30m usages:1 for:<player> save:debugContinue:
                     - flag <player> adminTools.debugMode:!
 
+                - clickable until:30m usages:1 for:<player> save:debugStop:
+                    - flag <player> adminTools.debugMode:!
+                    - flag <player> adminTools.killedQueue
+
                 - narrate <n>
                 - narrate "<element[Continue script execution].underline.on_click[<entry[debugContinue].command>]>"
+                - narrate <n>
+                - narrate "<element[Stop Queue].underline.on_click[<entry[debugStop].commands>]>"
 
                 - define beforeWaitTime <util.time_now.epoch_millis>
 
@@ -54,7 +61,14 @@ Debugger:
                 - define beforeWaitTime:!
 
             - narrate "Ran queue: <queue.id.color[gray].italicize> in: <queue.time_ran.in_milliseconds.sub[<[waitTime]>].abs.round_to_precision[0.1].color[red]><red>ms"
+
+            - if <player.has_flag[adminTools.killedQueue]>:
+                - flag <player> adminTools.killedQueue:!
+                - narrate "<red><bold>User Stopped Queue Execution."
+                - stop
+
             - narrate "<element[                                  ].strikethrough>"
+
 
     - else:
         - narrate format:admincallout "Queue at breakpoint in script:<queue.script.name.color[red]> does not have attached player!"
@@ -67,10 +81,8 @@ DebugMode_Handler:
             - queue <player.flag[adminTools.debugMode]> clear
             - flag <player> adminTools.debugMode:!
 
-        # Requires Denizen build 1773.
-        # fuck.
-        on scripts loaded:
-        - narrate test targets:<server.online_ops>
+        # on scripts loaded:
+        # - narrate test targets:<server.online_ops>
 
 TestScript_KDebug:
     type: task

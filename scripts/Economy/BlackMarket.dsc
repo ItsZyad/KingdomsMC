@@ -123,7 +123,7 @@ RefreshBlackMarketMerchants:
                         - inventory set slot:<[slotNum]> o:<[item]> d:<[merchant].inventory>
                         - inventory flag slot:<[slotNum]> amount:<[amountRandom]> d:<[merchant].inventory>
                         - inventory flag slot:<[slotNum]> price:<[price]> d:<[merchant].inventory>
-                        - inventory adjust slot:<[slotNum]> "lore:|<&color[#ffffff]>Amount Available<&co> <green><[amountRandom]>|<&color[#ffffff]>Price<&co> <red>$<proc[CommaAdder].context[<[price]>]>" d:<[merchant].inventory>
+                        - inventory adjust slot:<[slotNum]> "lore:|<&color[#ffffff]>Amount Available<&co> <green><[amountRandom]>|<&color[#ffffff]>Price<&co> <red>$<[price].format_number>" d:<[merchant].inventory>
                         - define slotNum:+:1
 
                     - else:
@@ -248,14 +248,14 @@ BMMerchant_Handler:
                         - adjust def:selectedItem "lore:I am a worthless waste of money."
                         - adjust def:selectedItem "lore:There are starving kids in Africa who|could have used that money..."
                         - adjust def:selectedItem "lore:For real? A bucket of milk named <context.item.display>?"
-                        - adjust def:selectedItem "lore:<player.nameplate> wasted a total of:|<red>$<proc[CommaAdder].context[<[price]>]> <italic><dark_purple>on me."
+                        - adjust def:selectedItem "lore:<player.nameplate> wasted a total of:|<red>$<[price].format_number> <italic><dark_purple>on me."
 
                 - give <[selectedItem]> quantity:<[purchaseAmount]>
 
                 # change the display in the GUI to reflect the
                 # purchase
 
-                - inventory adjust slot:<context.slot> "lore:|<&color[#ffffff]>Amount Available<&co> <green><[amount].sub[<[purchaseAmount]>]>|<&color[#ffffff]>Price<&co> <red>$<proc[CommaAdder].context[<[price]>]>" d:<context.inventory>
+                - inventory adjust slot:<context.slot> "lore:|<&color[#ffffff]>Amount Available<&co> <green><[amount].sub[<[purchaseAmount]>]>|<&color[#ffffff]>Price<&co> <red>$<[price].format_number>" d:<context.inventory>
 
                 # If the player has made a promise to the faction
                 # the npc is a part of them fullfill a part of the

@@ -1,331 +1,442 @@
 price_info:
-  neutral_region_name: NewFyndalin
-  items:
-    ores:
-        diamond:
-            base: '180'
-            gov_cap: '280'
-            complements: ''
-            substitutes: g:ores
-        lapis_ore:
-            base: '100'
-            gov_cap: '140'
-        diamond_ore:
-            base: '200'
-            gov_cap: '280'
-        coal_ore:
-            base: '15'
-            gov_cap: '21'
-        iron_ore:
-            base: '18'
-            gov_cap: '25.2'
-        gold_ore:
-            base: '45'
-            gov_cap: '63'
-        redstone_ore:
-            base: '30'
-            gov_cap: '42'
-        iron_block:
-            base: '190'
-            gov_cap: '266'
-        gold_block:
-            base: '450'
-            gov_cap: '630'
-        diamond_block:
-            base: '2000'
-            gov_cap: '2800'
-        lapis_block:
-            base: '950'
-            gov_cap: '1330'
-        iron_ingot:
-            base: '22'
-            gov_cap: '30.8'
-        gold_ingot:
-            base: '105'
-            gov_cap: '147'
-        redstone:
-            base: '30'
-            gov_cap: '42'
-    general:
-        stone:
-            base: '3'
-            gov_cap: '4.2'
-        dirt:
-            base: '1'
-            gov_cap: '1.4'
-        cobblestone:
-            base: '1'
-            gov_cap: '1.4'
-        bedrock:
-            base: '100'
-            gov_cap: '140'
-        sand:
-            base: '1'
-            gov_cap: '1.4'
-        gravel:
-            base: '1'
-            gov_cap: '1.4'
-        sponge:
-            base: '80'
-            gov_cap: '112'
-        glass:
-            base: '3'
-            gov_cap: '4.2'
-        sandstone:
-            base: '3'
-            gov_cap: '4.2'
-        grass:
-            base: '1'
-            gov_cap: '1.4'
-        brown_mushroom:
-            base: '2'
-            gov_cap: '2.8'
-        red_mushroom:
-            base: '2'
-            gov_cap: '2.8'
-        sugar_cane:
-            base: '10'
-            gov_cap: '14'
-        bookshelf:
-            base: '140'
-            gov_cap: '196'
-        mossy_cobblestone:
-            base: '90'
-            gov_cap: '126'
-        obsidian:
-            base: '130'
-            gov_cap: '182'
-        torch:
-            base: '4'
-            gov_cap: '5.6'
-        chest:
-            base: '4'
-            gov_cap: '5.6'
-        furnace:
-            base: '8.5'
-            gov_cap: '11.9'
-        ladder:
-            base: '0.5'
-            gov_cap: '0.7'
-        cobblestone_stairs:
-            base: '1.5'
-            gov_cap: '2.1'
-        cactus:
-            base: '10'
-            gov_cap: '14'
-        clay:
-            base: '12'
-            gov_cap: '16.8'
-        pumpkin:
-            base: '50'
-            gov_cap: '70'
-        jack_o_lantern:
-            base: '56'
-            gov_cap: '78.4'
-        redstone:
-            base: '32'
-            gov_cap: '44.8'
-        dispenser:
-            base: '58'
-            gov_cap: '81.2'
-        lever:
-            base: '1'
-            gov_cap: '1.4'
-        tnt:
-            base: '100'
-            gov_cap: '140'
-        note_block:
-            base: '36'
-            gov_cap: '50.4'
-        stone_button:
-            base: '6'
-            gov_cap: '8.4'
-        iron_door:
-            base: '22'
-            gov_cap: '30.8'
-        saddle:
-            base: '100'
-            gov_cap: '140'
-        minecart:
-            base: '23'
-            gov_cap: '32.2'
-        apple:
-            base: '10'
-            gov_cap: '14'
-        bow:
-            base: '15'
-            gov_cap: '21'
-        arrow:
-            base: '3.5'
-            gov_cap: '4.9'
-        coal:
-            base: '15'
-            gov_cap: '21'
-        stone_sword:
-            base: '2.5'
-            gov_cap: '3.5'
-        stone_pickaxe:
-            base: '4'
-            gov_cap: '5.6'
-        stone_axe:
-            base: '3'
-            gov_cap: '4.2'
-        stone_hoe:
-            base: '2.5'
-            gov_cap: '3.5'
-        iron_sword:
-            base: '22'
-            gov_cap: '30.8'
-        iron_pickaxe:
-            base: '22'
-            gov_cap: '30.8'
-        iron_axe:
-            base: '22'
-            gov_cap: '30.8'
-        iron_hoe:
-            base: '22'
-            gov_cap: '30.8'
-        diamond_sword:
-            base: '420'
-            gov_cap: '588'
-        diamond_pickaxe:
-            base: '650'
-            gov_cap: '910'
-        diamond_axe:
-            base: '650'
-            gov_cap: '910'
-        diamond_hoe:
-            base: '400'
-            gov_cap: '560'
-        stick:
-            base: '0.25'
-            gov_cap: '0.35'
-        bowl:
-            base: '0.5'
-            gov_cap: '0.7'
-        string:
-            base: '5'
-            gov_cap: '7'
-        feather:
-            base: '3'
-            gov_cap: '4.2'
-        wheat:
-            base: '9'
-            gov_cap: '12.6'
-        bread:
-            base: '30'
-            gov_cap: '42'
-        leather_helmet:
-            base: '52'
-            gov_cap: '72.8'
-        leather_chestplate:
-            base: '85'
-            gov_cap: '119'
-        leather_leggings:
-            base: '75'
-            gov_cap: '105'
-        leather_boots:
-            base: '42'
-            gov_cap: '58.8'
-        chainmail_helmet:
-            base: '40'
-            gov_cap: '56'
-        chainmail_chestplate:
-            base: '40'
-            gov_cap: '56'
-        chainmail_leggings:
-            base: '50'
-            gov_cap: '70'
-        chainmail_boots:
-            base: '30'
-            gov_cap: '42'
-        iron_helmet:
-            base: '22'
-            gov_cap: '30.8'
-        iron_chestplate:
-            base: '22'
-            gov_cap: '30.8'
-        iron_leggings:
-            base: '22'
-            gov_cap: '30.8'
-        iron_boots:
-            base: '22'
-            gov_cap: '30.8'
-        diamond_helmet:
-            base: '1000'
-            gov_cap: '1400'
-        diamond_chestplate:
-            base: '1750'
-            gov_cap: '2450'
-        diamond_leggings:
-            base: '1500'
-            gov_cap: '2100'
-        diamond_boots:
-            base: '850'
-            gov_cap: '1190'
-        painting:
-            base: '25'
-            gov_cap: '35'
-        golden_apple:
-            base: '100'
-            gov_cap: '140'
-        bucket:
-            base: '22'
-            gov_cap: '30.8'
-        water_bucket:
-            base: '40'
-            gov_cap: '56'
-        lava_bucket:
-            base: '40'
-            gov_cap: '56'
-        snowball:
-            base: '1'
-            gov_cap: '1.4'
-        leather:
-            base: '10'
-            gov_cap: '14'
-        milk_bucket:
-            base: '40'
-            gov_cap: '56'
-        brick:
-            base: '21'
-            gov_cap: '29.4'
-        clay_ball:
-            base: '3'
-            gov_cap: '4.2'
-        paper:
-            base: '10'
-            gov_cap: '14'
-        book:
-            base: '45'
-            gov_cap: '63'
-        slime_ball:
-            base: '50'
-            gov_cap: '70'
-        egg:
-            base: '1'
-            gov_cap: '1.4'
-        compass:
-            base: '22'
-            gov_cap: '30.8'
-        fishing_rod:
-            base: '10'
-            gov_cap: '14'
-        glowstone_dust:
-            base: '10'
-            gov_cap: '14'
-        bone:
-            base: '2'
-            gov_cap: '2.8'
-        sugar:
-            base: '10'
-            gov_cap: '14'
-        cake:
-            base: '180'
-            gov_cap: '252'
-        water:
-            base: '1'
-            gov_cap: '1.4'
-        lava:
-            base: '25'
-            gov_cap: '35'
+    neutral_region_name: NewFyndalin
+    global_supply_mod: '1'
+    items:
+        ores:
+            diamond:
+                base: '180'
+                gov_cap: '280'
+                substitutes:
+                - g:ores
+                supply_prob: '0.5'
+                amount_mod: '0.9'
+            lapis_ore:
+                base: '100'
+                gov_cap: '140'
+                supply_prob: '0.5'
+                amount_mod: '1.3'
+            diamond_ore:
+                base: '200'
+                gov_cap: '280'
+                supply_prob: '0.25'
+            coal_ore:
+                base: '15'
+                gov_cap: '21'
+                supply_prob: '0.9'
+                amount_mod: '1.1'
+            coal:
+                base: '4'
+                gov_cap: '6.5'
+                supply_prob: '0.76'
+                amount_mod: '2'
+            iron_ore:
+                base: '18'
+                gov_cap: '25.2'
+                supply_prob: '0.45'
+            gold_ore:
+                base: '45'
+                gov_cap: '63'
+                supply_prob: '0.3'
+            redstone_ore:
+                base: '30'
+                gov_cap: '42'
+                supply_prob: '0.33'
+            iron_block:
+                base: '190'
+                gov_cap: '266'
+                supply_prob: '0.25'
+            gold_block:
+                base: '450'
+                gov_cap: '630'
+                supply_prob: '0.19'
+            diamond_block:
+                base: '2000'
+                gov_cap: '2800'
+                supply_prob: '0.14'
+            lapis_block:
+                base: '950'
+                gov_cap: '1330'
+                supply_prob: '0.34'
+            iron_ingot:
+                base: '22'
+                gov_cap: '30.8'
+                supply_prob: '0.65'
+                amount_mod: '1.1'
+            gold_ingot:
+                base: '105'
+                gov_cap: '147'
+                supply_prob: '0.45'
+            redstone:
+                base: '30'
+                gov_cap: '42'
+                supply_prob: '0.55'
+                amount_mod: '1.5'
+            copper_ingot:
+                base: '12'
+                gov_cap: '20'
+                supply_prob: '0.69'
+                amount_mod: '1.1'
+            emerald:
+                base: '143'
+                gov_cap: '214'
+                supply_prob: '0.43'
+                amount_mod: '0.9'
+            charcoal:
+                base: '2.5'
+                gov_cap: '4'
+                supply_prob: '0.8'
+                amount_mod: '2'
+        tools:
+            diamond_pickaxe:
+                base: '540'
+                gov_cap: '1000'
+                supply_prob: '0.35'
+                amount_mod: '0.7'
+        building_blocks:
+            stone:
+                base: '3'
+                gov_cap: '4.2'
+                supply_prob: '0.95'
+            cobblestone:
+                base: '1'
+                gov_cap: '1.4'
+                supply_prob: '0.99'
+                amount_mod: '2'
+            stone_bricks:
+                base: '12'
+                gov_cap: '16.8'
+                supply_prob: '0.8'
+            mossy_cobblestone:
+                base: '90'
+                gov_cap: '126'
+                supply_prob: '0.56'
+                amount_mod: '0.8'
+            cobblestone_stairs:
+                base: '1.5'
+                gov_cap: '2.1'
+                supply_prob: '0.87'
+            dirt:
+                base: '1'
+                gov_cap: '1.4'
+                supply_prob: '1'
+                amount_mod: '2'
+            sand:
+                base: '1'
+                gov_cap: '1.4'
+            gravel:
+                base: '1'
+                gov_cap: '1.4'
+            glass:
+                base: '3'
+                gov_cap: '4.2'
+            glass_pane:
+                base: '2.5'
+                gov_cap: '3.5'
+                supply_prob: '0.95'
+            sandstone:
+                base: '3'
+                gov_cap: '4.2'
+            grass_block:
+                base: '1'
+                gov_cap: '1.4'
+            obsidian:
+                base: '130'
+                gov_cap: '182'
+            oak_stairs:
+                base: '1.5'
+                gov_cap: '2'
+            acacia_stairs:
+                base: '1.5'
+                gov_cap: '2'
+            jungle_stairs:
+                base: '1.5'
+                gov_cap: '2'
+            dark_oak_stairs:
+                base: '1.5'
+                gov_cap: '2'
+            birch_stairs:
+                base: '1.5'
+                gov_cap: '2'
+            mangrove_stairs:
+                base: '2'
+                gov_cap: '3'
+            diorite:
+                base: '1.5'
+                gov_cap: '2.7'
+                supply_prob: '0.89'
+            andesite:
+                base: '2.25'
+                gov_cap: '3.45'
+                supply_prob: '0.92'
+            red_sand:
+                base: '1'
+                gov_cap: '1.4'
+                supply_prob: '1'
+                amount_mod: '1'
+            oak_planks:
+                base: '1.5'
+                gov_cap: '2'
+            oak_log:
+                base: '1.5'
+                gov_cap: '2'
+            glowstone:
+                base: '70'
+                gov_cap: '98'
+        food:
+            pumpkin:
+                base: '50'
+                gov_cap: '70'
+                supply_prob: '0.46'
+            apple:
+                base: '10'
+                gov_cap: '14'
+                supply_prob: '0.87'
+                amount_mod: '1.5'
+            wheat:
+                base: '9'
+                gov_cap: '12.6'
+                supply_prob: '0.93'
+                amount_mod: '3'
+            bread:
+                base: '30'
+                gov_cap: '42'
+                supply_prob: '0.71'
+            golden_apple:
+                base: '100'
+                gov_cap: '140'
+                supply_prob: '0.22'
+            milk_bucket:
+                base: '40'
+                gov_cap: '56'
+                supply_prob: '0.43'
+            egg:
+                base: '1'
+                gov_cap: '1.4'
+                supply_prob: '0.89'
+                supply_mod: '1.4'
+            sugar:
+                base: '10'
+                gov_cap: '14'
+                supply_prob: '0.82'
+                amount_mod: '2'
+            cake:
+                base: '180'
+                gov_cap: '252'
+                supply_prob: '0.66'
+        general:
+            sponge:
+                base: '80'
+                gov_cap: '112'
+            bedrock:
+                base: '100'
+                gov_cap: '140'
+            brown_mushroom:
+                base: '2'
+                gov_cap: '2.8'
+            red_mushroom:
+                base: '2'
+                gov_cap: '2.8'
+            sugar_cane:
+                base: '10'
+                gov_cap: '14'
+            bookshelf:
+                base: '140'
+                gov_cap: '196'
+            torch:
+                base: '4'
+                gov_cap: '5.6'
+            chest:
+                base: '4'
+                gov_cap: '5.6'
+            furnace:
+                base: '8.5'
+                gov_cap: '11.9'
+            ladder:
+                base: '0.5'
+                gov_cap: '0.7'
+            cactus:
+                base: '10'
+                gov_cap: '14'
+            clay:
+                base: '12'
+                gov_cap: '16.8'
+            jack_o_lantern:
+                base: '56'
+                gov_cap: '78.4'
+            dispenser:
+                base: '58'
+                gov_cap: '81.2'
+            lever:
+                base: '1'
+                gov_cap: '1.4'
+            tnt:
+                base: '100'
+                gov_cap: '140'
+            note_block:
+                base: '36'
+                gov_cap: '50.4'
+            stone_button:
+                base: '6'
+                gov_cap: '8.4'
+            iron_door:
+                base: '22'
+                gov_cap: '30.8'
+            saddle:
+                base: '100'
+                gov_cap: '140'
+            minecart:
+                base: '23'
+                gov_cap: '32.2'
+            bow:
+                base: '15'
+                gov_cap: '21'
+            arrow:
+                base: '3.5'
+                gov_cap: '4.9'
+            stone_sword:
+                base: '2.5'
+                gov_cap: '3.5'
+            stone_pickaxe:
+                base: '4'
+                gov_cap: '5.6'
+            stone_axe:
+                base: '3'
+                gov_cap: '4.2'
+            stone_hoe:
+                base: '2.5'
+                gov_cap: '3.5'
+            iron_sword:
+                base: '22'
+                gov_cap: '30.8'
+            iron_pickaxe:
+                base: '22'
+                gov_cap: '30.8'
+            iron_axe:
+                base: '22'
+                gov_cap: '30.8'
+            iron_hoe:
+                base: '22'
+                gov_cap: '30.8'
+            diamond_sword:
+                base: '420'
+                gov_cap: '588'
+            diamond_pickaxe:
+                base: '650'
+                gov_cap: '910'
+            diamond_axe:
+                base: '650'
+                gov_cap: '910'
+            diamond_hoe:
+                base: '400'
+                gov_cap: '560'
+            stick:
+                base: '0.25'
+                gov_cap: '0.35'
+            bowl:
+                base: '0.5'
+                gov_cap: '0.7'
+            string:
+                base: '5'
+                gov_cap: '7'
+            feather:
+                base: '3'
+                gov_cap: '4.2'
+            leather_helmet:
+                base: '52'
+                gov_cap: '72.8'
+            leather_chestplate:
+                base: '85'
+                gov_cap: '119'
+            leather_leggings:
+                base: '75'
+                gov_cap: '105'
+            leather_boots:
+                base: '42'
+                gov_cap: '58.8'
+            chainmail_helmet:
+                base: '40'
+                gov_cap: '56'
+            chainmail_chestplate:
+                base: '40'
+                gov_cap: '56'
+            chainmail_leggings:
+                base: '50'
+                gov_cap: '70'
+            chainmail_boots:
+                base: '30'
+                gov_cap: '42'
+            iron_helmet:
+                base: '22'
+                gov_cap: '30.8'
+            iron_chestplate:
+                base: '22'
+                gov_cap: '30.8'
+            iron_leggings:
+                base: '22'
+                gov_cap: '30.8'
+            iron_boots:
+                base: '22'
+                gov_cap: '30.8'
+            diamond_helmet:
+                base: '1000'
+                gov_cap: '1400'
+            diamond_chestplate:
+                base: '1750'
+                gov_cap: '2450'
+            diamond_leggings:
+                base: '1500'
+                gov_cap: '2100'
+            diamond_boots:
+                base: '850'
+                gov_cap: '1190'
+            painting:
+                base: '25'
+                gov_cap: '35'
+            bucket:
+                base: '22'
+                gov_cap: '30.8'
+            water_bucket:
+                base: '40'
+                gov_cap: '56'
+            lava_bucket:
+                base: '40'
+                gov_cap: '56'
+            snowball:
+                base: '1'
+                gov_cap: '1.4'
+            leather:
+                base: '10'
+                gov_cap: '14'
+            brick:
+                base: '21'
+                gov_cap: '29.4'
+            clay_ball:
+                base: '3'
+                gov_cap: '4.2'
+            paper:
+                base: '10'
+                gov_cap: '14'
+            book:
+                base: '45'
+                gov_cap: '63'
+            slime_ball:
+                base: '50'
+                gov_cap: '70'
+            compass:
+                base: '22'
+                gov_cap: '30.8'
+            fishing_rod:
+                base: '10'
+                gov_cap: '14'
+            glowstone_dust:
+                base: '10'
+                gov_cap: '14'
+            bone:
+                base: '2'
+                gov_cap: '2.8'
+            water:
+                base: '1'
+                gov_cap: '1.4'
+            lava:
+                base: '25'
+                gov_cap: '35'
