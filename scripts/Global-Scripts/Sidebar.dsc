@@ -100,11 +100,7 @@ SidebarLoader:
             - sidebar add "values:<&sp>Influence Points: <yaml[ps].read[<[value].flag[kingdom]>.dailyinfluences]>" players:<[value]>
 
             # Separator Line
-            - sidebar add values:<underline><element[<&sp>].repeat[40]> players:<[value]>
-            - sidebar add values:<&sp> players:<[value]>
-
-            # Set Quests Title
-            - sidebar add "values:<&sp><bold><element[ACTIVE QUESTS:].color[<script[KingdomTextColors].data_key[<[value].flag[kingdom]>]>]>" players:<[value]>
+            - sidebar add values:<element[<&sp>].repeat[30]> players:<[value]>
 
         - else:
             - sidebar set title:<bold><gray>KINGDOMLESS
@@ -119,16 +115,6 @@ SidebarLoader:
             - sidebar add "values:<&sp><bold><gray>ACTIVE QUESTS:"
 
         - define activeQuestCount 0
-
-        - if <[value].has_flag[quests]>:
-            - foreach <[value].flag[quests]> as:quest:
-                - if <[activeQuestCount]> == 7:
-                    - sidebar add "values:<italic><gray>And more - check <aqua>/quests <gray>menu" players:<[value]>
-                    - foreach stop
-
-                - if <[quest].get[status]> == active:
-                    - sidebar add values:-<&sp><[quest].get[name]> players:<[value]>
-                    - define activeQuestCount:++
 
         # - if <[value].in_group[BDagger]> || <[value].is_op>:
         #     - sidebar add values:<underline><element[<&sp>].repeat[40]> players:<[value]>
