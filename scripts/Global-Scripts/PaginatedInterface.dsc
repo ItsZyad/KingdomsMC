@@ -36,7 +36,7 @@ GetTrueInterface_Proc:
 PaginatedInterface:
     type: task
     debug: false
-    definitions: itemList|page|player|footer
+    definitions: itemList|page|player|footer|title
     ChangeFooter:
     - if <[footer].exists> && <[footer].size> == 9:
         - define interfaceBody <proc[GetTrueInterface_Proc].context[<[interface]>].get[1].to[<[itemsPerPage]>]>
@@ -53,7 +53,7 @@ PaginatedInterface:
     - flag <[player]> dataHold.paginated.itemList:<[itemList]> if:<player.has_flag[dataHold.paginated.itemList].not>
 
     - define outList <list>
-    - define itemList <player.flag[dataHold.paginated.itemList]>
+    # - define itemList <player.flag[dataHold.paginated.itemList]>
     - define interface <inventory[PaginatedInterface_Window]>
     - define itemsPerPage <[interface].size.sub[9]>
 
@@ -73,6 +73,7 @@ PaginatedInterface:
 
     - define interface <[interface].include[<[outList]>]>
 
+    - adjust def:interface title:<[title]> if:<[title].exists>
     - adjust def:interface "title:<[interface].title> (page <[page]>/<[maxPages]>)"
 
     - definemap determination:
