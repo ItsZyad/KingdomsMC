@@ -1,3 +1,18 @@
+MerchantInterfaceNewFooter_Window:
+    type: inventory
+    inventory: chest
+    slots:
+    - [] [] [] [] [] [] [] [] [MerchantInterfaceChangeMode_Item]
+
+
+MerchantInterfaceChangeMode_Item:
+    type: item
+    material: player_head
+    display name: Change to<&co><blue> Sell Mode
+    mechanisms:
+        skull_skin: e9667d86-78a7-40ee-bcb9-bd1595f5fbaa|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTk5YWY0ODZjZTcyYmJiMWQ0ZmU5NWJiY2ZjZGY1OTY2ODFkOWQ2MTA4YjU2MzJmYjg5OTNkZmU5ZGJmMzI5MyJ9fX0=
+
+
 KMerchant_Assignment:
     type: assignment
     actions:
@@ -5,6 +20,8 @@ KMerchant_Assignment:
         - trigger name:click state:true
 
         on click:
+        - ratelimit <player> 1t
+
         - if <server.has_flag[PreGameStart]>:
             - narrate format:callout "Trading with the market is disabled when build mode is active."
             - determine cancelled
@@ -15,10 +32,13 @@ KMerchant_Assignment:
         - if <npc.has_flag[cachedInterface]>:
             - define interactingPlayers <npc.flag[dataHold.interactingPlayers]>
             - define itemList <npc.flag[cachedInterface]>
+            - define title "Buy Menu"
             - inject RunMerchantInterface path:OpenInterface
 
         - else:
             - run RunMerchantInterface def.merchant:<npc> def.player:<player>
+
+        - flag <player> dataHold.merchantMode:buy
 
 
 RunMerchantInterface:
@@ -27,7 +47,7 @@ RunMerchantInterface:
     definitions: merchant|player
     OpenInterface:
     - foreach <[interactingPlayers]> as:target:
-        - run PaginatedInterface def.itemList:<[itemList]> def.player:<[target]> def.page:1
+        - run PaginatedInterface def.itemList:<[itemList]> def.player:<[target]> def.page:1 def.footer:<[footer].if_null[<inventory[MerchantInterfaceNewFooter_Window]>]> def.title:<[title].if_null[Menu]>
 
     script:
     - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
@@ -56,6 +76,7 @@ RunMerchantInterface:
 
         - define itemList:->:<[item]>
 
+    - define footer <inventory[MerchantInterfaceNewFooter_Window]>
     - inject RunMerchantInterface path:OpenInterface
 
 # KMerchant_Interact:
@@ -70,64 +91,107 @@ KMerchantWindow_Handler:
     type: world
     debug: false
     events:
+        on player clicks MerchantInterfaceChangeMode_Item in inventory flagged:dataHold.merchantMode:
+        - define merchant <player.flag[dataHold.interactingMerchant]>
+        - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
+
+        - if <player.flag[dataHold.merchantMode]> == buy:
+            - define itemList <list[]>
+
+            - foreach <[merchant].flag[merchantData.supply]>:
+                - define name <[key]>
+                - define item <[name].as[item]>
+
+                - adjust def:item "lore:<element[Work In Progress].color[gray]>"
+
+                - define itemList:->:<[item]>
+
+            - define newChangeModeItem <inventory[MerchantInterfaceNewFooter_Window].slot[9]>
+            - define footer <inventory[MerchantInterfaceNewFooter_Window]>
+            - define title "Sell Menu"
+            - adjust def:newChangeModeItem "display:Change to<&co><green> Buy Mode"
+            - adjust def:newChangeModeItem skull_skin:13e9f695-f508-4680-ab69-bffb0b9e4bd2|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWYyNjI4NzA4NjZlMzYxNzU3ZWQ4ZGNmYWJkMTAzZWJkNjRkNTczODQ1NWQwYzkyOWIyNjYyNzRlN2M0YzdkYyJ9fX0=
+            - adjust def:footer contents:<list[<item[air]>|<item[air]>|<item[air]>|<item[air]>|<item[air]>|<item[air]>|<item[air]>|<item[air]>|<[newChangeModeItem]>]>
+
+            - foreach <[interactingPlayers]> as:target:
+                - run PaginatedInterface def.itemList:<[itemList]> def.player:<[target]> def.page:1 def.footer:<[footer].if_null[<inventory[MerchantInterfaceNewFooter_Window]>]> def.title:<[title].if_null[Menu]>
+
+            - flag <player> dataHold.merchantMode:sell
+
+        - else:
+            - if <[merchant].has_flag[cachedInterface]>:
+                - define title "Buy Menu"
+                - define itemList <[merchant].flag[cachedInterface]>
+                - inject RunMerchantInterface path:OpenInterface
+
+            - else:
+                - run RunMerchantInterface def.merchant:<[merchant]> def.player:<player>
+
+            - flag <player> dataHold.merchantMode:buy
+
         on player clicks in PaginatedInterface_Window flagged:dataHold.interactingMerchant:
         - ratelimit player 3t
 
-        - if !<context.item.has_flag[price]>:
-            - determine cancelled
+        - if <player.flag[dataHold.merchantMode]> == buy:
+            - if !<context.item.has_flag[price]>:
+                - determine cancelled
 
-        - define price <context.item.flag[price]>
-        - define merchant <player.flag[dataHold.interactingMerchant]>
-        - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
-        - define market <[merchant].flag[merchantData.linkedMarket]>
+            - define price <context.item.flag[price]>
+            - define merchant <player.flag[dataHold.interactingMerchant]>
+            - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
+            - define market <[merchant].flag[merchantData.linkedMarket]>
 
-        # If player shift clicks, buy 10 of the item instead of
-        # just 1
+            # If player shift clicks, buy 10 of the item instead of
+            # just 1
 
-        - if <context.click> == SHIFT_LEFT:
-            - define purchaseAmount 10
+            - if <context.click> == SHIFT_LEFT:
+                - define purchaseAmount 10
 
-            - if <[quantity]> < 10:
-                - define purchaseAmount <[quantity]>
-
-        - else:
-            - define purchaseAmount 1
-
-        - if <[quantity].is[OR_MORE].than[<[purchaseAmount]>]>:
-            - if <player.money.is[OR_MORE].than[<[price].mul[<[purchaseAmount]>]>]>:
-                - flag <[merchant]> merchantData.supply.<context.item.material.name>.quantity:-:<[purchaseAmount]>
-                - flag <[merchant]> merchantData.balance:+:<[price].mul[<[purchaseAmount]>]>
-
-                # take the appropriate amount of money and give
-                # the player the items;
-
-                - take money quantity:<[price].mul[<[purchaseAmount]>]>
-
-                # Create item without any of the BM Item's flags or lore
-
-                - define selectedItem <context.item>
-                - adjust def:selectedItem lore:<list[]>
-                - adjust def:selectedItem flag_map:<map[]>
-
-                - give <[selectedItem]> quantity:<[purchaseAmount]>
-
-                - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
-                - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
-
-                - foreach <[interactingPlayers]> as:target:
-                    - inventory adjust d:<[target].open_inventory> slot:<context.slot> "lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>" player:<[target]>
-
-                - run MarketDemandScript def.price:<[price]> def.item:<context.item.material.name> def.amount:<[purchaseAmount]> def.merchant:<[merchant]> def.player:<player> def.market:<[market]>
+                - if <[quantity]> < 10:
+                    - define purchaseAmount <[quantity]>
 
             - else:
-                # Clicking outside the window returns -998 for some reason
-                - if <context.slot> != -998 || <context.slot.is[OR_LESS].than[36]>:
-                    - if <context.item> != <item[air]>:
-                        - narrate format:callout "You do not have enough money to buy this item."
+                - define purchaseAmount 1
+
+            - if <[quantity].is[OR_MORE].than[<[purchaseAmount]>]>:
+                - if <player.money.is[OR_MORE].than[<[price].mul[<[purchaseAmount]>]>]>:
+                    - flag <[merchant]> merchantData.supply.<context.item.material.name>.quantity:-:<[purchaseAmount]>
+                    - flag <[merchant]> merchantData.balance:+:<[price].mul[<[purchaseAmount]>]>
+
+                    # take the appropriate amount of money and give
+                    # the player the items;
+
+                    - take money quantity:<[price].mul[<[purchaseAmount]>]>
+
+                    # Create item without any of the BM Item's flags or lore
+
+                    - define selectedItem <context.item>
+                    - adjust def:selectedItem lore:<list[]>
+                    - adjust def:selectedItem flag_map:<map[]>
+
+                    - give <[selectedItem]> quantity:<[purchaseAmount]>
+
+                    - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
+                    - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
+
+                    - foreach <[interactingPlayers]> as:target:
+                        - inventory adjust d:<[target].open_inventory> slot:<context.slot> "lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>" player:<[target]>
+
+                    - run MarketDemandScript def.price:<[price]> def.item:<context.item.material.name> def.amount:<[purchaseAmount]> def.merchant:<[merchant]> def.player:<player> def.market:<[market]>
+
+                - else:
+                    # Clicking outside the window returns -998 for some reason
+                    - if <context.slot> != -998 || <context.slot.is[OR_LESS].than[36]>:
+                        - if <context.item> != <item[air]>:
+                            - narrate format:callout "You do not have enough money to buy this item."
+
+            - else:
+                - if <context.item> != <item[air]>:
+                    - narrate format:callout "There is not enough of this item to buy."
 
         - else:
-            - if <context.item> != <item[air]>:
-                - narrate format:callout "There is not enough of this item to buy."
+            # TODO: Start working on the sell mechanic
+            - narrate format:debug WIP
 
         - determine cancelled
 
@@ -137,6 +201,9 @@ KMerchantWindow_Handler:
             - define inventoryContents <context.inventory.list_contents>
             - define merchant <player.flag[dataHold.interactingMerchant]>
 
-            - flag <[merchant]> cachedInterface:<[inventoryContents].get[1].to[<[inventoryContents].size.sub[9]>]>
+            - if <player.flag[dataHold.merchantMode]> == buy:
+                - flag <[merchant]> cachedInterface:<[inventoryContents].get[1].to[<[inventoryContents].size.sub[9]>]>
+
             - flag <[merchant]> dataHold.interactingPlayers:<-:<player>
+            - flag <player> dataHold.merchantMode:!
             - flag <player> dataHold.interactingMerchant:!
