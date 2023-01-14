@@ -10,51 +10,81 @@ simplesit:
             sit-on-corners: true
             #If true, players can sit on any stair even if they can not reach the location
             players-reach-any-block: false
+
+        invalid-sit-directions:
+            NORTH: SOUTH
+            EAST: WEST
+            WEST: EAST
+            SOUTH: NORTH
+
     events:
         after player right clicks *_stairs with:air:
         - define location <context.location>
+
         - if <player.has_flag[simplesit]> || <player.is_sneaking> || <[location].material.half> == TOP || <[location].above.material.is_solid>:
             - stop
+
         - if !<script.data_key[data.config.sit-on-corners].if_null[true]>:
             - if <[location].material.shape> != STRAIGHT:
                 - stop
+
         - if !<script.data_key[data.config.players-reach-any-block].if_null[false]>:
             - if <[location].y.sub[<player.location.y>]> >= 1.5 || !<player.is_on_ground>:
                 - stop
-        - choose <[location].material.direction>:
-            - case NORTH:
-                - spawn <[location].add[0.5,-1.2,0.6]> armor_stand[visible=false;collidable=false;gravity=false] save:armor
-                - look <entry[armor].spawned_entity> <[location].add[0.5,0,1]>
-            - case SOUTH:
-                - spawn <[location].add[0.5,-1.2,0.4]> armor_stand[visible=false;collidable=false;gravity=false] save:armor
-                - look <entry[armor].spawned_entity> <[location].add[0.5,0,-1]>
-            - case WEST:
-                - spawn <[location].add[0.6,-1.2,0.5]> armor_stand[visible=false;collidable=false;gravity=false] save:armor
-                - look <entry[armor].spawned_entity> <[location].add[1,0,0.5]>
-            - case EAST:
-                - spawn <[location].add[0.4,-1.2,0.5]> armor_stand[visible=false;collidable=false;gravity=false] save:armor
-                - look <entry[armor].spawned_entity> <[location].add[-1,0,0.5]>
-        - mount <player>|<entry[armor].spawned_entity>
-        - definemap map entity:<entry[armor].spawned_entity> location:<[location]>
-        - flag server simplesit.sitters:->:<player>
-        - flag <player> simplesit.armorstand:<[map]>
+
+        - define chairDirection <[location].material.direction.to_uppercase>
+        - define playerDirection <player.location.direction.to_uppercase>
+
+        - if <[playerDirection]> != <script.data_key[data.invalid-sit-directions.<[chairDirection]>]>:
+            - choose <[chairDirection]>:
+                - case NORTH:
+                    - spawn <[location].add[0.5,-1.2,0.6]> armor_stand[visible=false;collidable=false;gravity=false] save:armor
+                    - look <entry[armor].spawned_entity> <[location].add[0.5,0,1]>
+
+                - case SOUTH:
+                    - spawn <[location].add[0.5,-1.2,0.4]> armor_stand[visible=false;collidable=false;gravity=false] save:armor
+                    - look <entry[armor].spawned_entity> <[location].add[0.5,0,-1]>
+
+                - case WEST:
+                    - spawn <[location].add[0.6,-1.2,0.5]> armor_stand[visible=false;collidable=false;gravity=false] save:armor
+                    - look <entry[armor].spawned_entity> <[location].add[1,0,0.5]>
+
+                - case EAST:
+                    - spawn <[location].add[0.4,-1.2,0.5]> armor_stand[visible=false;collidable=false;gravity=false] save:armor
+                    - look <entry[armor].spawned_entity> <[location].add[-1,0,0.5]>
+
+            - mount <player>|<entry[armor].spawned_entity>
+
+            - definemap map entity:<entry[armor].spawned_entity> location:<[location]>
+            - flag server simplesit.sitters:->:<player>
+            - flag <player> simplesit.armorstand:<[map]>
+
         after player exits vehicle flagged:simplesit:
         - define location <context.entity.location.add[0,2.2,0]>
         - inject simplesitcancel
+
         - teleport <[location]>
+
         on player quits flagged:simplesit:
         - inject simplesitcancel
+
+
 simplesitcancel:
     type: task
     debug: false
     script:
     - define map <player.flag[simplesit.armorstand]>
     - define chunk <[map].get[location].chunk>
+
     - if !<[chunk].is_loaded>:
         - chunkload <[chunk]> duration:1s
+
     - remove <[map].get[entity]>
+
     - flag <player> simplesit:!
     - flag server simplesit.sitters:<-:<player>
+
+
 simplesitcommand:
     type: command
     debug: false
@@ -71,30 +101,42 @@ simplesitcommand:
             - if <context.args.first> != list:
                 - narrate <script[simplesitdata].parsed_key[help].separated_by[<n>]> format:simplesitformat
                 - stop
+
             - if <server.flag[simplesit.sitters].is_empty.if_null[true]>:
                 - narrate "Nobody sits." format:simplesitformat
                 - stop
+
             - define player_list <server.flag[simplesit.sitters]>
+
             - foreach <[player_list]> as:player:
                 - clickable simplesitteleport def:<[player]> for:<player> save:teleport_<[player]>
+
             - narrate "<yellow>Players sitting:" format:simplesitformat
             - narrate "<[player_list].parse_tag[<dark_aqua><&n><[parse_value].name.on_click[<entry[teleport_<[parse_value]>].command>].on_hover[Teleport to <[parse_value].name>'s sit location]><gray>].comma_separated>"
+
         - case 2:
             - if <context.args.first> != kick:
                 - narrate <script[simplesitdata].parsed_key[help].separated_by[<n>]> format:simplesitformat
                 - stop
+
             - define player <server.match_offline_player[<context.args.get[2]>].if_null[null]>
+
             - if <[player]> == null:
                 - narrate "The player is not valid!" format:simplesitformat
                 - stop
+
             - if !<[player].has_flag[simplesit]>:
                 - narrate "The player does not sit." format:simplesitformat
                 - stop
+
             - announce "[SimpleSit] <player.name> has removed ARMOR_STAND[<[player].flag[simplesit.armorstand].get[entity]>] at location <player.flag[simplesit.armorstand].get[location]>" to_console
             - run simplesitcancel player:<[player]>
             - narrate "<yellow><[player].name> <white>is able to sit again. Lookup your console for possible errors." format:simplesitformat
+
         - default:
             - narrate <script[simplesitdata].parsed_key[help].separated_by[<n>]> format:simplesitformat
+
+
 simplesitteleport:
     type: task
     debug: false
@@ -102,10 +144,14 @@ simplesitteleport:
     script:
     - teleport <[player].flag[simplesit.armorstand].get[location]>
     - narrate "You've been teleported to <yellow><[player].name><white>'s sit location." format:simplesitformat
+
+
 simplesitformat:
     type: format
     debug: false
     format: <gold>[SimpleSit] <white><[text]>
+
+
 simplesitdata:
     type: data
     debug: false
