@@ -43,7 +43,7 @@ KingdomSelection_Handler:
             - if <[key]> == <player.name>:
                 - define joinMsg <[value]>
 
-        - else:
+        - if <[joinMsg]> == null:
             - random:
                 - define joinMsg "has graced us with their presence"
                 - define joinMsg "has returned at last!"
