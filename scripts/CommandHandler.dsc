@@ -19,7 +19,7 @@ Kingdoms_Command:
     aliases:
         - ks
     tab completions:
-        1: about|credits|travel|ping|map|rules|version
+        1: about|credits|chunkmap|travel|ping|map|rules|version
     tab complete:
     - if <context.args.size> > 1 && <context.args.get[2]> == help:
         - if <script[Help_Strings].list_keys[].contains[<context.args.get[1]>]>:
@@ -119,6 +119,47 @@ Kingdoms_Command:
 
         - else:
             - narrate format:callout "You must specify a location to fast travel to!"
+
+    - else if <context.args.get[1]> == chunkmap:
+        - define playerChunk <player.location.chunk>
+        - define chunkList <list[]>
+
+        - yaml load:kingdoms.yml id:kingdoms
+
+        - repeat 10 from:-5 as:zChunk:
+            - repeat 19 from:-9 as:xChunk:
+                - define currentChunk <[playerChunk].add[<[xChunk]>,<[zChunk]>]>
+
+                - if <yaml[kingdoms].read[all_claims].contains[<[currentChunk]>]>:
+                    - foreach <yaml[kingdoms].read[].keys.exclude[all_claims|version|kingdom_real_names]> as:kingdom:
+                        - define kingdomTerritory <yaml[kingdoms].read[<[kingdom]>.castle_territory].include[<yaml[kingdoms].read[<[kingdom]>.core_claims]>]>
+                        - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+
+                        - if <[currentChunk]> == <[playerChunk]>:
+                            - define chunkList:->:<element[P].color[<[kingdomColor]>]>
+                            - foreach stop
+
+                        - else:
+                            - if <[kingdomTerritory].contains[<[currentChunk]>]>:
+                                - define chunkList:->:<element[■].color[<[kingdomColor]>]>
+
+                            - foreach stop
+
+                - else if <[currentChunk]> != <[playerChunk]>:
+                    - define chunkList:->:<element[-].color[gray]>
+
+                - else:
+                    - define chunkList:->:<element[P].color[white].on_hover[<[currentChunk]>]>
+
+        - yaml id:kingdoms unload
+
+        - define chunkList <[chunkList].sub_lists[19]>
+        - narrate "<gold>=-=-=-=-=-= <element[Chunk Map].color[#f7c64b]> =-=-=-=-=-=-="
+        - narrate <[chunkList].parse_tag[<[parse_value].space_separated>].separated_by[<n>]>
+        - narrate "- : <gray>Wilderness"
+        - narrate "P : <blue>Player"
+        - narrate "■ : <gold>Kingdom Claim"
+        - narrate "▒ : <green>Kingdom Outpost"
 
 ##############################################################################
 
