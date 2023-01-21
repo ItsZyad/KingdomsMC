@@ -1,6 +1,9 @@
 #ScriptVer 1.3.2
-#Author Icecapade
+#Author: Icecapade
 #Date 2021-03-05
+#Edited by: ItsZyad
+#Date: 2023-01-14
+
 simplesit:
     type: world
     debug: false
