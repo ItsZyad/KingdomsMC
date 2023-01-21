@@ -235,6 +235,7 @@ Help_Strings:
     travel: Upon selecting one of the options from the tab menu you will be teleported to that fast-travel location's designated waypoint. However you must discover an area first, before you travel to it.
     map: Displays the Kingdoms live map.
     rules: Displays the Kingdoms rules document.
+    chunkmap: Displays an in-chat map of the surrounding chunks and their claim status.
 
 ##############################################################################
 
