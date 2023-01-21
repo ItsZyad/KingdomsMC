@@ -2,54 +2,109 @@
 ## THIS FILE IS INDEV ##
 ########################
 
-## VERSION NUMBERS / GENERAL METADATA DO NOT EXIST FOR INDEV MODULES!
-
 # TODO: Add if case in caller function which throws an error to the player if the squad isn't assigned a leader yet
 # Also TODO: Compensate for Denizen's shitty definition handling
 
-# Command for test function:
-# /ex run FormationWalk def:<util.parse_yaml[<yaml[squads].read[<player.flag[kingdom]>.newsquad.npclist]>]>
+
+DEBUG_RunFormationWalk:
+    type: task
+    script:
+    - run FormationWalkTwo def.npcList:<server.flag[armies.cambrian.squads.test-1.npcList]> def.squadLeader:<npc[385]> def.npcsPerRow:3
+
+
+ClosestSquadMember:
+    type: task
+    definitions: npcList|location
+    script:
+    - define closestNpc null
+    - define closestDist 99999
+
+    - foreach <[npcList]> as:npc:
+        - if <[closestNpc]> == null || <[npc].location.distance[<[location]>]> < <[closestDist]>:
+            - define closestNpc <[npc]>
+            - define closestDist <[npc].location.distance[<[location]>]>
+
+    - determine <[closestNpc]>
+
+FormationWalkTwo:
+    type: task
+    definitions: npcList|squadLeader|npcsPerRow
+    script:
+    - define spacing 2
+    - define totalRows <[npcList].size.div[<[npcsPerRow]>].round_up>
+    - define sentNPCs <list[<[squadLeader]>]>
+
+    - repeat <[totalRows]> as:row:
+        - narrate format:debug ROW:<[row]>
+
+        - repeat <[npcsPerRow]> from:<[npcsPerRow].div[2].round_up.sub[<[npcsPerRow]>]> as:col:
+            - narrate format:debug COL:<[col]>
+
+            - if <[row]> == 1 && <[col]> == 0:
+                - repeat next
+
+            - else:
+                - define newX <[col].mul[<[spacing]>]>
+                - define location <[squadLeader].location.round.sub[<[newX]>,0,<[row]>].center>
+
+                - run ClosestSquadMember def.npcList:<[npcList].exclude[<[sentNPCs]>]> def.location:<[location]> save:closest
+                - define closestSquadMember <entry[closest].created_queue.determination.get[1]>
+                - walk <[closestSquadMember]> <[location]>
+                - flag <[closestSquadMember]> dataHold.formationPathfinding:<[location]>
+
+                - define sentNPCs:->:<[closestSquadMember]>
+
+                - narrate format:debug LOC:<[location]>
+                - narrate format:debug ----------------------
+
 
 FormationWalk:
     type: task
-    definitions: npcList_mapped
+    definitions: npcList|squadLeader|npcsPerRow
     script:
-    - define squadLeader <npc[865]>
+    - define spacing 1
+    - define leftOfLeader <list[]>
+    - define npcList <[npcList].exclude[<[squadLeader]>]>
 
-    - define npcList <[npcList_mapped].get[null]>
-    - define NPCsPerRow <[npcList].size.div[2].round>
+    - foreach <[npcList]> as:npc:
+        - if <[npc].location.x> > <[squadLeader].location.x>:
+            - define leftOfLeader:->:<[npc]>
 
-    # How far to the squad leader's left the script should start placing NPCs
-    #- if <[NPCsPerRow].mod[2]> == 0:
-    #    - define jumpsLeft <[NPCsPerRow].sub[2]>
-    #- else:
-    - define jumpsLeft <[NPCsPerRow].sub[1.5]>
+    - narrate format:debug LEFT:<[leftOfLeader]>
 
-    - define squadLeadBehind <[squadLeader].location.backward_flat[1].right[<[jumpsLeft]>]>
+    - define rightOfLeader <[npcList].exclude[<[leftOfLeader]>]>
+    - define roundedLeaderPos <[squadLeader].location.round>
 
-    - narrate format:debug <[npcList]>
+    - narrate format:debug RIGHT:<[rightOfLeader]>
 
-    - foreach <[npclist].exclude[<[squadLeader]>]>:
-        - narrate format:debug "Loop Index: <[loop_index]>"
+    - foreach <[leftOfLeader]> as:npc:
+        - define finalLocation <[roundedLeaderPos].add[<[spacing].mul[<[loop_index]>].add[1]>,0,-1].center>
+        - walk <[npc]> <[finalLocation]>
+        - flag <[npc]> dataHold.formationPathfinding:<[finalLocation]>
 
-        - if <[loop_index].sub[1].mod[<[NPCsPerRow]>]> == 0:
-            - define squadLeadBehind <[squadLeadBehind].backward_flat[1].right[<[jumpsLeft]>]>
+    - foreach <[rightOfLeader]> as:npc:
+        - define finalLocation <[roundedLeaderPos].sub[<[spacing].mul[<[loop_index]>].add[1]>,0,1].center>
+        - walk <[npc]> <[finalLocation]>
+        - flag <[npc]> dataHold.formationPathfinding:<[finalLocation]>
 
-        - narrate format:debug <[squadLeadBehind].simple>
-        - walk <[value]> <[squadLeadBehind]>
 
-        - define squadLeadBehind <[squadLeadBehind].left[2]>
+FormationWalkFix_Handler:
+    type: world
+    events:
+        on npc completes navigation:
+        - if <npc.has_flag[dataHold.formationPathfinding]>:
+            - ratelimit <npc> 10t
+            - define location <npc.flag[dataHold.formationPathfinding]>
+            - teleport <npc> <[location]>
+            - flag <npc> dataHold.formationPathfinding:!
 
-    # TEST CODE: Follow the Leader #
-
-    - foreach <[npclist]>:
-        - walk <[value]> <[value].location.forward_flat[14]> auto_range
 
 # Have a menu that allows you to enter garrison definition mode which first
 # clears all other fake blocks before letting you start.
 
 # It will then give the player a garrison definition flag and keep the fake
 # blocks until that flag is removed/player exits garrison mode.
+
 
 DEBUG_RefreshGarrisonArea:
     type: task
