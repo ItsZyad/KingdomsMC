@@ -9,33 +9,47 @@
 SquadCommand:
     type: command
     name: squad
-    usage: /squad
+    usage: /squad list|create ...|name ...|?display name
     description: "Brings up the squad selection window"
     permission: kingdoms.squads
     tab completions:
         1: list|create
+
+    tab complete:
+    - define args <context.raw_args.split_args>
+
+    - choose <[args].get[1]>:
+        - case create:
+            - choose <[args].size>:
+                - case 1:
+                    - determine <list[[name]]>
+                - case 2:
+                    - determine <list[?[display_name]]>
+
     script:
-    - if <context.args.get[1]> == list:
+    - define args <context.raw_args.split_args>
+
+    - if <[args].get[1]> == list:
         - flag player pageNumber:1
         - run SquadSelectionGUI
 
-    - if <context.args.get[1]> == create:
+    - if <[args].get[1]> == create:
         # Checks if player is not already in squad mode #
         - if !<player.has_flag[inventory_hold]>:
-            - yaml load:squads.yml id:squads
 
             # Checks if the player specifies a squad name #
-            - if <context.args.size.is[OR_MORE].than[2]>:
-
+            - if <[args].size.is[OR_MORE].than[2]>:
                 - define kingdom <player.flag[kingdom]>
+                - define internalSquadName <[args].get[2]>
+                - define displaySquadName <[args].get[3]>
 
                 # Checks for identical squad name #
-                - if !<yaml[squads].contains[<[kingdom]>.<context.args.get[2]>]>:
+                - if !<server.has_flag[armies.<[kingdom]>.squads.<[internalSquadName]>]>:
 
                     # Creates a temporary flag for player inventory holding and assigns squad name
                     # to a flag of its own.
                     - flag player inventory_hold:<list>
-                    - flag player squadName:<proc[YamlSpaceAdder].context[<context.args.get[2]>]>
+                    - flag player squadName:<[args].get[2]>
 
                     # Copies the player's current inventory into a temporary holding flag
                     # while also clearing it.
@@ -46,11 +60,7 @@ SquadCommand:
                     - inventory set slot:1 origin:<item[NPCSelectWand]>
                     - inventory set slot:9 origin:<item[NPCSelectExit]>
 
-                    - yaml id:squads set <[kingdom]>.<player.flag[squadName]>.name:<player.flag[squadName]>
-                    - yaml id:squads set <[kingdom]>.<player.flag[squadName]>.squadSize:0
-
-                    - yaml id:squads savefile:squads.yml
-                    - yaml id:squads unload
+                    - flag server armies.<[kingdom]>.squads.<[internalSquadName]>.displayName:<[displaySquadName]> if:<[displaySquadName].exists>
 
                 - else:
                     - narrate format:callout "There already exists a squad by this name."
@@ -87,7 +97,55 @@ SquadCommand:
             - narrate format:callout "Debug commands are not made available to players"
 
 
+SquadInterface_Item:
+    type: item
+    material: player_head
+    display name: "<gold><bold>Squad"
+    mechanisms:
+        skull_skin: 67f11d3f-bd61-4dcf-9675-d0b8919bcad2|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDZjYzZiODM3NjNhNjdmY2FkYTFlYTE4NGMyZDE3NTJhZDI0MDc0NmM2YmUyNThhNzM5ODNkOGI2NTdmNGJiNSJ9fX0=
+
+
 SquadSelectionGUI:
+    type: task
+    script:
+    - define kingdom <player.flag[kingdom]>
+    - define squadList <server.flag[armies.<[kingdom]>.squads].keys>
+    - define itemList <list[]>
+
+    - if <server.flag[armies.<[kingdom]>.squads].keys.size.if_null[0]> == 0:
+        - run PaginatedInterface def.itemList:<list[]> def.page:1 def.player:<player> def.title:Squads
+        - determine cancelled
+
+    - foreach <[squadList]> as:squadName:
+        - define squadItem <item[SquadInterface_Item]>
+        - define squad <server.flag[armies.<[kingdom]>.squads.<[squadName]>]>
+        - define name <[squadName]>
+
+        - if <[squad].contains[displayName]>:
+            - define name <[squad].get[displayName]>
+
+        - adjust def:squadItem display:<gold><bold><[name]>
+
+        - define npcListShort <[squad].get[npcList].get[1].to[4]>
+
+        - if <[npcListShort].size> < <[squad].get[npcList]>:
+            - define remainingNpcNumber <[squad].get[npcList].size.sub[<[npcListShort].size>]>
+            - define npcListShort:->:<element[And <[remainingNpcNumber]> Others...].color[gray]>
+
+        - adjust def:squadItem lore:<[npcListShort].separated_by[<n>]>
+
+        - definemap squadInfo:
+            internalName: <[squadName]>
+            displayName: <[name]>
+            npcList: <[squad].get[npcList]>
+
+        - flag <[squadItem]> squadInfo:<[squadInfo]>
+        - define itemList:->:<[squadItem]>
+
+    - run PaginatedInterface def.itemList:<[itemList]> def.page:1 def.player:<player> def.title:Squads
+
+
+OLD_SquadSelectionGUI:
     type: task
     debug: false
     script:
@@ -189,7 +247,7 @@ NPCSelectExit:
     material: barrier
     display name: "Exit"
 
-SquadSelectionHandler:
+SquadSelection_Handler:
     type: world
     events:
         # These two events handle pagination #
@@ -231,23 +289,24 @@ NPCSelectHandler:
         - flag player inventory_hold:!
         - flag player squadName:!
 
+        - determine cancelled
+
         on player right clicks npc with:NPCSelectWand:
         - ratelimit <player> 2t
 
-        - yaml load:squads.yml id:squads
+        - define kingdom <player.flag[kingdom]>
+        - define squadName <player.flag[squadName]>
+
+        - narrate format:debug <[squadName]>
 
         - if <player.has_flag[inventory_hold]>:
-            - if <context.entity.entity_type> == PLAYER && <context.entity.split[@].get[1]> == n:
-                - if !<yaml[squads].read[<player.flag[kingdom]>.<player.flag[squadName]>.npclist].contains[<context.entity>]>:
-                    - yaml id:squads set <player.flag[kingdom]>.<player.flag[squadName]>.npclist:->:<context.entity>
-                    - yaml id:squads set <player.flag[kingdom]>.<player.flag[squadName]>.squadSize:<yaml[squads].read[<player.flag[kingdom]>.<player.flag[squadName]>.npclist].size>
+            - if <context.entity.entity_type> == PLAYER && <context.entity.id.exists>:
+                - if !<server.flag[armies.<[kingdom]>.squads.<[squadName]>.npcList].contains[<context.entity>].if_null[false]>:
+                    - flag server armies.<[kingdom]>.squads.<[squadName]>.npcList:->:<context.entity>
                     - actionbar "Added to squad"
 
                 - else:
                     - actionbar "NPC already in squad"
-
-        - yaml id:squads savefile:squads.yml
-        - yaml id:squads unload
 
         on player drops item:
         - if <player.has_flag[inventory_hold]>:
