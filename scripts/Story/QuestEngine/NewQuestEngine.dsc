@@ -64,7 +64,7 @@ MainParser_CISK:
     - foreach <list[<[npc]>|<[player]>]> as:dataTarget:
         - foreach <[dataTarget].flag[KQuests.data]>:
             - if !<[value].keys.contains[persistent]>:
-                - narrate format:debug <[key]>
+                # - narrate format:debug <[key]>
                 - flag <[dataTarget]> KQuests.data.<[key]>:!
 
 
@@ -138,6 +138,12 @@ SpeechHandler_CISK:
             - inject <[commandScript]> path:<[commandPath]>
 
         - else:
+            - define regex .*((?<&lt>!/<&lc>1<&rc>)/(?!/).*(?<&lt>!/<&lc>1<&rc>)/(?!/)).*
+
+            - if <[line].regex_matches[<[regex]>]>:
+                - narrate format:debug "in-line command found!"
+                - narrate format:debug <[line].regex[<[regex]>].group[1]>
+
             - define waitTime <proc[WaitTime_CISK].context[<[line]>|<[talkSpeed]>].round_to_precision[0.01]>
             - chat targets:<[player]> talkers:<[npc]> <[line]>
 
@@ -323,7 +329,7 @@ OptionsHandler_CISK:
         - define speech <[value].get[actions]>
 
         - clickable save:option until:1m for:<[player]>:
-            - ~run SpeechHandler_CISK defmap:<queue.definition_map>
+            - run SpeechHandler_CISK defmap:<queue.definition_map>
             - flag <[player]> clickedOption
 
         - narrate "- <underline><element[<[prompt]>].on_click[<entry[option].command>]>"
