@@ -198,31 +198,37 @@ CuboidIntersect:
 
     - determine <cuboid[<[c1].world.name>,<[min_x]>,<[min_y]>,<[min_z]>,<[max_x]>,<[max_y]>,<[max_z]>]>
 
-DataType:
-    type: procedure
-    definitions: object
+SplitKeep:
+    type: task
+    definitions: text|delimiters|splitType
     script:
-    - if <[object].as[entity]> == <[object]>:
-        - if <[object].is_player>:
-            - determine player
+    - define letters <[text].to_list>
+    - define originalSize <[letters].size>
+    - define splitType <[splitType].if_null[inline]>
+    - define delimiters <[delimiters].unescaped.as[list]>
+    - define index 1
+
+    - define outList <list[]>
+    - define currentElem <list[]>
+
+    # - narrate format:debug DELIMS:<[delimiters].last>
+
+    - foreach <[letters]> as:letter:
+        - if <[letter].is_in[<[delimiters]>]>:
+            # - narrate format:debug VALID_DELIM:<[letter]>
+
+            - if <[splitType]> == inline:
+                - define currentElem:->:<[letter]>
+                - define outList:->:<[currentElem].unseparated>
+
+            - else if <[splitType]> == seperate:
+                - define outList:->:<[currentElem].unseparated>
+                - define outList:->:<[letter]>
+
+            - define currentElem <list[]>
 
         - else:
-            - determine entity
+            - define currentElem:->:<[letter]>
 
-    # Either map or list
-    - else if <[object].size.exists>:
-        - if <[object].insert[1].at[1].exists>:
-            - determine list
-
-        - else:
-            - determine map
-
-    # ElementTag of some kind
-    - else:
-        - if <[object].add[1].exists>:
-            - determine number
-
-        - else:
-            - determine string
-
-    - determine null
+    # - narrate format:debug <[outList]>
+    - determine <[outList]>
