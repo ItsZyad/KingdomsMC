@@ -3,7 +3,7 @@ GenerateRecursiveStructres_CISK:
     definitions: splitted
     DEBUG_GenerateSplittedList:
     #- define text "<element[[dataget t:player n:[dataget t:player n:ref]]]>"
-    - define text "<element[[give i:stick to_inv q:1]]>"
+    - define text "<element[[state get player:ZyadTheBoss health]]>"
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&rb>|<&lb>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
@@ -37,7 +37,7 @@ GenerateRecursiveStructres_CISK:
                 - define commandMap.attributes:->:<map[<[prevToken]>=<[nestedCommand]>]>
 
         - else if <[token]> != <&sp> && <[prevToken]> != <&co> && <[nextToken]> != <&co> && <[commandMap.name]> != <[token]>:
-            - narrate format:debug TOKEN:<[token]>
+            # - narrate format:debug TOKEN:<[token]>
             - define commandMap.attributes:->:<map[<[token]>=null]>
 
         - define totalLoops:++
@@ -76,8 +76,8 @@ CommandDelegator_CISK:
                 - define attrKey <[attrSubs].get[<[attrKeyRaw]>]> if:<[attrSubs].contains[<[attrKeyRaw]>]>
                 - define attrVal <[attrPair].values.get[1]>
 
-                - narrate format:debug ATTR_KEY:<[attrKey]>
-                - narrate format:debug ATTR_VAL:<[attrVal]>
+                # - narrate format:debug ATTR_KEY:<[attrKey]>
+                # - narrate format:debug ATTR_VAL:<[attrVal]>
 
                 - if <[attrVal].as[map]> == <[attrVal]>:
                     - run CommandDelegator_CISK def.commandMap:<[attrVal]> save:recur
@@ -145,6 +145,8 @@ DatastoreCommand_CISK:
     - run ProduceFlaggableObject_CISK def.text:<[dataTarget]> save:realTarget
     - define realTarget <entry[realTarget].created_queue.determination.get[1]>
     - flag <[realTarget]> KQuests.data.<[dataName]>.value:<[dataValue]>
+
+    # TODO: Add error check for this... And all of these commands for that fact.
 
     script:
     - choose <[attrKey]>:
@@ -222,9 +224,14 @@ StateCommand_CISK:
             player: p
             npc: n
 
-    PostEvalutionCode:
+    PostEvaluationCode:
     # This command should probably be its own file...
-    - narrate format:debug WIP
+    - narrate format:debug S_ACT:<[stateAction]>
+    - narrate format:debug S_TAR:<[stateTarget]>
+    - narrate format:debug S_MEC:<[stateMechanism]>
+    - narrate format:debug S_MES:<[stateMechanismSet].if_null[N/A]>
+
+    - inject StateCommandMechanisms_CISK
 
     script:
     - choose <[attrKey]>:
@@ -237,14 +244,20 @@ StateCommand_CISK:
                 - define stateAction <[attrKey]>
 
             - else if <[attrKey].is_in[player|npc|item]>:
-                - define stateTarget <[attrVal]>
-
-            - else if <[stateAction]> == set && <[stateTarget].exists>:
-                - define stateMechanismSet <[attrVal]>
-
-            - else:
                 - if <[attrVal].exists>:
-                    - define stateMechanism <[attrVal]>
+                    - define stateTarget <map[<[attrKey]>=<[attrVal]>]>
 
                 - else:
+                    - define stateTarget <map[<[attrKey]>=self]>
+
+            - else if <[stateTarget].exists>:
+                - if <[stateAction]> == set && !<[stateMechanism].exists>:
                     - define stateMechanism <[attrKey]>
+                    - define stateMechanismSet <[attrVal]>
+
+                - else:
+                    - if <[attrVal]> == null:
+                        - define stateMechanism <[attrKey]>
+
+                    - else:
+                        - define stateMechanism <[attrVal]>
