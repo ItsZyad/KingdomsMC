@@ -16,6 +16,15 @@ StateCommandMechanisms_CISK:
         - case health:
             - define returnVal <[playerStateTarget].health>
 
+        - case oxygen:
+            - define returnVal <[playerStateTarget].oxygen>
+
+        - case isSwimming:
+            - define returnVal <[playerStateTarget].swimming>
+
+        - case isFlying:
+            - define retuenVal <[playerStateTarget].is_flying>
+
         - default:
             - if <[stateMechanism].starts_with[location.]>:
                 - define locationComponent <[stateMechanism].split[.].get[2]>
@@ -44,7 +53,17 @@ StateCommandMechanisms_CISK:
                     - inject <script.name> path:GetEntity
 
                 - case npc:
-                    - narrate format:debug WIP
+                    - if <[stateTarget].values.get[1]> == null:
+                        - define playerStateTarget <[npc]>
+
+                    - else:
+                        - define playerStateTarget <server.npcs.filter_tag[<[filter_value].name.equals[<[stateTarget].values.get[1]>]>].get[1]>
+
+                    - inject <script.name> path:GetEntity
 
                 - case item:
-                    - narrate format:debug WIP
+                    - if <[stateTarget].values.get[1]> == null:
+                        - define itemStateTarget <[player].item_in_hand>
+
+                    - else:
+                        - narrate format:debug WIP
