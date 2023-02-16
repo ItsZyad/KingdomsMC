@@ -3,7 +3,7 @@ GenerateRecursiveStructres_CISK:
     definitions: splitted
     DEBUG_GenerateSplittedList:
     #- define text "<element[[dataget t:player n:[dataget t:player n:ref]]]>"
-    - define text "<element[[state get player:ZyadTheBoss health]]>"
+    - define text "<element[[state get player:[dataget t:player n:ref] health]]>"
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&rb>|<&lb>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
@@ -13,31 +13,33 @@ GenerateRecursiveStructres_CISK:
     - define totalLoops 0
     - define player <player[ZyadTheBoss]>
 
+    - define persistent <map[]>
+
     - foreach <[splitted]> as:token:
         - define prevToken <[splitted].get[<[loop_index].sub[1]>]>
         - define nextToken <[splitted].get[<[loop_index].add[1]>]>
 
-        - if <[loop_index]> < <[skipAmount].if_null[<[loop_index]>]>:
+        - if <[loop_index]> < <[persistent].get[skipAmount].add[2].if_null[<[loop_index]>]>:
             - foreach next
 
-        - if <[token]> == <&lb>:
-            - define commandMap.name:<[nextToken]>
-
-        - else if <[token]> == <&rb>:
-            - foreach stop
-
-        - else if <[token]> == <&co>:
+        - if <[token]> == <&co>:
             - if <[nextToken]> != <&lb>:
                 - define commandMap.attributes:->:<map[<[prevToken]>=<[nextToken]>]>
 
             - else:
-                - run <script.name> def.splitted:<[splitted].get[<[loop_index].add[1]>].to[last]> save:recur_split
+                - run GenerateRecursiveStructres_CISK def.splitted:<[splitted].get[<[loop_index].add[1]>].to[last]> save:recur_split
                 - define nestedCommand <entry[recur_split].created_queue.determination.get[1].get[commandMap]>
-                - define skipAmount <entry[recur_split].created_queue.determination.get[1].get[totalLoops].add[<[loop_index]>]>
+                - define persistent.skipAmount <entry[recur_split].created_queue.determination.get[1].get[totalLoops].add[<[loop_index]>]>
                 - define commandMap.attributes:->:<map[<[prevToken]>=<[nestedCommand]>]>
+                - foreach next
+
+        - else if <[token]> == <&lb>:
+            - define commandMap.name:<[nextToken]>
+
+        - else if <[token]> == <&rb>:
+            - determine <map[commandMap=<[commandMap]>;totalLoops=<[totalLoops]>]>
 
         - else if <[token]> != <&sp> && <[prevToken]> != <&co> && <[nextToken]> != <&co> && <[commandMap.name]> != <[token]>:
-            # - narrate format:debug TOKEN:<[token]>
             - define commandMap.attributes:->:<map[<[token]>=null]>
 
         - define totalLoops:++
@@ -225,7 +227,6 @@ StateCommand_CISK:
             npc: n
 
     PostEvaluationCode:
-    # This command should probably be its own file...
     - narrate format:debug S_ACT:<[stateAction]>
     - narrate format:debug S_TAR:<[stateTarget]>
     - narrate format:debug S_MEC:<[stateMechanism]>
