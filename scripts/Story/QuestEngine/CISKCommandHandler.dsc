@@ -3,8 +3,8 @@ GenerateRecursiveStructures_CISK:
     debug: false
     definitions: splitted
     DEBUG_GenerateSplittedList:
-    - define text "<element[something [state get player:[dataget t:player n:ref] location]]>"
-    - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&rb>|<&lb>|<&co>| ]>" def.splitType:seperate save:split
+    - define text "<element[something <&lt>state get player:<&lt>dataget t:player n:ref<&gt> location<&gt>]>"
+    - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
     script:
@@ -22,7 +22,7 @@ GenerateRecursiveStructures_CISK:
         - if <[loop_index]> < <[persistent].get[commandSize].add[2].if_null[<[loop_index]>]>:
             - foreach next
 
-        - if <[token]> == <&lb> && !<[prevToken].ends_with[\]>:
+        - if <[token]> == <&lt> && !<[prevToken].ends_with[\]>:
             - run CommandMapGenerator_CISK def.splitted:<[splitted].get[<[loop_index]>].to[last]> save:command
             - define persistent.commandMap <entry[command].created_queue.determination.get[1].get[commandMap]>
             - define persistent.commandSize <entry[command].created_queue.determination.get[1].get[commandSize]>
@@ -40,8 +40,8 @@ CommandMapGenerator_CISK:
     debug: false
     definitions: splitted
     DEBUG_GenerateSplittedList:
-    - define text "<element[[state get player:[dataget t:player n:ref] location]]>"
-    - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&rb>|<&lb>|<&co>| ]>" def.splitType:seperate save:split
+    - define text "<element[<&lt>state get player:<&lt>dataget t:player n:ref<&gt> location<&gt>]>"
+    - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
     script:
@@ -59,11 +59,11 @@ CommandMapGenerator_CISK:
         - if <[loop_index]> < <[persistent].get[skipAmount].add[1].if_null[<[loop_index]>]>:
             - foreach next
 
-        - if <[token]> == <&lb> && !<[prevToken].ends_with[\]>:
+        - if <[token]> == <&lt> && !<[prevToken].ends_with[\]>:
             - define commandMap.name:<[nextToken]>
 
         - else if <[token]> == <&co>:
-            - if <[nextToken]> != <&lb>:
+            - if <[nextToken]> != <&lt>:
                 - define commandMap.attributes:->:<map[<[prevToken]>=<[nextToken]>]>
 
             - else:
@@ -74,10 +74,10 @@ CommandMapGenerator_CISK:
 
                 - foreach next
 
-        - else if <[token]> != <&sp> && <[prevToken]> != <&co> && <[nextToken]> != <&co> && <[commandMap.name]> != <[token]> && !<[token].is_in[<&rb>|<&lb>]>:
+        - else if <[token]> != <&sp> && <[prevToken]> != <&co> && <[nextToken]> != <&co> && <[commandMap.name]> != <[token]> && !<[token].is_in[<&gt>|<&lt>]>:
             - define commandMap.attributes:->:<map[<[token]>=null]>
 
-        - else if <[token]> == <&rb>:
+        - else if <[token]> == <&gt>:
             - determine <map[commandMap=<[commandMap]>;commandSize=<[commandSize]>]>
 
 
@@ -85,13 +85,21 @@ CommandDelegator_CISK:
     type: task
     debug: false
     GetRecursiveStructure:
-    - run GenerateRecursiveStructures_CISK save:line
+    - if <[splitted].exists>:
+        - run GenerateRecursiveStructures_CISK def.splitted:<[splitted]> save:line
+
+    - else:
+        - run GenerateRecursiveStructures_CISK save:line
+
     - define line <entry[line].created_queue.determination.get[1]>
 
     script:
     - inject <script.name> path:GetRecursiveStructure if:<[commandMap].exists.not>
     - define evaluatedLine <list[]>
-    - define player <player[ZyadTheBoss]>
+    - define player <player[ZyadTheBoss]> if:<[player].exists.not>
+
+    - adjust <queue> linked_player:<[player]>
+    - adjust <queue> linked_npc:<[npc]> if:<[npc].exists>
 
     - foreach <[line]> as:token:
         - if <[token].as[map]> == <[token]>:
@@ -100,13 +108,14 @@ CommandDelegator_CISK:
             - define commandScript <script[<[commandName]>Command_CISK]>
 
             - run CommandMapEvaluator_CISK defmap:<queue.definition_map> save:eval_commandMap
-            - define commandResult <entry[eval_commandMap].created_queue.determination.get[1]>
-            - define evaluatedLine:->:<[commandResult]>
+            - define commandResult <entry[eval_commandMap].created_queue.determination.get[1].if_null[N/A]>
+            - define evaluatedLine:->:<[commandResult]> if:<[commandResult].equals[N/A].not>
 
         - else:
             - define evaluatedLine:->:<[token]>
 
-    - narrate format:debug <red>EVAL_LINE:<[evaluatedLine]>
+    # - narrate format:debug <red>EVAL_LINE:<[evaluatedLine]>
+    - determine <[evaluatedLine]>
 
 
 CommandMapEvaluator_CISK:
@@ -174,9 +183,6 @@ DatagetCommand_CISK:
 
     PostEvaluationCode:
     - run ProduceFlaggableObject_CISK def.text:<[dataTarget]> save:realTarget
-
-    - narrate format:debug DATA_TAR:<[dataTarget]>
-    - narrate format:debug DATA_NAM:<[dataName]>
 
     - define realTarget <entry[realTarget].created_queue.determination.get[1]>
     - define data <[realTarget].flag[KQuests.data.<[dataName]>.value]>
@@ -288,10 +294,10 @@ StateCommand_CISK:
             npc: n
 
     PostEvaluationCode:
-    - narrate format:debug S_ACT:<[stateAction]>
-    - narrate format:debug S_TAR:<[stateTarget]>
-    - narrate format:debug S_MEC:<[stateMechanism]>
-    - narrate format:debug S_MES:<[stateMechanismSet].if_null[N/A]>
+    # - narrate format:debug S_ACT:<[stateAction]>
+    # - narrate format:debug S_TAR:<[stateTarget]>
+    # - narrate format:debug S_MEC:<[stateMechanism]>
+    # - narrate format:debug S_MES:<[stateMechanismSet].if_null[N/A]>
 
     - inject StateCommandMechanisms_CISK
 
