@@ -5,31 +5,31 @@ StateCommandMechanisms_CISK:
     GetEntity:
     - choose <[stateMechanism]>:
         - case name:
-            - define returnVal <[playerStateTarget].name>
+            - define returnVal <[entityStateTarget].name>
 
         - case uuid:
-            - define returnVal <[playerStateTarget].uuid>
+            - define returnVal <[entityStateTarget].uuid>
 
         - case location:
-            - define returnVal <[playerStateTarget].location.simple>
+            - define returnVal <[entityStateTarget].location.simple>
 
         - case health:
-            - define returnVal <[playerStateTarget].health>
+            - define returnVal <[entityStateTarget].health>
 
         - case isSwimming:
-            - define returnVal <[playerStateTarget].swimming>
+            - define returnVal <[entityStateTarget].swimming>
 
         - case isFlying:
-            - define returnVal <[playerStateTarget].is_flying>
+            - define returnVal <[entityStateTarget].is_flying>
 
         - default:
             - if <[stateMechanism].starts_with[location.]>:
                 - define locationComponent <[stateMechanism].split[.].get[2]>
                 - definemap locationMap:
-                    x: <[playerStateTarget].location.x.round>
-                    y: <[playerStateTarget].location.y.round>
-                    z: <[playerStateTarget].location.z.round>
-                    world: <[playerStateTarget].location.world.name>
+                    x: <[entityStateTarget].location.x.round>
+                    y: <[entityStateTarget].location.y.round>
+                    z: <[entityStateTarget].location.z.round>
+                    world: <[entityStateTarget].location.world.name>
 
                 - define returnVal <[locationMap].get[<[locationComponent]>]>
 
@@ -42,21 +42,25 @@ StateCommandMechanisms_CISK:
             - choose <[stateTarget].keys.get[1]>:
                 - case player:
                     - if <[stateTarget].values.get[1]> == null:
-                        - define playerStateTarget <[player]>
+                        - define entityStateTarget <[player]>
 
                     - else:
-                        - define playerStateTarget <server.players.filter_tag[<[filter_value].name.equals[<[stateTarget].values.get[1]>]>].get[1]>
+                        - define entityStateTarget <server.players.filter_tag[<[filter_value].name.equals[<[stateTarget].values.get[1]>]>].get[1]>
 
                     - inject <script.name> path:GetEntity
 
                 - case npc:
                     - if <[stateTarget].values.get[1]> == null:
-                        - define playerStateTarget <[npc]>
+                        - define entityStateTarget <[npc]>
 
                     - else:
-                        - define playerStateTarget <server.npcs.filter_tag[<[filter_value].name.equals[<[stateTarget].values.get[1]>]>].get[1]>
+                        - define entityStateTarget <server.npcs.filter_tag[<[filter_value].name.equals[<[stateTarget].values.get[1]>]>].get[1]>
 
                     - inject <script.name> path:GetEntity
 
                 - case item:
-                    - narrate format:debug WIP
+                    - if <[stateTarget].values.get[1]> == null:
+                        - define itemStateTarget <[player].item_in_hand>
+
+                    - else:
+                        - narrate format:debug WIP
