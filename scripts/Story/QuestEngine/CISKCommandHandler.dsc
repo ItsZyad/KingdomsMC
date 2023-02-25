@@ -1,74 +1,129 @@
-GenerateRecursiveStructres_CISK:
+GenerateRecursiveStructures_CISK:
     type: task
+    debug: false
     definitions: splitted
     DEBUG_GenerateSplittedList:
-    #- define text "<element[[dataget t:player n:[dataget t:player n:ref]]]>"
-    - define text "<element[[state get player:[dataget t:player n:ref] health]]>"
+    - define text "<element[something [state get player:[dataget t:player n:ref] location]]>"
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&rb>|<&lb>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
     script:
     - inject <script.name> path:DEBUG_GenerateSplittedList if:<[splitted].exists.not>
-    - define commandMap <map[]>
-    - define totalLoops 0
     - define player <player[ZyadTheBoss]>
-
     - define persistent <map[]>
+    - define lineList <list[]>
+    - define totalLoops 0
+    - define bracketDepth 0
 
     - foreach <[splitted]> as:token:
         - define prevToken <[splitted].get[<[loop_index].sub[1]>]>
         - define nextToken <[splitted].get[<[loop_index].add[1]>]>
 
-        - if <[loop_index]> < <[persistent].get[skipAmount].add[2].if_null[<[loop_index]>]>:
+        - if <[loop_index]> < <[persistent].get[commandSize].add[2].if_null[<[loop_index]>]>:
             - foreach next
 
-        - if <[token]> == <&co>:
+        - if <[token]> == <&lb> && !<[prevToken].ends_with[\]>:
+            - run GenerateCommandStructure def.splitted:<[splitted].get[<[loop_index]>].to[last]> save:command
+            - define persistent.commandMap <entry[command].created_queue.determination.get[1].get[commandMap]>
+            - define persistent.commandSize <entry[command].created_queue.determination.get[1].get[commandSize]>
+
+            - define lineList:->:<[persistent].get[commandMap]>
+
+        - else:
+            - define lineList:->:<[token]>
+
+    - determine <[lineList]>
+
+
+GenerateCommandStructure:
+    type: task
+    debug: false
+    definitions: splitted
+    DEBUG_GenerateSplittedList:
+    - define text "<element[[state get player:[dataget t:player n:ref] location]]>"
+    - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&rb>|<&lb>|<&co>| ]>" def.splitType:seperate save:split
+    - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
+
+    script:
+    - define commandSize 0
+    - define commandMap <map[]>
+    - define persistent <map[]>
+
+    - inject <script.name> path:DEBUG_GenerateSplittedList if:<[splitted].exists.not>
+
+    - foreach <[splitted]> as:token:
+        - define prevToken <[splitted].get[<[loop_index].sub[1]>]>
+        - define nextToken <[splitted].get[<[loop_index].add[1]>]>
+        - define commandSize:++
+
+        - if <[loop_index]> < <[persistent].get[skipAmount].add[1].if_null[<[loop_index]>]>:
+            - foreach next
+
+        - if <[token]> == <&lb> && !<[prevToken].ends_with[\]>:
+            - define commandMap.name:<[nextToken]>
+
+        - else if <[token]> == <&co>:
             - if <[nextToken]> != <&lb>:
                 - define commandMap.attributes:->:<map[<[prevToken]>=<[nextToken]>]>
 
             - else:
-                - run GenerateRecursiveStructres_CISK def.splitted:<[splitted].get[<[loop_index].add[1]>].to[last]> save:recur_split
+                - run GenerateCommandStructure def.splitted:<[splitted].get[<[loop_index].add[1]>].to[last]> save:recur_split
                 - define nestedCommand <entry[recur_split].created_queue.determination.get[1].get[commandMap]>
-                - define persistent.skipAmount <entry[recur_split].created_queue.determination.get[1].get[totalLoops].add[<[loop_index]>]>
+                - define persistent.skipAmount <entry[recur_split].created_queue.determination.get[1].get[commandSize].add[<[loop_index]>]>
                 - define commandMap.attributes:->:<map[<[prevToken]>=<[nestedCommand]>]>
+
                 - foreach next
 
-        - else if <[token]> == <&lb>:
-            - define commandMap.name:<[nextToken]>
-
-        - else if <[token]> == <&rb>:
-            - determine <map[commandMap=<[commandMap]>;totalLoops=<[totalLoops]>]>
-
-        - else if <[token]> != <&sp> && <[prevToken]> != <&co> && <[nextToken]> != <&co> && <[commandMap.name]> != <[token]>:
+        - else if <[token]> != <&sp> && <[prevToken]> != <&co> && <[nextToken]> != <&co> && <[commandMap.name]> != <[token]> && !<[token].is_in[<&rb>|<&lb>]>:
             - define commandMap.attributes:->:<map[<[token]>=null]>
 
-        - define totalLoops:++
-
-    - determine <map[commandMap=<[commandMap]>;totalLoops=<[totalLoops]>]>
+        - else if <[token]> == <&rb>:
+            - determine <map[commandMap=<[commandMap]>;commandSize=<[commandSize]>]>
 
 
 CommandDelegator_CISK:
     type: task
+    debug: false
     GetRecursiveStructure:
-    - run GenerateRecursiveStructres_CISK save:command_map
-    - define commandMap <entry[command_map].created_queue.determination.get[1].get[commandMap]>
-
-    GenerateAttributeShorthands:
-    - define invertedMap <map[]>
-
-    - foreach <[commandScript].data_key[commandData.attributeSubs]> as:subList key:key:
-        - foreach <[subList].as[list]> as:sub:
-            - define invertedMap.<[sub]>:<[key]>
+    - run GenerateRecursiveStructures_CISK save:line
+    - define line <entry[line].created_queue.determination.get[1]>
 
     script:
     - inject <script.name> path:GetRecursiveStructure if:<[commandMap].exists.not>
+    - define evaluatedLine <list[]>
+    - define player <player[ZyadTheBoss]>
+
+    - foreach <[line]> as:token:
+        - if <[token].as[map]> == <[token]>:
+            - define commandMap <[token]>
+            - define commandName <[commandMap].get[name]>
+            - define commandScript <script[<[commandName]>Command_CISK]>
+
+            - run CommandMapEvaluator_CISK defmap:<queue.definition_map> save:eval_commandMap
+            - define commandResult <entry[eval_commandMap].created_queue.determination.get[1]>
+            - define evaluatedLine:->:<[commandResult]>
+
+        - else:
+            - define evaluatedLine:->:<[token]>
+
+    - narrate format:debug <red>EVAL_LINE:<[evaluatedLine]>
+
+
+CommandMapEvaluator_CISK:
+    type: task
+    debug: false
+    definitions: commandMap|commandScript
+    GenerateAttributeShorthands:
+    - define attrSubs <map[]>
+
+    - foreach <[commandScript].data_key[commandData.attributeSubs]> as:subList key:key:
+        - foreach <[subList].as[list]> as:sub:
+            - define attrSubs.<[sub]>:<[key]>
+
+    script:
     - define commandName <[commandMap].get[name]>
-    - define commandScript <script[<[commandName]>Command_CISK]>
-
+    - define commandScript <[commandScript].if_null[<script[<[commandName]>Command_CISK]>]>
     - inject <script.name> path:GenerateAttributeShorthands if:<[commandScript].data_key[commandData.attributeSubs].exists>
-    #- run <[commandScript].name> def.commandMap:<[commandMap]> def.attrSubs:<[invertedMap]> save:command
-
-    - define attrSubs <[invertedMap]>
 
     - foreach <[commandMap]> key:datapoint:
         - if <[datapoint]> == attributes:
@@ -78,11 +133,8 @@ CommandDelegator_CISK:
                 - define attrKey <[attrSubs].get[<[attrKeyRaw]>]> if:<[attrSubs].contains[<[attrKeyRaw]>]>
                 - define attrVal <[attrPair].values.get[1]>
 
-                # - narrate format:debug ATTR_KEY:<[attrKey]>
-                # - narrate format:debug ATTR_VAL:<[attrVal]>
-
                 - if <[attrVal].as[map]> == <[attrVal]>:
-                    - run CommandDelegator_CISK def.commandMap:<[attrVal]> save:recur
+                    - run CommandMapEvaluator_CISK def.commandMap:<[attrVal]> save:recur
 
                     - define nestedCommandResult <entry[recur].created_queue.determination.get[1]>
                     - define attrVal <[nestedCommandResult]>
@@ -96,6 +148,7 @@ CommandDelegator_CISK:
 
 ProduceFlaggableObject_CISK:
     type: task
+    debug: false
     definitions: text
     script:
     - choose <[text]>:
@@ -113,6 +166,7 @@ ProduceFlaggableObject_CISK:
 
 DatagetCommand_CISK:
     type: task
+    debug: false
     commandData:
         attributeSubs:
             target: t|tr
@@ -120,6 +174,9 @@ DatagetCommand_CISK:
 
     PostEvaluationCode:
     - run ProduceFlaggableObject_CISK def.text:<[dataTarget]> save:realTarget
+
+    - narrate format:debug DATA_TAR:<[dataTarget]>
+    - narrate format:debug DATA_NAM:<[dataName]>
 
     - define realTarget <entry[realTarget].created_queue.determination.get[1]>
     - define data <[realTarget].flag[KQuests.data.<[dataName]>.value]>
@@ -137,6 +194,7 @@ DatagetCommand_CISK:
 
 DatastoreCommand_CISK:
     type: task
+    debug: false
     commandData:
         attributeSubs:
             target: t|tr
@@ -164,6 +222,7 @@ DatastoreCommand_CISK:
 
 BreakCommand_CISK:
     type: task
+    debug: false
     PostEvalutionCode:
     - determine cancelled
 
@@ -173,6 +232,7 @@ BreakCommand_CISK:
 
 GotoCommand_CISK:
     type: task
+    debug: false
     PostEvaluationCode:
     - define playerDefinedBlock <yaml[ciskFile].read[<[schema]>.branches.<[gotoBranch]>]>
     - define currentBlock_orig <[currentBlock]>
@@ -193,6 +253,7 @@ GotoCommand_CISK:
 
 GiveCommand_CISK:
     type: task
+    debug: false
     commandData:
         attributeSubs:
             item: i
