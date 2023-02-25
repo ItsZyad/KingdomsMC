@@ -127,25 +127,17 @@ SpeechHandler_CISK:
                     - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[currentBlock]> def.message:<[errMsg]>
                     - determine cancelled
 
-        - else if <[line].starts_with[/]> && <[line].ends_with[/]>:
-            - define waitTime 0
-            - define value <[line]>
-            - inject CommandHandler_CISK
-
-            - define commandScript <[commandRes].get[script]>
-            - define commandPath <[commandRes].get[path]>
-
-            - inject <[commandScript]> path:<[commandPath]>
-
         - else:
-            - define regex .*((?<&lt>!/<&lc>1<&rc>)/(?!/).*(?<&lt>!/<&lc>1<&rc>)/(?!/)).*
+            - run SplitKeep def.text:<[line]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
+            - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
-            - if <[line].regex_matches[<[regex]>]>:
-                - narrate format:debug "in-line command found!"
-                - narrate format:debug <[line].regex[<[regex]>].group[1]>
+            - run CommandDelegator_CISK def.splitted:<[splitted]> save:evaluated_line
+            - define evaluatedLine <entry[evaluated_line].created_queue.determination.get[1]>
+            - define waitTime 0
 
-            - define waitTime <proc[WaitTime_CISK].context[<[line]>|<[talkSpeed]>].round_to_precision[0.01]>
-            - chat targets:<[player]> talkers:<[npc]> <[line]>
+            - if <[evaluatedLine].size> > 0:
+                - define waitTime <proc[WaitTime_CISK].context[<[evaluatedLine]>|<[talkSpeed]>].round_to_precision[0.01]>
+                - chat targets:<[player]> talkers:<[npc]> <[evaluatedLine].space_separated>
 
         - if !<[waitOverride].exists> || <[waitOverride]> == null:
             - wait <[waitTime]>s
