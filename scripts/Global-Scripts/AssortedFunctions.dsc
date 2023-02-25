@@ -230,5 +230,7 @@ SplitKeep:
         - else:
             - define currentElem:->:<[letter]>
 
+    - define outList:->:<[currentElem].unseparated>
+
     # - narrate format:debug <[outList]>
     - determine <[outList]>
