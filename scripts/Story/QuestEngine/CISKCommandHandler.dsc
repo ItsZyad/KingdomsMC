@@ -23,7 +23,7 @@ GenerateRecursiveStructures_CISK:
             - foreach next
 
         - if <[token]> == <&lb> && !<[prevToken].ends_with[\]>:
-            - run GenerateCommandStructure def.splitted:<[splitted].get[<[loop_index]>].to[last]> save:command
+            - run CommandMapGenerator_CISK def.splitted:<[splitted].get[<[loop_index]>].to[last]> save:command
             - define persistent.commandMap <entry[command].created_queue.determination.get[1].get[commandMap]>
             - define persistent.commandSize <entry[command].created_queue.determination.get[1].get[commandSize]>
 
@@ -35,7 +35,7 @@ GenerateRecursiveStructures_CISK:
     - determine <[lineList]>
 
 
-GenerateCommandStructure:
+CommandMapGenerator_CISK:
     type: task
     debug: false
     definitions: splitted
@@ -67,7 +67,7 @@ GenerateCommandStructure:
                 - define commandMap.attributes:->:<map[<[prevToken]>=<[nextToken]>]>
 
             - else:
-                - run GenerateCommandStructure def.splitted:<[splitted].get[<[loop_index].add[1]>].to[last]> save:recur_split
+                - run CommandMapGenerator_CISK def.splitted:<[splitted].get[<[loop_index].add[1]>].to[last]> save:recur_split
                 - define nestedCommand <entry[recur_split].created_queue.determination.get[1].get[commandMap]>
                 - define persistent.skipAmount <entry[recur_split].created_queue.determination.get[1].get[commandSize].add[<[loop_index]>]>
                 - define commandMap.attributes:->:<map[<[prevToken]>=<[nestedCommand]>]>
