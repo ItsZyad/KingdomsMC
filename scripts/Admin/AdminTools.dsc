@@ -457,6 +457,19 @@ AddEssentialsWorthItems:
     - yaml id:prices savefile:economy_data/price-info.yml
     - yaml id:prices unload
 
+DEBUG_GenerateKingdomFlags:
+    type: task
+    script:
+    - define kingdomNames <list[centran|cambrian|viridian|raptoran|fyndalin]>
+
+    - foreach <[kingdomNames]> as:kingdom:
+        - define oldKingdomFlag <server.flag[<[kingdom]>]>
+
+        - flag server kingdoms.<[kingdom]>.members:<[oldKingdomFlag].get[members]>
+        - flag server kingdoms.<[kingdom]>.openWarp:<[oldKingdomFlag].get[openWarp]> if:<[oldKingdomFlag].get[openWarp].exists>
+        - flag server kingdoms.<[kingdom]>.loans:<[oldKingdomFlag].get[loans]> if:<[oldKingdomFlag].get[loans].exists>
+        - flag server kingdoms.<[kingdom]>.powerstruggle:<[oldKingdomFlag].get[powerstruggle]> if:<[oldKingdomFlag].get[powerstruggle].exists>
+
 admincallout:
     type: format
     format: "<light_purple>Kingdoms <light_purple>Admin:: <[text]>"
