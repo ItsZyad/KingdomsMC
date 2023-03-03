@@ -78,8 +78,8 @@ SidebarLoader:
             - else:
                 - sidebar add "values:<&sp>Upkeep: <aqua>Frozen!" players:<[value]>
 
-            - if <server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax].exists>:
-                - sidebar add "values:<&sp>Fyndalin Tax Bonus: <green>$<server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax].format_number>" players:<[value]>
+            - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influenceBonuses.bonusTax].exists>:
+                - sidebar add "values:<&sp>Fyndalin Tax Bonus: <green>$<server.flag[kingdoms.<[kingdom]>.powerstruggle.influenceBonuses.bonusTax].format_number>" players:<[value]>
 
             # Set Core Claim amount line
             - sidebar add "values:<&sp>Core Claims: <[kingdomData].get[core_claims].size.if_null[0]> / <[kingdomData].get[core_max]>" players:<[value]>

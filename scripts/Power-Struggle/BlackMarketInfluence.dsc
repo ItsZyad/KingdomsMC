@@ -131,7 +131,7 @@ BlackMarketInfluence_Handler:
                         - yaml id:ps savefile:powerstruggle.yml
                         - yaml id:ps unload
 
-                        - run SidebarLoader def.target:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
+                        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
                         - narrate format:callout "You are now required to fullfill <blue>$<server.flag[promisedTrade<[kingdom]>].last.get[1]><&6> of trade with <red><bold><yaml[bmf].read[factiondata.<server.flag[promisedTrade<[kingdom]>].last.get[2]>.name]><&6> before you can use this action again."
 

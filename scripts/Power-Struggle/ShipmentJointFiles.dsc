@@ -182,7 +182,7 @@ TransferTakeoverChecker:
         - flag <[originalPlayer]> transferData:!
 
         - define kingdom <player.flag[kingdom]>
-        - define sameMaterialTransfers <server.flag[<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<[newPlayer].flag[transferData].get[material]>]>].exclude[false].size>
+        - define sameMaterialTransfers <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<[newPlayer].flag[transferData].get[material]>]>].exclude[false].size>
         - define newTransferID <[newPlayer].name>-<[newPlayer].flag[transferData].get[material]><[sameMaterialTransfers]>
 
         - flag server <[kingdom]>.powerstruggle.activeTransfers.<[newTransferID]>:<[transferInfo]>
@@ -254,7 +254,7 @@ TransferClaimConfirm_Handler:
         on player joins flagged:maintainedTransferRights:
         - define transferID <player.flag[maintainedTransferRights]>
         - define kingdom <player.flag[kingdom]>
-        - define transferInfo <server.flag[<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>]>
+        - define transferInfo <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>]>
         - define originalPlayer <[transferInfo].get[madeBy]>
 
         - clickable usages:1 until:10m save:AllowTransferTO:
@@ -305,7 +305,7 @@ TransferTracker_Command:
     description: Shows all of your kingdom's active transfer orders
     script:
     - define kingdom <player.flag[kingdom]>
-    - define transferFlag <server.flag[<[kingdom]>.powerstruggle.activeTransfers]>
+    - define transferFlag <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers]>
     - define transferItemList <list[]>
 
     - foreach <[transferFlag]> as:request:

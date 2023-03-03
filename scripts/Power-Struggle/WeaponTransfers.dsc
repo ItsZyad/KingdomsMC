@@ -75,7 +75,7 @@ WeaponTransferOption_Handler:
                 - narrate format:callout "Your kingdom has exhasuted its influence points today"
                 - determine cancelled
 
-            - if <server.flag[<[kingdom]>.powerstruggle.activeTransfers].size> > 44:
+            - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers].size> > 44:
                 - narrate format:callout "Your kingdom has made the maximum number of transfer requests (44). Please fulfill some of them before making a new one!"
                 - determine cancelled
 
@@ -132,7 +132,7 @@ WeaponTransferOption_Handler:
                     #- flag <player> influenceType:<list[weapons|mercenary]>
 
                     - define kingdom <player.flag[kingdom]>
-                    - define sameMaterialTransfers <server.flag[<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<player.flag[transferData].get[material]>]>].exclude[false].size>
+                    - define sameMaterialTransfers <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<player.flag[transferData].get[material]>]>].exclude[false].size>
                     - define transferID <player.name>-<player.flag[transferData].get[material]><[sameMaterialTransfers]>
                     - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.influenceType:<player.flag[transferData].get[transferType]>
                     - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.material:<player.flag[transferData].get[material]>
@@ -158,7 +158,7 @@ WeaponTransferOption_Handler:
                     - yaml id:ps savefile:powerstruggle.yml
                     - yaml id:ps unload
 
-                    - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+                    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
                 - else:
                     - narrate format:callout "There is not enough demand for you to fullfill that many orders!"

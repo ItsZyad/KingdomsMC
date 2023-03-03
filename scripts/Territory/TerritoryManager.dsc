@@ -108,7 +108,7 @@ Claim_Command:
 
     - yaml id:k savefile:kingdoms.yml
     - yaml id:k unload
-    - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 FindKingdomOverlaps:
     type: task

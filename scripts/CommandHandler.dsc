@@ -382,7 +382,7 @@ Kingdom_Command:
             #- else:
             #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
 
-        - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
     #------------------------------------------------------------------------------------------------------------------------
 
@@ -423,7 +423,7 @@ Kingdom_Command:
             - if <server.flag[kingdoms.<player.flag[kingdom]>.balance].is[OR_MORE].than[0]>:
                 - flag server indebtedKingdoms.<player.flag[kingdom]>:0
 
-        - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
         #- else:
         #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
@@ -452,7 +452,7 @@ Kingdom_Command:
         - else:
             - narrate format:callout "You do not have sufficient funds in your kingdom to withdraw"
 
-        - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<player>].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>].get[members].include[<server.online_ops>]>
 
         #- else:
         #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
@@ -466,7 +466,7 @@ Kingdom_Command:
 
             - narrate format:debug <context.raw_args.split[rename].get[2]>
 
-            - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>].get[members].include[<server.online_ops>]>
 
         - else:
             - narrate format:callout "This command requires permission from the server owner to perform!"
@@ -632,7 +632,7 @@ Kingdom_Command:
                     - if <[kingdomCodeNames].get[<[index]>]> != <[kingdom]>:
                         - define codeNameChosenKingdom <[kingdomCodeNames].get[<[index]>]>
                         - flag server kingdoms.<[kingdom]>.openWarp:->:<[codeNameChosenKingdom]>
-                        - flag server kingdoms.<[kingdom]>.openWarp:<server.flag[<[kingdom]>.openWarp].deduplicate>
+                        - flag server kingdoms.<[kingdom]>.openWarp:<server.flag[kingdoms.<[kingdom]>.openWarp].deduplicate>
                         - narrate format:callout "Now allowing members of: <context.args.get[3].color[red].bold> to warp to your kingdom."
 
                     - else:
@@ -807,7 +807,7 @@ KingdomGuardList_Handler:
 
         - if <[kingdomBalance]> >= <[respawnCost]>:
             - flag server kingdoms.<[kingdom]>.balance:-:<[respawnCost]>
-            - run SidebarLoader def:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
+            - run SidebarLoader def:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
             - narrate format:callout "Respawned castle guard at their previously defined anchor position!"
 
         - else:

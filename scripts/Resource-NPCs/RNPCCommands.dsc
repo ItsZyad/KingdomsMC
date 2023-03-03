@@ -483,7 +483,7 @@ RNPCInfo_Handler:
 
         - remove <[npc]>
         - inventory close
-        - run SidebarLoader def.target:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
         on player clicks CancelDeleteRNPC_Item in DeleteConfirm_Window:
         - inventory close

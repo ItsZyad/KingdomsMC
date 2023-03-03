@@ -74,7 +74,7 @@ Loan_GUI:
     procedural items:
     - define loanAmounts <player.flag[loanData]>
     - define kingdom <player.flag[kingdom]>
-    - define existingLoans <server.flag[<[kingdom]>.loans].if_null[<list>]>
+    - define existingLoans <server.flag[kingdoms.<[kingdom]>.powerstruggle.loans].if_null[<list>]>
     - define outList <list[]>
     - define count 0
 
@@ -187,10 +187,10 @@ Loan_Handler:
             - yaml id:kingdoms set <[kingdom]>.balance:-:<[loanData].get[amount]>
             - yaml id:kingdoms set <[loanData].get[issuer]>.balance:+:<[loanData].get[amount]>
 
-            - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members]>|<player>
+            - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members]>|<player>
 
             # Remove that loan from the kingdom's outstanding debt
-            - flag server <[kingdom]>.loans:<server.flag[<[kingdom]>].get[loans].exclude[<[loanData]>]>
+            - flag server <[kingdom]>.loans:<server.flag[kingdoms.<[kingdom]>.powerstruggle.loans].exclude[<[loanData]>]>
 
             - yaml id:kingdoms savefile:kingdoms.yml
 
@@ -242,7 +242,7 @@ Loan_Handler:
                 - narrate format:callout "<[kingdomName]> has taken out a loan of $<[amount]> from Fyndalin. Your kingdom will have <[due].from_now.formatted.color[red].bold> to pay back this loan or else you will default!"
                 - narrate "<&sp><gray>To pay back your loans access the loans section of the <element[/influence options].color[red].bold> command again!"
 
-                - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+                - run SidebarLoader def.target:<server.flag[kigndoms.<[kingdom]>.members].include[<server.online_ops>]>
 
             - yaml id:ps unload
 

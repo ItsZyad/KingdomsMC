@@ -111,7 +111,7 @@ Bribe_Handler:
         - yaml id:ps unload
 
         - run CalcTotalInfluence def:<[kingdom]>
-        - run SidebarLoader def.target:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
         - flag player bribeAmount:!
         - flag player noChat:!

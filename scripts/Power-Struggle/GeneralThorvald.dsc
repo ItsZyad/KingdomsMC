@@ -156,7 +156,7 @@ ChestTransferInfluenceCalc:
     - yaml unload id:ps
 
     - ~run CalcTotalInfluence def:<[kingdom]>
-    - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
     - flag player transferData:!
     #- flag player influenceType:!

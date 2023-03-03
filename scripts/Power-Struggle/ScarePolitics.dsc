@@ -135,7 +135,7 @@ IntimidationInfluence_Handler:
                 - yaml id:ps set <[kingdom]>.dailyinfluences:--
                 - yaml id:ps savefile:powerstruggle.yml
 
-                - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+                - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
                 - narrate format:callout "The <script[KingdomRealNames].data_key[<player.flag[kingdom]>]> has dispatched agents to secure the support of key MPs in the Fyndalin parliament."
 

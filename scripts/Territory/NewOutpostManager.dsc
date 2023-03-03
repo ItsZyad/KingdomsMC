@@ -155,7 +155,7 @@ Outpost_Command:
                 - yaml id:kingdoms savefile:kingdoms.yml
                 - yaml id:kingdoms unload
 
-                - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+                - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
             - else:
                 - narrate format:callout "Are you sure you would like to delete this outpost?"
@@ -430,7 +430,7 @@ OutpostWand_Handler:
             - yaml id:kingdoms savefile:kingdoms.yml
             - yaml id:outpost savefile:outposts.yml
 
-            - run SidebarLoader def.target:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
+            - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
             - flag player outpostCost:!
             - flag player cornerOneDefined:!
