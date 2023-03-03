@@ -16,12 +16,10 @@ NEW_DynmapFlagBuilder:
     definitions: world
     script:
     - define kingdomList <list[centran|cambrian|viridian|raptoran]>
-    - ~yaml load:kingdoms.yml id:kingdoms
-    - ~yaml load:outposts.yml id:outp
 
     - foreach <[kingdomList]> as:kingdom:
-        - define core <yaml[kingdoms].read[<[kingdom]>.core_claims].as[list]>
-        - define castle <yaml[kingdoms].read[<[kingdom]>.castle_territory].as[list]>
+        - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
+        - define castle <server.flag[kigndoms.<[kingdom]>.claims.castle].as[list]>
         - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
         - define all <[core].include[<[castle]>]>
         - define as_cuboid <[all].get[1].cuboid>
@@ -56,23 +54,20 @@ NEW_DynmapFlagBuilder:
         - determine cancelled
 
         - flag <[world]> dynmap.kingdoms.<[kingdom]>.region:<list[<[kingdomName]>|<[as_cuboid]>]>
-        - define outposts <yaml[outp].read[<[kingdom]>].to_pair_lists>
+        - define outposts <server.flag[kingdoms.<[kingdom]>.outpostList].to_pair_lists>
         - flag <[world]> dynmap.kingdoms.<[kingdom]>.outposts:<list[]>
 
         - foreach <[outposts]> as:outpost:
-            - if <[outpost].get[1]> != totalupkeep:
-                - define cornerone <[outpost].get[2].get[cornerone].xyz>
-                - define cornertwo <[outpost].get[2].get[cornertwo].xyz>
-                - define name <[outpost].get[2].get[name]>
+            - define cornerone <[outpost].get[2].get[cornerone].xyz>
+            - define cornertwo <[outpost].get[2].get[cornertwo].xyz>
+            - define name <[outpost].get[2].get[name]>
 
-                - define region <cuboid[<player.location.world.name>,<[cornerone]>,<[cornertwo]>]>
+            - define region <cuboid[<player.location.world.name>,<[cornerone]>,<[cornertwo]>]>
 
-                - flag <[world]> dynmap.kingdoms.<[kingdom]>.outposts:<[world].flag[dynmap].deep_get[kingdoms.<[kingdom]>.outposts].include_single[<[name]>|<[region]>]>
+            - flag <[world]> dynmap.kingdoms.<[kingdom]>.outposts:<[world].flag[dynmap].deep_get[kingdoms.<[kingdom]>.outposts].include_single[<[name]>|<[region]>]>
 
         - narrate format:debug -------------------------
 
-    - yaml id:kingdoms unload
-    - yaml id:outp unload
 
 DynmapFlagBuilder:
     type: task
@@ -80,12 +75,10 @@ DynmapFlagBuilder:
     definitions: world
     script:
     - define kingdomList <list[centran|cambrian|viridian|raptoran]>
-    - ~yaml load:kingdoms.yml id:kingdoms
-    - ~yaml load:outposts.yml id:outp
 
     - foreach <[kingdomList]> as:kingdom:
-        - define core <yaml[kingdoms].read[<[kingdom]>.core_claims].as[list]>
-        - define castle <yaml[kingdoms].read[<[kingdom]>.castle_territory].as[list]>
+        - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
+        - define castle <server.flag[kigndoms.<[kingdom]>.claims.castle].as[list]>
         - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
         - define all <[core].include[<[castle]>]>
         - define as_cuboid <[all].get[1].cuboid>
@@ -106,24 +99,21 @@ DynmapFlagBuilder:
         - narrate format:debug CUBD:<[as_cuboid]>
         - narrate format:debug SIZE:<[x_size].mul[<[z_size]>]>
 
-        - define outposts <yaml[outp].read[<[kingdom]>].to_pair_lists>
+        - define outposts <server.flag[kingdoms.<[kingdom]>.outpostList].to_pair_lists>
 
         - flag <[world]> dynmap.kingdoms.<[kingdom]>.outposts:<list[]>
 
         - foreach <[outposts]> as:outpost:
-            - if <[outpost].get[1]> != totalupkeep:
-                - define cornerone <[outpost].get[2].get[cornerone].xyz>
-                - define cornertwo <[outpost].get[2].get[cornertwo].xyz>
-                - define name <[outpost].get[2].get[name]>
+            - define cornerone <[outpost].get[2].get[cornerone].xyz>
+            - define cornertwo <[outpost].get[2].get[cornertwo].xyz>
+            - define name <[outpost].get[2].get[name]>
 
-                - define region <cuboid[<player.location.world.name>,<[cornerone]>,<[cornertwo]>]>
+            - define region <cuboid[<player.location.world.name>,<[cornerone]>,<[cornertwo]>]>
 
-                - flag <[world]> dynmap.kingdoms.<[kingdom]>.outposts:<[world].flag[dynmap].deep_get[kingdoms.<[kingdom]>.outposts].include_single[<[name]>|<[region]>]>
+            - flag <[world]> dynmap.kingdoms.<[kingdom]>.outposts:<[world].flag[dynmap].deep_get[kingdoms.<[kingdom]>.outposts].include_single[<[name]>|<[region]>]>
 
         - narrate format:debug -------------------------
 
-    - yaml id:kingdoms unload
-    - yaml id:outp unload
 
 DynmapTask:
     type: command
