@@ -217,11 +217,9 @@ KingdomSwitcher_Command:
     description: Allows admins to switch their kingdom tag for debug purposes
     permission: kingdoms.admin.kingdomswitch
     tab completions:
-        1: centran|viridian|raptoran|cambrian
+        1: centran|viridian|raptoran|cambrian|fyndalin
     script:
-    - yaml load:kingdoms.yml id:kingdoms
-    - define kingdomList <proc[GetKingdomList].context[true]>
-    - yaml id:kingdoms unload
+    - define kingdomList <script[KingdomRealNames].data_key[].keys>
 
     - if <[kingdomList].contains[<context.args.get[1]>]>:
         - if <context.args.length> == 2:
