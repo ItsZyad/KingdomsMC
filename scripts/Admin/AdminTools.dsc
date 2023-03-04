@@ -460,6 +460,9 @@ DEBUG_GenerateKingdomFlags:
     script:
     - define kingdomNames <list[centran|cambrian|viridian|raptoran|fyndalin]>
 
+    - yaml load:kingdoms.yml id:kingdoms
+    - yaml load:powerstruggle.yml id:ps
+
     - foreach <[kingdomNames]> as:kingdom:
         - define oldKingdomFlag <server.flag[<[kingdom]>]>
 
@@ -467,6 +470,36 @@ DEBUG_GenerateKingdomFlags:
         - flag server kingdoms.<[kingdom]>.openWarp:<[oldKingdomFlag].get[openWarp]> if:<[oldKingdomFlag].get[openWarp].exists>
         - flag server kingdoms.<[kingdom]>.loans:<[oldKingdomFlag].get[loans]> if:<[oldKingdomFlag].get[loans].exists>
         - flag server kingdoms.<[kingdom]>.powerstruggle:<[oldKingdomFlag].get[powerstruggle]> if:<[oldKingdomFlag].get[powerstruggle].exists>
+
+        - define YKI <yaml[kingdoms].read[<[kingdom]>]>
+        - define YPI <yaml[ps].read[<[kingdom]>]>
+
+        - flag server kingdoms.<[kingdom]>.balance:<[YKI].get[balance]>
+        - flag server kingdoms.<[kingdom]>.warps:<[YKI].get[warp_location]>
+        - flag server kingdoms.<[kingdom]>.description:<[YKI].get[description]>
+        - flag server kingdoms.<[kingdom]>.prestige:<[YKI].get[prestige]>
+        - flag server kingdoms.<[kingdom]>.upkeep:<[YKI].get[upkeep]>
+        - flag server kingdoms.<[kingdom]>.warStatus:<[YKI].get[war_status]>
+        - flag server kingdoms.<[kingdom]>.claims.core:<[YKI].get[core_claims]>
+        - flag server kingdoms.<[kingdom]>.claims.castle:<[YKI].get[castle_territory]>
+        - flag server kingdoms.<[kingdom]>.claims.coreMax:<[YKI].get[core_max]>
+        - flag server kingdoms.<[kingdom]>.claims.castleMax:<[YKI].get[castle_max]>
+        - flag server kingdoms.<[kingdom]>.outposts.costMultiplier:<[YKI].deep_get[outposts.outpost_cost]>
+        - flag server kingdoms.<[kingdom]>.outposts.upkeepMultiplier:<[YKI].deep_get[outposts.outpost_upkeep]>
+        - flag server kingdoms.<[kingdom]>.outposts.totalUpkeep:0
+
+        - flag server kingdoms.<[kingdom]>.powerstruggle.cityPopulation:<[YPI].get[citypopulation]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:<[YPI].get[dailyinfluences]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.fyndalinGovt:<[YPI].get[fyndalingovt]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.maxPlotSize:<[YPI].get[maxplotsize]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.totalInfluence:<[YPI].get[totalinfluence]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.mercenaryGuild:<[YPI].get[mercenaryguild]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.masonsGuild:<[YPI].get[masonsguild]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.prestigeMultiplier:<[YPI].get[perstigemultiplier]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.electionInfluence:<[YPI].get[electioninfluence]>
+
+    - yaml id:kingdoms unload
+    - yaml id:ps unload
 
 admincallout:
     type: format
