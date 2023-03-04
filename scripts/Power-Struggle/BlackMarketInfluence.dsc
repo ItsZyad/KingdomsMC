@@ -54,15 +54,13 @@ BlackMarketInfluence_Handler:
         on player clicks item in BlackMarketInfluence_Window:
         - if <context.item.material.name> != air || <context.item.script.name> != Bribe_Influence:
             - flag <player> factionInfo:<context.item.flag[factionInfo]>
-            #- narrate <player.flag[factionInfo]>
 
             - inventory open d:BlackMarketInfluenceOptions_Window
 
         on player clicks PromiseTrade in BlackMarketInfluenceOptions_Window:
-        - yaml load:powerstruggle.yml id:ps
         - define kingdom <player.flag[kingdom]>
 
-        - if <yaml[ps].read[<[kingdom]>.dailyinfluences].is[OR_MORE].than[0]>:
+        - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints].is[OR_MORE].than[0]>:
             - inventory close
             - flag <player> noChat.BMInf expire:1m
 
@@ -70,8 +68,6 @@ BlackMarketInfluence_Handler:
 
         - else:
             - narrate format:callout "You have exhausted your influence points today."
-
-        - yaml id:ps unload
 
         on player chats:
 
@@ -109,13 +105,10 @@ BlackMarketInfluence_Handler:
                 - if <context.message.is_integer>:
                     - define amount <context.message>
 
-                    - yaml load:kingdoms.yml id:kingdoms
-                    - yaml load:blackmarket-formatted.yml id:bmf
-
                     # If the promised amount is less than half of the kingdom's
                     # balance then allow the transaction
 
-                    - if <[amount].is[OR_MORE].than[<yaml[kingdoms].read[<[kingdom]>.balance].div[2]>]>:
+                    - if <[amount].is[OR_MORE].than[<server.flag[kingdoms.<[kingdom]>.balance].div[2]>]>:
 
                         # promisedTrade example:
                         # FLAG :: promisedTradeCentran <-- [6000,syndicates]
@@ -123,23 +116,16 @@ BlackMarketInfluence_Handler:
                         # Meaning the first list item is the promised trade
                         # volume and the second list item is to whom
 
+                        # TODO: come back later and fold the promisedTrade flag in the kingdoms flag because this is just disgusting.
+
                         - flag server promisedTrade<[kingdom]>:<server.flag[promisedTrade<[kingdom]>].include_single[<list[<[amount]>|<player.flag[factionInfo].get[1]>|<[amount]>]>]>
-                        #- narrate format:debug <server.flag[promisedTrade<[kingdom]>]>
-
-                        - yaml load:powerstruggle.yml id:ps
-                        - yaml id:ps set <[kingdom]>.dailyinfluences:--
-                        - yaml id:ps savefile:powerstruggle.yml
-                        - yaml id:ps unload
-
+                        - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:--
                         - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
-                        - narrate format:callout "You are now required to fullfill <blue>$<server.flag[promisedTrade<[kingdom]>].last.get[1]><&6> of trade with <red><bold><yaml[bmf].read[factiondata.<server.flag[promisedTrade<[kingdom]>].last.get[2]>.name]><&6> before you can use this action again."
+                        - narrate format:callout "You are now required to fullfill <blue>$<server.flag[promisedTrade<[kingdom]>].last.get[1]><&6> of trade with <red><bold><server.flag[kingdoms.factionInfo.<server.flag[promisedTrade<[kingdom]>].last.get[2]>.name]><&6> before you can use this action again."
 
                     - else:
                         - narrate format:callout "You must have at least <blue>$<[amount]> <&6>in your kingdom bank!"
-
-                    - yaml id:kingdoms unload
-                    - yaml id:bmf unload
 
                 - else if <context.message.to_lowercase> == cancel:
                     - flag player noChat:!
@@ -158,28 +144,23 @@ BlackMarketInfluence_Handler:
         on player clicks FriendshipLetter in BlackMarketInfluenceOptions_Window:
         - define kingdom <player.flag[kingdom]>
 
-        - yaml load:powerstruggle.yml id:ps
-
-        - if <yaml[ps].read[<[kingdom]>.dailyinfluences]> <= 0:
+        - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints]> <= 0:
             - narrate format:callout "Your kingdom has exhasuted its influence points today"
             - determine cancelled
 
-        - yaml id:ps unload
-
         - if <server.flag[FriendshipLetterCooldown<[kingdom]>]>:
             - inventory adjust d:<context.inventory> slot:<context.slot> "lore:<context.item.lore>|<red>Your kingdom has already used this influence method recently|<white>Use again in: <red><server.flag_expiration[FriendshipLetterCooldown<[kingdom]>].from_now.formatted>"
+
+        # TODO: later make factionInfo a dataHold flag
 
         - else:
             - flag server FriendshipLetterCooldown<[kingdom]> expire:72h
             - define influenceAmount <util.random.decimal[0.005].to[<util.random.decimal[0.007].to[0.1]>]>
             - define faction <player.flag[factionInfo].get[1]>
 
-            - yaml id:bmf load:blackmarket-formatted.yml
-            - yaml id:bmf set factiondata.opinions.<[kingdom]>.<[faction]>:+:<[influenceAmount]>
-            - yaml id:bmf savefile:blackmarket-formatted.yml
-            - yaml id:bmf unload
+            - flag server kingdoms.<[kingdom]>.powerstruggle.factionData.<[faction]>:+:<[influenceAmount]>
 
-            - narrate format:callout "A letter of support has been sent to the boss of: <yaml[bmf].read[factiondata.<[faction]>.name]>"
+            - narrate format:callout "A letter of support has been sent to the boss of: <server.flag[kingdoms.factionInfo.<[faction]>.name]>"
 
         - flag player factionInfo:!
         - determine cancelled
