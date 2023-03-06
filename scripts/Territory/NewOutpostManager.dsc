@@ -414,7 +414,7 @@ OutpostHandler:
         - if <script.queues.size.is[MORE].than[1]>:
             - queue clear <script.queues.get[1]>
 
-        - if <server.flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>]>:
+        - if <server.has_flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>]>:
             - define whichKingdom <server.flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>]>
 
             - if <[whichKingdom]> == <player.flag[kingdom]>:
@@ -431,7 +431,7 @@ OutpostHandler:
         - if <script.queues.size.is[MORE].than[1]>:
             - queue clear <script.queues.get[1]>
 
-        - if <server.flag[kingdoms.outpostinfo.allOutposts.<context.area.split[@].get[2]>]>:
+        - if <server.has_flag[kingdoms.outpostinfo.allOutposts.<context.area.split[@].get[2]>]>:
             - repeat 3:
                 - actionbar "<red>Leaving outpost"
                 - wait 1s
