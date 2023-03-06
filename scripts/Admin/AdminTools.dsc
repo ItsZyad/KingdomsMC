@@ -486,6 +486,7 @@ DEBUG_GenerateKingdomFlags:
         - flag server kingdoms.<[kingdom]>.claims.castleMax:<[YKI].get[castle_max]>
         - flag server kingdoms.<[kingdom]>.outposts.costMultiplier:<[YKI].deep_get[outposts.outpost_cost]>
         - flag server kingdoms.<[kingdom]>.outposts.upkeepMultiplier:<[YKI].deep_get[outposts.outpost_upkeep]>
+        - flag server kingdoms.<[kingdom]>.outposts.maxSize:<[YKI].deep_get[outposts.max_size]>
         - flag server kingdoms.<[kingdom]>.outposts.totalUpkeep:0
 
         - flag server kingdoms.<[kingdom]>.powerstruggle.cityPopulation:<[YPI].get[citypopulation]>
