@@ -22,8 +22,9 @@ FlagVisualizer:
 
         - determine passively "<[flag].color[light_purple].on_hover[<[formattedTime]> UTC]>"
 
-    - else if <[flag].as[map]> == <[flag]>:
+    - else if <[flag].object_type> == Map:
         - narrate "<proc[MakeTabbed].context[<element[MAP :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>"
+        - define tabWidth:+:4
 
         - foreach <[flag]>:
 
@@ -40,9 +41,10 @@ FlagVisualizer:
                 - define line:->:<entry[Recur].created_queue.determination.get[1].color[white]>
                 - narrate <proc[MakeTabbed].context[<[line].unseparated>|<[tabWidth]>]>
 
-    - else if <[flag].as[list]> == <[flag]>:
+    - else if <[flag].object_type> == List:
         - narrate "<proc[MakeTabbed].context[<element[LIST :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>"
         - define longestNumber <[flag].length>
+        - define tabWidth:+:4
 
         - foreach <[flag]>:
 
