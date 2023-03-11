@@ -40,9 +40,7 @@ IntimidationHanderScript:
     - define kingdomList <list[cambrian|viridian|raptoran|centran].exclude[<[kingdom]>]>
     - define randomVal <util.random.int[1].to[<[kingdomList].size>]>
     - define randomKingdom <[kingdomList].get[<[randomVal]>]>
-
-    - yaml load:kingdoms.yml id:kingdoms
-    - define prestigeMultiplier <yaml[kingdoms].read[<[kingdom]>.prestige].div[100]>
+    - define prestigeMultiplier <server.flag[kingdoms.<[kingdom]>.prestige].div[100]>
     - define influenceModifier <element[100].sub[<[campaignModifier]>]>
 
     # x = ln(qy + 0.159) + 1.83885
@@ -63,15 +61,10 @@ IntimidationHanderScript:
         # originalinfluencehit / 2 --> (originalinfluencehit / 2) + originalinfluencehit
         - define influenceHitRandomized <util.random.decimal[<[kingdomInfluenceHit].div[2]>].to[<[kingdomInfluenceHit].add[<[kingdomInfluenceHit].div[2]>]>]>
 
-        - if <yaml[kingdoms].read[<[kingdom]>.balance].is[OR_MORE].than[<[campaignModifier].mul[500]>]>:
-            - yaml id:kingdoms <[kingdom]>.balance:-:<[campaignModifier].mul[500]>
-            - yaml id:kingdoms savefile:kingdoms.yml
-
-            - yaml load:powerstruggle.yml id:ps
-            - yaml id:ps set <[randomKingdom]>.fyndalingovt:-:<[influenceRandomized]>
-            - yaml id:ps set <[kingdom]>.fyndalingovt:-:<[influenceHitRandomized]>
-            - yaml id:ps savefile:powerstruggle.yml
-            - yaml id:ps unload
+        - if <server.flag[kingdoms.<[kingdom]>.balance].is[OR_MORE].than[<[campaignModifier].mul[500]>]>:
+            - flag server kingdoms.<[kingdom]>.balance:-:<[campaignModifier].mul[500]>
+            - flag server kingdoms.<[randomKingdom]>.powerstruggle.fyndalinGovt:-:<[influenceRandomized]>
+            - flag server kingdoms.<[kingdom]>.powerstruggle.fyndalinGovt:-:<[influenceHitRandomized]>
 
         - else:
             - inventory close
@@ -79,8 +72,6 @@ IntimidationHanderScript:
 
     - else:
         - determine <list[<[influenceAmount]>].include[<[kingdomInfluenceHit]>]>
-
-    - yaml id:kingdoms unload
 
 IntimidationInfluence_Handler:
     type: world
@@ -106,9 +97,7 @@ IntimidationInfluence_Handler:
 
         - define kingdom <player.flag[kingdom]>
 
-        - yaml load:powerstruggle.yml id:ps
-
-        - if <yaml[ps].read[<[kingdom]>.dailyinfluences]> <= 0:
+        - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints]> <= 0:
             - narrate format:callout "Your kingdom has exhasuted its influence points today"
             - determine cancelled
 
@@ -132,11 +121,8 @@ IntimidationInfluence_Handler:
                         - runlater delay:12d IntimidationHanderScript def:50|true
                         - flag server <[kingdom]>.influence.noIntimidationUse expire:12d
 
-                - yaml id:ps set <[kingdom]>.dailyinfluences:--
-                - yaml id:ps savefile:powerstruggle.yml
+                - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:--
 
                 - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
-                - narrate format:callout "The <script[KingdomRealNames].data_key[<player.flag[kingdom]>]> has dispatched agents to secure the support of key MPs in the Fyndalin parliament."
-
-        - yaml id:ps unload
+                - narrate format:callout "The <script[KingdomRealNames].data_key[<[kingdom]>]> has dispatched agents to secure the support of key MPs in the Fyndalin parliament."
