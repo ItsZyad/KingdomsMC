@@ -75,9 +75,7 @@ FarmerGenerationHandler:
             - define npcID <[farmArea].split[_].get[4]>
             - define npc <npc[<[npcID]>]>
             - define outpostMod <[npc].flag[outpostMod]>
-            - define kingdomBalance <yaml[kingdoms].read[<[kingdom]>.balance]>
-
-            - yaml load:kingdoms.yml id:kingdoms
+            - define kingdomBalance <server.flag[kingdoms.<[kingdom]>.balance]>
 
             # Loop through all the blocks in the farm area that are valid food types...
             - foreach <[farmArea].blocks> as:block:
@@ -124,8 +122,6 @@ FarmerGenerationHandler:
                                 - define bonusRatio <[npc].flag[Level].mul[0.01]>
 
                                 - flag <[npc]> outputMod:<[bonusRatio].round_to_precision[0.01]>
-
-            - yaml id:kingdoms unload
 
 ## IMPORTANT! DO NOT USE ##
 FarmerGenerationHandler_OLD:
