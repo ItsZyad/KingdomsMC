@@ -4,19 +4,17 @@ Claim_Command:
     name: claim
     description: Claims kingdoms territory
     script:
-    # YAML-related variables
-    - yaml load:kingdoms.yml id:k
     - define kingdom <player.flag[kingdom]>
-    - define coreMax <yaml[k].read[<[kingdom]>.core_max].if_null[0]>
-    - define castleMax <yaml[k].read[<[kingdom]>.castle_max].if_null[0]>
-    - define castleAmount <yaml[k].read[<[kingdom]>.castle_territory].size.if_null[0]>
-    - define coreAmount <yaml[k].read[<[kingdom]>.core_claims].size.if_null[0]>
-    - define chunkConnected false
-    - define coreChunks <yaml[k].read[<[kingdom]>.core_claims].if_null[<list[]>]>
-    - define castleChunks <yaml[k].read[<[kingdom]>.castle_territory].if_null[<list[]>]>
+    - define coreMax <server.flag[kingdoms.<[kingdom]>.claims.coreMax].if_null[0]>
+    - define castleMax <server.flag[kingdoms.<[kingdom]>.claims.castleMax].if_null[0]>
+    - define castleAmount <server.flag[kingdoms.<[kingdom]>.claims.castle].size.if_null[0]>
+    - define coreAmount <server.flag[kingdoms.<[kingdom]>.claims.core].size.if_null[0]>
+    - define coreChunks <server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>
+    - define castleChunks <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>]>
     - define combinedChunks <[castleChunks].include[<[coreChunks]>]>
-    - define balance <yaml[k].read[<[kingdom]>.balance].if_null[0]>
+    - define balance <server.flag[kingdoms.<[kingdom]>.balance].if_null[0]>
     - define playerChunk <player.location.chunk>
+    - define chunkConnected false
 
     # Calculation of chunk proximity #
     - if <[combinedChunks].size> != 0:
@@ -60,7 +58,7 @@ Claim_Command:
 
             - else:
                 # Core Plot Price Equation #
-                - define realPrestige <element[100].sub[<yaml[k].read[<[kingdom]>.prestige]>]>
+                - define realPrestige <element[100].sub[<server.flag[kingdoms.<[kingdom]>.prestige]>]>
                 - define prestigeMultiplier <util.e.power[<element[0.02186].mul[<[realPrestige]>]>].sub[0.9]>
                 - define corePrice <[prestigeMultiplier].mul[100].round_to_precision[100]>
 
@@ -79,18 +77,18 @@ Claim_Command:
                     - determine cancelled
 
                 - else:
-                    - yaml id:k set <[kingdom]>.core_claims:->:<player.location.chunk>
-                    - yaml id:k set all_claims:->:<player.location.chunk>
+                    - flag server kingdoms.<[kingdom]>.claims.core:->:<player.location.chunk>
+                    - flag server kingdoms.claimInfo.allClaims:->:<player.location.chunk>
 
                     - if <server.has_flag[PreGameStart]>:
-                        - yaml id:k set <[kingdom]>.balance:-:<[corePrice].div[2]>
+                        - flag server kingdoms.<[kingdom]>.balance:-:<[corePrice].div[2]>
 
-                        - if <yaml[k].read[<[kingdom]>.core_claims].size> < 20:
-                            - yaml id:k set <[kingdom]>.upkeep:+:5
+                        - if <server.flag[kingdoms.<[kingdom]>.claims.core].size> < 20:
+                            - flag server kingdoms.<[kingdom]>.upkeep:+:5
 
                     - else:
-                        - yaml id:k set <[kingdom]>.balance:-:<[corePrice]>
-                        - yaml id:k set <[kingdom]>.upkeep:+:30
+                        - flag server kingdoms.<[kingdom]>.balance:-:<[corePrice]>
+                        - flag server kingdoms.<[kingdom]>.upkeep:+:30
 
         - case CastleClaiming:
             - if <[castleChunks].contains[<[playerChunk]>]>:
@@ -102,25 +100,20 @@ Claim_Command:
                 - determine cancelled
 
             - else:
-                - yaml id:k set <[kingdom]>.castle_territory:->:<player.location.chunk>
-                - yaml id:k set all_claims:->:<player.location.chunk>
+                - flag server kingdoms.<[kingdom]>.claims.castle:->:<player.location.chunk>
+                - flag server kingdoms.claimInfo.allClaims:->:<player.location.chunk>
                 - narrate format:callout Claimed!
 
-    - yaml id:k savefile:kingdoms.yml
-    - yaml id:k unload
     - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 FindKingdomOverlaps:
     type: task
     definitions: currentClaim
     script:
-    - yaml load:kingdoms.yml id:k
-
-    - foreach <yaml[k].read[all_claims]>:
+    - foreach <server.flag[kingdoms.claimInfo.allClaims]>:
         - if <[value]> == <[currentClaim]>:
             - determine true
 
-    - yaml id:k unload
     - determine false
 
 ResetClaimFlags:
