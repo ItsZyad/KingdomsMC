@@ -128,11 +128,6 @@ AdminTools_Command:
                 - narrate format:admincallout "Entered ID Checker"
 
         - case influence:
-            - yaml load:powerstruggle.yml id:ps
-            - flag server powerstruggleFile:<util.parse_yaml[<yaml[ps].to_text>]>
-
-            - yaml unload id:ps
-
             - inventory open d:AdminOverallInfluence
 
         - case loans:
@@ -462,6 +457,7 @@ DEBUG_GenerateKingdomFlags:
 
     - yaml load:kingdoms.yml id:kingdoms
     - yaml load:powerstruggle.yml id:ps
+    - yaml load:blackmarket-formatted.yml id:bmf
 
     - foreach <[kingdomNames]> as:kingdom:
         - define oldKingdomFlag <server.flag[<[kingdom]>]>
@@ -473,6 +469,7 @@ DEBUG_GenerateKingdomFlags:
 
         - define YKI <yaml[kingdoms].read[<[kingdom]>]>
         - define YPI <yaml[ps].read[<[kingdom]>]>
+        - define YBI <yaml[bmf].read[factiondata.opinions.<[kingdom]>]>
 
         - flag server kingdoms.<[kingdom]>.balance:<[YKI].get[balance]>
         - flag server kingdoms.<[kingdom]>.warps:<[YKI].get[warp_location]>
@@ -498,6 +495,9 @@ DEBUG_GenerateKingdomFlags:
         - flag server kingdoms.<[kingdom]>.powerstruggle.masonsGuild:<[YPI].get[masonsguild]>
         - flag server kingdoms.<[kingdom]>.powerstruggle.prestigeMultiplier:<[YPI].get[perstigemultiplier]>
         - flag server kingdoms.<[kingdom]>.powerstruggle.electionInfluence:<[YPI].get[electioninfluence]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.BMFactionInfluence:<[YBI]>
+
+    - flag server kingdoms.claimInfo.allClaims:<yaml[kingdoms].read[all_claims]>
 
     - yaml id:kingdoms unload
     - yaml id:ps unload
