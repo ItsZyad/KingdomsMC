@@ -51,7 +51,7 @@ FyndalinAnger:
     type: procedure
     script:
     - define slot <context.inventory.find_item[FyndalinAnger_Item]>
-    - define anger <server.flag[powerstruggleFile].get[fyndalinanger].mul[100]>
+    - define anger <server.flag[kingdoms.fyndalin.fyndalinAnger].mul[100]>
     - define influenceGraphic <list>
 
     - repeat <[anger].div[5]>:
@@ -71,9 +71,8 @@ InfluenceGetter:
     type: procedure
     definitions: type
     script:
-    #- narrate <server.flag[powerstruggleFile].get[centran]>
-
-    - define influencePercentage <server.flag[powerstruggleFile].deep_get[<player.flag[kingdom]>.<[type]>].mul[100]>
+    - define kingdom <player.flag[kingdom]>
+    - define influencePercentage <server.flag[kingdoms.<[kingdom]>.powerstruggle.<[type]>].mul[100]>
     - define influenceGraphic <list>
 
     - repeat <[influencePercentage].div[5]>:
@@ -93,7 +92,7 @@ InfluenceBonusDisplay_Handler:
     events:
         on player opens InfluenceWindow:
         - define kingdom <player.flag[kingdom]>
-        - define powerStruggle <server.flag[powerstruggleFile]>
+        - define powerStruggle <server.flag[kingdoms.<[kingdom]>.powerstruggle]>
 
         - foreach <context.inventory.list_contents>:
             - define newLore <list>
@@ -101,10 +100,10 @@ InfluenceBonusDisplay_Handler:
 
             - if <[value].has_flag[type]>:
                 - define type <[value].flag[type]>
-                - define influenceAmount <[powerStruggle].deep_get[<[kingdom]>.<[type]>]>
+                - define influenceAmount <[powerStruggle].get[<[type]>]>
 
                 - choose <[type]>:
-                    - case fyndalingovt:
+                    - case fyndalinGovt:
                         - define bonusTax 0
 
                         - if <[influenceAmount].is[OR_MORE].than[0.15]>:
@@ -123,7 +122,7 @@ InfluenceBonusDisplay_Handler:
                         - define newLine "<element[<aqua>- Additional $<[bonusTax].format_number> of Fyndalin's tax money]>"
                         - define newLore:->:<[newLine]>
 
-                    - case totalinfluence:
+                    - case totalInfluence:
                         - define bonusTitle DESCRIPTION
 
                         - if <[influenceAmount].is[OR_MORE].than[0.95]>:
@@ -146,7 +145,7 @@ InfluenceBonusDisplay_Handler:
 
                         - define newLore <[newLore].include[<[newLines]>]>
 
-                    - case mercenaryguild:
+                    - case mercenaryGuild:
                         - define bonusTitle DESCRIPTION
 
                         - if <[influenceAmount].is[OR_MORE].than[0.9]>:
@@ -175,9 +174,7 @@ InfluenceGetter_Admin:
     type: procedure
     definitions: kingdom
     script:
-    #- narrate <server.flag[powerstruggleFile].get[centran]>
-
-    - define influencePercentage <server.flag[powerstruggleFile].deep_get[<[kingdom]>.totalinfluence].mul[100]>
+    - define influencePercentage <server.flag[kingdoms.<[kingdom]>.powerstruggle.totalInfluence].mul[100]>
     - define influenceGraphic <list>
 
     - repeat <[influencePercentage].div[5]>:
@@ -216,15 +213,11 @@ InfluenceStatus_Command:
         - narrate format:callout "Sorry! You cannot use this while the server is still in build mode!"
         - determine cancelled
 
-    - yaml load:kingdoms.yml id:kingdoms
+    - define kingdom <player.flag[kingdom]>
+    - define isBankrupt <proc[IsKingdomBankrupt].context[<server.flag[kingdoms.<[kingdom]>.balance]>|<[kingdom]>]>
 
-    - if !<proc[IsKingdomBankrupt].context[<yaml[kingdoms].parsed_key[].deep_get[<player.flag[kingdom]>.balance]>|<player.flag[kingdom]>]>:
+    - if !<[isBankrupt]>:
         - if <context.args.size> == 0 || <context.args.get[1]> == info:
-            - yaml load:powerstruggle.yml id:ps
-            - flag server powerstruggleFile:<util.parse_yaml[<yaml[ps].to_text>]>
-
-            - yaml unload id:ps
-
             - inventory open d:InfluenceWindow
 
         - else if <context.args.get[1]> == help:
@@ -232,8 +225,6 @@ InfluenceStatus_Command:
 
     - else:
         - narrate format:callout "Your kingdom is bankrupt! Clear your outstanding debts to start using influence actions again."
-
-    - yaml id:kingdoms unload
 
 ##############################################################################
 
@@ -245,21 +236,11 @@ InfluenceWindow_Handler:
         # the other.
 
         on player clicks InfluenceHelp in inventory:
-        - narrate format:debug <context.inventory.script.name>
-
         - if <context.inventory.script.name> == InfluenceWindow_Help:
-            - yaml load:powerstruggle.yml id:ps
-            - flag server powerstruggleFile:<util.parse_yaml[<yaml[ps].to_text>]>
-
-            - yaml unload id:ps
-
             - inventory open d:InfluenceWindow
 
         - else if <context.inventory.script.name> == InfluenceWindow:
             - inventory open d:InfluenceWindow_Help
-
-        on player closes InfluenceWindow:
-        - flag server powerstruggleFile:!
 
 ##############################################################################
 
@@ -279,11 +260,9 @@ InfluenceOption_Handler:
         - inventory open d:PopulationInfluence_Window
 
         on player clicks BlackMarketInfluence in InfluenceWindow:
-        - define BMWindow <inventory[BlackMarketInfluence_Window]>
-        - yaml load:blackmarket-formatted.yml id:bmf
-
         - define kingdom <player.flag[kingdom]>
-        - define factionOpinions <yaml[bmf].read[factiondata.opinions.<[kingdom]>]>
+        - define BMWindow <inventory[BlackMarketInfluence_Window]>
+        - define factionOpinions <server.flag[kingdoms.<[kingdom]>.powerstruggle.BMFactionInfluence]>
 
         - foreach <[BMWindow].list_contents>:
             - if <[value].has_flag[factionInfo]>:
@@ -325,15 +304,9 @@ InfluenceOption_Handler:
 
                 - inventory adjust d:<[BMWindow]> slot:<[loop_index]> "lore:<[factionOpMeter].unseparated>|Exact Opinion: ~<[factionOpinion].sub[1].round_to_precision[0.01]>| |<[sentence].italicize>"
 
-        - yaml id:bmf unload
         - inventory open d:<[BMWindow]>
 
         on player clicks Back_Influence in inventory:
-        - yaml load:powerstruggle.yml id:ps
-        - flag server powerstruggleFile:<util.parse_yaml[<yaml[ps].to_text>]>
-
-        - yaml unload id:ps
-
         - inventory open d:InfluenceWindow
         - determine cancelled
 
@@ -342,16 +315,11 @@ InfluenceOption_Handler:
 DailyInfluenceRefresh:
     type: task
     script:
-    - yaml load:powerstruggle.yml id:ps
-
     - define kingdomList <proc[GetKingdomList].context[true]>
 
-    - foreach <[kingdomList]>:
-        - if <yaml[ps].read[<[value]>.dailyinfluences]> < 3:
-            - yaml id:ps set <[value]>.dailyinfluences:3
-
-    - yaml id:ps savefile:powerstruggle.yml
-    - yaml id:ps unload
+    - foreach <[kingdomList]> as:kingdom:
+        - if <server.flag[kigndoms.<[kingdom]>.powerstruggle.influencePoints]> < 3:
+            - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:3
 
     - run DailyOrderRefresh
     - run SidebarLoader def.target:<server.online_players>
@@ -368,82 +336,64 @@ CalcTotalInfluence:
     type: task
     definitions: kingdom
     script:
-    - yaml load:powerstruggle.yml id:ps
+    - define avgList <list[]>
+    - define avgList:->:<server.flag[kingdoms.<[kingdom]>.powerstruggle.cityPopulation]>
+    - define avgList:->:<server.flag[kingdoms.<[kingdom]>.powerstruggle.fyndalinGovt]>
+    - define avgList:->:<server.flag[kingdoms.<[kingdom]>.powerstruggle.mercenaryGuild]>
+    - define avgList:->:<server.flag[kingdoms.<[kingdom]>.powerstruggle.masonsGuild]>
+    - define blackMarketAvg <server.flag[kingdoms.<[kingdom]>.powerstruggle.BMFactionInfluence].values.parse_tag[<[parse_value].sub[1]>].average>
+    - define avgList:->:<[blackMarketAvg]>
 
-    - define population <yaml[ps].read[<[kingdom]>.citypopulation]>
-    - define government <yaml[ps].read[<[kingdom]>.fyndalingovt]>
-    - define mercenary <yaml[ps].read[<[kingdom]>.mercenaryguild]>
-    - define masons <yaml[ps].read[<[kingdom]>.masonsguild]>
+    - define average <[avgList].average>
 
-    - define average <[population].add[<[government]>].add[<[mercenary]>].add[<[masons]>].div[4]>
-
-    - yaml id:ps set <[kingdom]>.totalinfluence:<[average]>
-    - yaml savefile:powerstruggle.yml id:ps
-
-    - yaml id:ps unload
+    - flag server kingdoms.<[kingdom]>.powerstruggle.totalInfluence:<[average]>
 
 ##############################################################################
 
 PerkChecker:
     type: task
     script:
-    - yaml load:powerstruggle.yml id:ps
+    - define kingdomList <proc[GetKingdomList].context[true]>
 
-    - define kingdoms <proc[GetKingdomList].context[<yaml[kingdoms].parsed_key[]>]>
+    - foreach <[kingdomList]> as:kingdom:
+        - define govInfluence <server.flag[kingdoms.<[kingdom]>.powerstruggle.fyndalinGovt]>
+        - define popInfluence <server.flag[kingdoms.<[kingdom]>.powerstruggle.cityPopulation]>
+        - define merInfluence <server.flag[kingdoms.<[kingdom]>.powerstruggle.mercenaryGuild]>
+        - define masInfluence <server.flag[kingdoms.<[kingdom]>.powerstruggle.masonsGuild]>
+        - define totInfluence <server.flag[kingdoms.<[kingdom]>.powerstruggle.totalInfluence]>
 
-    - foreach <yaml[ps].list_keys[]> as:kingdom:
-        - if <[kingdoms].contains[<[kingdom]>]>:
+        # GOVERNMENT INF. CHECK #
 
-            - define govInfluence <yaml[ps].read[<[kingdom]>.fyndalingovt]>
-            - define popInfluence <yaml[ps].read[<[kingdom]>.citypopulation]>
-            - define merInfluence <yaml[ps].read[<[kingdom]>.mercenaryguild]>
-            - define masInfluence <yaml[ps].read[<[kingdom]>.masonsguild]>
-            - define totInfluence <yaml[ps].read[<[kingdom]>.totalinfluence]>
+        - if <[govInfluence].is[OR_MORE].than[0.15]>:
+            - flag server kingdoms.<[kingdom]>.influenceBonuses.merchantDiscount:25
 
-            # GOVERNMENT INF. CHECK #
+        - if <[govInfluence].is[OR_MORE].than[0.25]>:
+            - flag server kingdoms.<[kingdom]>.influenceBonuses.bonusTax:+:4000
 
-            - if <[govInfluence].is[OR_MORE].than[0.15]>:
-                - flag server <[kingdom]>.influenceBonuses.merchantDiscount:25
+        - if <[govInfluence].is[OR_MORE].than[0.35]>:
+            - flag server kingdoms.<[kingdom]>.influenceBonuses.bonusTax:+:1500
 
-            - if <[govInfluence].is[OR_MORE].than[0.25]>:
-                - flag server <[kingdom]>.influenceBonuses.bonusTax:+:4000
+        # TOTAL INF. CHECK #
 
-            - if <[govInfluence].is[OR_MORE].than[0.35]>:
-                - flag server <[kingdom]>.influenceBonuses.bonusTax:+:1500
+        - if <[totInfluence].is[OR_MORE].than[0.5]>:
+            - flag server kingdoms.<[kingdom]>.influenceBonuses.controlStatus:DeJure
 
-            # TOTAL INF. CHECK #
-
-            - if <[totInfluence].is[OR_MORE].than[0.5]>:
-                - flag server <[kingdom]>.influenceBonuses.controlStatus:DeJure
-
-            # POPULATION INF. CHECK #
+        # POPULATION INF. CHECK #
 
 
 
-            # MASONS INF. CHECK #
+        # MASONS INF. CHECK #
 
 
 
-            # MERCENARY INF. CHECK #
+        # MERCENARY INF. CHECK #
 
 
 
-            - narrate format:debug <yaml[ps].read[<[kingdom]>]>
+        # BLACK MARKET INF. CHECK #
 
-    - yaml id:ps unload
-
-    # BLACK MARKET INF. CHECK #
-
-    - yaml load:blackmarket-formatted.yml id:bm
-
-    - define factionOpinions <yaml[bm].read[factiondata.opinions].to_pair_lists>
-    - foreach <[factionOpinions]>:
-        - define kingdom <[value].get[1]>
-
-        - foreach <[value].get[2].to_pair_lists> as:faction:
-            - flag server <[kingdom]>.influenceBonuses.BMOpinion.<[faction].get[1]>:<[faction].get[2]>
-
-    - yaml id:bm unload
+        - if <server.has_flag[kingdoms.<[kingdom]>.powerstruggle.BMFactionInfluence]>:
+            - narrate format:debug WIP
 
 ##############################################################################
 
@@ -454,14 +404,12 @@ FyndalinTakeover_Handler:
         - define inventoryItem <item[FyndalinTakeoverImpossible_Item]>
         - define kingdom <player.flag[kingdom]>
 
-        - yaml load:powerstruggle.yml id:ps
-
-        - define totalInf <yaml[ps].read[<[kingdom]>.totalinfluence]>
-        - define kingdomList <list[centran|raptoran|viridian|cambrian].exclude[<[kingdom]>]>
+        - define totalInf <server.flag[kingdoms.<[kingdom]>.powerstruggle.totalInfluence]>
+        - define kingdomList <proc[GetKingdomList].context[true]>
         - define takeoverCondition 0
 
         - foreach <[kingdomList]>:
-            - define otherTotalInf <yaml[ps].read[<[value]>.totalinfluence]>
+            - define otherTotalInf <server.flag[kingdoms.<[value]>.powerstruggle.totalInfluence]>
 
             - if <[otherTotalInf].add[0.3].is[LESS].than[<[totalInf]>]> && <[totalInf].is[MORE].than[0.5]>:
                 - define takeoverCondition:++
@@ -469,23 +417,17 @@ FyndalinTakeover_Handler:
         - if <[takeoverCondition].is[OR_MORE].than[<[kingdomList].size.sub[1]>]>:
             - define inventoryItem <item[FyndalinTakeoverPossible_Item]>
 
-            - yaml load:kingdoms.yml id:king
-
-            - define fyndalinBalance <yaml[king].read[fyndalin.balance]>
-            - define fyndalinUpkeep <yaml[king].read[fyndalin.upkeep]>
-            - define fyndalinPrestige <yaml[king].read[fyndalin.prestige]>
+            - define fyndalinBalance <server.flag[kingdoms.fyndalin.balance]>
+            - define fyndalinUpkeep <server.flag[kingdoms.fyndalin.upkeep]>
+            - define fyndalinPrestige <server.flag[kingdoms.fyndalin.prestige]>
             - define taxDivisor <[fyndalinPrestige].div[<[fyndalinPrestige].ln>].round_to_precision[0.1]>
             - define fyndalinDailyTax <element[20000].div[<[taxDivisor]>]>
-
-            - yaml id:king unload
 
             - adjust def:inventoryItem "lore:<white>If you were to annex Fyndalin now, your kingdom would:|<&sp>|<green><bold>[GAIN] <&r><red>$<[fyndalinBalance].format_number> <white>from Fyndalin's coffers instantly,|<green><bold>[GAIN] <&r><red>$<[fyndalinDailyTax].format_number> <white>from Fyndalin's tax money daily,|<&sp>|<red><bold>[LOSE] <&r><red>$<[fyndalinUpkeep].format_number> <white>As upkeep for your Kingdom's new territories."
 
         - flag <player> FyndalinTakeoverList:<list[air|air|air|air|<[inventoryItem]>|air|air|air|air]>
         - inventory open d:FyndalinTakeoverWindow
         - flag <player> FyndalinTakeoverList:!
-
-        - yaml is:ps unload
 
         # on player clicks FyndalinTakeoverPossible_Item in FyndalinTakeoverWindow:
         # - narrate format:callout "I JUST MORBED"
