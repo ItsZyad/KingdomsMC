@@ -93,11 +93,8 @@ ShowRNPCPrices:
     definitions: spawnType
     script:
     - define basePrice <script[RNPCBasePrices].data_key[<[spawnType]>]>
-
-    - yaml load:kingdoms.yml id:kingdoms
-
     - define k 6.31
-    - define invPrestige <yaml[kingdoms].read[<player.flag[kingdom]>.prestige].sub[100].abs>
+    - define invPrestige <server.flag[kingdoms.<player.flag[kingdom]>.prestige].sub[100].abs>
     - define gradient 0.1543221
 
     # Prestige modifier for RNPC Spawning:
@@ -105,8 +102,6 @@ ShowRNPCPrices:
 
     - define prestigeModifier <element[4].mul[<[invPrestige].add[<[k]>].log[10].power[-1]>].sub[<[gradient].mul[<[k]>]>].round_to_precision[0.01]>
     - determine <[prestigeModifier].mul[<[basePrice]>]>
-
-    - yaml id:kingdoms unload
 
 WriteRNPCData:
     type: task
