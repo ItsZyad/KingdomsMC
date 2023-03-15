@@ -25,10 +25,7 @@ ReconstructionPermit_Command:
     script:
     - yaml load:reconstruction-permits.yml id:recon
 
-    - yaml load:kingdoms.yml id:kingdoms
-    - define kingdomList <proc[GetKingdomList].context[<yaml[kingdoms].parsed_key[]>]>
-    - yaml id:kingdoms unload
-
+    - define kingdomList <proc[GetKingdomList]>
     - define permitList <list[]>
 
     - if <player.has_permission[kingdoms.admin]> || <player.has_permission[kingdoms.admin.permits]> || <player.is_op>:
@@ -71,17 +68,13 @@ ReconstructionPermit_Handler:
     type: world
     events:
         on player clicks Reconstruction_Influence in GovernmentInfluence_Window:
-        - yaml id:ps load:powerstruggle.yml
-
-        - define maxPlotSize <yaml[ps].read[<player.flag[kingdom]>.maxplotsize]>
-        - flag player RequestedPayout:-1
+        - define maxPlotSize <server.flag[kingdoms.<player.flag[kingdom]>.powerstruggle.maxPlotSize]>
+        - flag <player> RequestedPayout:-1
 
         - narrate format:callout "Reconstruction permit requests can get your kingdom a compensation (upfront payment) from the mandate council for your help. Please type the width of plot you wish to be allocated to this permit. (may not exceed <[maxPlotSize]> blocks):"
         - narrate format:callout "Type <element['cancel'].color[red]> to stop the permit application."
 
         - inventory close
-
-        - yaml id:ps unload
 
         on player chats:
         - if <player.flag[RequestedPayout]> == -1:
@@ -93,10 +86,7 @@ ReconstructionPermit_Handler:
 
                 - define kingdom <player.flag[kingdom]>
 
-                - yaml load:powerstruggle.yml id:ps
-                - yaml id:ps set <[kingdom]>.dailyinfluences:-:1
-                - yaml id:ps savefile:powerstruggle.yml
-                - yaml id:ps unload
+                - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:-:1
 
                 - run SidebarLoader def.target:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
 
@@ -173,10 +163,7 @@ ReconstructionPermitAdmin_Function:
     script:
     - yaml load:reconstruction-permits.yml id:recon
 
-    - yaml load:kingdoms.yml id:kingdoms
-    - define kingdomList <proc[GetKingdomList].context[<yaml[kingdoms].parsed_key[]>]>
-    - yaml id:kingdoms unload
-
+    - define kingdomList <proc[GetKingdomList]>
     - define outInv <inventory[]>
     - define permitList <list[]>
 
@@ -231,19 +218,14 @@ ReconstructionPermitAdmin_Handler:
         - define reqKingdom <[permit].get[requestingkingdom]>
         - define reqPlayerId <[permit].get[requestingplayer].get[uuid]>
 
-        - yaml load:powerstruggle.yml id:ps
         - yaml load:reconstruction-permits.yml id:recon
-
         - yaml id:recon set permits.<[permitId]>.requeststatus:approved
         - yaml id:recon set <[reqKingdom]>.permits.pending:<-:<[permitIdRaw]>
         - yaml id:recon set <[reqKingdom]>.permits.approved:->:<[permitIdRaw]>
 
         - flag <[reqPlayerId].as[player]> approvedPermit:<[permitId]>
 
-        - yaml id:ps savefile:powerstruggle.yml
         - yaml id:recon savefile:reconstruction-permits.yml
-
-        - yaml id:ps unload
         - yaml id:recon unload
 
         - determine passively cancelled
