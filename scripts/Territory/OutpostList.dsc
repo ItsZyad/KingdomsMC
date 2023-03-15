@@ -17,18 +17,16 @@ Old_OutpostManager_Command:
     permission: kingdoms.admin
     description: "Displays all the outposts currently maintained by your kingdom [CURRENTLY BROKEN]"
     script:
-        - yaml load:outposts.yml id:outpost
         - define kingdom <player.flag[kingdom]>
 
         - narrate format:admincallout "THIS COMMAND IS DEPRECATED AND NO LONGER WORKS. ONLY USE FOR DEBUG PURPOSES!"
-
         - narrate format:callout "Current Outposts for the <[kingdom]> kingdom"
 
-        - foreach <yaml[outpost].read[<[kingdom]>].keys.exclude[totalupkeep]>:
+        - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
             - narrate "- <[value]>"
 
-            - define cornerOne <yaml[outpost].read[<[kingdom]>].values.get[<[loop_index]>].get[cornerone]>
-            - define cornerTwo <yaml[outpost].read[<[kingdom]>].values.get[<[loop_index]>].get[cornertwo]>
+            - define cornerOne <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].values.get[<[loop_index]>].get[cornerOne]>
+            - define cornerTwo <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].values.get[<[loop_index]>].get[cornerTwo]>
 
             - narrate "    X : <[cornerOne].x.round> | Y : <[cornerOne].y.round> | Z : <[cornerOne].z.round>"
             - narrate "    X : <[cornerTwo].x.round> | Y : <[cornerTwo].y.round> | Z : <[cornerTwo].z.round>"
@@ -50,12 +48,14 @@ OutpostList_GUI:
     - [] [] [] [] [] [] [] [] []
     - [] [] [] [Page_Back] [] [Page_Forward] [] [] []
 
+
 MiningSpec_Item:
     type: item
     material: player_head
     display name: "<gray><bold>Mining Outpost"
     mechanisms:
         skull_skin: d9ce127a-ffcc-451a-98dc-fb05edebba06|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzYxYzU3OTc0ZjEwMmQzZGViM2M1M2Q0MmZkZTkwOWU5YjM5Y2NiYzdmNzc2ZTI3NzU3NWEwMmQ1MWExOTk5ZSJ9fX0=
+
 
 FarmingSpec_Item:
     type: item
@@ -64,12 +64,14 @@ FarmingSpec_Item:
     mechanisms:
         skull_skin: 30939add-08ae-41b5-802f-d55a546c9a06|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2FhNTk2NmExNDcyNDQ1MDRjYzU2ZWY2ZWZkMmQyZjQ0NzM4YjhmMDNkOTNhNjE3NjZhZjNmYzQ0ODdmOTgwYiJ9fX0=
 
+
 LoggingSpec_Item:
     type: item
     material: player_head
     display name: "<bold><element[Logging Outpost].color[#743e3e]>"
     mechanisms:
         skull_skin: 1f77726e-867b-4a66-8015-1ed701753de0|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmQyZTMxMDg3OWE2NDUwYWY1NjI1YmNkNDUwOTNkZDdlNWQ4ZjgyN2NjYmZlYWM2OWM4MTUzNzc2ODQwNmIifX19
+
 
 Unspec_Item:
     type: item
@@ -78,6 +80,7 @@ Unspec_Item:
     mechanisms:
         skull_skin: bcccae77-0ac7-4cd0-8126-c900727c2223|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDljMTgzMmU0ZWY1YzRhZDljNTE5ZDE5NGIxOTg1MDMwZDI1NzkxNDMzNGFhZjI3NDVjOWRmZDYxMWQ2ZDYxZCJ9fX0=
 
+
 SpecTypeToItem:
     type: data
     loggers: LoggingSpec_Item
@@ -85,16 +88,16 @@ SpecTypeToItem:
     miners: MiningSpec_Item
     none: Unspec_Item
 
+
 OutpostList_Command:
     type: task
     subpaths:
         OutpostGUI_Init:
-        - yaml load:outposts.yml id:outpost
         - define kingdom <player.flag[kingdom]>
         - define rawOutpostList <list[]>
 
-        - foreach <yaml[outpost].read[<[kingdom]>].keys.exclude[totalupkeep]>:
-            - define currentOutpost <yaml[outpost].read[<[kingdom]>.<[value]>]>
+        - foreach <server.flag[kingdoms.<[kingdom]>.outpost.outpostList].keys>:
+            - define currentOutpost <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[value]>]>
             - define cornerOne <[currentOutpost].get[cornerone].xyz>
             - define cornerTwo <[currentOutpost].get[cornertwo].xyz>
             - define name <[currentOutpost].get[name]>
@@ -120,8 +123,6 @@ OutpostList_Command:
             - run Paginate_Task def.itemArray:<[rawOutpostList]> def.itemsPerPage:27 def.page:<player.flag[OutpostGUIPage]> save:paginate
             - flag <player> outpostList:<entry[paginate].created_queue.determination.get[1]>
 
-        - yaml id:outpost unload
-
         ResetOutpostPageFlag:
         - if !<player.has_flag[outpostGUIPage]>:
             - flag <player> outpostGUIPage:1
@@ -144,6 +145,7 @@ OutpostList_Command:
     - inject OutpostList_Command.subpaths.ResetOutpostPageFlag
     - inject OutpostList_Command.subpaths.OutpostGUI_Init
     - inject OutpostList_Command.subpaths.OutpostGUI_Show
+
 
 OutpostList_Handler:
     type: world
