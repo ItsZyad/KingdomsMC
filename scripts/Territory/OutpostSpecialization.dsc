@@ -53,21 +53,18 @@ OutpostSpecialize_Handler:
     type: world
     events:
         on player clicks OutpostSpec* in OutpostSpec_Window:
-        - yaml load:outposts.yml id:outp
         - define outpost <player.flag[outpostName]>
+        - define kingdom <player.flag[kingdom]>
 
         - if <player.has_flag[outpostToBeSpeced]>:
             - define outpost <player.flag[outpostToBeSpeced]>
 
-        - yaml id:outp set <player.flag[kingdom]>.<[outpost]>.specType:<context.item.flag[specType]>
-        - yaml id:outp set <player.flag[kingdom]>.<[outpost]>.specMod:<script[NPCSpecMod].data_key[<context.item.flag[specType]>]>
+        - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.specType:<context.item.flag[specType]>
+        - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.specMod:<script[NPCSpecMod].data_key[<context.item.flag[specType]>]>
 
-        - define currUpkeep <yaml[outp].read[<player.flag[kingdom]>.<[outpost]>.upkeep]>
-        - yaml id:outp set <player.flag[kingdom]>.<[outpost]>.upkeep:+:<[currUpkeep].mul[0.25]>
+        - define currUpkeep <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.upkeep]>
 
-        - yaml id:outp savefile:outposts.yml
-        - yaml id:outp unload
-
+        - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.upkeep:+:<[currUpkeep].mul[0.25]>
         - flag <player> outpostToBeSpeced:!
         - flag <player> outpostName:!
         - inventory close
