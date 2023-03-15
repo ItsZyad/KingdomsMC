@@ -6,7 +6,6 @@
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Jun 2021
 ## @Script Ver: v1.0
-## @Clean Code Classification: 3.5
 ##
 ##ignorewarning ancient_defs
 ##ignorewarning invalid_data_line_quotes

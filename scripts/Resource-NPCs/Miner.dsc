@@ -5,7 +5,6 @@
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Jun 2021
 ## @Script Ver: v0.9
-## @ Clean Code Classification: 2
 ##
 ##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------

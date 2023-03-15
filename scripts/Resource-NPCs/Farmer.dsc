@@ -6,7 +6,6 @@
 ## @Date: Jun 2021
 ## @Updated: Jul 2022
 ## @Script Ver: v1.0
-## @ Clean Code Classification: 3
 ##
 ## ----------------END HEADER-----------------
 

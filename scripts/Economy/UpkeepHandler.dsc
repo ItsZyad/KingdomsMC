@@ -5,7 +5,6 @@
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Sep 2021
 ## @Script Ver: v0.2
-## @ Clean Code Classification: 3
 ##
 ## ----------------END HEADER-----------------
 
