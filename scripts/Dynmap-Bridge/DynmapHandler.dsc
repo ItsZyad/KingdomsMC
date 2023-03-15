@@ -1,5 +1,5 @@
 ##
-## * A (lightly modified) Denizen-Dynmap hook
+## * A (lightly modified) Denizen-Dynmap hook for Kingdoms
 ##
 ## @Author: (Icecapade#8825)
 ## @Editor: Zyad (ITSZYAD#9280)
