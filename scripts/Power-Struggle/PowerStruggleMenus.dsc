@@ -22,45 +22,45 @@ TotalInfluence:
     material: emerald
     display name: "<white>Total Influence"
     flags:
-        type: totalinfluence
+        type: totalInfluence
     lore:
-    - <proc[InfluenceGetter].context[totalinfluence]>
+    - <proc[InfluenceGetter].context[totalInfluence]>
 
 MasonsInfluence:
     type: item
     material: bricks
     display name: "<dark_purple>Mason's Guild Influence"
     flags:
-        type: masonsguild
+        type: masonsGuild
     lore:
-    - <proc[InfluenceGetter].context[masonsguild]>
+    - <proc[InfluenceGetter].context[masonsGuild]>
 
 MercenaryInfluence:
     type: item
     material: bow
     display name: "<red>Fyndalin Militia Influence"
     flags:
-        type: mercenaryguild
+        type: mercenaryGuild
     lore:
-    - <proc[InfluenceGetter].context[mercenaryguild]>
+    - <proc[InfluenceGetter].context[mercenaryGuild]>
 
 GovernmentInfluence:
     type: item
     material: blaze_rod
     display name: "<blue>Fyndalin Govt<&sq> Influence"
     flags:
-        type: fyndalingovt
+        type: fyndalinGovt
     lore:
-    - <proc[InfluenceGetter].context[fyndalingovt]>
+    - <proc[InfluenceGetter].context[fyndalinGovt]>
 
 PopulationInfluence:
     type: item
     material: player_head
     display name: "<green>Popular Influence"
     flags:
-        type: citypopulation
+        type: cityPopulation
     lore:
-    - <proc[InfluenceGetter].context[citypopulation]>
+    - <proc[InfluenceGetter].context[cityPopulation]>
 
 BlackMarketInfluence:
     type: item

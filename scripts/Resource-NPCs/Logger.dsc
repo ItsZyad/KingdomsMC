@@ -5,7 +5,6 @@
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Jun 2021
 ## @Script Ver: v0.1
-## @ Clean Code Classification: 2
 ##
 ## ----------------END HEADER-----------------
 
@@ -31,6 +30,7 @@ LoggerRangeFinder:
     - else:
         - note <[areaOfEffect]> as:INTERNAL_ranch_<[npc].flag[kingdom]>_<[npc].id>
 
+
 LoggerGenerationHandler_NEW:
     #type: task
     #script:
@@ -38,13 +38,11 @@ LoggerGenerationHandler_NEW:
     debug: false
     events:
         on system time secondly every:50:
-        - yaml load:kingdoms.yml id:kingdoms
-
         - foreach <util.notes[cuboids].filter_tag[<[filter_value].starts_with[cu@INTERNAL_ranch]>]> as:ranch:
             - define npcID <[ranch].split[_].get[4]>
             - define npc <npc[<[npcID]>]>
             - define kingdom <[ranch].split[_].get[3]>
-            - define isKingdomBankrupt <proc[IsKingdomBankrupt].context[<yaml[kingdoms].parsed_key[].deep_get[<player.flag[kingdom]>.balance]>|<[kingdom]>]>
+            - define isKingdomBankrupt <proc[IsKingdomBankrupt].context[<server.flag[kingdoms.<[kingdom]>.balance]>|<[kingdom]>]>
             - define npcLevel <[npc].flag[Level]>
             - define npcIteration <element[100].sub[<[npcLevel]>].round_up_to_precision[10].div[10]>
             - define lowestY 1000
@@ -80,7 +78,7 @@ LoggerGenerationHandler_NEW:
                 - if <[npc].flag[Level].round_down> != <[prevBaseLevel]>:
                     - rename t:<[npc]> <[npc].nickname.split[<&sp>].get[1].to[-2].space_separated><&sp><[npc].flag[Level].round_down>
                     - define kingdom <[npc].flag[kingdom]>
-                    - define prestige <yaml[kingdoms].read[<[kingdom]>.prestige]>
+                    - define prestige <server.flag[kingdoms.<[kingdom]>.prestige]>
                     - define level <[npc].flag[Level]>
 
                     - flag <[npc]> outputMod:+:<[level].mul[<[prestige].div[20]>]>
@@ -102,7 +100,6 @@ LoggerGenerationHandler_NEW:
             - give to:<[npc].inventory> <[currentBlock].material.name.split[_].get[1]>_sapling quantity:<util.random.int[1].to[<util.random.int[1].to[4]>]>
             - modifyblock <[startBlock]> <[currentBlock].material.name.split[_].get[1]>_sapling
 
-        - yaml id:kingdoms unload
 
 LoggerGenerationHandler:
     type: task
@@ -119,9 +116,7 @@ LoggerGenerationHandler:
             - define npcID <[value].split[_].get[4]>
             - define npc <npc[<[npcID]>]>
 
-            - yaml load:kingdoms.yml id:kingdoms
-
-            - if !<proc[IsKingdomBankrupt].context[<yaml[kingdoms].parsed_key[].deep_get[<player.flag[kingdom]>.balance]>|<[npc].flag[kingdom]>]>:
+            - if !<proc[IsKingdomBankrupt].context[<server.flag[kingdoms.<[npc].flag[kingdom]>.balance]>|<[npc].flag[kingdom]>]>:
                 - define npcLevel <[npc].flag[Level]>
                 - define npcIteration <element[100].sub[<[npcLevel]>].round_up_to_precision[10].div[10]>
 
@@ -161,7 +156,7 @@ LoggerGenerationHandler:
                             - rename t:<[npc]> <[npc].nickname.substring[1,<[npc].nickname.length.sub[1]>]><[npc].flag[Level].round_down>
 
                             - define kingdom <[npc].flag[kingdom]>
-                            - define prestige <yaml[kingdoms].read[<[kingdom]>.prestige]>
+                            - define prestige <server.flag[kingdoms.<[kingdom]>.prestige]>
                             - define level <[npc].flag[Level]>
 
                             - flag <[npc]> outputMod:+:<[level].mul[<[prestige].div[20]>]>
@@ -186,5 +181,3 @@ LoggerGenerationHandler:
                     - give <[npc].inventory> stick quantity:<util.random.int[1].to[5]>
 
                 - narrate format:debug <[currentTree]>
-
-            - yaml id:kingdoms unload

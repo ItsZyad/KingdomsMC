@@ -3,21 +3,23 @@ GenerateRecursiveStructures_CISK:
     debug: false
     definitions: splitted
     DEBUG_GenerateSplittedList:
-    - define text "<element[something <&lt>state get player:<&lt>dataget t:player n:ref<&gt> location<&gt>]>"
+    - define text <element[something <&lt>give i:exp q:20<&gt>]>
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
     script:
     - inject <script.name> path:DEBUG_GenerateSplittedList if:<[splitted].exists.not>
-    - define player <player[ZyadTheBoss]>
     - define persistent <map[]>
     - define lineList <list[]>
     - define totalLoops 0
     - define bracketDepth 0
 
     - foreach <[splitted]> as:token:
-        - define prevToken <[splitted].get[<[loop_index].sub[1]>]>
-        - define nextToken <[splitted].get[<[loop_index].add[1]>]>
+        - define prevToken <[splitted].get[<[loop_index].sub[1]>]> if:<[loop_index].is[MORE].than[1]>
+        - define nextToken <[splitted].get[<[loop_index].add[1]>]> if:<[loop_index].is[LESS].than[<[splitted].size>]>
+
+        - define prevToken <element[]> if:<[loop_index].is[OR_LESS].than[1]>
+        - define nextToken <element[]> if:<[loop_index].is[OR_MORE].than[<[splitted].size>]>
 
         - if <[loop_index]> < <[persistent].get[commandSize].add[2].if_null[<[loop_index]>]>:
             - foreach next
@@ -52,8 +54,12 @@ CommandMapGenerator_CISK:
     - inject <script.name> path:DEBUG_GenerateSplittedList if:<[splitted].exists.not>
 
     - foreach <[splitted]> as:token:
-        - define prevToken <[splitted].get[<[loop_index].sub[1]>]>
-        - define nextToken <[splitted].get[<[loop_index].add[1]>]>
+        - define prevToken <[splitted].get[<[loop_index].sub[1]>]> if:<[loop_index].is[MORE].than[1]>
+        - define nextToken <[splitted].get[<[loop_index].add[1]>]> if:<[loop_index].is[LESS].than[<[splitted].size>]>
+
+        - define prevToken <element[]> if:<[loop_index].is[OR_LESS].than[1]>
+        - define nextToken <element[]> if:<[loop_index].is[OR_MORE].than[<[splitted].size>]>
+
         - define commandSize:++
 
         - if <[loop_index]> < <[persistent].get[skipAmount].add[1].if_null[<[loop_index]>]>:
@@ -102,7 +108,7 @@ CommandDelegator_CISK:
     - adjust <queue> linked_npc:<[npc]> if:<[npc].exists>
 
     - foreach <[line]> as:token:
-        - if <[token].as[map]> == <[token]>:
+        - if <[token].object_type.to_uppercase> == MAP:
             - define commandMap <[token]>
             - define commandName <[commandMap].get[name]>
             - define commandScript <script[<[commandName]>Command_CISK]>
@@ -142,7 +148,7 @@ CommandMapEvaluator_CISK:
                 - define attrKey <[attrSubs].get[<[attrKeyRaw]>]> if:<[attrSubs].contains[<[attrKeyRaw]>]>
                 - define attrVal <[attrPair].values.get[1]>
 
-                - if <[attrVal].as[map]> == <[attrVal]>:
+                - if <[attrVal].object_type.to_uppercase> == MAP:
                     - run CommandMapEvaluator_CISK def.commandMap:<[attrVal]> save:recur
 
                     - define nestedCommandResult <entry[recur].created_queue.determination.get[1]>
@@ -211,6 +217,7 @@ DatastoreCommand_CISK:
     - run ProduceFlaggableObject_CISK def.text:<[dataTarget]> save:realTarget
     - define realTarget <entry[realTarget].created_queue.determination.get[1]>
     - flag <[realTarget]> KQuests.data.<[dataName]>.value:<[dataValue]>
+    - flag <[realTarget]> KQuests.data.<[dataName]>.persistent:true if:<[dataPersistent].if_null[false].equals[true]>
 
     # TODO: Add error check for this... And all of these commands for that fact.
 
@@ -224,6 +231,9 @@ DatastoreCommand_CISK:
 
         - case value:
             - define dataValue <[attrVal]>
+
+        - case persistent:
+            - define dataPersistent true
 
 
 BreakCommand_CISK:
@@ -266,11 +276,17 @@ GiveCommand_CISK:
             quantity: q
 
     PostEvaluationCode:
-    - if <[giveType]> == as_drop:
-        - drop <[giveItem].as[item]> quantity:<[giveQuantity]> <[npc].as[entity].location.forward[1]>
+    - if <[giveItem]> == exp:
+        - experience give <[giveQuantity]> player:<[player]>
 
-    - else:
-        - give <[giveItem].as[item]> quantity:<[giveQuantity]> to:<[player].inventory>
+    - else if <[giveItem].as[item].exists>:
+        - define giveItem <[giveItem].as[item]>
+
+        - if <[giveType]> == as_drop:
+            - drop <[giveItem]> quantity:<[giveQuantity]> <[npc].as[entity].location.forward[1]>
+
+        - else:
+            - give <[giveItem]> quantity:<[giveQuantity]> to:<[player].inventory>
 
     script:
     - choose <[attrKey]>:
@@ -287,6 +303,7 @@ GiveCommand_CISK:
 
 StateCommand_CISK:
     type: task
+    debug: false
     commandData:
         attributeSubs:
             item: i
@@ -311,13 +328,6 @@ StateCommand_CISK:
             - if <[attrKey].is_in[get|set]>:
                 - define stateAction <[attrKey]>
 
-            - else if <[attrKey].is_in[player|npc|item]>:
-                - if <[attrVal].exists>:
-                    - define stateTarget <map[<[attrKey]>=<[attrVal]>]>
-
-                - else:
-                    - define stateTarget <map[<[attrKey]>=self]>
-
             - else if <[stateTarget].exists>:
                 - if <[stateAction]> == set && !<[stateMechanism].exists>:
                     - define stateMechanism <[attrKey]>
@@ -329,3 +339,10 @@ StateCommand_CISK:
 
                     - else:
                         - define stateMechanism <[attrVal]>
+
+            - else:
+                - if <[attrVal].exists>:
+                    - define stateTarget <map[<[attrKey]>=<[attrVal]>]>
+
+                - else:
+                    - define stateTarget <map[<[attrKey]>=self]>

@@ -144,19 +144,14 @@ ChestTransferInfluenceCalc:
     # Reduce order amounts, daily influences + add
     # required influence to militia guild
 
-    - ~yaml load:powerstruggle.yml id:ps
+    - flag server kingdoms.<[kingdom]>.powerstruggle.mercenaryGuild:+:<[influenceEquation]>
+    - flag server kingdoms.transferItemsToday.<[orderItem]>:-:<[orderAmount]>
 
-    - yaml id:ps set <[kingdom]>.mercenaryguild:+:<[influenceEquation]>
-    - yaml id:ps set transferItemsToday.<[orderItem]>:-:<[orderAmount]>
-
-    - if <yaml[ps].read[<[kingdom]>.mercenaryguild].is[MORE].than[1]>:
-        - yaml id:ps set <[kingdom]>.mercenaryguild:1
-
-    - ~yaml savefile:powerstruggle.yml id:ps
-    - yaml unload id:ps
+    - if <server.flag[kigndoms.<[kingdom]>.powerstruggle.mercenaryGuild].is[MORE].than[1]>:
+        - flag server kingdoms.<[kingdom]>.powerstruggle.mercenaryGuild:1
 
     - ~run CalcTotalInfluence def:<[kingdom]>
-    - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
     - flag player transferData:!
     #- flag player influenceType:!

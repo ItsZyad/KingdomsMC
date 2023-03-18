@@ -5,16 +5,13 @@ FastTravel:
         - narrate format:callout "You have fast travelled recently, please wait another <player.flag_expiration[fastTravelCooldown].from_now.formatted_words.color[red]>"
 
     - else:
-        - yaml load:kingdoms.yml id:kingdoms
         - define kingdom <player.flag[kingdom]>
         - define allKingdoms <list[centran|cambrian|raptoran|viridian]>
         - define allOtherClaims <list[]>
 
         - foreach <[allKingdoms].exclude[<[kingdom]>]> as:currkingdom:
-            - foreach <yaml[kingdoms].read[<[currKingdom]>.castle_territory].include[<yaml[kingdoms].read[<[currKingdom]>.core_claims]>]>:
+            - foreach <server.flag[kingdoms.<[currKingdom]>.claims.castle].include[<server.flag[kingdoms.<[currKingdom]>.claims.core]>]>:
                 - define allOtherClaims:->:<[value]>
-
-        - yaml id:kingdoms unload
 
         - define isPlayerInOtherClaims <[allOtherClaims].cuboid.contains[<player.location>]>
 

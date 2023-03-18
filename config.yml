@@ -98,8 +98,8 @@ Triggers:
             Must be looking in direction of NPC: true
             Must be able to see NPC: true
         Formats:
-            Player to NPC: "You -> <npc.nickname>: <text>"
-            Player to NPC overheard: "<player.name> -> <npc.nickname>: <text>"
+            Player to NPC: "<gray>You -> <npc.nickname>: <white><text>"
+            Player to NPC overheard: "<gray><player.name> -> <npc.nickname>: <white><text>"
         Appears globally:
             If triggers missing: true
             If triggers failed: false
@@ -131,10 +131,10 @@ Commands:
             # set to -1 to disable bystanders overhearing, or 0 for all players on the server to hear
             Range for bystanders: 5.0
         Formats:
-            No target: "[<[talker].name>]: <[message]>"
-            To target: "[<[talker].name>] -> You: <[message]>"
-            With target to bystanders: "[<[talker].name>] -> <[target].name>: <[message]>"
-            With targets to bystanders: "[<[talker].name>] -> [<[targets]>]: <[message]>"
+            No target: "<gray>[<[talker].name>]: <white><[message]>"
+            To target: "<gray>[<[talker].name>] -> You: <white><[message]>"
+            With target to bystanders: "<gray>[<[talker].name>] -> <[target].name>: <white><[message]>"
+            With targets to bystanders: "<gray>[<[talker].name>] -> [<[targets]>]: <white><[message]>"
     Delete:
         # Whether scripts are allowed to delete files from your server
         # This is mostly to clean up saves, but could potentially be abused.

@@ -122,7 +122,7 @@ ItemGradientData:
 
 # This script will loop through all the items that can
 # be shipped to the militia and assign them a value of
-# 1 or 0 in YAML to signify whether or not they're
+# 1 or 0 in flag to signify whether or not they're
 # available during this refresh.
 
 DailyOrderRefresh:
@@ -130,14 +130,12 @@ DailyOrderRefresh:
     script:
     - define refreshDecider <util.random.decimal[0.1].to[1]>
 
-    - yaml load:powerstruggle.yml id:ps
-
-    - foreach <yaml[ps].read[transferItemsToday].to_pair_lists>:
+    - foreach <server.flag[kingdoms.powerstruggleInfo.transferItems].to_pair_lists>:
         - define item <[value].get[1]>
         - define value <[value].get[2]>
 
         # if the weighting for each item is above the refresh
-        # threshold then assign the item key in YAML a value
+        # threshold then assign the item key in flag a value
         # representing the amount of available orders.
 
         # if not then set the value to 0.
@@ -156,14 +154,12 @@ DailyOrderRefresh:
             - define itemAmount <util.random.int[<[itemAmountWeight].div[2].round_up>].to[<[itemAmountWeight]>]>
             - narrate format:debug AMOUNT:<[itemAmount]>
 
-            - yaml id:ps set transferItemsToday.<[item]>:<[itemAmount]>
+            - flag server kingdoms.powerstruggleInfo.transferItems.<[item]>:<[itemAmount]>
 
         - else:
-            - yaml id:ps set transferItemsToday.<[item]>:0
+            - flag server kingdoms.powerstruggleInfo.transferItems.<[item]>:0
 
         - narrate format:debug -----------------------------
-    - yaml id:ps savefile:powerstruggle.yml
-    - yaml id:ps unload
 
 DailyOrderRefresh_Handler:
     type: world
@@ -182,7 +178,7 @@ TransferTakeoverChecker:
         - flag <[originalPlayer]> transferData:!
 
         - define kingdom <player.flag[kingdom]>
-        - define sameMaterialTransfers <server.flag[<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<[newPlayer].flag[transferData].get[material]>]>].exclude[false].size>
+        - define sameMaterialTransfers <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<[newPlayer].flag[transferData].get[material]>]>].exclude[false].size>
         - define newTransferID <[newPlayer].name>-<[newPlayer].flag[transferData].get[material]><[sameMaterialTransfers]>
 
         - flag server <[kingdom]>.powerstruggle.activeTransfers.<[newTransferID]>:<[transferInfo]>
@@ -254,7 +250,7 @@ TransferClaimConfirm_Handler:
         on player joins flagged:maintainedTransferRights:
         - define transferID <player.flag[maintainedTransferRights]>
         - define kingdom <player.flag[kingdom]>
-        - define transferInfo <server.flag[<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>]>
+        - define transferInfo <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>]>
         - define originalPlayer <[transferInfo].get[madeBy]>
 
         - clickable usages:1 until:10m save:AllowTransferTO:
@@ -305,7 +301,7 @@ TransferTracker_Command:
     description: Shows all of your kingdom's active transfer orders
     script:
     - define kingdom <player.flag[kingdom]>
-    - define transferFlag <server.flag[<[kingdom]>.powerstruggle.activeTransfers]>
+    - define transferFlag <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers]>
     - define transferItemList <list[]>
 
     - foreach <[transferFlag]> as:request:

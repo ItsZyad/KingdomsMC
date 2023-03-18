@@ -74,7 +74,7 @@ Loan_GUI:
     procedural items:
     - define loanAmounts <player.flag[loanData]>
     - define kingdom <player.flag[kingdom]>
-    - define existingLoans <server.flag[<[kingdom]>.loans].if_null[<list>]>
+    - define existingLoans <server.flag[kingdoms.<[kingdom]>.powerstruggle.loans].if_null[<list>]>
     - define outList <list[]>
     - define count 0
 
@@ -143,29 +143,21 @@ Loan_Handler:
     type: world
     events:
         on player clicks Loan_From_Fyndalin_Influence in GovernmentInfluence_Window:
-        - yaml load:powerstruggle.yml id:ps
-
         - define kingdom <player.flag[kingdom]>
-        - define totInfluence <yaml[ps].read[<[kingdom]>.fyndalingovt]>
+        - define totInfluence <server.flag[kingdoms.<[kingdom]>.fyndalinGovt]>
         - define loanAmounts <[totInfluence].round_to_precision[0.1].mul[10]>
 
         - flag player loanData:<[loanAmounts]>
         - inventory open d:Loan_GUI
         - flag player loanData:!
 
-        - yaml unload id:ps
-
         on player clicks AvailableLoan_Item in Loan_GUI:
         - define LoanGUI <inventory[LoanSelection_GUI]>
         - define kingdom <player.flag[kingdom]>
 
-        - yaml load:powerstruggle.yml id:ps
-
-        - if <yaml[ps].read[<[kingdom]>.dailyinfluences]> <= 0:
+        - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints]> <= 0:
             - narrate format:callout "Your kingdom has exhasuted its influence points today"
             - determine cancelled
-
-        - yaml is:ps unload
 
         # When the player opens the 'TAKE LOAN' window instead of give loan
         # replace all the influence bonuses with influence hits instead to
@@ -180,26 +172,21 @@ Loan_Handler:
         - define loanData <context.item.flag[loanData]>
         - define kingdom <player.flag[kingdom]>
         - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
-        - yaml load:kingdoms.yml id:kingdoms
 
-        - if <yaml[kingdoms].read[<[kingdom]>.balance].is[MORE].than[<[loanData].get[amount]>]>:
+        - if <server.flag[kingdoms.<[kingdom]>.balance].is[MORE].than[<[loanData].get[amount]>]>:
             # Subtract from kingdom, add to issuer
-            - yaml id:kingdoms set <[kingdom]>.balance:-:<[loanData].get[amount]>
-            - yaml id:kingdoms set <[loanData].get[issuer]>.balance:+:<[loanData].get[amount]>
+            - flag server kingdoms.<[kingdom]>.balance:-:<[loanData].get[amount]>
+            - flag server kingdoms.<[loanData].get[issuer]>.balance:+:<[loanData].get[amount]>
 
-            - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members]>|<player>
+            - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members]>|<player>
 
             # Remove that loan from the kingdom's outstanding debt
-            - flag server <[kingdom]>.loans:<server.flag[<[kingdom]>].get[loans].exclude[<[loanData]>]>
-
-            - yaml id:kingdoms savefile:kingdoms.yml
-
+            - flag server <[kingdom]>.loans:<server.flag[kingdoms.<[kingdom]>.powerstruggle.loans].exclude[<[loanData]>]>
             - narrate format:callout "Successfully paid back loan debt to the <[kingdomName].color[aqua].bold> worth: $<[loanData].get[amount].color[red].bold>"
 
         - else:
             - narrate format:callout "You do not have enough money in your kingdom's balance to pay back this debt!"
 
-        - yaml id:kingdoms unload
         - inventory close
 
         on player clicks item in LoanSelection_GUI:
@@ -209,23 +196,17 @@ Loan_Handler:
         - else if <context.item.has_flag[amount]>:
             - define amount <context.item.flag[amount]>
             - define kingdom <player.flag[kingdom]>
-            - yaml load:kingdoms.yml id:kingdoms
-            - yaml load:powerstruggle.yml id:ps
 
-            - if <yaml[ps].read[<[kingdom]>.dailyinfluences]> <= 0:
+            - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints]> <= 0:
                 - narrate format:callout "Your kingdom has exhasuted its influence points today"
                 - determine cancelled
 
-            - define fyndalinTotal <yaml[kingdoms].read[fyndalin.balance]>
+            - define fyndalinTotal <server.flag[kingdoms.fyndalin.balance]>
 
             - if <[amount].is[LESS].than[<[fyndalinTotal].add[1000]>]>:
-                - yaml id:kingdoms set fyndalin.balance:-:<[amount]>
-                - yaml id:kingdoms set <[kingdom]>.balance:+:<[amount]>
-                - yaml id:kingdoms savefile:kingdoms.yml
-                - yaml id:kingdoms unload
-
-                - yaml id:ps set <[kingdom]>.dailyinfluences:--
-                - yaml id:ps savefile:powerstruggle.yml
+                - flag server kingdoms.fyndalin.balance:-:<[amount]>
+                - flag server kingdoms.<[kingdom]>.balance:+:<[amount]>
+                - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:--
 
                 - define daysToDue <[amount].div[1000].add[<[amount].div[2000].round>]>
                 - define due <util.time_now.add[<[daysToDue]>d]>
@@ -235,16 +216,14 @@ Loan_Handler:
                 ## until I start work on the global economy system;;
                 - define loanMap <map[amount=<[amount]>;dueDate=<[due]>;interest=0;issuer=fyndalin]>
 
-                - flag server <[kingdom]>.loans:->:<[loanMap]>
+                - flag server kingdoms.<[kingdom]>.loans:->:<[loanMap]>
 
                 - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
                 - inventory close
                 - narrate format:callout "<[kingdomName]> has taken out a loan of $<[amount]> from Fyndalin. Your kingdom will have <[due].from_now.formatted.color[red].bold> to pay back this loan or else you will default!"
                 - narrate "<&sp><gray>To pay back your loans access the loans section of the <element[/influence options].color[red].bold> command again!"
 
-                - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
-
-            - yaml id:ps unload
+                - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
             - else:
                 - inventory close
@@ -300,9 +279,9 @@ LoanExpiryChecker:
     type: task
     definitions: offer
     script:
-    - foreach <server.flag[fyndalin].get[loanOffers]>:
+    - foreach <server.flag[kingdoms.fyndalin].get[loanOffers]>:
         - if <[value]> == <[offer]>:
-            - flag server fyndalin.loanOffers:<-:<[value]>
+            - flag server kingdoms.fyndalin.loanOffers:<-:<[value]>
 
 LoanGive_Handler:
     type: world
@@ -311,13 +290,9 @@ LoanGive_Handler:
         - define loanGUI <inventory[LoanSelection_GUI]>
         - define kingdom <player.flag[kingdom]>
 
-        - yaml load:powerstruggle.yml id:ps
-
-        - if <yaml[ps].read[<[kingdom]>.dailyinfluences]> <= 0:
+        - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints]> <= 0:
             - narrate format:callout "Your kingdom has exhasuted its influence points today"
             - determine cancelled
-
-        - yaml is:ps unload
 
         # When the player opens the 'GIVE LOAN' window instead of take loan
         # replace all the influence hits with influence bonuses instead to
@@ -335,7 +310,7 @@ LoanGive_Handler:
 
         # Loop through Fyndalin's active loan offers and check if one of
         # them has the player's kingdom name attached.
-        - foreach <server.flag[fyndalin].get[loanOffers]>:
+        - foreach <server.flag[kingdoms.fyndalin].get[loanOffers]>:
             - if <[value].get[kingdom]> == <[kingdom]>:
                 - define hasMadeOffer true
                 - define offerDetails <[value]>
@@ -365,9 +340,9 @@ LoanGive_Handler:
         on player clicks LoanCancelConfirm_Item in LoanCancelConfirmation_Window:
         - define kingdom  <player.flag[kingdom]>
 
-        - foreach <server.flag[fyndalin].get[loanOffers]>:
+        - foreach <server.flag[kingdoms.fyndalin].get[loanOffers]>:
             - if <[value].get[kingdom]> == <[kingdom]>:
-                - flag server fyndalin.loanOffers:<-:<[value]>
+                - flag server kingdoms.fyndalin.loanOffers:<-:<[value]>
                 - foreach stop
 
         - inventory close
@@ -381,9 +356,7 @@ LoanGive_Handler:
             - define amount <context.item.flag[amount]>
             - define expiry <util.time_now.add[7d]>
 
-            - yaml load:kingdom.yaml id:kingdoms
-
-            - if <yaml[kingdoms].read[<[kingdom]>.balance].sub[<[amount]>].is[LESS].than[0]>:
+            - if <server.flag[kingdoms.<[kingdom]>.balance].sub[<[amount]>].is[LESS].than[0]>:
                 - narrate format:debug "Your kingdom does not have the sufficient funds to make this loan offer!"
 
             - else:
@@ -392,9 +365,7 @@ LoanGive_Handler:
                     kingdom: <[kingdom]>
                     expiry: <[expiry]>
 
-                - flag server fyndalin.loanOffers:->:<[loanOffer]>
+                - flag server kingdoms.fyndalin.loanOffers:->:<[loanOffer]>
                 - runlater delay:7d LoanExpiryChecker def:<[loanOffer]>
                 - inventory close
                 - narrate format:callout "Your loan offer has been made to Fyndalin. You must wait until this offer expires in a week or Fyndalin accepts it before making another."
-
-            - yaml id:kingdoms unload

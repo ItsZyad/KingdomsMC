@@ -3,35 +3,26 @@ DoorInteractCode:
     debug: false
     script:
     - if !<player.has_permission[kingdoms.admin.bypassclickcheck]>:
-        - yaml load:kingdoms.yml id:kingdoms
-
         - define kingdom <player.flag[kingdom]>
 
-        - if <yaml[kingdoms].read[all_claims].contains[<context.location.chunk>]>:
-            - if <yaml[kingdoms].read[<[kingdom]>.war_status]> != true:
-                - yaml load:outposts.yml id:outp
-
-                - define castle <yaml[kingdoms].read[<[kingdom]>.castle_territory]>
-                - define core <yaml[kingdoms].read[<[kingdom]>.core_claims].as[list]>
-
+        - if <server.flag[kingdoms.claimInfo.allClaims].contains[<context.location.chunk>]>:
+            - if <server.flag[kingdoms.<[kingdom]>.warStatus]> != true:
+                - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
+                - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
                 - define castleCore <[core].include[<[castle]>].exclude[0]>
-
                 - define isInOwnTerritory false
 
                 - foreach <[castleCore]>:
                     - if <[value].cuboid.contains[<context.location>]>:
                         - define isInOwnTerritory true
 
-                - foreach <yaml[outp].read[<player.flag[kingdom]>].keys.exclude[totalupkeep]>:
+                - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
                     - if <cuboid[<[value]>].players.contains[<player>]>:
                         - define isInOwnTerritory true
 
                 - if !<[isInOwnTerritory]>:
                     - determine cancelled
 
-                - yaml id:outp unload
-
-        - yaml id:kingdoms unload
 
 TerritoryHandler:
     type: world
@@ -50,8 +41,6 @@ TerritoryHandler:
         - inject DoorInteractCode
 
         on player damaged by entity:
-        - yaml load:kingdoms.yml id:kingdoms
-
         # If player has taken damage within their own core/castle
         # territory or within their own outpost then cancel the
         # damage event.
@@ -59,10 +48,8 @@ TerritoryHandler:
         - if <context.entity.is_player>:
             - define belligerent <context.entity>
             - define belligerentKingdom <context.entity.flag[kingdom]>
-
-            - define castle <yaml[kingdoms].read[<[belligerentKingdom]>.castle_territory]>
-            - define core <yaml[kingdoms].read[<[belligerentKingdom]>.core_claims].as[list]>
-
+            - define castle <server.flag[kingdoms.<[belligerentKingdom]>.claims.castle].as[list]>
+            - define core <server.flag[kingdoms.<[belligerentKingdom]>.claims.core].as[list]>
             - define castleCore <[core].include[<[castle]>].exclude[0]>
 
             - foreach <[castleCore]>:
@@ -72,37 +59,26 @@ TerritoryHandler:
         - if <player.has_flag[kingdom]>:
             - define kingdom <player.flag[kingdom]>
 
-            - if <yaml[kingdoms].read[<[kingdom]>.war_status]> != true:
-                - yaml load:outposts.yml id:outp
-
-                - define castle <yaml[kingdoms].read[<[kingdom]>.castle_territory]>
-                - define core <yaml[kingdoms].read[<[kingdom]>.core_claims].as[list]>
-
+            - if <server.flag[kingdoms.<[kingdom]>.warStatus]> != true:
+                - define castle <server.flag[kingdoms.<[belligerentKingdom]>.claims.castle].as[list]>
+                - define core <server.flag[kingdoms.<[belligerentKingdom]>.claims.core].as[list]>
                 - define castleCore <[core].include[<[castle]>].exclude[0]>
 
                 - foreach <[castleCore]>:
                     - if <[value].cuboid.contains[<context.entity.location>]>:
                         - determine cancelled
 
-                - foreach <yaml[outp].read[<player.flag[kingdom]>].keys.exclude[totalupkeep]>:
+                - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
                     - if <cuboid[<[value]>].players.contains[<player>]>:
                         - determine cancelled
 
-                - yaml unload id:outp
-
-            - yaml unload id:kingdoms
-
         on player empties bucket:
-        - yaml load:kingdoms.yml id:kingdoms
-
         - if <player.has_flag[kingdom]>:
             - define kingdom <player.flag[kingdom]>
 
             - if <server.has_flag[RestrictedCreative]>:
                 - if !<player.has_permission[kingdoms.admin.bypassrc]>:
-                    - yaml load:outposts.yml id:outp
-
-                    - define castleCore <yaml[kingdoms].read[<[kingdom]>.castle_territory].include[<yaml[kingdoms].read[<[kingdom]>.core_claim]>]>
+                    - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
                     - define inOwnTerritory false
 
                     # Note to self: this may not be very efficient. Try consolidating
@@ -118,19 +94,14 @@ TerritoryHandler:
                         - determine cancelled
 
                     - else:
-                        - foreach <yaml[outp].read[<player.flag[kingdom]>].keys.exclude[totalupkeep]>:
+                        - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
                             - if <cuboid[<[value]>].players.contains[<player>]>:
                                 - determine cancelled
-
-                    - yaml id:outp unload
 
         - else:
             - determine cancelled
 
-        - yaml id:kingdoms unload
-
         on player places block:
-        - yaml load:kingdoms.yml id:kingdoms
         - define kingdom <player.flag[kingdom]>
 
         - if !<player.has_flag[kingdom]>:
@@ -138,7 +109,7 @@ TerritoryHandler:
 
         - define isInAnyClaim false
 
-        - foreach <yaml[kingdoms].read[all_claims]>:
+        - foreach <server.flag[kingdoms.claimInfo.allClaims]>:
             - if <[value]> == <context.location.chunk>:
                 - define isInAnyClaim true
                 - foreach stop
@@ -147,11 +118,9 @@ TerritoryHandler:
         # outpost territory then undo the block place
 
         - if <[isInAnyClaim]>:
-            - if !<yaml[kingdoms].read[<[kingdom]>.war_status]>:
+            - if !<server.flag[kingdoms.<[kingdom]>.warStatus]>:
                 - if !<player.has_permission[kingdoms.admin.bypassrc]>:
-                    - yaml load:outposts.yml id:outp
-
-                    - define castleCore <yaml[kingdoms].read[<[kingdom]>.castle_territory].include[<yaml[kingdoms].read[<[kingdom]>.core_claims]>]>
+                    - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
                     - define inOwnTerritory false
 
                     # Note to self: this may not be very efficient. Try consolidating
@@ -167,14 +136,10 @@ TerritoryHandler:
                         - determine cancelled
 
                     - else:
-                        - if <yaml[outp].read[<player.flag[kingdom]>].keys.exclude[totalupkeep].size> != 0:
-                                - foreach <yaml[outp].read[<player.flag[kingdom]>].keys.exclude[totalupkeep]>:
-                                    - if <cuboid[<[value]>].players.contains[<player>]>:
-                                        - determine cancelled
-
-                    - yaml unload id:outp
-
-            - yaml unload id:kingdoms
+                        - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size> != 0:
+                            - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
+                                - if <cuboid[<[value]>].players.contains[<player>]>:
+                                    - determine cancelled
 
         - else:
             - if <server.has_flag[RestrictedCreative]>:
@@ -182,7 +147,6 @@ TerritoryHandler:
                     - determine cancelled
 
         on player breaks block:
-        - yaml load:kingdoms.yml id:kingdoms
         - define kingdom <player.flag[kingdom]>
 
         - if !<player.has_flag[kingdom]>:
@@ -190,7 +154,7 @@ TerritoryHandler:
 
         - define isInAnyClaim false
 
-        - foreach <yaml[kingdoms].read[all_claims]>:
+        - foreach <server.flag[kingdoms.claimInfo.allClaims]>:
             - if <[value]> == <context.location.chunk>:
                 - define isInAnyClaim true
                 - foreach stop
@@ -199,11 +163,9 @@ TerritoryHandler:
         # outpost territory then undo the block place
 
         - if <[isInAnyClaim]>:
-            - if !<yaml[kingdoms].read[<[kingdom]>.war_status]>:
+            - if !<server.flag[kingdoms.<[kingdom]>.warStatus]>:
                 - if !<player.has_permission[kingdoms.admin.bypassrc]>:
-                    - yaml load:outposts.yml id:outp
-
-                    - define castleCore <yaml[kingdoms].read[<[kingdom]>.castle_territory].include[<yaml[kingdoms].read[<[kingdom]>.core_claims]>]>
+                    - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
                     - define inOwnTerritory false
 
                     # Note to self: this may not be very efficient. Try consolidating
@@ -218,14 +180,10 @@ TerritoryHandler:
                         - determine cancelled
 
                     - else:
-                        - if <yaml[outp].read[<player.flag[kingdom]>].keys.exclude[totalupkeep].size> != 0:
-                            - foreach <yaml[outp].read[<player.flag[kingdom]>].keys.exclude[totalupkeep]>:
+                        - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size> != 0:
+                            - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
                                 - if <cuboid[<[value]>].players.contains[<player>]>:
                                     - determine cancelled
-
-                    - yaml unload id:outp
-
-            - yaml unload id:kingdoms
 
         - else:
             - if <server.has_flag[RestrictedCreative]>:
@@ -249,34 +207,28 @@ EntityTerritoryHandler:
         - define blockedSpawnTypes <list[NATURAL|LIGHTNING|SPAWNER|JOCKEY]>
 
         - if <[blockedSpawnTypes].contains[<context.reason>]>:
-            - yaml load:kingdoms.yml id:kingdoms
             - define kingdomList <proc[GetKingdomList].context[true]>
 
             - foreach <[kingdomList]> as:kingdom:
-                - define castle <yaml[kingdoms].read[<[kingdom]>.castle_territory]>
-                - define core <yaml[kingdoms].read[<[kingdom]>.core_claims].as[list]>
+                - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
+                - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
                 - define kingdomAllTerritory <[core].include[<[castle]>].exclude[0]>
 
                 - foreach <[kingdomAllTerritory]>:
                     - if <[value].cuboid.contains[<context.location>]>:
                         - determine cancelled
 
-            - yaml id:kingdoms unload
-
         on entity explodes:
-        - yaml load:kingdoms.yml id:kingdoms
         - define kingdomList <proc[GetKingdomList].context[true]>
 
         - foreach <[kingdomList]> as:kingdom:
-            - define castle <yaml[kingdoms].read[<[kingdom]>.castle_territory]>
-            - define core <yaml[kingdoms].read[<[kingdom]>.core_claims].as[list]>
+            - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
+            - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
 
             - define kingdomAllTerritory <[core].include[<[castle]>]>
 
             - foreach <[kingdomAllTerritory]>:
                 - if <[value].cuboid.contains[<context.location>]>:
-                    - if <yaml[kingdoms].read[<[kingdom]>.war_status]> != true:
+                    - if <server.flag[kingdoms.<[kingdom]>.warStatus]> != true:
                         - determine cancelled
                         - foreach stop
-
-        - yaml id:kingdoms unload

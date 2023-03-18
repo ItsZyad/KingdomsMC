@@ -37,9 +37,7 @@ MPHostile_Item:
 ElectionScheduler:
     type: task
     script:
-    - yaml load:powerstruggle.yml id:ps
-
-    - define nextElection <yaml[ps].read[global.nextelection]>
+    - define nextElection <server.flag[kingdoms.powerstruggleInfo.nextElection]>
     - define timeNow <util.time_now>
     - define isAfterElection <[timeNow].is_after[<[nextElection]>]>
 
@@ -51,7 +49,7 @@ ElectionScheduler:
         - define highestInfluenceKingdom none
 
         - foreach <[kingdomList]> as:kingdom:
-            - define influence <yaml[ps].read[<[kingdom]>.electioninfluence]>
+            - define influence <server.flag[kingdoms.<[kingdom]>.powerstruggle.electionInfluence]>
 
             - if <[influence].is[MORE].than[<[highestInfluence]>]>:
                 - define highestInfluence <[influence]>
@@ -59,13 +57,10 @@ ElectionScheduler:
 
         - define randomDayCount <util.random.int[21].to[42]>
         - define scheduledDate <util.time_now.add[<[randomDayCount]>d]>
-        - yaml id:ps set global.nextelection:<[scheduledDate]>
-        - yaml id:ps savefile:powerstruggle.yml
+        - flag server kingdoms.powerstruggleInfo.nextElection:<[scheduledDate]>
 
         - determine <[highestInfluenceKingdom]>|<[highestInfluence]>
-        - yaml id:ps unload
 
-    - yaml id:ps unload
     - determine null
 
 VoteRigging_Handler:
@@ -79,9 +74,5 @@ VoteRigging_Handler:
         - inventory open d:VoteRigInfo_Window
 
         on player opens VoteRigInfo_Window:
-        - yaml load:powerstruggle.yml id:ps
-        - define nextElection <yaml[ps].read[global.nextelection]>
-
+        - define nextElection <server.flag[kingdoms.powerstruggleInfo.nextElection]>
         - inventory d:<context.inventory> adjust slot:14 lore:<list[<[nextElection].from_now.formatted>]>
-
-        - yaml id:ps unload

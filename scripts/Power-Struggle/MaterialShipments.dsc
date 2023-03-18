@@ -17,10 +17,8 @@ MaterialTransferOption_Handler:
         - determine cancelled
 
         on player opens MaterialTransferSelection_Window:
-        - yaml load:powerstruggle.yml id:ps
-
         - foreach <context.inventory.list_contents> as:item:
-            - define amountAvailable <yaml[ps].read[transferItemsToday.<[item].material.name>]>
+            - define amountAvailable <server.flag[kingdoms.powerstruggleInfo.transferItems.<[item].material.name>]>
 
             - if <[amountAvailable].is_integer.if_null[false]> && <[amountAvailable].is[MORE].than[0]>:
                 - inventory adjust d:<context.inventory> slot:<[loop_index]> "lore:|Present Orders: <[amountAvailable].color[aqua]>"
@@ -28,22 +26,19 @@ MaterialTransferOption_Handler:
             - else:
                 - inventory adjust d:<context.inventory> slot:<[loop_index]> "lore:|<red>No Present Orders!"
 
-        - yaml id:ps unload
-
         on player clicks in MaterialTransferSelection_Window:
         - if <context.item.material.name> == air || <context.clicked_inventory.id_holder> == <player>:
             - determine cancelled
 
-        - yaml load:powerstruggle.yml id:ps
         - define kingdom <player.flag[kingdom]>
 
-        - if <yaml[ps].read[<[kingdom]>.dailyinfluences]> <= 0:
+        - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints]> <= 0:
             - narrate format:callout "Your kingdom has exhasuted its influence points today"
             - determine cancelled
 
         - if <context.item.script.name.if_null[true]> != Back_Influence:
             - if !<player.has_flag[transferData.amount]>:
-                - if <yaml[ps].read[transferItemsToday.<context.item.material.name>]> != 0:
+                - if <server.flag[kingdoms.powerstruggleInfo.transferItems.<context.item.material.name>]> != 0:
 
                     - definemap tData:
                         transferType: masons
@@ -57,10 +52,9 @@ MaterialTransferOption_Handler:
 
                 - else:
                     - narrate format:callout "There are no present orders for this type of item!"
+
             - else:
                 - narrate format:callout "You are already making an item transfer transaction"
-
-        - yaml id:ps unload
 
         on player places *_sign:
         - if <player.has_flag[transferData]>:
@@ -120,11 +114,8 @@ IngestMaterialTransfer:
 
                     - define kingdom <player.flag[kingdom]>
 
-                    - yaml load:powerstruggle.yml id:ps
-                    - yaml id:ps set <[kingdom]>.masonsguild:+:<[influenceEquation]>
-                    - yaml id:ps set transferItemsToday.<[transferItem]>:-:<[transferAmount]>
-                    - yaml id:ps savefile:powerstruggle.yml
-                    - yaml id:ps unload
+                    - flag server kingdoms.<[kingdom]>.powerstruggle.masonsGuild:+:<[influenceEquation]>
+                    - flag server kingdoms.powerstruggleInfo.transferItems.<[transferItem]>:-:<[transferAmount]>
 
                     - run CalcTotalInfluence def:<[kingdom]>
 
@@ -152,7 +143,7 @@ IngestMaterialTransfer:
                     - flag player transferVaultLoc:!
                     - flag player transferData:!
 
-                    - run SidebarLoader def.target:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
+                    - run SidebarLoader def.target:<server.flag[kigndoms.<[kingdom]>.members].include[<server.online_ops>]>
                     - narrate format:callout "Materials sent! Any remaining blocks will be found in the chest"
 
                 - else:

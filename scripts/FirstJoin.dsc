@@ -17,6 +17,7 @@ CustomJoinMessages:
 
 KingdomSelection_Handler:
     type: world
+    debug: false
     events:
         on player joins:
         # Get players out of the pre-migration world

@@ -18,13 +18,13 @@ Bribe_Handler:
         - ratelimit <player> 1t
 
         - define influenceTypeRaw <context.inventory.script.name.split[Influence].get[1]>
-        - yaml load:powerstruggle.yml id:ps
+        - define kingdom <player.flag[kingdom]>
 
         # If the kingdom has daily influences left and the player
         # does not have a cooldown then close the window and
         # allow the player to type in an amount to bribe
 
-        - if <yaml[ps].read[<player.flag[kingdom]>.dailyinfluences].is[MORE].than[0]>:
+        - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints].is[MORE].than[0]>:
             - if !<player.has_flag[influenceCooldown.<[influenceTypeRaw]>]>:
                 - flag <player> noChat.bribe.influenceType:<[influenceTypeRaw]> expire:1m
                 - inventory close
@@ -51,8 +51,6 @@ Bribe_Handler:
 
         - define kingdom <player.flag[kingdom]>
         - define influenceType <player.flag[noChat.bribe.influenceType]>
-        - yaml load:kingdoms.yml id:kingdoms
-        - yaml load:powerstruggle.yml id:ps
 
         - if <context.message.is_integer>:
             - flag player bribeAmount:<context.message>
@@ -66,17 +64,17 @@ Bribe_Handler:
         - define bribeAmount <player.flag[bribeAmount]>
 
         # If the bribe amount in less than the kingdom's balance and the minimum bribe amount
-        - if <yaml[kingdoms].read[<[kingdom]>.balance].is[OR_MORE].than[<[bribeAmount]>]>:
+        - if <server.flag[kingdoms.<[kingdom]>.balance].is[OR_MORE].than[<[bribeAmount]>]>:
             - if <[bribeAmount].is[OR_MORE].than[<[minBribe]>]>:
 
-                - define influenceTarget citypopulation
+                - define influenceTarget cityPopulation
                 - choose <[influenceType]>:
                     - case mercenary:
-                        - define influenceTarget mercenaryguild
+                        - define influenceTarget mercenaryGuild
                     - case government:
-                        - define influenceTarget fyndalingovt
+                        - define influenceTarget fyndalinGovt
                     - case masons:
-                        - define influenceTarget masonsguild
+                        - define influenceTarget masonsGuild
 
                 # If player doesn't have a cooldown for influence
                 # actions then add influence to the target faction
@@ -86,9 +84,9 @@ Bribe_Handler:
                 - if !<player.has_flag[influenceCooldown.<[influenceType]>]>:
                     - define baseValue <element[0.35].mul[<element[1.09].div[1200].mul[<[bribeAmount]>].log[10].power[2]>].div[19]>
 
-                    - yaml id:ps set <[kingdom]>.<[influenceTarget]>:+:<[baseValue].round_to_precision[0.001]>
-                    - yaml id:kingdoms set <[kingdom]>.balance:-:<[bribeAmount]>
-                    - yaml id:ps set <[kingdom]>.dailyinfluences:-:1
+                    - flag server kingdoms.<[kingdom]>.powerstruggle.<[influenceTarget]>:+:<[baseValue].round_to_precision[0.001]>
+                    - flag server kingdoms.<[kingdom]>.balance:-:<[bribeAmount]>
+                    - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:-:1
 
                     - narrate format:callout "An envoy has been sent containing the funds. Please wait 10 hours before sending another."
 
@@ -103,15 +101,8 @@ Bribe_Handler:
         - else:
             - narrate format:callout "There is not enough money in your kingdom's bank to complete this transaction!"
 
-        # Save and unload yaml
-
-        - yaml savefile:kingdoms.yml id:kingdoms
-        - yaml savefile:powerstruggle.yml id:ps
-        - yaml id:kingdoms unload
-        - yaml id:ps unload
-
         - run CalcTotalInfluence def:<[kingdom]>
-        - run SidebarLoader def.target:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
         - flag player bribeAmount:!
         - flag player noChat:!

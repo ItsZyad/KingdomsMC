@@ -5,7 +5,6 @@
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Jun 2021
 ## @Script Ver: v0.9
-## @ Clean Code Classification: 2
 ##
 ##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------
@@ -122,8 +121,6 @@ MinerGeneration:
     # Note: be sure to add some code which flags all miners RNPCs
     #       with the block build-up of their area as they're created
 
-    - yaml load:kingdoms.yml id:kingdoms
-
     - foreach <util.notes[cuboids].filter_tag[<[filter_value].starts_with[cu@INTERNAL_mine]>]>:
 
         # Don't forget to add netherrack and quartz for nether update #
@@ -137,7 +134,7 @@ MinerGeneration:
         # If the NPC's kingdom is not currently in a state of bankruptcy (4+
         # days in debt)
 
-        - if !<proc[IsKingdomBankrupt].context[<yaml[kingdoms].parsed_key[].deep_get[<player.flag[kingdom]>.balance]>|<[npc].flag[kingdom]>]>:
+        - if !<proc[IsKingdomBankrupt].context[<server.flag[kingdoms.<[npc].flag[kingdom]>.balance]>|<[npc].flag[kingdom]>]>:
             - define npcLevel <[npc].flag[Level]>
             #- define npcIteration <element[100].sub[<[npcLevel]>].round_up_to_precision[10].div[10]>
             - define npcIteration 1
@@ -187,7 +184,7 @@ MinerGeneration:
 
                                 # Modify the possibility of getting extra items
                                 # by the second value in the outpostMod list
-                                # stored in YAML
+                                # stored in flag system
 
                                 - give <script[TrueItemRef].data_key[<[randomItem]>]> to:<[npc].inventory> quantity:<[outpostMod].get[2]>
 

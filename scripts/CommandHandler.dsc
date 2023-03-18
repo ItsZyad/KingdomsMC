@@ -124,15 +124,13 @@ Kingdoms_Command:
         - define playerChunk <player.location.chunk>
         - define chunkList <list[]>
 
-        - yaml load:kingdoms.yml id:kingdoms
-
         - repeat 10 from:-5 as:zChunk:
             - repeat 19 from:-9 as:xChunk:
                 - define currentChunk <[playerChunk].add[<[xChunk]>,<[zChunk]>]>
 
-                - if <yaml[kingdoms].read[all_claims].contains[<[currentChunk]>]>:
-                    - foreach <yaml[kingdoms].read[].keys.exclude[all_claims|version|kingdom_real_names]> as:kingdom:
-                        - define kingdomTerritory <yaml[kingdoms].read[<[kingdom]>.castle_territory].include[<yaml[kingdoms].read[<[kingdom]>.core_claims]>]>
+                - if <server.flag[kingdoms.allClaims].contains[<[currentChunk]>]>:
+                    - foreach <server.flag[kingdoms].keys.exclude[allClaims]> as:kingdom:
+                        - define kingdomTerritory <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
                         - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
 
                         - if <[currentChunk]> == <[playerChunk]>:
@@ -150,8 +148,6 @@ Kingdoms_Command:
 
                 - else:
                     - define chunkList:->:<element[P].color[white].on_hover[<[currentChunk]>]>
-
-        - yaml id:kingdoms unload
 
         - define chunkList <[chunkList].sub_lists[19]>
         - narrate "<gold>=-=-=-=-=-= <element[Chunk Map].color[#f7c64b]> =-=-=-=-=-=-="
@@ -256,9 +252,8 @@ Kingdom_Command:
             - determine <script[KingdomRealShortNames].data_key[].values.exclude[data]>
 
         - else if <context.args.get[2].starts_with[kingdom<&co>]>:
-            - yaml load:kingdoms.yml id:kingdoms
             - define kingdom <player.flag[kingdom]>
-            - define warpList <yaml[kingdoms].read[<[kingdom]>.warp_location].keys>
+            - define warpList <server.flag[kingdoms.<[kingdom]>.warps].keys>
             - determine <[warpList]>
 
         - define kingdomRealNames <script[KingdomRealShortNames].data_key[].values.exclude[data]>
@@ -281,7 +276,6 @@ Kingdom_Command:
 
     - else if <context.args.get[1]> == outline:
         # DEFINE PARAM GLOBALS #
-        - yaml load:kingdoms.yml id:kingdoms
         - define param <context.args.get[2]>
         - define jointCuboid 0
         - define persistTime 10
@@ -290,12 +284,9 @@ Kingdom_Command:
         - if <context.args.size.is[LESS].than[2]>:
             - narrate format:callout "Insufficient or too many parameters. Please specify either castle or core territory to outline"
 
-        - else if <[param]> == castle:
-            - define jointCuboid <yaml[kingdoms].read[<[kingdom]>.castle_territory].get[1].cuboid.if_null[0]>
-
-        - else if <[param]> == core:
-            - define jointCuboid <yaml[kingdoms].read[<[kingdom]>.core_claims].get[1].cuboid.if_null[0]>
-            - define territoryType core_claims
+        - else if <[param].is_in[castle|core]>:
+            - define territoryType <[param]>
+            - define jointCuboid <server.flag[kingdoms.<[kingdom]>.claims.<[param]>].get[1].cuboid.if_null[0]>
 
         - else:
             - narrate format:callout "<[param].to_titlecase> is not a valid territory type!"
@@ -325,7 +316,7 @@ Kingdom_Command:
         # excluding the first territory since the joinCuboid is initialized with the first
         # already added
 
-        - foreach <yaml[kingdoms].read[<[kingdom]>.<[territoryType]>].exclude[<yaml[kingdoms].read[<[kingdom]>.<[territoryType]>].get[1]>]>:
+        - foreach <server.flag[kingdoms.<[kingdom]>.<[territoryType]>].exclude[<server.flag[kingdoms.<[kingdom]>.<[territoryType]>].get[1]>]>:
             - define jointCuboid <[jointCuboid].add_member[<[value].cuboid>]>
 
         # Show the borders at different altitudes depending on if the player is flying or
@@ -336,8 +327,6 @@ Kingdom_Command:
 
         - else:
             - showfake red_stained_glass <[jointCuboid].outline_2d[<player.location.y.add[20]>]> duration:<[persistTime]>
-
-        - yaml id:kingdoms unload
 
     #------------------------------------------------------------------------------------------------------------------------
 
@@ -352,7 +341,7 @@ Kingdom_Command:
             - narrate format:callout "You are now in core claiming mode"
             - narrate format:callout "Use /claim to claim a chunk for your kingdom!"
 
-            - define realPrestige <element[100].sub[<yaml[kingdoms].read[<[kingdom]>.prestige]>]>
+            - define realPrestige <element[100].sub[<server.flag[kingdoms.<[kingdom]>.prestige]>]>
             - define prestigeMultiplier <util.e.power[<element[0.02186].mul[<[realPrestige]>]>].sub[0.9]>
             - define corePrice <[prestigeMultiplier].mul[100].round_to_precision[100]>
 
@@ -368,18 +357,13 @@ Kingdom_Command:
 
         - if <[param]> == unclaim:
             #- if <player.has_permission[kingdoms.admin.unclaim]> || <player.is_op>:
-            - yaml id:kingdoms load:kingdoms.yml
 
-            - if <yaml[kingdoms].read[<player.flag[kingdom]>.castle_territory].contains[<player.location.chunk>]>:
-                - yaml id:kingdoms set <player.flag[kingdom]>.castle_territory:<-:<player.location.chunk>
-                - yaml id:kingdoms set all_claims:<-:<player.location.chunk>
-                - yaml id:kingdoms set <player.flag[kingdom]>.castle_territory_amount:--
+            - if <server.flag[kingdoms.<player.flag[kingdom]>.claims.castle].contains[<player.location.chunk>]>:
+                - flag server kingdoms.<player.flag[kingdom]>.claims.castle:<-:<player.location.chunk>
+                - flag server kingdoms.allClaims:<-:<player.location.chunk>
 
             - else:
                 - narrate format:admin "This area is not a castle claim"
-
-            - yaml id:kingdoms savefile:kingdoms.yml
-            - yaml id:kingdoms unload
 
             #- else:
             #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
@@ -398,7 +382,7 @@ Kingdom_Command:
             #- else:
             #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
 
-        - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
     #------------------------------------------------------------------------------------------------------------------------
 
@@ -407,33 +391,23 @@ Kingdom_Command:
     # extent of each kingdom is
 
     - else if <context.args.get[1]> == layclaim:
-        - yaml load:kingdoms.yml id:kingdoms
-
         - narrate "Making unofficial claim to: <player.location.chunk>"
-        - yaml id:kingdoms set <player.flag[kingdom]>.unofficial_claim:->:<player.location.chunk>
-
-        - yaml savefile:kingdoms.yml id:kingdoms
-        - yaml unload id:kingdoms
+        - flag server kingdoms.<player.flag[kingdom]>.unofficial_claim:->:<player.location.chunk>
 
     #------------------------------------------------------------------------------------------------------------------------
 
     - else if <context.raw_args> == balance:
-        - yaml load:kingdoms.yml id:kingdoms
-
         - narrate format:callout "Balance for <proc[KingdomNameReplacer].context[<player.flag[kingdom]>]>"
-        - narrate $<yaml[kingdoms].read[<player.flag[Kingdom]>.balance].format_number.color[red]>
-
-        - yaml id:kingdoms unload
+        - narrate $<server.flag[kingdoms.<player.flag[kingdom]>.balance].format_number.color[red]>
 
     #------------------------------------------------------------------------------------------------------------------------
 
     - else if <context.args.get[1]> == deposit:
         #- if <player.has_permission[kingdom.deposit]>:
-        - yaml load:kingdoms.yml id:kingdoms
         - define amount <context.args.get[2]>
 
         - if <player.money.is[OR_MORE].than[<[amount]>]>:
-            - yaml id:kingdoms set <player.flag[kingdom]>.balance:+:<[amount]>
+            - flag server kingdoms.<player.flag[kingdom]>.balance:+:<[amount]>
             - money take from:<player> quantity:<[amount]>
 
             - narrate format:callout "Successfully deposited: $<[amount].as_money>"
@@ -441,18 +415,15 @@ Kingdom_Command:
         - else:
             - narrate format:callout "You do not have sufficient funds to perform this action."
 
-        - yaml id:kingdoms savefile:kingdoms.yml
-
         # if the kingdom was previously indebted but has now pushed back
         # into the positives then clear its debt status from the appropriate
         # flag on the server
 
         - if <server.flag[indebtedKingdoms].get[<player.flag[kingdom]>].exists>:
-            - if <yaml[kingdoms].read[<player.flag[kingdom]>.balance].is[OR_MORE].than[0]>:
+            - if <server.flag[kingdoms.<player.flag[kingdom]>.balance].is[OR_MORE].than[0]>:
                 - flag server indebtedKingdoms.<player.flag[kingdom]>:0
 
-        - yaml id:kingdoms unload
-        - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
         #- else:
         #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
@@ -467,25 +438,21 @@ Kingdom_Command:
             - if <[value].get[kingdom]> == <[kingdom]>:
                 - define offerWorth <[value].get[amount]>
 
-        - yaml load:kingdoms.yml id:kingdoms
         - define amount <context.args.get[2]>
 
-        - if <yaml[kingdoms].read[<[kingdom]>.balance].sub[<[amount]>].is[LESS].than[<[offerWorth].if_null[0]>]>:
+        - if <server.flag[kingdoms.<[kingdom]>.balance].sub[<[amount]>].is[LESS].than[<[offerWorth].if_null[0]>]>:
             - narrate format:callout "Your kingdom has an active loan offer to Fyndalin worth: $<[offerWorth]>. You may not withdraw an amount that would place you below that amount until the offer is resolved."
 
-        - else if <yaml[kingdoms].read[<[kingdom]>.balance].is[OR_MORE].than[<[amount]>]>:
+        - else if <server.flag[kingdoms.<[kingdom]>.balance].is[OR_MORE].than[<[amount]>]>:
             - money give to:<player> quantity:<[amount]>
-            - yaml id:kingdoms set <[kingdom]>.balance:-:<[amount]>
+            - flag server kingdoms.<[kingdom]>.balance:-:<[amount]>
 
             - narrate format:callout "Successfully withdrawn: $<[amount]>"
 
         - else:
             - narrate format:callout "You do not have sufficient funds in your kingdom to withdraw"
 
-        - yaml id:kingdoms savefile:kingdoms.yml
-        - yaml id:kingdoms unload
-
-        - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<player>].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>].get[members].include[<server.online_ops>]>
 
         #- else:
         #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
@@ -494,15 +461,12 @@ Kingdom_Command:
 
     - else if <context.args.get[1]> == rename:
         - if <player.has_permission[kingdom.canrename]>:
-            - yaml load:kingdoms.yml id:kingdoms
+            - define newName <context.raw_args.split[rename].get[2]>
+            - flag server kingdoms.<player.flag[kingdom]>.name:<[newName]>
 
-            - yaml id:kingdoms set kingdom_real_names.<player.flag[kingdom]>:<proc[YamlSpaceSerilizer].context[<context.raw_args.split[rename].get[2]>]>
-            - narrate <context.raw_args.split[rename].get[2]>
+            - narrate format:debug <context.raw_args.split[rename].get[2]>
 
-            - yaml id:kingdoms savefile:kingdoms.yml
-            - yaml id:kingdoms unload
-
-            - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>].get[members].include[<server.online_ops>]>
 
         - else:
             - narrate format:callout "This command requires permission from the server owner to perform!"
@@ -515,11 +479,8 @@ Kingdom_Command:
             - determine cancelled
 
         #- if <player.has_permission[kingdom.npc.spawn]>:
-        - yaml load:kingdoms.yml id:kingdoms
-        - yaml load:outposts.yml id:outp
-
-        - define coreLoc <yaml[kingdoms].read[<[kingdom]>.core_claims].as[list]>
-        - define castleLoc <yaml[kingdoms].read[<[kingdom]>.castle_territory].as[list]>
+        - define coreLoc <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
+        - define castleLoc <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
 
         - define isInClaimedLoc <[coreLoc].include[<[castleLoc]>].contains[<player.location.chunk>].if_null[false]>
 
@@ -527,19 +488,13 @@ Kingdom_Command:
         # kingdom's territory
 
         - if !<[isInClaimedLoc]>:
-            - foreach <yaml[outp].read[<[kingdom]>].keys.exclude[totalupkeep]>:
-                - define cornerOne <yaml[outp].read[<[kingdom]>.<[value]>.cornerone].with_y[255]>
-                - define cornerTwo <yaml[outp].read[<[kingdom]>.<[value]>.cornertwo].with_y[0]>
+            - foreach <server.flag[kingdoms.<[kingdom]>.outposts].keys.exclude[totalUpkeep]>:
+                - define cornerOne <server.flag[kingdoms.<[kingdom]>.<[value]>.cornerOne].with_y[255]>
+                - define cornerTwo <server.flag[kingdoms.<[kingdom]>.<[value]>.cornerTwo].with_y[0]>
                 - define outpostCuboid <cuboid[<player.location.world.name>,<[cornerOne].xyz>,<[cornerTwo].xyz>]>
-
-                #- narrate format:debug CO1:<[cornerOne]>
 
                 - if <[outpostCuboid].contains[<player.location>]>:
                     - define isInClaimedLoc true
-                    #- narrate format:debug CUB:<[outpostCuboid]>
-
-        - yaml id:kingdoms unload
-        - yaml id:outp unload
 
         # Gives the player an info message if they've never opened
         # the npc window before
@@ -575,24 +530,20 @@ Kingdom_Command:
             #- narrate format:debug <[param]>
 
             - if <[param]> == set:
-                - yaml load:kingdoms.yml id:k
-
                 #- if <player.has_permission[kingdom.setwarp]> || <player.is_op>:
 
                 # If the player does not specify a specific warp name the game will assume
                 # they are trying to reset their main castle spawn.
                 - define warpName <context.raw_args.split_args.get[3].if_null[main]>
-                - define castle <yaml[k].read[<[kingdom]>.castle_territory].as[list]>
-                - define core <yaml[k].read[<[kingdom]>.core_claims].as[list]>
+                - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
+                - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
                 - define castleCore <[core].include[<[castle]>].exclude[0]>
 
                 - if <[warpName]> == main:
                     - if <[castle].contains[<player.location.chunk>]>:
 
                         - clickable save:confirm_warp until:1m usages:1:
-                            - yaml id:k set <[kingdom]>.warp_location.main:<player.location.center>
-                            - yaml id:k savefile:kingdoms.yml
-
+                            - flag server kingdoms.<[kingdom]>.warps.main:<player.location.center>
                             - narrate format:callout "Warp location has been set to: <aqua><player.location.round.xyz>"
 
                         - clickable save:decline_warp until:1m usages:1:
@@ -607,8 +558,7 @@ Kingdom_Command:
 
                 - else:
                     - if <[castleCore].contains[<player.location.chunk>]>:
-                        - yaml id:k set <[kingdom]>.warp_location.<[warpName]>:<player.location.center>
-                        - yaml id:k savefile:kingdoms.yml
+                        - flag server kingdoms.<[kingdom]>.warps.<[warpName]>:<player.location.center>
 
                     - else:
                         - narrate format:callout "Regular kingdom warps must be within castle or core territory"
@@ -616,11 +566,7 @@ Kingdom_Command:
                 #- else:
                 #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
 
-                - yaml id:k unload
-
             - else if <[param].starts_with[kingdom<&co>]>:
-                - yaml load:kingdoms.yml id:k
-
                 - define chosenKingdomRN <[param].split[<&co>].get[2]>
                 - define warpName <context.args.get[3].if_null[main]>
                 - define kingdomRealNames <script[KingdomRealShortNames].data_key[].values.exclude[data]>
@@ -631,9 +577,9 @@ Kingdom_Command:
                     - determine cancelled
 
                 - if <[chosenKingdomRN].is_in[<[kingdomRealNames]>]>:
-                    - if <server.flag[<[chosenKingdomCN]>.openWarp].contains[<[kingdom]>]>:
-                        - if <yaml[k].read[<[chosenKingdomCN]>.warp_location.<[warpName]>].exists>:
-                            - define warpLoc <yaml[k].read[<[chosenKingdomCN]>.warp_location.<[warpName]>]>
+                    - if <server.flag[kingdoms.<[chosenKingdomCN]>.openWarp].contains[<[kingdom]>]>:
+                        - if <server.flag[kingdoms.<[chosenKingdomCN]>.warps.<[warpName]>].exists>:
+                            - define warpLoc <server.flag[kingdoms.<[chosenKingdomCN]>.warps.<[warpName]>]>
                             - narrate format:callout "Warping in 3 seconds..."
                             - chunkload add <[warpLoc].chunk> duration:1m
 
@@ -650,73 +596,59 @@ Kingdom_Command:
                 - else:
                     - narrate format:callout "Invalid kingdom name."
 
-                - yaml id:k unload
-
             - else if <[param]> == list:
-                - yaml load:kingdoms.yml id:k
-
-                - if !<yaml[k].read[<[kingdom]>.warp_location].as[list].get[1].exists>:
+                - if !<server.flag[kingdoms.<[kingdom]>.warps].as[list].get[1].exists>:
                     - narrate format:callout "Your kingdom doesn't have any warps! Consider setting a private castle warp by standing in the desired warp location and typing <aqua>/k warp set"
 
                 - else:
-                    - foreach <yaml[k].read[<[kingdom]>.warp_location].to_pair_lists> as:warp:
+                    - foreach <server.flag[kingdoms.<[kingdom]>.warps].to_pair_lists> as:warp:
                         - narrate "<green>--<&gt> <[warp].get[1].color[aqua].bold><&co> <[warp].get[2].round.simple>"
 
-                - yaml id:k unload
-
             - else if <[param]> == deny:
-                - yaml load:kingdoms.yml id:k
-
                 - define kingdomCodeName <script[KingdomRealShortNames].data_key[].invert.get[<context.args.get[3]>]>
-                - if <server.flag[<[kingdom]>.openWarp].contains[<[kingdomCodeName]>]>:
-                    - flag server <[kingdom]>.openWarp:<-:<[kingdomCodeName]>
+                - if <server.flag[kingdoms.<[kingdom]>.openWarp].contains[<[kingdomCodeName]>]>:
+                    - flag server kingdoms.<[kingdom]>.openWarp:<-:<[kingdomCodeName]>
                     - narrate format:callout "Removed kingdom: <context.args.get[3].color[red].bold> from your warp whitelist!"
 
                 - else:
                     - narrate format:callout "That kingdom was already not on your kingdom's warp whitelist."
 
-                - yaml id:k unload
-
             - else if <[param]> == allow:
-                - yaml load:kingdoms.yml id:k
-
                 - define kingdomRealNames <script[KingdomRealShortNames].data_key[].values.exclude[data]>
                 - define kingdomCodeNames <script[KingdomRealShortNames].data_key[].keys.exclude[type]>
 
                 - if !<context.args.get[3].exists>:
-                    - define openWarp <server.flag[<[kingdom]>.openWarp]>
+                    - define openWarp <server.flag[kingdoms.<[kingdom]>.openWarp]>
+
                     - if <[openWarp].size.if_null[0]> == 0:
                         - narrate format:callout "Your kingdom has its warps closed to all kingdoms"
 
                     - else:
-                        - narrate format:callout "Kingdoms that can access your warps:<n><server.flag[<[kingdom]>.openWarp].parse_tag[<script[KingdomRealShortNames].data_key[<[parse_value]>]>].separated_by[<n>]>"
+                        - narrate format:callout "Kingdoms that can access your warps:<n><server.flag[kingdoms.<[kingdom]>.openWarp].parse_tag[<script[KingdomRealShortNames].data_key[<[parse_value]>]>].separated_by[<n>]>"
 
                 - else if <[kingdomRealNames].contains[<context.args.get[3]>]>:
                     - define index <[kingdomRealNames].find[<context.args.get[3]>]>
 
                     - if <[kingdomCodeNames].get[<[index]>]> != <[kingdom]>:
                         - define codeNameChosenKingdom <[kingdomCodeNames].get[<[index]>]>
-                        - flag server <[kingdom]>.openWarp:->:<[codeNameChosenKingdom]>
-                        - flag server <[kingdom]>.openWarp:<server.flag[<[kingdom]>.openWarp].deduplicate>
+                        - flag server kingdoms.<[kingdom]>.openWarp:->:<[codeNameChosenKingdom]>
+                        - flag server kingdoms.<[kingdom]>.openWarp:<server.flag[kingdoms.<[kingdom]>.openWarp].deduplicate>
                         - narrate format:callout "Now allowing members of: <context.args.get[3].color[red].bold> to warp to your kingdom."
 
                     - else:
                         - narrate format:callout "Please specify a kingdom other than your own"
 
-                - yaml id:k unload
-
             - else:
                 - define warpArea <[param]>
-                - yaml load:kingdoms.yml id:k
 
-                - if !<yaml[k].contains[<[kingdom]>.warp_location.<[param]>]>:
+                - if !<server.flag[kingdoms.<[kingdom]>.warps.<[param]>]>:
                     - clickable save:confirm_warp usages:1 until:1m:
                         - narrate format:callout "Warping in 3 seconds..."
-                        - chunkload add <yaml[k].read[<[kingdom]>.warp_location.<[warpArea]>].chunk> duration:1m
+                        - chunkload add <server.flag[kingdoms.<[kingdom]>.warps.<[warpArea]>].chunk> duration:1m
 
                         - wait 3s
 
-                        - teleport <player> <yaml[k].read[<[kingdom]>.warp_location.<[warpArea]>]>
+                        - teleport <player> <server.flag[kingdoms.<[kingdom]>.warps.<[warpArea]>]>
                         - clickable cancel:<entry[decline_warp].id>
 
                     - clickable save:decline_warp usages:1 until:1m:
@@ -727,20 +659,18 @@ Kingdom_Command:
                     - narrate format:callout "Not specifying a name for the warp will take you to your kingdom's main warp. Do you want to do this?"
                     - narrate format:callout "<element[YES].bold.underline.on_click[<entry[confirm_warp].command>]> / <element[NO].bold.underline.on_click[<entry[decline_warp].command>]>"
 
-                - else if <yaml[k].read[<[kingdom]>.warp_location]> != null:
+                - else if <server.flag[kingdoms.<[kingdom]>.warps]> != null:
                     - narrate format:callout "Warping in 3 seconds..."
                     #- narrate format:debug <[kingdom]>
-                    #- chunkload add <yaml[k].read[<[kingdom]>.warp_location.main].chunk> duration:1m
+                    #- chunkload add <server.flag[kingdoms.<[kingdom]>.warps.main].chunk> duration:1m
 
                     - wait 3s
 
-                    - teleport <player> <yaml[k].read[<[kingdom]>.warp_location.main]>
-                    #- narrate format:debug <yaml[k].read[<[kingdom]>.warp_location]>
+                    - teleport <player> <server.flag[kingdoms.<[kingdom]>.warps.main]>
+                    #- narrate format:debug <server.flag[kingdoms.<[kingdom]>.warps]>
 
                 - else:
                     - narrate format:callout "Your kingdom does not currently have a warp location. You may want to speak to your king about this."
-
-                - yaml id:k unload
 
         - else:
             - narrate format:callout "You may not use warps, you are in <red>combat mode!"
@@ -871,22 +801,19 @@ KingdomGuardList_Handler:
         - flag <player> clickedNPC:<[guard]>
 
         on player clicks GuardRespawn_Item in KingdomGuardRespawn_Window:
-        - yaml load:kingdoms.yml id:kingdoms
         - define kingdom <player.flag[kingdom]>
-        - define kingdomBalance <yaml[kingdoms].read[<[kingdom]>.balance]>
+        - define kingdomBalance <server.flag[kingdoms.<[kingdom]>.balance]>
         - define respawnCost <context.item.flag[cost]>
 
         - if <[kingdomBalance]> >= <[respawnCost]>:
-            - yaml id:kingdoms set <[kingdom]>.balance:-:<[respawnCost]>
-            - run SidebarLoader def:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
+            - flag server kingdoms.<[kingdom]>.balance:-:<[respawnCost]>
+            - run SidebarLoader def:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
             - narrate format:callout "Respawned castle guard at their previously defined anchor position!"
 
         - else:
             - narrate format:callout "Your kingdom does not have enough funds in its treasury to replace this guard!"
 
         - inventory close
-        - yaml id:kingdoms savefile:kingdoms.yml
-        - yaml id:kingdoms unload
 
 ##############################################################################
 

@@ -130,32 +130,23 @@ Outpost_Command:
                 - define name <proc[OutpostNameEscaper].context[<context.args.get[3].to[last].space_separated>]>
                 - define kingdom <player.flag[kingdom]>
 
-                - yaml load:outposts.yml id:outpost
-                - yaml load:kingdoms.yml id:kingdoms
-
                 # Clear outpost name if it exists under the player's kingdom
-                - if <yaml[outpost].contains[<[kingdom]>.<[name]>]>:
-                    - yaml id:kingdoms set <[kingdom]>.balance:+:<yaml[outposts].read[<[kingdom]>.<[name]>.upkeep].mul[0.45]>
+                - if <server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>]>:
+                    - flag server kingdoms.<[kingdom]>.balance:+:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>.upkeep].mul[0.45]>
 
-                    - yaml id:outpost set <[kingdom]>.<[name]>:!
-                    - yaml id:outpost set outposts.<[name]>:!
+                    - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[name]>:!
+                    - flag server kingdoms.outpostInfo.allOutposts.<[name]>:!
 
                     #TODO: Make it clear the relevant amount of upkeep from the kingdom total
 
                     - note remove as:<[name]>
                     - narrate format:callout "Successfully deleted outpost by the name <[name]>"
-                    - narrate format:callout "45<&pc> of your outpost's usual weekly upkeep has been returned to your kingdom."
+                    - narrate format:callout "45<&pc> of your outpost's usual daily upkeep has been returned to your kingdom."
 
                 - else:
                     - narrate format:callout "There is no outpost by the name: <red><[name]>"
 
-                - yaml id:outpost savefile:outposts.yml
-                - yaml id:outpost unload
-
-                - yaml id:kingdoms savefile:kingdoms.yml
-                - yaml id:kingdoms unload
-
-                - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+                - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
             - else:
                 - narrate format:callout "Are you sure you would like to delete this outpost?"
@@ -179,14 +170,10 @@ Outpost_Command:
     - else if <context.args.get[1]> == redefine:
         - if <player.has_permission[kingdoms.outpost.redefine]>:
             - if <context.args.size.is[MORE].than[1]>:
-
                 - define kingdom <player.flag[kingdom]>
-
                 - define name <context.args.get[2].to[last]>
-                #- narrate format:debug NAME:<[name]>
-                - yaml load:outposts.yml id:outpost
 
-                - if <yaml[outpost].contains[<[kingdom]>.<[name]>]>:
+                - if <server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>]>:
                     - run TempSaveInventory def:<player>
                     - give to:<player.inventory> slot:<player.held_item_slot> OutpostWand_Item
 
@@ -235,12 +222,10 @@ OutpostWand_Handler:
             - define cornerTwo <context.location>
             - flag player cornerTwoDefined:<[cornerTwo]>
 
-            - yaml id:kingdoms load:kingdoms.yml
-
             ## CLOSE TO CASTLE CHECK ##
             # Check outpost's distance to other kingdom claims
 
-            - foreach <yaml[kingdoms].read[all_claims]>:
+            - foreach <server.flag[kingdoms.allClaims]>:
                 - define chunkCenter <[value].cuboid.center>
                 - define outpostDistance <[cornerTwo].distance[<[chunkCenter]>]>
 
@@ -256,16 +241,13 @@ OutpostWand_Handler:
                     - run LoadTempInventory def:<player>
                     - foreach stop
 
-            - yaml id:outpost load:outposts.yml
-
             # Cuboid object of the player's unfinalized outpost selection
 
             - define currOutpostSelection <cuboid[<player.location.world>,<[cornerOne]>,<[cornerTwo]>]>
-
-            - define outpostList <yaml[outpost].read[outposts].to_pair_lists>
+            - define outpostList <server.flag[kingdoms.outpostInfo.allOutposts].to_pair_lists>
 
             - if <player.has_flag[redefiningOutpost]>:
-                - define outpostList <yaml[outpost].read[outposts].to_pair_lists.exclude[<list[<player.flag[redefiningOutpost]>|<player.flag[kingdom]>]>]>
+                - define outpostList <server.flag[kingdoms.outpostInfo.allOutposts].to_pair_lists.exclude[<list[<player.flag[redefiningOutpost]>|<[kingdom]>]>]>
 
             - foreach <[outpostList]>:
 
@@ -274,14 +256,13 @@ OutpostWand_Handler:
 
                 - define outpostKingdom <[value].get[2]>
                 - define outpostName <[value].get[1]>
-                - define outpostCornerOne <yaml[outpost].read[<[outpostKingdom]>.<[outpostName]>.cornerone]>
+                - define outpostCornerOne <server.flag[kingdoms.<[outpostKingdom]>.outposts.outpostList.<[outpostName]>.cornerone]>
 
                 #- narrate format:debug "outpost corner one: <[outpostCornerOne].x>"
                 #- narrate format:debug "outpost kingdom: <[outpostKingdom]>"
 
-                - define outpostCornerTwo <yaml[outpost].read[<[outpostKingdom]>.<[outpostName]>.cornertwo]>
-
-                - define outpostWorld <yaml[outpost].read[<[outpostKingdom]>.<[outpostName]>.cornerone].world>
+                - define outpostCornerTwo <server.flag[kingdoms.<[outpostKingdom]>.outposts.outpostList.<[outpostName]>.cornertwo]>
+                - define outpostWorld <server.flag[kingdoms.<[outpostKingdom]>.outposts.outpostList.<[outpostName]>.cornerone].world>
 
                 #- narrate format:debug "outpost world: <[outpostWorld]>"
 
@@ -313,13 +294,13 @@ OutpostWand_Handler:
 
                 - define size <[diffX].mul[<[diffZ]>]>
 
-                # If the size of the current claim is less than the maximum size of an outpost then commit the claim to relevant yaml files #
+                # If the size of the current claim is less than the maximum size of an outpost then commit the claim to relevant server flags #
 
                 #- narrate format:debug "size: <[size]>"
 
-                - if <[size].is[OR_LESS].than[<yaml[kingdoms].read[<[kingdom]>.outposts.max_size]>]>:
+                - if <[size].is[OR_LESS].than[<server.flag[kingdoms.<[kingdom]>.outposts.maxSize]>]>:
 
-                    - define outpostCost <[size].mul[<yaml[kingdoms].read[<[kingdom]>.outposts.outpost_cost]>].round>
+                    - define outpostCost <[size].mul[<server.flag[kingdoms.<[kingdom]>.outposts.outpostCost]>].round>
 
                     # Add buffs and debuffs to viridian and cambrian respectively, as outlined in their kingdom ideas
 
@@ -329,7 +310,7 @@ OutpostWand_Handler:
                     - else if <[kingdom]> == cambrian:
                         - define outpostCost <[outpostCost].mul[0.9]>
 
-                    - if <yaml[kingdoms].read[<[kingdom]>.balance].is[OR_MORE].than[<[outpostCost]>]>:
+                    - if <server.flag[kingdoms.<[kingdom]>.balance].is[OR_MORE].than[<[outpostCost]>]>:
 
                         - if !<player.has_flag[redefiningOutpost]>:
                             - flag player canNameOutpost
@@ -351,98 +332,77 @@ OutpostWand_Handler:
                         - flag player cornerTwoDefined:!
 
                 - else:
-                    - narrate format:callout "Outpost exceeds maximum size of: <red><yaml[kingdoms].read[<[kingdom]>.outposts.max_size]><&6>! Attempted claim size of: <red><[size]>"
+                    - narrate format:callout "Outpost exceeds maximum size of: <red><server.flag[kingdoms.<[kingdom]>.outposts.maxSize]><&6>! Attempted claim size of: <red><[size]>"
 
                     - flag player cornerOneDefined:!
                     - flag player cornerTwoDefined:!
 
-            - yaml id:kingdoms unload
-
         on player chats:
         - define posOne <player.flag[cornerOneDefined]>
         - define posTwo <player.flag[cornerTwoDefined]>
-
         - define outpostCost <player.flag[outpostCost]>
-
-        - yaml load:kingdoms.yml id:kingdoms
-        - yaml load:outposts.yml id:outpost
-
         - define kingdom <player.flag[kingdom]>
 
-        - if <player.has_flag[canNameOutpost]> || <player.has_flag[outpostAlreadyNamed]>:
-            - if <player.has_flag[canNameOutpost]>:
-                - if !<yaml[outpost].contains[<[kingdom]>.<context.message>]>:
+        - if <player.has_flag[canNameOutpost]>:
+            - if !<server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<context.message>]>:
+                - note <cuboid[<player.world.name>,<[PosOne].as[location].x>,0,<[PosOne].as[location].z>,<[PosTwo].as[location].x>,255,<[PosTwo].as[location].z>]> as:<context.message>
+                - define escapedName <proc[OutpostNameEscaper].context[<context.message>]>
 
-                    - note <cuboid[<player.world.name>,<[PosOne].as[location].x>,0,<[PosOne].as[location].z>,<[PosTwo].as[location].x>,255,<[PosTwo].as[location].z>]> as:<context.message>
+                #- narrate format:debug "ESCAPED: <[escapedName]>"
 
-                    - define escapedName <proc[OutpostNameEscaper].context[<context.message>]>
-                    #- narrate format:debug "ESCAPED: <[escapedName]>"
+                # Set data in outposts.yml
 
-                    # Set data in outposts.yml
+                - flag server kingdoms.outpostInfo.allOutposts.<[escapedName]>:<[kingdom]>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornerone:<[PosOne].as[location]>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornertwo:<[PosTwo].as[location]>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size:<player.flag[size].round>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.upkeep:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size].mul[<server.flag[kingdoms.<[kingdom]>.outposts.upkeepMultiplier]>].round>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.name:<context.message>
 
-                    - yaml id:outpost set outposts.<[escapedName]>:<[kingdom]>
-                    - yaml id:outpost set <[kingdom]>.<[escapedName]>.cornerone:<[PosOne].as[location]>
-                    - yaml id:outpost set <[kingdom]>.<[escapedName]>.cornertwo:<[PosTwo].as[location]>
-                    - yaml id:outpost set <[kingdom]>.<[escapedName]>.size:<player.flag[size].round>
-                    - yaml id:outpost set <[kingdom]>.<[escapedName]>.upkeep:<yaml[outpost].read[<[kingdom]>.<[escapedName]>.size].mul[<yaml[kingdoms].read[<[kingdom]>.outposts.outpost_upkeep]>].round>
-                    - yaml id:outpost set <[kingdom]>.<[escapedName]>.name:<context.message>
+                # Set data in kingdoms.yml
 
-                    # Set data in kingdoms.yml
+                - flag server kingdoms.<[kingdom]>.outposts.totalupkeep:+:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.upkeep]>
+                - flag server kingdoms.<[kingdom]>.balance:-:<[outpostCost]>
+                - flag server kingdoms.<[kingdom]>.upkeep:+:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.upkeep]>
 
-                    - yaml id:outpost set <[kingdom]>.totalupkeep:+:<[kingdom]>.<[escapedName]>.upkeep
-                    - yaml id:kingdoms set <[kingdom]>.balance:-:<[outpostCost]>
-                    - yaml id:kingdoms set <[kingdom]>.upkeep:+:<yaml[outpost].read[<[kingdom]>.<[escapedName]>]>
-                    - yaml id:kingdoms set <[kingdom]>.outpost_count:+:1
+            - else:
+                - narrate format:callout "There is already an outpost by this name! Use <red>/outpost redefine <&6>or <red>/outpost rename to change an existing outpost"
 
-                - else:
-                    - narrate format:callout "There is already an outpost by this name! Use <red>/outpost redefine <&6>or <red>/outpost rename to change an existing outpost"
+        - else if <player.has_flag[outpostAlreadyNamed]>:
+            - if <context.message.to_lowercase> == yes:
+                - define outpostName <player.flag[redefiningOutpost]>
+                - note <cuboid[<player.world.name>,<[PosOne].as[location].x>,0,<[PosOne].as[location].z>,<[PosTwo].as[location].x>,255,<[PosTwo].as[location].z>]> as:<context.message>
 
-            - else if <player.has_flag[outpostAlreadyNamed]>:
-                - if <context.message.to_lowercase> == yes:
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornerone:<[PosOne].as[location]>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornertwo:<[PosTwo].as[location]>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size:<player.flag[size].round>
 
-                    - define outpostName <player.flag[redefiningOutpost]>
+                - define newUpkeep <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpostName]>.size].mul[<server.flag[kingdoms.<[kingdom]>.outposts.upkeepMultiplier]>].round>
+                - define oldUpkeep <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpostName]>.upkeep]>
 
-                    - note <cuboid[<player.world.name>,<[PosOne].as[location].x>,0,<[PosOne].as[location].z>,<[PosTwo].as[location].x>,255,<[PosTwo].as[location].z>]> as:<context.message>
+                - flag server <[kingdom]>.outposts.outpostList.<[outpostName]>.upkeep:<[newUpkeep]>
 
-                    - yaml id:outpost set <[kingdom]>.<[outpostName]>.cornerone:<[PosOne].as[location]>
-                    - yaml id:outpost set <[kingdom]>.<[outpostName]>.cornertwo:<[PosTwo].as[location]>
-                    - yaml id:outpost set <[kingdom]>.<[outpostName]>.size:<player.flag[size].round>
+                - define upkeepDiff <[newUpkeep].sub[<[newUpkeep]>].abs>
 
-                    - define newUpkeep <yaml[outpost].read[<[kingdom]>.<[outpostName]>.size].mul[<yaml[kingdoms].read[<[kingdom]>.outposts.outpost_upkeep]>].round>
-                    - define oldUpkeep <yaml[outpost].read[<[kingdom]>.<[outpostName]>.upkeep]>
+                - flag server kingdoms.<[kingdom]>.outposts.totalupkeep:+:<[upkeepDiff]>
+                - flag server kingdoms.<[kingdom]>.upkeep:+:<[upkeepDiff]>
+                - flag player outpostAlreadyNames:!
 
-                    - yaml id:outpost set <[kingdom]>.<[outpostName]>.upkeep:<[newUpkeep]>
+            - else:
+                - narrate format:callout "Changes reverted."
 
-                    - define upkeepDiff <[newUpkeep].sub[<[newUpkeep]>].abs>
+        - run LoadTempInventory def:<player>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
-                    #- narrate format:debug <[upkeepDiff]>
+        - flag player outpostCost:!
+        - flag player cornerOneDefined:!
+        - flag player cornerTwoDefined:!
+        - flag player canNameOutpost:!
+        - flag player size:!
+        - flag player redefiningOutpost:!
+        - flag player outpostAlreadyNamed:!
 
-                    - yaml id:outpost set <[kingdom]>.totalupkeep:+:<[upkeepDiff]>
-                    - yaml id:kingdoms set <[kingdom]>.upkeep:+:<[upkeepDiff]>
-
-                    - flag player outpostAlreadyNames:!
-
-                - else:
-                    - narrate format:callout "Reverting changes..."
-
-            - run LoadTempInventory def:<player>
-
-            - yaml id:kingdoms savefile:kingdoms.yml
-            - yaml id:outpost savefile:outposts.yml
-
-            - run SidebarLoader def.target:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
-
-            - flag player outpostCost:!
-            - flag player cornerOneDefined:!
-            - flag player cornerTwoDefined:!
-            - flag player canNameOutpost:!
-            - flag player size:!
-            - flag player redefiningOutpost:!
-            - flag player outpostAlreadyNamed:!
-
-            - yaml id:kingdom unload
-            - yaml id:outpost unload
-            - determine cancelled
+        - determine cancelled
 
 ##############################################################################
 
@@ -451,13 +411,11 @@ OutpostHandler:
     debug: false
     events:
         on player enters *:
-        - yaml load:outposts.yml id:outp
-
         - if <script.queues.size.is[MORE].than[1]>:
             - queue clear <script.queues.get[1]>
 
-        - if <yaml[outp].contains[outposts.<context.area.split[@].get[2]>]>:
-            - define whichKingdom <yaml[outp].read[outposts.<context.area.split[@].get[2]>]>
+        - if <server.has_flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>]>:
+            - define whichKingdom <server.flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>]>
 
             - if <[whichKingdom]> == <player.flag[kingdom]>:
                 - repeat 3:
@@ -466,20 +424,14 @@ OutpostHandler:
 
             - else:
                 - repeat 3:
-                    - actionbar "You are now entering a <yaml[outp].read[outposts.<context.area.split[@].get[2]>].color[<script[KingdomTextColors].data_key[<[whichKingdom]>]>]> outpost"
+                    - actionbar "You are now entering a <server.flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>].color[<script[KingdomTextColors].data_key[<[whichKingdom]>]>]> outpost"
                     - wait 1s
 
-        - yaml unload id:outp
-
         on player exits *:
-        - yaml load:outposts.yml id:outp
-
         - if <script.queues.size.is[MORE].than[1]>:
             - queue clear <script.queues.get[1]>
 
-        - if <yaml[outp].contains[outposts.<context.area.split[@].get[2]>]>:
+        - if <server.has_flag[kingdoms.outpostinfo.allOutposts.<context.area.split[@].get[2]>]>:
             - repeat 3:
                 - actionbar "<red>Leaving outpost"
                 - wait 1s
-
-        - yaml unload id:outp

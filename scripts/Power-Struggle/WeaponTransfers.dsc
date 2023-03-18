@@ -20,23 +20,19 @@ DidTransferFail:
     definitions: target|flagName
     script:
     - if <[target].has_flag[<[flagName]>]>:
-        - yaml load:powerstruggle.yml id:ps
+        - define kingdom <[target].flag[kingdom]>
 
         # Debuff amount is defined as:
         # (totalinfluence / mercinfluence) / 10
 
-        - define debuffAmount <yaml[ps].read[<[target].flag[kingdom]>.totalinfluence].div[<yaml[ps].read[<[target].flag[kingdom]>.mercenaryguild]>].div[10]>
+        - define debuffAmount <server.flag[kingdoms.<[kingdom]>.powerstruggle.totalInfluence].div[<server.flag[<[kingdom]>.powerstruggle.mercenaryGuild]>].div[10]>
 
-        - yaml id:ps set <[target].flag[kingdom]>.mercenaryguild:-:<[debuffAmount]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.mercenaryGuild:-:<[debuffAmount]>
 
         # Recalculates total influence so it is representative of
         # the new average
 
         - run CalcTotalInfluence def:<[target].flag[kingdom]>
-
-        - yaml id:ps savefile:powerstruggle.yml
-        - yaml id:ps unload
-
 
 ##############################################################################
 
@@ -68,20 +64,18 @@ WeaponTransferOption_Handler:
             - if <context.item.material.name> == air || <context.clicked_inventory.id_holder> == <player>:
                 - determine cancelled
 
-            - yaml load:powerstruggle.yml id:ps
             - define kingdom <player.flag[kingdom]>
 
-            - if <yaml[ps].read[<[kingdom]>.dailyinfluences]> <= 0:
+            - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints]> <= 0:
                 - narrate format:callout "Your kingdom has exhasuted its influence points today"
                 - determine cancelled
 
-            - if <server.flag[<[kingdom]>.powerstruggle.activeTransfers].size> > 44:
+            - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers].size> > 44:
                 - narrate format:callout "Your kingdom has made the maximum number of transfer requests (44). Please fulfill some of them before making a new one!"
                 - determine cancelled
 
-
             - if !<player.has_flag[transferData.amount]>:
-                - if <yaml[ps].read[transferItemsToday.<context.item.material.name>]> != 0:
+                - if <server.flag[kingdoms.powerstruggleInfo.transferItems.<context.item.material.name>]> != 0:
 
                     - narrate format:callout "Type out (<element[using just numbers].bold>) how many orders you want to fullfill."
                     - narrate format:callout "Type cancel to end the transfer."
@@ -102,8 +96,6 @@ WeaponTransferOption_Handler:
             - else:
                 - narrate format:callout "You are already making a weapon transfer transaction"
 
-            - yaml id:ps unload
-
         on player chats:
         - if <player.has_flag[transferData.transferType]>:
             - if <context.message.to_lowercase> == cancel:
@@ -116,7 +108,6 @@ WeaponTransferOption_Handler:
                     - determine cancelled
 
                 - define kingdom <player.flag[kingdom]>
-                - yaml load:powerstruggle.yml id:ps
 
                 # If player does not cancel the transaction then extract
                 # the item transfer type and material name and add to a
@@ -126,13 +117,13 @@ WeaponTransferOption_Handler:
                 - define transferType <player.flag[transferData.transferType]>
                 - define transferItem <player.flag[transferData.material]>
 
-                - if <yaml[ps].read[transferItemsToday.<[transferItem]>].is[OR_MORE].than[<context.message>]>:
+                - if <server.flag[kingdoms.powerstruggleInfo.transferItems.<[transferItem]>].is[OR_MORE].than[<context.message>]>:
 
                     - flag <player> transferData.amount:<context.message>
                     #- flag <player> influenceType:<list[weapons|mercenary]>
 
                     - define kingdom <player.flag[kingdom]>
-                    - define sameMaterialTransfers <server.flag[<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<player.flag[transferData].get[material]>]>].exclude[false].size>
+                    - define sameMaterialTransfers <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<player.flag[transferData].get[material]>]>].exclude[false].size>
                     - define transferID <player.name>-<player.flag[transferData].get[material]><[sameMaterialTransfers]>
                     - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.influenceType:<player.flag[transferData].get[transferType]>
                     - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.material:<player.flag[transferData].get[material]>
@@ -154,11 +145,9 @@ WeaponTransferOption_Handler:
                     - else:
                         - narrate format:callout "You have 24 hours to place a sign on the chest you would like to use as a transfer vault."
 
-                    - yaml id:ps set <[kingdom]>.dailyinfluences:-:1
-                    - yaml id:ps savefile:powerstruggle.yml
-                    - yaml id:ps unload
+                    - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:-:1
 
-                    - run SidebarLoader def.target:<server.flag[<[kingdom]>].get[members].include[<server.online_ops>]>
+                    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
                 - else:
                     - narrate format:callout "There is not enough demand for you to fullfill that many orders!"
@@ -169,9 +158,9 @@ WeaponTransferOption_Handler:
         on player clicks WeaponTransfer_MercInfluence in MercenaryInfluence_Window:
         - ratelimit <player> 3t
 
-        - yaml load:powerstruggle.yml id:ps
+        - define kingdom <player.flag[kingdom]>
 
-        - if <yaml[ps].read[<player.flag[kingdom]>.dailyinfluences].is[MORE].than[0]>:
+        - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints].is[MORE].than[0]>:
             - define influenceTypeRaw <context.inventory.script.name.split[Influence].get[1]>
 
             - if !<player.has_flag[influenceCooldown.<[influenceTypeRaw]>]>:
@@ -201,15 +190,11 @@ InitiateWeaponTransferWindow:
         - define validInventories <list[TransferSwords_Window|TransferRanged_Window|TransferArmour_Window]>
 
         - if <context.inventory.script.exists> && <[validInventories].contains[<context.inventory.script.name>]>:
-            - yaml load:powerstruggle.yml id:ps
-
             - foreach <context.inventory.list_contents.exclude[<item[Back_influence]>]>:
-                - define amountAvailable <yaml[ps].read[transferItemsToday.<[value].material.name>]>
+                - define amountAvailable <server.flag[kingdoms.powerstruggleInfo.transferItems.<[value].material.name>]>
 
                 - if <[amountAvailable].is_integer> && <[amountAvailable]> != 0:
-                    - inventory adjust d:<context.inventory> slot:<[loop_index]> "lore:<aqua>Available Orders<&co> <white><yaml[ps].read[transferItemsToday.<[value].material.name>]>"
+                    - inventory adjust d:<context.inventory> slot:<[loop_index]> "lore:<aqua>Available Orders<&co> <white><server.flag[kingdoms.powerstruggleInfo.transferItems.<[value].material.name>]>"
 
                 - else:
                     - inventory adjust d:<context.inventory> slot:<[loop_index]> "lore:<red>No orders available"
-
-            - yaml unload id:ps
