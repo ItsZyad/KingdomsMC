@@ -28,44 +28,26 @@ StateCommandMechanisms_CISK:
     GetEntity:
     - define entityMechs <script[DenizenCISKMechMirrors].data_key[entity]>
 
-    - foreach <[entityMechs].keys> as:mech:
-        - define mechInfo <[entityMechs].get[<[mech]>]>
-        - define dynamicPropName <[mechInfo].get[prop]>
-        - define dynamicPropName <[mech]> if:<[mechInfo].get[prop].equals[/]>
+    - if !<[stateMechanism].contains_text[.]>:
+        - foreach <[entityMechs].keys> as:mech:
+            - define mechInfo <[entityMechs].get[<[mech]>]>
+            - define dynamicPropName <[mechInfo].get[prop]>
+            - define dynamicPropName <[mech]> if:<[mechInfo].get[prop].equals[/]>
 
-        - if <[stateMechanism]> == <[dynamicPropName]>:
-            - define returnVal <element[<&lt>[entityStateTarget].<[dynamicPropName]><&gt>].parsed>
-            - foreach stop
+            - if <[stateMechanism]> == <[dynamicPropName]>:
+                - define returnVal <element[<&lt>[entityStateTarget].<[dynamicPropName]><&gt>].parsed>
+                - foreach stop
 
-    - choose <[stateMechanism]>:
-        - case name:
-            - define returnVal <[entityStateTarget].name>
+    - else:
+        - if <[stateMechanism].starts_with[location.]>:
+            - define locationComponent <[stateMechanism].split[.].get[2]>
+            - definemap locationMap:
+                x: <[entityStateTarget].location.x.round>
+                y: <[entityStateTarget].location.y.round>
+                z: <[entityStateTarget].location.z.round>
+                world: <[entityStateTarget].location.world.name>
 
-        - case uuid:
-            - define returnVal <[entityStateTarget].uuid>
-
-        - case location:
-            - define returnVal <[entityStateTarget].location.simple>
-
-        - case health:
-            - define returnVal <[entityStateTarget].health>
-
-        - case isSwimming:
-            - define returnVal <[entityStateTarget].swimming>
-
-        - case isFlying:
-            - define returnVal <[entityStateTarget].is_flying>
-
-        - default:
-            - if <[stateMechanism].starts_with[location.]>:
-                - define locationComponent <[stateMechanism].split[.].get[2]>
-                - definemap locationMap:
-                    x: <[entityStateTarget].location.x.round>
-                    y: <[entityStateTarget].location.y.round>
-                    z: <[entityStateTarget].location.z.round>
-                    world: <[entityStateTarget].location.world.name>
-
-                - define returnVal <[locationMap].get[<[locationComponent]>]>
+            - define returnVal <[locationMap].get[<[locationComponent]>]>
 
     - determine <[returnVal]> if:<[returnVal].exists>
 
