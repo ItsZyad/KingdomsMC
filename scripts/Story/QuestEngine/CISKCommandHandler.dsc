@@ -3,7 +3,7 @@ GenerateRecursiveStructures_CISK:
     debug: false
     definitions: splitted
     DEBUG_GenerateSplittedList:
-    - define text <element[something <&lt>state get kingdom balance<&gt>]>
+    - define text <element[something <&lt>state get player uuid<&gt>]>
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
@@ -142,7 +142,7 @@ CommandMapEvaluator_CISK:
                 - define attrKey <[attrSubs].get[<[attrKeyRaw]>]> if:<[attrSubs].contains[<[attrKeyRaw]>]>
                 - define attrVal <[attrPair].values.get[1]>
 
-                - if <[attrVal].as[map]> == <[attrVal]>:
+                - if <[attrVal].object_type.to_uppercase> == MAP:
                     - run CommandMapEvaluator_CISK def.commandMap:<[attrVal]> save:recur
 
                     - define nestedCommandResult <entry[recur].created_queue.determination.get[1]>
@@ -229,6 +229,7 @@ DatastoreCommand_CISK:
         - case persistent:
             - define dataPersistent true
 
+
 BreakCommand_CISK:
     type: task
     debug: false
@@ -290,6 +291,7 @@ GiveCommand_CISK:
 
 StateCommand_CISK:
     type: task
+    debug: false
     commandData:
         attributeSubs:
             item: i
@@ -297,16 +299,14 @@ StateCommand_CISK:
             npc: n
 
     PostEvaluationCode:
-    - narrate format:debug S_ACT:<[stateAction]>
-    - narrate format:debug S_TAR:<[stateTarget]>
-    - narrate format:debug S_MEC:<[stateMechanism]>
-    - narrate format:debug S_MES:<[stateMechanismSet].if_null[N/A]>
+    # - narrate format:debug S_ACT:<[stateAction]>
+    # - narrate format:debug S_TAR:<[stateTarget]>
+    # - narrate format:debug S_MEC:<[stateMechanism]>
+    # - narrate format:debug S_MES:<[stateMechanismSet].if_null[N/A]>
 
     - inject StateCommandMechanisms_CISK
 
     script:
-    - narrate format:debug ATTR_KEY:<[attrKey].color[red]>
-
     - choose <[attrKey]>:
         - case server:
             - if <[stateAction].exists>:
