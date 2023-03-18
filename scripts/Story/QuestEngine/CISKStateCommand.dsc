@@ -25,6 +25,7 @@ DenizenCISKMechMirrors:
 
 StateCommandMechanisms_CISK:
     type: task
+    debug: false
     GetEntity:
     - define entityMechs <script[DenizenCISKMechMirrors].data_key[entity]>
 
