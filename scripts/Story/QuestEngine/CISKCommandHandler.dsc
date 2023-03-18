@@ -3,7 +3,7 @@ GenerateRecursiveStructures_CISK:
     debug: false
     definitions: splitted
     DEBUG_GenerateSplittedList:
-    - define text "<element[something <&lt>state get player:<&lt>dataget t:player n:ref<&gt> location<&gt>]>"
+    - define text <element[something <&lt>state get kingdom balance<&gt>]>
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
@@ -211,6 +211,7 @@ DatastoreCommand_CISK:
     - run ProduceFlaggableObject_CISK def.text:<[dataTarget]> save:realTarget
     - define realTarget <entry[realTarget].created_queue.determination.get[1]>
     - flag <[realTarget]> KQuests.data.<[dataName]>.value:<[dataValue]>
+    - flag <[realTarget]> KQuests.data.<[dataName]>.persistent:true if:<[dataPersistent].if_null[false].equals[true]>
 
     # TODO: Add error check for this... And all of these commands for that fact.
 
@@ -225,6 +226,8 @@ DatastoreCommand_CISK:
         - case value:
             - define dataValue <[attrVal]>
 
+        - case persistent:
+            - define dataPersistent true
 
 BreakCommand_CISK:
     type: task
@@ -294,14 +297,16 @@ StateCommand_CISK:
             npc: n
 
     PostEvaluationCode:
-    # - narrate format:debug S_ACT:<[stateAction]>
-    # - narrate format:debug S_TAR:<[stateTarget]>
-    # - narrate format:debug S_MEC:<[stateMechanism]>
-    # - narrate format:debug S_MES:<[stateMechanismSet].if_null[N/A]>
+    - narrate format:debug S_ACT:<[stateAction]>
+    - narrate format:debug S_TAR:<[stateTarget]>
+    - narrate format:debug S_MEC:<[stateMechanism]>
+    - narrate format:debug S_MES:<[stateMechanismSet].if_null[N/A]>
 
     - inject StateCommandMechanisms_CISK
 
     script:
+    - narrate format:debug ATTR_KEY:<[attrKey].color[red]>
+
     - choose <[attrKey]>:
         - case server:
             - if <[stateAction].exists>:
@@ -310,13 +315,6 @@ StateCommand_CISK:
         - default:
             - if <[attrKey].is_in[get|set]>:
                 - define stateAction <[attrKey]>
-
-            - else if <[attrKey].is_in[player|npc|item]>:
-                - if <[attrVal].exists>:
-                    - define stateTarget <map[<[attrKey]>=<[attrVal]>]>
-
-                - else:
-                    - define stateTarget <map[<[attrKey]>=self]>
 
             - else if <[stateTarget].exists>:
                 - if <[stateAction]> == set && !<[stateMechanism].exists>:
@@ -329,3 +327,10 @@ StateCommand_CISK:
 
                     - else:
                         - define stateMechanism <[attrVal]>
+
+            - else:
+                - if <[attrVal].exists>:
+                    - define stateTarget <map[<[attrKey]>=<[attrVal]>]>
+
+                - else:
+                    - define stateTarget <map[<[attrKey]>=self]>
