@@ -15,8 +15,11 @@ GenerateRecursiveStructures_CISK:
     - define bracketDepth 0
 
     - foreach <[splitted]> as:token:
-        - define prevToken <[splitted].get[<[loop_index].sub[1]>]>
-        - define nextToken <[splitted].get[<[loop_index].add[1]>]>
+        - define prevToken <[splitted].get[<[loop_index].sub[1]>]> if:<[loop_index].is[MORE].than[1]>
+        - define nextToken <[splitted].get[<[loop_index].add[1]>]> if:<[loop_index].is[LESS].than[<[splitted].size>]>
+
+        - define prevToken <element[]> if:<[loop_index].is[OR_LESS].than[1]>
+        - define nextToken <element[]> if:<[loop_index].is[OR_MORE].than[<[splitted].size>]>
 
         - if <[loop_index]> < <[persistent].get[commandSize].add[2].if_null[<[loop_index]>]>:
             - foreach next
@@ -51,8 +54,12 @@ CommandMapGenerator_CISK:
     - inject <script.name> path:DEBUG_GenerateSplittedList if:<[splitted].exists.not>
 
     - foreach <[splitted]> as:token:
-        - define prevToken <[splitted].get[<[loop_index].sub[1]>]>
-        - define nextToken <[splitted].get[<[loop_index].add[1]>]>
+        - define prevToken <[splitted].get[<[loop_index].sub[1]>]> if:<[loop_index].is[MORE].than[1]>
+        - define nextToken <[splitted].get[<[loop_index].add[1]>]> if:<[loop_index].is[LESS].than[<[splitted].size>]>
+
+        - define prevToken <element[]> if:<[loop_index].is[OR_LESS].than[1]>
+        - define nextToken <element[]> if:<[loop_index].is[OR_MORE].than[<[splitted].size>]>
+
         - define commandSize:++
 
         - if <[loop_index]> < <[persistent].get[skipAmount].add[1].if_null[<[loop_index]>]>:
