@@ -19,12 +19,6 @@
     #branches:
     #    - 
 
-WaitTime_CISK:
-    type: procedure
-    definitions: text|multiplier
-    script:
-    - determine <[text].split[<&sp>].size.div[1.5].div[<[multiplier]>]>
-
 DataStorageParser_CISK:
     type: task
     definitions: npc|player|dataBlock|isDialogue|schemaName

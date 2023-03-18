@@ -12,6 +12,13 @@
 #ignorewarning invalid_data_line_quotes
 ## ---------------------------END HEADER----------------------------
 
+WaitTime_CISK:
+    type: procedure
+    definitions: text|multiplier
+    script:
+    - determine <[text].split[<&sp>].size.div[1.5].div[<[multiplier]>]>
+
+
 #TODO: Make var handler change every script so that error messages reflect correctly
 
 RequiredKeys_CISK:
