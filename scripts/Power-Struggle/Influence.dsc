@@ -48,6 +48,7 @@ InfluenceWindow_Help:
 
 FyndalinAnger:
     type: procedure
+    debug: false
     script:
     - define slot <context.inventory.find_item[FyndalinAnger_Item]>
     - define anger <server.flag[kingdoms.fyndalin.fyndalinAnger].mul[100]>
@@ -69,6 +70,7 @@ FyndalinAnger:
 InfluenceGetter:
     type: procedure
     definitions: type
+    debug: false
     script:
     - define kingdom <player.flag[kingdom]>
     - define influencePercentage <server.flag[kingdoms.<[kingdom]>.powerstruggle.<[type]>].mul[100]>
@@ -88,6 +90,7 @@ InfluenceGetter:
 
 InfluenceBonusDisplay_Handler:
     type: world
+    debug: false
     events:
         on player opens InfluenceWindow:
         - define kingdom <player.flag[kingdom]>
@@ -172,6 +175,7 @@ InfluenceBonusDisplay_Handler:
 InfluenceGetter_Admin:
     type: procedure
     definitions: kingdom
+    debug: false
     script:
     - define influencePercentage <server.flag[kingdoms.<[kingdom]>.powerstruggle.totalInfluence].mul[100]>
     - define influenceGraphic <list>
@@ -229,6 +233,7 @@ InfluenceStatus_Command:
 
 InfluenceWindow_Handler:
     type: world
+    debug: false
     events:
         # Changes the function of the influence help button depending
         # on which GUI it is present in so that it correctly leads to
@@ -245,6 +250,7 @@ InfluenceWindow_Handler:
 
 InfluenceOption_Handler:
     type: world
+    debug: false
     events:
         on player clicks MercenaryInfluence in InfluenceWindow:
         - inventory open d:MercenaryInfluence_Window
@@ -313,6 +319,7 @@ InfluenceOption_Handler:
 
 DailyInfluenceRefresh:
     type: task
+    debug: false
     script:
     - define kingdomList <proc[GetKingdomList].context[true]>
 
@@ -325,6 +332,7 @@ DailyInfluenceRefresh:
 
 DailyInfluenceRefresh_Handler:
     type: world
+    debug: false
     events:
         on system time hourly every:24:
         - run DailyInfluenceRefresh
@@ -334,6 +342,7 @@ DailyInfluenceRefresh_Handler:
 CalcTotalInfluence:
     type: task
     definitions: kingdom
+    debug: false
     script:
     - define avgList <list[]>
     - define avgList:->:<server.flag[kingdoms.<[kingdom]>.powerstruggle.cityPopulation]>
@@ -351,6 +360,7 @@ CalcTotalInfluence:
 
 PerkChecker:
     type: task
+    debug: false
     script:
     - define kingdomList <proc[GetKingdomList].context[true]>
 
@@ -398,6 +408,7 @@ PerkChecker:
 
 FyndalinTakeover_Handler:
     type: world
+    debug: false
     events:
         on player clicks TotalInfluence in InfluenceWindow:
         - define inventoryItem <item[FyndalinTakeoverImpossible_Item]>
