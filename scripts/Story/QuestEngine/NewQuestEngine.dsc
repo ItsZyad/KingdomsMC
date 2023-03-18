@@ -510,10 +510,25 @@ CISKAssignment:
     type: assignment
     actions:
         on click:
-        - define file <npc.flag[file]>
-        - define schema <npc.flag[schema]>
+        - if <player.has_flag[CISKAdmin.enabled]>:
+            - narrate "<gray><strikethrough>                     "
+            - narrate "<bold>NPC ID: <blue><npc.id>"
+            - narrate "<bold>ASSIGNED FILE: <blue><npc.flag[file]>"
+            - narrate "<bold>ASSIGNED SCHEMA: <blue><npc.flag[schema]>"
+            - narrate "<gray><strikethrough>                     "
 
-        - run MainParser_CISK def.file:<[file]> def.schema:<[schema]> def.handler:click def.npc:<npc> def.player:<player>
+        - else:
+            - define file <npc.flag[file]>
+            - define schema <npc.flag[schema]>
+
+            - run MainParser_CISK def.file:<[file]> def.schema:<[schema]> def.handler:click def.npc:<npc> def.player:<player>
+
+
+ResetCISKFlag_Handler:
+    type: world
+    events:
+        on player quits:
+        - flag <player> CISKAdmin:!
 
 
 CISKCommand:
@@ -523,35 +538,47 @@ CISKCommand:
     description: Umbrella command for the CISK Engine
     permission: kingdoms.admin.cisk
     tab completions:
-        1: assign
+        1: assign|admin
         2: [FileName]
         3: [SchemaName]
         4: [NPCID]
 
     script:
-    - define file <context.args.get[2]>
-    - define schema <context.args.get[3]>
-    - define npc <npc[<context.args.get[4]>]>
+    - define args <context.raw_args.split_args>
 
-    - if !<util.has_file[quest_schemas/<[file]>]>:
-        - narrate format:admincallout "Server does not have CISK file with name: <[file]>."
-        - determine cancelled
+    - if <[args].get[1]> == assign:
+        - define file <context.args.get[2]>
+        - define schema <context.args.get[3]>
+        - define npc <npc[<context.args.get[4]>]>
 
-    - yaml load:quest_schemas/<[file]> id:schema
+        - if !<util.has_file[quest_schemas/<[file]>]>:
+            - narrate format:admincallout "Server does not have CISK file with name: <[file]>."
+            - determine cancelled
 
-    - if !<yaml[schema].contains[<[schema]>]>:
-        - narrate format:admincallout "CISK file: <[file]> does not contain a schema with the name: <[schema]>."
-        - determine cancelled
+        - yaml load:quest_schemas/<[file]> id:schema
 
-    - yaml id:schema unload
+        - if !<yaml[schema].contains[<[schema]>]>:
+            - narrate format:admincallout "CISK file: <[file]> does not contain a schema with the name: <[schema]>."
+            - determine cancelled
 
-    - if !<server.npcs.parse_tag[<[parse_value].id>].contains[<[npc].id>]>:
-        - narrate format:admincallout "There is no npc with that ID."
-        - determine cancelled
+        - yaml id:schema unload
 
-    - flag <[npc]> file:<[file]>
-    - flag <[npc]> schema:<[schema]>
+        - if !<server.npcs.parse_tag[<[parse_value].id>].contains[<[npc].id>]>:
+            - narrate format:admincallout "There is no npc with that ID."
+            - determine cancelled
 
-    - assignment clear to:<[npc]>
-    - assignment set CISKAssignment to:<[npc]>
-    - narrate format:admincallout "Assigned quest: <[schema]> to npc: <[npc].name>"
+        - flag <[npc]> file:<[file]>
+        - flag <[npc]> schema:<[schema]>
+
+        - assignment clear to:<[npc]>
+        - assignment set CISKAssignment to:<[npc]>
+        - narrate format:admincallout "Assigned quest: <[schema]> to npc: <[npc].name>"
+
+    - else if <[args].get[1]> == admin:
+        - if <player.has_flag[CISKAdmin.enabled]>:
+            - flag <player> CISKAdmin:!
+
+        - else:
+            - flag <player> CISKAdmin.enabled
+
+        - narrate format:admincallout "CISK NPC debug view: <red><player.flag[CISKAdmin].exists.if_true[Activated].if_false[Deactivated]>!"
