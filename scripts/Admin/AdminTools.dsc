@@ -481,6 +481,7 @@ DEBUG_GenerateKingdomFlags:
         - flag server kingdoms.<[kingdom]>.claims.castle:<[YKI].get[castle_territory]>
         - flag server kingdoms.<[kingdom]>.claims.coreMax:<[YKI].get[core_max]>
         - flag server kingdoms.<[kingdom]>.claims.castleMax:<[YKI].get[castle_max]>
+        - flag server kingdoms.<[kingdom]>.npcTotal:<[YKI].deep_get[npcs.npc_total]>
         - flag server kingdoms.<[kingdom]>.outposts.costMultiplier:<[YKI].deep_get[outposts.outpost_cost]>
         - flag server kingdoms.<[kingdom]>.outposts.upkeepMultiplier:<[YKI].deep_get[outposts.outpost_upkeep]>
         - flag server kingdoms.<[kingdom]>.outposts.maxSize:<[YKI].deep_get[outposts.max_size]>
@@ -495,7 +496,7 @@ DEBUG_GenerateKingdomFlags:
         - flag server kingdoms.<[kingdom]>.powerstruggle.masonsGuild:<[YPI].get[masonsguild]>
         - flag server kingdoms.<[kingdom]>.powerstruggle.prestigeMultiplier:<[YPI].get[perstigemultiplier]>
         - flag server kingdoms.<[kingdom]>.powerstruggle.electionInfluence:<[YPI].get[electioninfluence]>
-        - flag server kingdoms.<[kingdom]>.powerstruggle.BMFactionInfluence:<[YBI]>
+        - flag server kingdoms.<[kingdom]>.powerstruggle.BMFactionInfluence:<[YBI]> if:<[YBI].exists>
 
     - flag server kingdoms.claimInfo.allClaims:<yaml[kingdoms].read[all_claims]>
 
