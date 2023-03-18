@@ -158,7 +158,7 @@ BlackMarketInfluence_Handler:
             - define influenceAmount <util.random.decimal[0.005].to[<util.random.decimal[0.007].to[0.1]>]>
             - define faction <player.flag[factionInfo].get[1]>
 
-            - flag server kingdoms.<[kingdom]>.powerstruggle.factionData.<[faction]>:+:<[influenceAmount]>
+            - flag server kingdoms.<[kingdom]>.powerstruggle.BMFactionInfluence.<[faction]>:+:<[influenceAmount]>
 
             - narrate format:callout "A letter of support has been sent to the boss of: <server.flag[kingdoms.factionInfo.<[faction]>.name]>"
 
