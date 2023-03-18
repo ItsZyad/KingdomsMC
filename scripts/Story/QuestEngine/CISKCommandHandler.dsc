@@ -3,13 +3,12 @@ GenerateRecursiveStructures_CISK:
     debug: false
     definitions: splitted
     DEBUG_GenerateSplittedList:
-    - define text <element[something <&lt>state get player uuid<&gt>]>
+    - define text <element[something <&lt>give i:exp q:20<&gt>]>
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
     script:
     - inject <script.name> path:DEBUG_GenerateSplittedList if:<[splitted].exists.not>
-    - define player <player[ZyadTheBoss]>
     - define persistent <map[]>
     - define lineList <list[]>
     - define totalLoops 0
@@ -102,7 +101,7 @@ CommandDelegator_CISK:
     - adjust <queue> linked_npc:<[npc]> if:<[npc].exists>
 
     - foreach <[line]> as:token:
-        - if <[token].as[map]> == <[token]>:
+        - if <[token].object_type.to_uppercase> == MAP:
             - define commandMap <[token]>
             - define commandName <[commandMap].get[name]>
             - define commandScript <script[<[commandName]>Command_CISK]>
@@ -270,11 +269,17 @@ GiveCommand_CISK:
             quantity: q
 
     PostEvaluationCode:
-    - if <[giveType]> == as_drop:
-        - drop <[giveItem].as[item]> quantity:<[giveQuantity]> <[npc].as[entity].location.forward[1]>
+    - if <[giveItem]> == exp:
+        - experience give <[giveQuantity]> player:<[player]>
 
-    - else:
-        - give <[giveItem].as[item]> quantity:<[giveQuantity]> to:<[player].inventory>
+    - else if <[giveItem].as[item].exists>:
+        - define giveItem <[giveItem].as[item]>
+
+        - if <[giveType]> == as_drop:
+            - drop <[giveItem]> quantity:<[giveQuantity]> <[npc].as[entity].location.forward[1]>
+
+        - else:
+            - give <[giveItem]> quantity:<[giveQuantity]> to:<[player].inventory>
 
     script:
     - choose <[attrKey]>:
