@@ -1,9 +1,42 @@
 ##ignorewarning def_of_nothing
 
+DenizenCISKMechMirrors:
+    type: data
+    entity:
+        name:
+            prop: /
+            mech: display_name
+        uuid:
+            prop: /
+        location:
+            prop: location.simple
+            mech: location
+        health:
+            prop: /
+            mech: /
+        isSwimming:
+            prop: swimming
+            mech: swimming
+        isFlying:
+            prop: is_flying
+            mech: flying
+
+
 StateCommandMechanisms_CISK:
     type: task
     debug: false
     GetEntity:
+    - define entityMechs <script[DenizenCISKMechMirrors].data_key[entity]>
+
+    - foreach <[entityMechs].keys> as:mech:
+        - define mechInfo <[entityMechs].get[<[mech]>]>
+        - define dynamicPropName <[mechInfo].get[prop]>
+        - define dynamicPropName <[mech]> if:<[mechInfo].get[prop].equals[/]>
+
+        - if <[stateMechanism]> == <[dynamicPropName]>:
+            - define returnVal <element[<&lt>[entityStateTarget].<[dynamicPropName]><&gt>].parsed>
+            - foreach stop
+
     - choose <[stateMechanism]>:
         - case name:
             - define returnVal <[entityStateTarget].name>
@@ -52,6 +85,16 @@ StateCommandMechanisms_CISK:
     - if <[stateMechanism].is_in[<[nonMapKeys]>]>:
         - define returnVal <[targetKingdomFlag].get[<[stateMechanism]>]>
 
+    - else if <[stateMechanism].starts_with[outposts.]>:
+
+        ## WARNING: Assumes that there can only be an outposts mechanism in the form of outposts.x
+        ##          Any other format will bug out.
+
+        - define outpostSecondComponent <[stateMechanism].split[.].get[2]>
+        - define outpostKeyList <[targetKingdomFlag].get[outposts].deep_keys.filter_tag[<[filter_value].contains_text[.].not>]>
+        - define returnVal <[targetKingdomFlag].deep_get[outposts.<[outpostSecondComponent]>]> if:<[outpostKeyList].contains[<[outpostSecondComponent]>]>
+
+    - narrate format:debug RET:<[returnVal]>
     - determine <[returnVal]> if:<[returnVal].exists>
 
     script:
