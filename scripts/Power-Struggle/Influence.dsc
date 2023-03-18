@@ -50,7 +50,6 @@ FyndalinAnger:
     type: procedure
     debug: false
     script:
-    - define slot <context.inventory.find_item[FyndalinAnger_Item]>
     - define anger <server.flag[kingdoms.fyndalin.fyndalinAnger].mul[100]>
     - define influenceGraphic <list>
 
