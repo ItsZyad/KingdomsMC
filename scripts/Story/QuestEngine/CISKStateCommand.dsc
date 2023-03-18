@@ -21,6 +21,7 @@ DenizenCISKMechMirrors:
             prop: is_flying
             mech: flying
 
+# TODO: Make more of these ^
 
 StateCommandMechanisms_CISK:
     type: task
@@ -75,6 +76,32 @@ StateCommandMechanisms_CISK:
         - define outpostSecondComponent <[stateMechanism].split[.].get[2]>
         - define outpostKeyList <[targetKingdomFlag].get[outposts].deep_keys.filter_tag[<[filter_value].contains_text[.].not>]>
         - define returnVal <[targetKingdomFlag].deep_get[outposts.<[outpostSecondComponent]>]> if:<[outpostKeyList].contains[<[outpostSecondComponent]>]>
+
+    - else if <[stateMechanism].starts_with[influence.]>:
+        - define influenceArgs <[stateMechanism].split[.]>
+        - define influenceInfo <[targetKingdomFlag].get[powerstruggle]>
+
+        - choose <[influenceArgs].get[2]>:
+            - case mercenaries:
+                - define returnVal <[influenceInfo].get[mercenaryGuild]>
+
+            - case government:
+                - define returnVal <[influenceInfo].get[fyndalinGovt]>
+
+            - case masons:
+                - define returnVal <[influenceInfo].get[masonsGuild]>
+
+            - case populace:
+                - define returnVal <[influenceInfo].get[cityPopulation]>
+
+            - case points:
+                - define returnVal <[influenceInfo].get[influencePoints]>
+
+            - case blackmarket:
+                - define BMFactionsList <[influenceInfo].get[BMFactionInfluence].keys>
+
+                - if <[influenceArgs].get[3].is_in[<[BMFactionList]>]>:
+                    - define returnVal <[influenceInfo].deep_get[BMFactionInfluence.<[influenceArgs].get[3]>]>
 
     - narrate format:debug RET:<[returnVal]>
     - determine <[returnVal]> if:<[returnVal].exists>
