@@ -136,7 +136,7 @@ SpeechHandler_CISK:
             - define waitTime 0
 
             - if <[evaluatedLine].size> > 0:
-                - define waitTime <proc[WaitTime_CISK].context[<[evaluatedLine]>|<[talkSpeed]>].round_to_precision[0.01]>
+                - define waitTime <proc[WaitTime_CISK].context[<[evaluatedLine].space_separated>|<[talkSpeed]>].round_to_precision[0.01]>
                 - chat targets:<[player]> talkers:<[npc]> <[evaluatedLine].space_separated>
 
         - if !<[waitOverride].exists> || <[waitOverride]> == null:
@@ -511,11 +511,11 @@ CISKAssignment:
     actions:
         on click:
         - if <player.has_flag[CISKAdmin.enabled]>:
-            - narrate "<gray><strikethrough>                     "
+            - narrate "<gray><strikethrough>                         "
             - narrate "<bold>NPC ID: <blue><npc.id>"
             - narrate "<bold>ASSIGNED FILE: <blue><npc.flag[file]>"
             - narrate "<bold>ASSIGNED SCHEMA: <blue><npc.flag[schema]>"
-            - narrate "<gray><strikethrough>                     "
+            - narrate "<gray><strikethrough>                         "
 
         - else:
             - define file <npc.flag[file]>
