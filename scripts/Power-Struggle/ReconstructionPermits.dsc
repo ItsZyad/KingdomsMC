@@ -66,6 +66,7 @@ ReconstructionPermit_Command:
 
 ReconstructionPermit_Handler:
     type: world
+    debug: false
     events:
         on player clicks Reconstruction_Influence in GovernmentInfluence_Window:
         - define maxPlotSize <server.flag[kingdoms.<player.flag[kingdom]>.powerstruggle.maxPlotSize]>

@@ -45,6 +45,7 @@ IsKingdomBankrupt:
 
 NegativeBalanceAlert:
     type: world
+    debug: false
     events:
         on player joins:
         - wait 10t
