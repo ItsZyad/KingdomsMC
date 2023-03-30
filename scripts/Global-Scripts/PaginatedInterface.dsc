@@ -33,6 +33,7 @@ GetTrueInterface_Proc:
 
     - determine <[outList]>
 
+
 PaginatedInterface:
     type: task
     debug: false
@@ -50,10 +51,14 @@ PaginatedInterface:
         - adjust def:interface contents:<[newInterfaceItems]>
 
     script:
-    - flag <[player]> dataHold.paginated.itemList:<[itemList]> if:<player.has_flag[dataHold.paginated.itemList].not>
+    # - flag <[player]> dataHold.paginated.itemList:<[itemList]> if:<player.has_flag[dataHold.paginated.itemList].not>
+    - define itemList <[itemList].if_null[<player.flag[dataHold.paginated.itemList]>].exclude[<item[air]>]>
+
+    - flag <[player]> dataHold.paginated.itemList:<[itemList]>
+    - flag <[player]> dataHold.paginated.footer:<[footer]>
+    - flag <[player]> dataHold.paginated.title:<[title]>
 
     - define outList <list>
-    # - define itemList <player.flag[dataHold.paginated.itemList]>
     - define interface <inventory[PaginatedInterface_Window]>
     - define itemsPerPage <[interface].size.sub[9]>
 
@@ -89,36 +94,42 @@ PaginatedInterface:
 PaginatedInterface_Handler:
     type: world
     debug: false
+    InitializeVariables:
+    - define pageNum <player.flag[dataHold.paginated.page]>
+    - define itemList <player.flag[dataHold.paginated.itemList]>
+    - define itemsPerPage <context.inventory.size.sub[9]>
+    - define maxPages <[itemList].size.div[<[itemsPerPage]>].round_up>
+    - define footer <player.flag[dataHold.paginated.footer]>
+    - define title <player.flag[dataHold.paginated.title]>
+
+    #Todo: add custom events that fire when player changes page
     events:
-        on player clicks Page_Back in PaginatedInterface_Window:
-        - define pageNum <player.flag[dataHold.paginated.page]>
-        - define itemList <player.flag[dataHold.paginated.itemList]>
-        - define itemsPerPage <context.inventory.size.sub[9]>
-        - define maxPages <[itemList].size.div[<[itemsPerPage]>].round_up>
+        on player clicks Page_Back in PaginatedInterface_Window priority:0:
+        - inject <script.name> path:InitializeVariables
+        - narrate format:debug PAGE_BACK
 
         - if <[pageNum].sub[1].is[OR_MORE].than[1]>:
-            - run PaginatedInterface def.itemList:<[itemList]> def.page:<[pageNum].sub[1]> def.player:<player>
+            - run PaginatedInterface def.itemList:<[itemList]> def.page:<[pageNum].sub[1]> def.player:<player> def.title:<[title]> def.footer:<[footer]>
 
         - else:
-            - run PaginatedInterface def.itemList:<[itemList]> def.page:<[maxPages]> def.player:<player>
+            - run PaginatedInterface def.itemList:<[itemList]> def.page:<[maxPages]> def.player:<player> def.title:<[title]> def.footer:<[footer]>
 
         - determine cancelled
 
-        on player clicks Page_Forward in PaginatedInterface_Window:
-        - define pageNum <player.flag[dataHold.paginated.page]>
-        - define itemList <player.flag[dataHold.paginated.itemList]>
-        - define itemsPerPage <context.inventory.size.sub[9]>
-        - define maxPages <[itemList].size.div[<[itemsPerPage]>].round_up>
+        on player clicks Page_Forward in PaginatedInterface_Window priority:0:
+        - inject <script.name> path:InitializeVariables
+        - narrate format:debug PAGE_FORWARD
 
         - if <[pageNum].add[1].is[OR_LESS].than[<[maxPages]>]>:
-            - run PaginatedInterface def.itemList:<[itemList]> def.page:<[pageNum].add[1]> def.player:<player>
+            - run PaginatedInterface def.itemList:<[itemList]> def.page:<[pageNum].add[1]> def.player:<player> def.title:<[title]> def.footer:<[footer]>
 
         - else:
-            - run PaginatedInterface def.itemList:<[itemList]> def.page:1 def.player:<player>
+            - run PaginatedInterface def.itemList:<[itemList]> def.page:1 def.player:<player> def.title:<[title]> def.footer:<[footer]>
 
         - determine cancelled
 
         on player closes PaginatedInterface_Window:
         - wait 2t
         - if <player.open_inventory> == <player.inventory>:
+            - customevent id:PaginatedInvClose
             - flag <player> dataHold.paginated:!
