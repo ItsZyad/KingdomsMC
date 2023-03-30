@@ -62,7 +62,7 @@ MinerRangeFinder:
     - define npcLoc <[npc].location>
     - define locOne <[npcLoc].right[<[radius]>].forward[<[radius]>]>
     - define locTwo <[npcLoc].left[<[radius]>].backward[<[radius]>]>
-    - define areaOfEffect <cuboid[<[npc].location.world.name>,<[locOne].x>,<[npcLoc].y.add[<[radius]>]>,<[locOne].z>,<[locTwo].x>,<[npcLoc].y.sub[<[radius]>]>,<[locTwo].z>]>
+    - define areaOfEffect <cuboid[<[npc].location.world.name>,<[locOne].x>,<[npcLoc].y.add[<[radius].mul[2]>]>,<[locOne].z>,<[locTwo].x>,<[npcLoc].y.sub[<[radius]>]>,<[locTwo].z>]>
 
     - foreach <[areaOfEffect].blocks> as:block:
        - flag <[npc]> blockBuildup.<[block].material.name>:++

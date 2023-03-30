@@ -211,22 +211,22 @@ RNPCWindow_Handler:
             - if <context.item.flag[spawnType]> == farmers:
                 - create player <player.location> "<[nameType]> :: Lvl 1" save:latestNPC
 
+                # Make the AOE scale with half the kingdom's prestige with
+                # a minimum radius of 5
+
+                - define radius <[prestige].div[2].round>
+                - define radius 5 if:<[prestige].round.is[LESS].than[10]>
+
                 # If the NPC is spawned into an outpost of its correspond-
                 # ing specialization type, assign it a modifier
 
                 - flag <entry[latestNPC].created_npc> outpostMod:<[NPCOutpostMod].as[list]>
 
                 # Change NPC's skin
+
                 - adjust def:<entry[latestNPC].created_npc> skin_blob:<script[RNPCSkins].data_key[farmer]>
 
-                # Make the AOE scale with half the kingdom's prestige with
-                # a minimum radius of 5
-
-                - if <[prestige].round.is[LESS].than[10]>:
-                    - run FarmerRangeFinder def:<entry[latestNPC].created_npc>|5
-
-                - else:
-                    - run FarmerRangeFinder def:<entry[latestNPC].created_npc>|<[prestige].div[2].round>
+                - run FarmerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
 
                 # Write relevant RNPC data
 
@@ -262,21 +262,19 @@ RNPCWindow_Handler:
 
                     - create player <player.location> "<[nameType]> :: Lvl 1" save:latestNPC
 
+                    - define radius <[prestige].sqrt.mul[3.9].round>
+                    - define radius 10 if:<[prestige].round.is[LESS].than[10]>
+
                     # If the NPC is spawned into an outpost of its correspond
                     # .ing specialization type, assign it a modifier
 
                     - flag <entry[latestNPC].created_npc> outpostMod:<[NPCOutpostMod]>
 
+                    - run MinerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
+
                     # Write relevant RNPC data
 
                     - run WriteRNPCData def:<entry[latestNPC].created_npc>|<context.item.flag[spawnType]>
-
-                    - if <[prestige].is[LESS].than[20]>:
-                        - run MinerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:5
-
-                    - else:
-                        - run MinerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[prestige].div[4].round_up>
-
                     - run CalculateRNPCPrice def.truePrice:<[truePrice]> def.player:<player>
 
                 # If not then remove the NPC just created and its ref
@@ -291,16 +289,19 @@ RNPCWindow_Handler:
             - else if <context.item.flag[spawnType]> == loggers:
                 - create player <player.location> "<[nameType]> :: Lvl 1" save:latestNPC
 
+                - define radius <[prestige].sqrt.mul[6.2].round>
+                - define radius 20 if:<[prestige].round.is[LESS].than[10]>
+
                 # If the NPC is spawned into an outpost of its correspond
                 # .ing specialization type, assign it a modifier
 
                 - flag <entry[latestNPC].created_npc> outpostMod:<[NPCOutpostMod]>
 
+                - run LoggerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
+
+                # Write relevant RNPC data
+
                 - run WriteRNPCData def:<entry[latestNPC].created_npc>|<context.item.flag[spawnType]>
-
-                - if <[prestige].round.is[LESS].than[10]>:
-                    - run LoggerRangeFinder def:<entry[latestNPC].created_npc>|20
-
                 - run CalculateRNPCPrice def.truePrice:<[truePrice]> def.player:<player>
 
             ## >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -310,7 +311,6 @@ RNPCWindow_Handler:
                 - define isInCastleLoc <server.flag[kingdoms.<[kingdom]>.claims.castle].contains[<player.location.chunk>]>
 
                 - if <[isInCastleLoc]>:
-                    # Found in: CastleGuard.dsc
                     - run GuardSetup def:<player>
 
                 - else:

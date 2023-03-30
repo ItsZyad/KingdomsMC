@@ -28,7 +28,7 @@ FarmerRangeFinder:
     #- narrate --------------
     #- narrate format:debug <[npcLoc].y.sub[radius]>
 
-    #- showfake red_stained_glass|blue_stained_glass <[areaOfEffect].outline_2d[<player.location.y>]> duration:5s
+    # - showfake red_stained_glass <[areaOfEffect].outline>
 
     - showfake glass <[areaOfEffect_DEBUG].outline> duration:5s
 
@@ -42,7 +42,7 @@ FarmerRangeFinder:
 
     - note <[areaOfEffect_DEBUG]> as:INTERNAL_farm_<[npc].flag[kingdom]>_<[npc].id>
 
-    - chunkload add <[areaOfEffect_DEBUG].chunks>
+    - chunkload add <[areaOfEffect_DEBUG].chunks> duration:10s
 
 FoodExperienceGain:
     type: data
