@@ -32,6 +32,8 @@ Claim_Command:
             - narrate format:callout "You are not allowed to claim a chunk here. This area is a point of interest!"
             - determine cancelled
 
+    - run FindKingdomOverlaps def.currentClaim:<[playerChunk]> save:overlap
+
     - choose <player.flag[ClaimingMode]>:
         - case CoreClaiming:
             - if <[coreChunks].contains[<[playerChunk]>]>:
@@ -46,7 +48,6 @@ Claim_Command:
                 - narrate format:callout "You must have castle chunks claimed before making core claims."
                 - determine cancelled
 
-            - run FindKingdomOverlaps def.currentClaim:<[playerChunk]> save:overlap
 
             - else if <entry[overlap].created_queue.determination.get[1]>:
                 - narrate format:callout "This chunk is already occupied. Double claiming could be considered an act of agression!"
