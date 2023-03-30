@@ -27,10 +27,16 @@ WorldNews_Command:
                     - determine <list[inhand]>
 
                 - case 2:
-                    - determine <list[[expiry]]>
+                    - determine <list[expiry]>
 
                 - case 3:
                     - determine <list[[title]]>
+
+                - case 4:
+                    - determine <list[[subtitle]]>
+
+                - case 5:
+                    - determine <list[[kingdoms]]>
 
     script:
     - define args <context.raw_args.split_args>
@@ -49,23 +55,42 @@ WorldNews_Command:
                         - determine cancelled
 
                     - define bookContent <player.item_in_hand.book_pages>
-                    - define expiry <[args].get[3]>
-                    - define title <[args].get[4].if_null[<player.item_in_hand.book_title>]>
+                    - define expiry <[args].get[3].as[duration].if_null[null]>
+                    - define title <[args].get[4]>
                     - define subtitle <[args].get[5].if_null[<list[]>]>
+                    - define targetKingdoms <[args].get[6].split[,].if_null[<list[all]>]>
 
-                    - define trueExpiry <[expiry].as[duration].if_null[null]>
+                    - define title <player.item_in_hand.book_title> if:<[title].length.equals[0]>
+                    - define subtitle <list[]> if:<[subtitle].length.equals[0]>
+                    - define targetKingdoms <list[all]> if:<[targetKingdoms].length.equals[0]>
+
+                    - define newsID <server.flag[news.articles].last.get[newsID].if_null[0].add[1]>
 
                     - definemap newNews:
                         content: <[bookContent]>
                         title: <[title]>
                         subtitle: <[subtitle]>
-                        expiry: <[trueExpiry]>
+                        expiry: <[expiry]>
+                        kingdoms: <[targetKingdoms]>
+                        newsID: <[newsID]>
 
-                    - flag server news.world:->:<[newNews]>
-                    - narrate format:admincallout "Added new global news article."
+                    - flag server news.articles:->:<[newNews]>
+                    - narrate format:admincallout "Added news article."
 
                 - else:
                     - narrate format:admincallout "The item to add to the news list must be of type: <underline>book"
+
+        - case remove:
+            - define newsID <[args].get[2]>
+
+            - if !<[newsID].exists>:
+                - narrate format:admincallout "You must provide a Temp. News ID corresponding to the article you want to remove."
+                - determine cancelled
+
+            - define article <server.flag[news.articles].filter_tag[<[filter_value].get[newsID].equals[<[newsID]>]>]>
+            - flag server news.articles:<server.flag[news.articles].exclude[<[article]>].max[1]>
+
+            - narrate format:admincallout "Removed news article with ID: <[newsID]>"
 
 
 NewsArticle_Item:
@@ -83,26 +108,31 @@ EmptyNews_Item:
     mechanisms:
         skull_skin: c42fe8de-3315-435b-a911-2fd93aabd58c|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODhhZTdlOGVhOGRkNWZmOGRlM2MzNjEwYTFjMWI2M2U4MGI3ZGRiZGRmZDUzMTRkZjNiYjhhYjQ4ZmZiNyJ9fX0=
 
+
 WorldNewsViewer:
     type: task
     definitions: player
     script:
-    - if <server.flag[news.world].size.if_null[0]> == 0:
+    - if <server.flag[news.articles].size.if_null[0]> == 0:
         - define itemList <list[<item[EmptyNews_Item]>]>
 
     - else:
-        - define newsList <server.flag[news.world]>
+        - define newsList <server.flag[news.articles]>
         - define itemList <list[]>
         - define newsItem <item[NewsArticle_Item]>
 
         - foreach <[newsList]> as:article:
-            - adjust def:newsItem display:<white><bold><[article].get[title]>
-            - flag <[newsItem]> content:<[article].get[content]>
+            - if <[article].get[kingdoms].if_null[<list[all]>].get[1]> == all || <[article].get[kingdoms].contains[<[player].flag[kingdom]>]>:
+                - adjust def:newsItem display:<white><bold><[article].get[title]>
+                - flag <[newsItem]> content:<[article].get[content]>
 
-            - if <[article].get[subtitle].size> != 0:
-                - adjust def:newsItem lore:<n><[article].get[subtitle]>
+                - if <[article].get[subtitle].size> != 0:
+                    - adjust def:newsItem lore:<n><[article].get[subtitle]>
 
-            - define itemList:->:<[newsItem]>
+                - if <[player].is_op> || <player.has_permission[kingdoms.admin]>:
+                    - adjust def:newsItem "lore:<n><gray>Temporary Article ID: <[article].get[newsID]>"
+
+                - define itemList:->:<[newsItem]>
 
     - run PaginatedInterface def.itemList:<[itemList]> def.page:1 def.player:<[player]> def.title:News
 
@@ -151,3 +181,6 @@ Mailbox_Handler:
         - if <player.flag[kingdom]> == <context.location.flag[mailbox]> || <player.has_permission[kingdoms.admin.mailbox]>:
             - flag <player> dataHold.viewingNews
             - run WorldNewsViewer def.player:<player>
+
+        - else:
+            - narrate format:callout "You cannot open another kingdom's mailbox!"
