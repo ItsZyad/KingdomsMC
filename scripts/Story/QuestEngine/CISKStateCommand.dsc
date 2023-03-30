@@ -3,11 +3,11 @@
 DenizenCISKMechMirrors:
     type: data
     entity:
+
+        # PROPERTY-MECHANISM KEYS
         name:
             prop: /
             mech: display_name
-        uuid:
-            prop: /
         location:
             prop: location.simple
             mech: location
@@ -20,6 +20,16 @@ DenizenCISKMechMirrors:
         isFlying:
             prop: is_flying
             mech: flying
+
+        # PROPERTY-ONLY KEYS
+        isTrading:
+            prop: is_trading
+        uuid:
+            prop: /
+        direction:
+            prop: location.yaw.simple
+        type:
+            prop: entity_type
 
 # TODO: Make more of these ^
 
