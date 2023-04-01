@@ -3,7 +3,7 @@ GenerateRecursiveStructures_CISK:
     debug: false
     definitions: splitted
     DEBUG_GenerateSplittedList:
-    - define text <element[something <&lt>give i:exp q:20<&gt>]>
+    - define text <element[You are <&lt>state get player name<&gt>. You're good to go!]>
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
@@ -32,7 +32,8 @@ GenerateRecursiveStructures_CISK:
             - define lineList:->:<[persistent].get[commandMap]>
 
         - else:
-            - define lineList:->:<[token]>
+            - if <[token]> != <&gt>:
+                - define lineList:->:<[token]>
 
     - determine <[lineList]>
 
