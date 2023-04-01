@@ -9,7 +9,7 @@
 ## @Date: Aug - Nov 2022
 ## @Status: INDEV
 ## @Version: v0.5
-#ignorewarning invalid_data_line_quotes
+##ignorewarning bad_quotes
 ## ---------------------------END HEADER----------------------------
 
 WaitTime_CISK:
@@ -142,6 +142,8 @@ SpeechHandler_CISK:
             - define evaluatedLine <entry[evaluated_line].created_queue.determination.get[1]>
             - define waitTime 0
 
+            - narrate format:debug SPLIT:<[splitted]>
+
             - if <[evaluatedLine].size> > 0:
                 - define waitTime <proc[WaitTime_CISK].context[<[evaluatedLine].space_separated>|<[talkSpeed]>].round_to_precision[0.01]>
                 - chat targets:<[player]> talkers:<[npc]> <[evaluatedLine].space_separated>
@@ -153,159 +155,6 @@ SpeechHandler_CISK:
         #TODO: UNCOMMENT ONCE IN PROD!
         #- flag <[npc]> playerInteractions.<[player]>:++
         - disengage
-
-
-CommandHandler_CISK:
-    type: task
-    BreakCommand:
-    - define hasBroken true
-    - determine cancelled
-
-    GotoCommand:
-    - define gotoScript "<[value].split[/goto ].get[2].replace_text[/].with[]>"
-    - define playerDefinedBlock <yaml[ciskFile].read[<[schema]>.branches.<[gotoScript]>]>
-
-    - define currentBlock_orig <[currentBlock]>
-    - define currentHandler <[playerDefinedBlock]>
-    - define speech <[currentHandler].get[actions]>
-    - define talkSpeed <[currentHandler].get[talkSpeed].if_null[1]>
-
-    - inject SpeechHandler_CISK
-
-    - define currentHandler <[currentBlock_orig]>
-    - determine cancelled
-
-    WaitCommand:
-    - define valueSplit "<[value].split[ ]>"
-    - define extraWaitTime <[valueSplit].filter_tag[<[filter_value].is_integer.or[<[filter_value].is_decimal>]>].get[1].trim.replace_text[regex:/$]>
-    - define waitOverride <[valueSplit].filter_tag[<[filter_value].trim.contains_text[override]>].get[1].replace_text[regex:/$].if_null[null]>
-
-    - if <[extraWaitTime].is_integer.or[<[extraWaitTime].is_decimal>]>:
-        - wait <[extraWaitTime]>s
-
-    - else:
-        - define errMsg "Expected decimal or integer argument in wait command."
-        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
-        - determine cancelled
-
-    DataGetCommand:
-    - define valueSplit "<[value].split[ ]>"
-    - define dataTargetRaw <[valueSplit].filter_tag[<[filter_value].starts_with[t:].or[<[filter_value].starts_with[target:]>]>].get[1].replace_text[regex:/$]>
-    - define dataName <[valueSplit].filter_tag[<[filter_value].starts_with[n:].or[<[filter_value].starts_with[name:]>]>].get[1].replace_text[regex:/$].split[:].get[2]>
-    - define dataDefaultRaw <[valueSplit].filter_tag[<[filter_value].starts_with[def:].or[<[filter_value].starts_with[default:]>]>].get[1].replace_text[regex:/$]>
-
-    - if !<[dataName].exists> || !<[dataTargetRaw].exists>:
-        - define errMsg "Must specify data variable name and a data target."
-        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
-        - determine cancelled
-
-    - define dataTarget <[dataTargetRaw].split[:].get[2].as[entity]>
-
-    - if !<[dataTarget].flag_map.exists>:
-        - define errMsg "The data target: '<[dataTarget].color[red]>' provided is not a valid flaggable entity."
-        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
-        - determine cancelled
-
-    - define return <[dataTarget].flag[KQuests.data.<[dataName]>.value]>
-
-    - if !<[return].exists> && <[dataDefaultRaw].exists>:
-        - determine <[dataDefaultRaw].split[:].get[2]>
-
-    - determine <[return]>
-
-    GiveCommand:
-    - define valueSplit "<[value].split[ ]>"
-    - define giveItem <[valueSplit].filter_tag[<[filter_value].starts_with[i:].or[<[filter_value].starts_with[item:]>]>].get[1].trim.replace_text[regex:/$].split[:].get[2].if_null[null]>
-    - define quantity <[valueSplit].filter_tag[<[filter_value].starts_with[q:].or[<[filter_value].starts_with[quantity:]>]>].get[1].trim.replace_text[regex:/$].split[:].get[2].if_null[null]>
-    - define toPlayer <[valueSplit].filter_tag[<[filter_value].starts_with[to:]>].get[1].trim.replace_text[regex:/$].split[:].get[2].as[player].if_null[null]>
-    - define asDrop <[valueSplit].filter_tag[<[filter_value].trim.contains_text[as_drop]>].get[1].replace_text[regex:/$].if_null[null]>
-
-    - if !<[giveItem].exists>:
-        - define errMsg "Must specify item to give to player"
-        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
-        - determine cancelled
-
-    - if <[quantity]> == null:
-        - define quantity 1
-
-    - if <[toPlayer]> == null:
-        - define toPlayer <[player]>
-
-    - if <[asDrop]> == as_drop:
-        - drop <[giveItem].as[item]> quantity:<[quantity]> <[npc].as[entity].location.forward[1]>
-
-    - else:
-        - give <[giveItem].as[item]> quantity:<[quantity]> to:<[toPlayer].inventory>
-
-    DataStoreCommand:
-    - define valueSplit "<[value].split[ ]>"
-    - define targetName <[valueSplit].filter_tag[<[filter_value].starts_with[t:].or[<[filter_value].starts_with[target:]>]>].get[1].trim.replace_text[regex:/$].split[:].get[2].if_null[null]>
-    - define dataName <[valueSplit].filter_tag[<[filter_value].starts_with[n:].or[<[filter_value].starts_with[name:]>]>].get[1].trim.replace_text[regex:/$].split[:].get[2].if_null[null]>
-    - define dataVal <[valueSplit].filter_tag[<[filter_value].starts_with[v:].or[<[filter_value].starts_with[value:]>]>].get[1].trim.replace_text[regex:/$].split[:].get[2].if_null[null]>
-    - define isPersistent <[valueSplit].filter_tag[<[filter_value].trim.contains_text[persistent]>].get[1].replace_text[regex:/$].if_null[null]>
-
-    ## Maybe turn this into its own module for checking if an object is
-    ## actually flaggable
-    ## --- ##
-    - if <[targetName].regex_matches[^npc|player]>:
-        - if <[targetName].contains_text[<&at>]>:
-            - define targetType <[targetName].split[<&at>].get[1]>
-            - define targetID <[targetName].split[<&at>].get[2]>
-            - define lookupList <list>
-
-            - choose <[targetType]>:
-                - case player:
-                    - define lookupList <server.players.parse_tag[<[parse_value].name>]>
-                    - define dataTarget <player[<[targetID]>]>
-                - case npc:
-                    - define lookupList <server.npcs.parse_tag[<[parse_value].id>]>
-                    - define dataTarget <npc[<[targetID]>]>
-
-            - if <[dataTarget].exists> || <[dataTarget]> == null:
-                - define errMsg "Invalid target specified: '<[targetName]>'"
-                - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
-                - determine cancelled
-
-        - else:
-            - define dataTarget <queue.definition_map.get[<[targetName]>]>
-    ## --- ##
-
-    - if !<[dataTarget].exists>:
-        - define errMsg "Internal error occured while calculating data target result"
-        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
-        - determine cancelled
-
-    - flag <[dataTarget]> KQuests.data.<[dataName]>:!
-    - flag <[dataTarget]> KQuests.data.<[dataName]>.value:<[dataVal]>
-    - flag <[dataTarget]> KQuests.data.<[dataName]>.persistent if:<[isPersistent].equals[null].not>
-
-    script:
-    ## Defs carried from MAINPARSER_CISK:
-    ## file, schema, handler, npc, player
-
-    ## Defs carried from SPEECHHANDLER_CISK:
-    ## waitTime, currentBlock, interactionAmounts, talkSpeed, shouldEngage, speech, hasBroken
-
-    - definemap commandRes:
-        script: <script.name>
-        path: null
-
-    - definemap commandToPathRef:
-        /goto: GotoCommand
-        /wait: WaitCommand
-        /give: GiveCommand
-        /end: BreakCommand
-        /dataget: DataGetCommand
-        /datastore: DataStoreCommand
-
-    - define commandStart "<[value].split[ ].get[1]>"
-
-    - if <[commandStart].is_in[<[commandToPathRef].keys>]> && <[value].ends_with[/]>:
-        - define commandRes.path:<[commandToPathRef].get[<[commandStart]>]>
-
-    - else:
-        - define errMsg "Unrecognized command '<[line]>'"
-        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[handler]> def.message:<[errMsg]>
 
 
 OptionsHandler_CISK:
@@ -360,15 +209,14 @@ ConditionalHandler_CISK:
     - define parsedOperands <list[]>
 
     - foreach <[compOperands]> as:operand:
-        - if <[operand].starts_with[/]> && <[operand].ends_with[/]>:
-            - define value <[operand]>
-            - inject CommandHandler_CISK
+        # TODO: Add a regex check here to make sure it's only firing on lines that have commands.
 
-            - define commandScript <[commandRes].get[script]>
-            - define commandPath <[commandRes].get[path]>
+        - run SplitKeep def.text:<[operand]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
+        - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
-            - run <[commandScript]> path:<[commandPath]> defmap:<queue.definition_map> save:command
-            - define result <entry[command].created_queue.determination.get[1]>
+        - run CommandDelegator_CISK def.splitted:<[splitted]> def.player:<[player]> save:evaluated_line
+        - define evaluatedLine <entry[evaluated_line].created_queue.determination.get[1]>
+        - define result <[evaluatedLine].get[1]>
 
         - if <[result].exists>:
             - define parsedOperands:->:<[result]>
