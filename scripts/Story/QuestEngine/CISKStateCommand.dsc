@@ -20,6 +20,9 @@ DenizenCISKMechMirrors:
         isFlying:
             prop: is_flying
             mech: flying
+        foodLevel:
+            prop: food_level
+            mech: food_level
 
         # PROPERTY-ONLY KEYS
         isTrading:
