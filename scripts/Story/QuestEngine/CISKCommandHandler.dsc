@@ -347,3 +347,35 @@ StateCommand_CISK:
 
                 - else:
                     - define stateTarget <map[<[attrKey]>=self]>
+
+# Example Usage:
+# <walk t:npc to:140,64,320>
+# <walk t:npc forward:10>
+# <walk t:npc anchor:ANCHOR_NAME>
+WalkCommand_CISK:
+    type: task
+    description:
+    - CISK COMMAND - Walks an NPC to a specified location
+    - Note: Will use Kingdoms walk which teleports the specified entity the last couple blocks due to Minecraft pathfinding failing
+    - Example Usage<&co>
+    - <&lt>walk t:npc to:140,64,320<&gt>
+    commandData:
+        attributeSubs:
+            target: t|tr
+
+    PostEvaluationCode:
+    # TODO: Add checks to this
+
+    - run ProduceFlaggableObject_CISK def.text:<[walkTarget]> save:realTarget
+    - define realTarget <entry[realTarget].created_queue.determination.get[1]>
+    - define realLocation <location[<[realTarget].location.world.name>,<[walkLocationRaw].comma_separated>]>
+
+    - walk <[realTarget]> <[realLocation]> auto_range
+
+    script:
+    - choose <[attrKey]>:
+        - case target:
+            - define walkTarget <[attrVal]>
+
+        - case to:
+            - define walkLocationRaw <[attrVal].split[,]>
