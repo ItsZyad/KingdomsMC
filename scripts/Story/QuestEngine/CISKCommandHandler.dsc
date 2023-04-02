@@ -180,6 +180,9 @@ ProduceFlaggableObject_CISK:
                 - determine <item[<[itemRef]>]>
 
 
+# Example Usage:
+# <dataget t:npc n:x def:0>
+# <dataget t:player n:y>
 DatagetCommand_CISK:
     type: task
     debug: false
@@ -205,6 +208,10 @@ DatagetCommand_CISK:
             - define dataName <[attrVal]>
 
 
+# Example Usage:
+# <datastore t:npc n:x v:10>
+# <datastore t:player n:y v:Hello>
+# <datastore t:npc n:name v:<state get player name>>
 DatastoreCommand_CISK:
     type: task
     debug: false
@@ -247,6 +254,8 @@ BreakCommand_CISK:
     - define hasBroken true
 
 
+# Example Usage:
+# <goto PlayerDefinedBranch1>
 GotoCommand_CISK:
     type: task
     debug: false
@@ -268,6 +277,9 @@ GotoCommand_CISK:
             - define gotoBranch <[attrKey]>
 
 
+# Example Usage:
+# <give i:stick as_drop q:10>
+# <give i:obsidian to_inv q:1>
 GiveCommand_CISK:
     type: task
     debug: false
@@ -302,6 +314,10 @@ GiveCommand_CISK:
                 - define giveType <[attrKey]>
 
 
+# Example Usage:
+# <state get player name>
+# <state get kingdom balance>
+# <state set kingdom balance:14000>
 StateCommand_CISK:
     type: task
     debug: false
@@ -347,6 +363,7 @@ StateCommand_CISK:
 
                 - else:
                     - define stateTarget <map[<[attrKey]>=self]>
+
 
 # Example Usage:
 # <walk t:npc to:140,64,320>
