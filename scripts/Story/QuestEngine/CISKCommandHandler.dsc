@@ -103,7 +103,6 @@ CommandDelegator_CISK:
     script:
     - inject <script.name> path:GetRecursiveStructure if:<[commandMap].exists.not>
     - define evaluatedLine <list[]>
-    - define player <player[ZyadTheBoss]> if:<[player].exists.not>
 
     - adjust <queue> linked_player:<[player]>
     - adjust <queue> linked_npc:<[npc]> if:<[npc].exists>
@@ -141,6 +140,12 @@ CommandMapEvaluator_CISK:
     - define commandScript <[commandScript].if_null[<script[<[commandName]>Command_CISK]>]>
     - inject <script.name> path:GenerateAttributeShorthands if:<[commandScript].data_key[commandData.attributeSubs].exists>
 
+    - adjust <queue> linked_player:<[player]>
+    - adjust <queue> linked_npc:<[npc]> if:<[npc].exists>
+
+    - if <[commandScript].data_key[PreEvaluationCode].exists>:
+        - inject <[commandScript].name> path:PreEvaluationCode
+
     - foreach <[commandMap]> key:datapoint:
         - if <[datapoint]> == attributes:
             - foreach <[value]> as:attrPair:
@@ -150,7 +155,7 @@ CommandMapEvaluator_CISK:
                 - define attrVal <[attrPair].values.get[1]>
 
                 - if <[attrVal].object_type.to_uppercase> == MAP:
-                    - run CommandMapEvaluator_CISK def.commandMap:<[attrVal]> save:recur
+                    - run CommandMapEvaluator_CISK def.commandMap:<[attrVal]> def.player:<[player]> save:recur
 
                     - define nestedCommandResult <entry[recur].created_queue.determination.get[1]>
                     - define attrVal <[nestedCommandResult]>
@@ -396,3 +401,93 @@ WalkCommand_CISK:
 
         - case to:
             - define walkLocationRaw <[attrVal].split[,]>
+
+
+# Example Usage:
+# <add 3 5>
+# <add <state get player health> 10>
+AddCommand_CISK:
+    type: task
+    description:
+    - CISK COMMAND - Adds two numbers together
+    - Example Usage<&co>
+    - <&lt>add 3 5<&gt>
+    - <&lt>add <&lt>state get player health<&gt> 10<&gt>
+
+    PreEvaluationCode:
+    - define operands <list[]>
+
+    PostEvaluationCode:
+    # TODO: Add error-checking as usual
+
+    - if <[operands].unseparated.add[1].exists>:
+        - determine <[operands].get[1].add[<[operands].get[2]>]>
+
+    script:
+    - define operands:->:<[attrKey]>
+
+
+# Example Usage:
+# <sub 3 5>
+# <sub <state get player health> 10>
+SubCommand_CISK:
+    type: task
+    description:
+    - CISK COMMAND - Subtracts the first number from the second
+    - Example Usage<&co>
+    - <&lt>sub 3 5<&gt>
+    - <&lt>sub <&lt>state get player health<&gt> 10<&gt>
+
+    PreEvaluationCode:
+    - define operands <list[]>
+
+    PostEvaluationCode:
+    - if <[operands].unseparated.sub[1].exists>:
+        - determine <[operands].get[1].sub[<[operands].get[2]>]>
+
+    script:
+    - define operands:->:<[attrKey]>
+
+
+# Example Usage:
+# <mul 3 5>
+# <mul <state get player health> 10>
+MulCommand_CISK:
+    type: task
+    description:
+    - CISK COMMAND - Multiplies two numbers together
+    - Example Usage<&co>
+    - <&lt>mul 3 5<&gt>
+    - <&lt>mul <&lt>state get player health<&gt> 10<&gt>
+
+    PreEvaluationCode:
+    - define operands <list[]>
+
+    PostEvaluationCode:
+    - if <[operands].unseparated.mul[1].exists>:
+        - determine <[operands].get[1].mul[<[operands].get[2]>]>
+
+    script:
+    - define operands:->:<[attrKey]>
+
+
+# Example Usage:
+# <div 3 5>
+# <div <state get player health> 10>
+DivCommand_CISK:
+    type: task
+    description:
+    - CISK COMMAND - Divides the first number by the second
+    - Example Usage<&co>
+    - <&lt>div 3 5<&gt>
+    - <&lt>div <&lt>state get player health<&gt> 10<&gt>
+
+    PreEvaluationCode:
+    - define operands <list[]>
+
+    PostEvaluationCode:
+    - if <[operands].unseparated.div[1].exists>:
+        - determine <[operands].get[1].div[<[operands].get[2]>]>
+
+    script:
+    - define operands:->:<[attrKey]>
