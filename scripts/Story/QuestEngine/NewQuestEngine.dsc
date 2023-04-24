@@ -213,6 +213,7 @@ ConditionalHandler_CISK:
     - define ifBlock <[line].get[CONDITIONAL]>
     - define compOperation <[line].deep_get[CONDITIONAL.comparison]>
     - define compOperands <[line].deep_get[CONDITIONAL.operands]>
+    - define compOperation != if:<[compOperation].equals[NOT_EQUAL]>
     - define parsedOperands <list[]>
 
     - foreach <[compOperands]> as:operand:
