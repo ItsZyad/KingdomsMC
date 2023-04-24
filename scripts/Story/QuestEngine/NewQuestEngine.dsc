@@ -113,8 +113,6 @@ SpeechHandler_CISK:
         - engage
 
     - foreach <[speech]> as:line:
-        - define nextLine <[speech].get[<[loop_index].add[1]>]> if:<[loop_index].is[LESS].than[<[speech].size>]>
-
         - if <[hasBroken]> || <[player].has_flag[KQuests.temp.hasBroken]>:
             - disengage
             - flag <[player]> KQuests.temp.hasBroken:!
@@ -146,11 +144,7 @@ SpeechHandler_CISK:
 
             - run CommandDelegator_CISK def.splitted:<[splitted]> def.player:<[player]> save:evaluated_line
             - define evaluatedLine <entry[evaluated_line].created_queue.determination.get[1]>
-            - define nextLineIsCommandOnly <[nextLine].starts_with[<&lt>].and[<[nextLine].ends_with[<&gt>]>]>
             - define waitTime 0
-
-            - if <[nextLineIsCommandOnly]>:
-                - define waitOverride 0
 
             - if <[evaluatedLine].size> > 0:
                 - define waitTime <proc[WaitTime_CISK].context[<[evaluatedLine].space_separated>|<[talkSpeed]>].round_to_precision[0.01]>
