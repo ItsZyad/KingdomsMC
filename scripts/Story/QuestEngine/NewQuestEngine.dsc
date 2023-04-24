@@ -153,11 +153,15 @@ SpeechHandler_CISK:
 
             - if <[evaluatedLine].size> > 0:
                 - define waitTime <proc[WaitTime_CISK].context[<[evaluatedLine].space_separated>|<[talkSpeed]>].round_to_precision[0.01]>
-                - define waitTime 1 if:<[waitTime].is[LESS].than[1]>
+                - define waitTime 1 if:<[waitTime].is[LESS].than[0.1]>
                 - chat targets:<[player]> talkers:<[npc]> <[evaluatedLine].space_separated>
 
         - if !<[waitOverride].exists> || <[waitOverride]> == null:
             - wait <[waitTime]>s
+
+        - else if <[player].has_flag[KQuests.temp.wait]>:
+            - wait <[player].flag[KQuests.temp.wait]>s
+            - flag <[player]> KQuests.temp.wait:!
 
     - if <[shouldEngage]> && <[npc].engaged>:
         #TODO: UNCOMMENT ONCE IN PROD!

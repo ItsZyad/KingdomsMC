@@ -186,6 +186,19 @@ ProduceFlaggableObject_CISK:
 
 
 # Example Usage:
+# <wait 2>
+# <wait 3.5>
+WaitCommand_CISK:
+    type: task
+    PostEvaluationCode:
+    - flag <[player]> KQuests.temp.wait:<[waitAmount].round_to_precision[0.01]>
+
+    script:
+    - if <[attrKey].div[2].exists>:
+        - define waitAmount <[attrKey]>
+
+
+# Example Usage:
 # <dataget t:npc n:x def:0>
 # <dataget t:player n:y>
 DatagetCommand_CISK:
