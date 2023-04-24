@@ -14,6 +14,7 @@
 
 WaitTime_CISK:
     type: procedure
+    debug: false
     definitions: text|multiplier
     script:
     - determine <[text].split[<&sp>].size.div[1.5].div[<[multiplier]>]>
@@ -31,6 +32,7 @@ RequiredKeys_CISK:
 
 MainParser_CISK:
     type: task
+    debug: false
     definitions: file|schema|handler|npc|player
     script:
     - yaml load:quest_schemas/<[file]> id:ciskFile
@@ -77,6 +79,7 @@ MainParser_CISK:
 
 SpeechHandler_CISK:
     type: task
+    debug: false
     InitializeVars:
     - define hasBroken <[hasBroken].if_null[false]>
     - define interactionAmounts <[npc].flag[playerInteractions].get[<[player]>]>
@@ -110,6 +113,8 @@ SpeechHandler_CISK:
         - engage
 
     - foreach <[speech]> as:line:
+        - define nextLine <[speech].get[<[loop_index].add[1]>]> if:<[loop_index].is[LESS].than[<[speech].size>]>
+
         - if <[hasBroken]>:
             - disengage
             - determine cancelled
@@ -140,12 +145,15 @@ SpeechHandler_CISK:
 
             - run CommandDelegator_CISK def.splitted:<[splitted]> def.player:<[player]> save:evaluated_line
             - define evaluatedLine <entry[evaluated_line].created_queue.determination.get[1]>
+            - define nextLineIsCommandOnly <[nextLine].starts_with[<&lt>].and[<[nextLine].ends_with[<&gt>]>]>
             - define waitTime 0
 
-            # - narrate format:debug SPLIT:<[splitted]>
+            - if <[nextLineIsCommandOnly]>:
+                - define waitOverride 0
 
             - if <[evaluatedLine].size> > 0:
                 - define waitTime <proc[WaitTime_CISK].context[<[evaluatedLine].space_separated>|<[talkSpeed]>].round_to_precision[0.01]>
+                - define waitTime 1 if:<[waitTime].is[LESS].than[1]>
                 - chat targets:<[player]> talkers:<[npc]> <[evaluatedLine].space_separated>
 
         - if !<[waitOverride].exists> || <[waitOverride]> == null:
@@ -204,8 +212,8 @@ ConditionalHandler_CISK:
 
     - define handler <[line].keys.get[1]>
     - define ifBlock <[line].get[CONDITIONAL]>
-    - define compOperation <[line].deep_get[CONDITIONAL.condition.comparison]>
-    - define compOperands <[line].deep_get[CONDITIONAL.condition.operands]>
+    - define compOperation <[line].deep_get[CONDITIONAL.comparison]>
+    - define compOperands <[line].deep_get[CONDITIONAL.operands]>
     - define parsedOperands <list[]>
 
     - foreach <[compOperands]> as:operand:
@@ -225,8 +233,8 @@ ConditionalHandler_CISK:
         - else:
             - define parsedOperands:->:<[operand]>
 
-    - define ifTrue <[line].deep_get[CONDITIONAL.ifTrue.actions]>
-    - define ifFalse <[line].deep_get[CONDITIONAL.ifFalse.actions]>
+    - define ifTrue <[line].deep_get[CONDITIONAL.true.actions]>
+    - define ifFalse <[line].deep_get[CONDITIONAL.false.actions]>
     - define speech null
 
     - if <[parsedOperands].get[1].is[<[compOperation]>].than[<[parsedOperands].get[2]>]>:
