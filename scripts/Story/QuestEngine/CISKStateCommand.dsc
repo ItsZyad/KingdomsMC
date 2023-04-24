@@ -1,4 +1,5 @@
 ##ignorewarning def_of_nothing
+##ignorewarning bad_execute
 
 DenizenCISKMechMirrors:
     type: data
@@ -64,6 +65,30 @@ StateCommandMechanisms_CISK:
             - define returnVal <[locationMap].get[<[locationComponent]>]>
 
     - determine <[returnVal]> if:<[returnVal].exists>
+
+    SetEntity:
+    - define entityMechs <script[DenizenCISKMechMirrors].data_key[entity]>
+
+    - foreach <[entityMechs].keys> as:mech:
+        - define mechInfo <[entityMechs].get[<[mech]>]>
+
+        - if !<[mechInfo].contains[mech]>:
+            - foreach next
+
+        - define dynamicMechName <[mechInfo].get[mech]>
+        - define dynamicMechName <[mech]> if:<[mechInfo].get[mech].equals[/]>
+
+        # - narrate format:debug STM:<[stateMechanism]>
+        # - narrate format:debug DMN:<[dynamicMechName]>
+
+        - if <[stateMechanism]> == <[dynamicMechName]>:
+            - choose <[stateMechanism]>:
+                - case location:
+                    - define stateMechanismSet <proc[LocationType_CISK].context[<[stateMechanismSet]>|<[player]>]>
+
+            - execute as_server "ex adjust <[entityStateTarget]> <[dynamicMechName]>:<[stateMechanismSet]>"
+            # - narrate format:debug "ex adjust <[entityStateTarget]> <[dynamicMechName]>:<[stateMechanismSet]>"
+            - foreach stop
 
     GetPlayer:
     - choose <[stateMechanism]>:
@@ -158,3 +183,16 @@ StateCommandMechanisms_CISK:
 
                     - else:
                         - narrate format:debug WIP
+
+        - case set:
+            - choose <[stateTarget].keys.get[1]>:
+                - case player:
+
+                    - if <[stateTarget].values.get[1]> == null:
+                        - define entityStateTarget <[player]>
+
+                    - else:
+                        - define entityStateTarget <server.players.filter_tag[<[filter_value].name.equals[<[stateTarget].values.get[1]>]>].get[1]>
+
+                    - inject <script.name> path:SetEntity
+                    #- inject <script.name> path:SetPlayer
