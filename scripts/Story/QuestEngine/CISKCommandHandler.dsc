@@ -269,7 +269,7 @@ BreakCommand_CISK:
     - determine cancelled
 
     script:
-    - define hasBroken true
+    - flag <[player]> KQuests.temp.hasBroken
 
 
 # Example Usage:

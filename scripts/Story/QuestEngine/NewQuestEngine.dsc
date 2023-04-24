@@ -115,8 +115,9 @@ SpeechHandler_CISK:
     - foreach <[speech]> as:line:
         - define nextLine <[speech].get[<[loop_index].add[1]>]> if:<[loop_index].is[LESS].than[<[speech].size>]>
 
-        - if <[hasBroken]>:
+        - if <[hasBroken]> || <[player].has_flag[KQuests.temp.hasBroken]>:
             - disengage
+            - flag <[player]> KQuests.temp.hasBroken:!
             - determine cancelled
 
         - define waitTime <[waitTime].if_null[1]>
