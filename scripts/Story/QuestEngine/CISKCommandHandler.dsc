@@ -3,7 +3,7 @@ GenerateRecursiveStructures_CISK:
     debug: false
     definitions: splitted
     DEBUG_GenerateSplittedList:
-    - define text <element[You are <&lt>state get player name<&gt>. You're good to go!]>
+    - define text <element[<&lt>state get player health<&gt>]>
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
@@ -66,9 +66,6 @@ CommandMapGenerator_CISK:
         - if <[loop_index]> < <[persistent].get[skipAmount].add[1].if_null[<[loop_index]>]>:
             - foreach next
 
-        - if <[token]> == <&lt> && !<[prevToken].ends_with[\]>:
-            - define commandMap.name:<[nextToken]>
-
         - else if <[token]> == <&co>:
             - if <[nextToken]> != <&lt>:
                 - define commandMap.attributes:->:<map[<[prevToken]>=<[nextToken]>]>
@@ -81,8 +78,20 @@ CommandMapGenerator_CISK:
 
                 - foreach next
 
+        - else if <[token]> == <&lt> && !<[prevToken].ends_with[\]>:
+            - if <[commandMap].get[name].exists>:
+                - run CommandMapGenerator_CISK def.splitted:<[splitted].get[<[loop_index]>].to[last]> save:recur_split
+                - define nestedCommand <entry[recur_split].created_queue.determination.get[1].get[commandMap]>
+                - define persistent.skipAmount <entry[recur_split].created_queue.determination.get[1].get[commandSize].add[<[loop_index].sub[1]>]>
+                - define commandMap.attributes:->:<map[null=<[nestedCommand]>]>
+
+                - foreach next
+
+            - else:
+                - define commandMap.name:<[nextToken]>
+
         - else if <[token]> != <&sp> && <[prevToken]> != <&co> && <[nextToken]> != <&co> && <[commandMap.name]> != <[token]> && !<[token].is_in[<&gt>|<&lt>]>:
-            - define commandMap.attributes:->:<map[<[token]>=null]>
+            - define commandMap.attributes:->:<map[null=<[token]>]>
 
         - else if <[token]> == <&gt>:
             - determine <map[commandMap=<[commandMap]>;commandSize=<[commandSize]>]>
@@ -151,7 +160,7 @@ CommandMapEvaluator_CISK:
             - foreach <[value]> as:attrPair:
                 - define attrKeyRaw <[attrPair].keys.get[1]>
                 - define attrKey <[attrKeyRaw]>
-                - define attrKey <[attrSubs].get[<[attrKeyRaw]>]> if:<[attrSubs].contains[<[attrKeyRaw]>]>
+                - define attrKey <[attrSubs].get[<[attrKeyRaw]>]> if:<[attrSubs].exists.and[<[attrSubs].contains[<[attrKeyRaw]>]>]>
                 - define attrVal <[attrPair].values.get[1]>
 
                 - if <[attrVal].object_type.to_uppercase> == MAP:
@@ -192,11 +201,14 @@ WaitCommand_CISK:
     type: task
     PostEvaluationCode:
     - flag <[player]> KQuests.temp.wait:<[waitAmount].round_to_precision[0.01]>
+    - flag <[player]> KQuests.temp.wait.override:true if:<[waitOverride].equals[true]>
 
     script:
-    - if <[attrKey].div[2].exists>:
-        - define waitAmount <[attrKey]>
+    - if <[attrVal].div[2].exists>:
+        - define waitAmount <[attrVal]>
 
+    - else if <[attrVal]> == override:
+        - define waitOverride true
 
 # Example Usage:
 # <dataget t:npc n:x def:0>
@@ -228,7 +240,7 @@ DatagetCommand_CISK:
 
 # Example Usage:
 # <datastore t:npc n:x v:10>
-# <datastore t:player n:y v:Hello>
+# <datastore t:player n:y v:Hello persistent>
 # <datastore t:npc n:name v:<state get player name>>
 DatastoreCommand_CISK:
     type: task
@@ -258,8 +270,9 @@ DatastoreCommand_CISK:
         - case value:
             - define dataValue <[attrVal]>
 
-        - case persistent:
-            - define dataPersistent true
+        - case null:
+            - if <[attrVal]> == persistent:
+                - define dataPersistent true
 
 
 BreakCommand_CISK:
@@ -290,9 +303,8 @@ GotoCommand_CISK:
     - determine cancelled
 
     script:
-    - choose <[attrKey]>:
-        - default:
-            - define gotoBranch <[attrKey]>
+    - if <[attrKey]> == null:
+        - define gotoBranch <[attrVal]>
 
 
 # Example Usage:
@@ -328,8 +340,8 @@ GiveCommand_CISK:
             - define giveQuantity <[attrVal]>
 
         - default:
-            - if <[attrKey].is_in[as_drop|to_inv]>:
-                - define giveType <[attrKey]>
+            - if <[attrVal].is_in[as_drop|to_inv]>:
+                - define giveType <[attrVal]>
 
 
 # Example Usage:
@@ -360,8 +372,8 @@ StateCommand_CISK:
                 - define stateTarget <[attrVal]>
 
         - default:
-            - if <[attrKey].is_in[get|set]>:
-                - define stateAction <[attrKey]>
+            - if <[attrVal].is_in[get|set]>:
+                - define stateAction <[attrVal]>
 
             - else if <[stateTarget].exists>:
                 - if <[stateAction]> == set && !<[stateMechanism].exists>:
@@ -369,15 +381,16 @@ StateCommand_CISK:
                     - define stateMechanismSet <[attrVal]>
 
                 - else:
-                    - if <[attrVal]> == null:
-                        - define stateMechanism <[attrKey]>
+                    - if <[attrKey]> == null:
+                        - define stateMechanism <[attrVal]>
 
                     - else:
-                        - define stateMechanism <[attrVal]>
+                        - define stateMechanism <[attrKey]>
 
             - else:
                 - if <[attrVal].exists>:
                     - define stateTarget <map[<[attrKey]>=<[attrVal]>]>
+                    - define stateTarget <map[<[attrVal]>=<[attrKey]>]> if:<[attrKey].equals[null]>
 
                 - else:
                     - define stateTarget <map[<[attrKey]>=self]>
@@ -437,7 +450,7 @@ AddCommand_CISK:
         - determine <[operands].get[1].add[<[operands].get[2]>]>
 
     script:
-    - define operands:->:<[attrKey]>
+    - define operands:->:<[attrVal]>
 
 
 # Example Usage:
