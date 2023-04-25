@@ -15,6 +15,12 @@ DenizenCISKMechMirrors:
         health:
             prop: /
             mech: /
+        oxygen:
+            prop: /
+            mech: /
+        speed:
+            prop: /
+            mech: /
         isSwimming:
             prop: swimming
             mech: swimming
@@ -24,10 +30,29 @@ DenizenCISKMechMirrors:
         foodLevel:
             prop: food_level
             mech: food_level
+        maxHealth:
+            prop: health_max
+            mech: max_health
 
         # PROPERTY-ONLY KEYS
         isTrading:
             prop: is_trading
+        isAnimate:
+            prop: is_living
+        isMob:
+            prop: is_mob
+        isMonster:
+            prop: is_monster
+        isProjectile:
+            prop: is_projectile
+        isSpawned:
+            prop: is_spawned
+        maxOxygen:
+            prop: max_oxygen
+        onFire:
+            prop: on_fire
+        entityType:
+            prop: entity_type
         uuid:
             prop: /
         direction:
