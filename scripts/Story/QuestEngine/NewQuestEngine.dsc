@@ -151,10 +151,14 @@ SpeechHandler_CISK:
                 - define waitTime 1 if:<[waitTime].is[LESS].than[0.1]>
                 - chat targets:<[player]> talkers:<[npc]> <[evaluatedLine].space_separated>
 
+        - if <[player].has_flag[KQuests.temp.wait.override]>:
+            - define waitOverride 0
+            - flag <[player]> KQuests.temp.wait.override:!
+
         - if !<[waitOverride].exists> || <[waitOverride]> == null:
             - wait <[waitTime]>s
 
-        - else if <[player].has_flag[KQuests.temp.wait]>:
+        - if <[player].has_flag[KQuests.temp.wait]>:
             - wait <[player].flag[KQuests.temp.wait]>s
             - flag <[player]> KQuests.temp.wait:!
 
