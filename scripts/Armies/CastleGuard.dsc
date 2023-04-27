@@ -8,6 +8,7 @@ CastleGuard:
     interact scripts:
     - CastleGuard_I
 
+
 CastleGuard_I:
     type: interact
     steps:
@@ -19,6 +20,7 @@ CastleGuard_I:
                     - flag <player> clickedNPC:<npc>
 
 ##############################################################################
+
 
 Guard_Window:
     type: inventory
@@ -32,6 +34,7 @@ Guard_Window:
     - [] [EngagementRules_Item] [] [] [GuardAnchorReturn_Item] [] [] [GuardGetIncursionRecord_Item] []
     - [] [] [] [] [GuardDelete_Item] [] [] [] []
 
+
 GuardDeleteConfirm_Window:
     type: inventory
     inventory: chest
@@ -40,10 +43,12 @@ GuardDeleteConfirm_Window:
     slots:
     - [] [] [] [GuardConfirmDelete_Item] [] [GuardDenyDelete_Item] [] [] []
 
+
 GuardConfirmDelete_Item:
     type: item
     material: green_wool
     display name: "<green><bold>Confirm Deletion"
+
 
 GuardDenyDelete_Item:
     type: item
@@ -55,15 +60,18 @@ GuardName_Item:
     material: name_tag
     display name: "<gold>Change Guard Name"
 
+
 EngagementRules_Item:
     type: item
     material: iron_sword
     display name: "<light_purple>Engagement Rules"
 
+
 ShowGuardInventory_Item:
     type: item
     material: player_head
     display name: "<aqua><bold>Show Inventory"
+
 
 ShowGuardArmour_Item:
     type: item
@@ -71,6 +79,7 @@ ShowGuardArmour_Item:
     display name: "<aqua><bold>Show Armour"
     mechanisms:
         hides: ALL
+
 
 GuardIncursionReports_Item:
     type: item
@@ -80,6 +89,7 @@ GuardIncursionReports_Item:
     - "<gold><bold>Warning!"
     - "This record will only show the last 45 incursion records."
     - "Any records prior are automatically cleared."
+
 
 GuardGetIncursionRecord_Item:
     type: item
@@ -92,12 +102,14 @@ GuardGetIncursionRecord_Item:
     - "This button will grab the current incursion record as"
     - "it currently stands"
 
+
 GuardWindowBack_Item:
     type: item
     material: player_head
     display name: Back
     mechanisms:
         skull_skin: e5b4f889-64ba-3de9-a5b4-f88964baade9|e3RleHR1cmVzOntTS0lOOnt1cmw6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGM2ZGNjYzk2Y2YzZGRkNTFjYWE3MDYyM2UxZWIzM2QxZWFlYTU3NDVhNDUyZjhhNWM0ZDViOWJlYWFhNWNjNCJ9fX0=
+
 
 GuardAnchorPosition_Item:
     type: item
@@ -109,6 +121,7 @@ GuardAnchorPosition_Item:
     - "The anchor position is where the guard returns when it"
     - "no longer tracks any targets."
 
+
 GuardAnchorReturn_Item:
     type: item
     material: player_head
@@ -118,10 +131,12 @@ GuardAnchorReturn_Item:
     lore:
     - "Will make the guard return to its <element[current].underline> <element[anchor position].color[#A700A7].italicize>"
 
+
 GuardDelete_Item:
     type: item
     material: barrier
     display name: "<red><bold>Delete Guard"
+
 
 GuardIncursionReport_Book:
     type: book
@@ -130,6 +145,7 @@ GuardIncursionReport_Book:
     signed: true
     text:
     - null
+
 
 GuardInterface_Handler:
     type: world
@@ -260,6 +276,7 @@ GuardInterface_Handler:
 
 ##############################################################################
 
+
 GuardArmour_Window:
     type: inventory
     inventory: chest
@@ -269,10 +286,12 @@ GuardArmour_Window:
     slots:
     - [] [] [] [] [GuardBlockedSlot_Item] [GuardBlockedSlot_Item] [GuardBlockedSlot_Item] [GuardBlockedSlot_Item] [GuardBlockedSlot_Item]
 
+
 GuardBlockedSlot_Item:
     type: item
     material: barrier
     display name: "<red><bold>Unused"
+
 
 GuardArmour_Handler:
     type: world
@@ -302,6 +321,7 @@ GuardArmour_Handler:
 
 ##############################################################################
 
+
 IncursionRecords_Window:
     type: inventory
     inventory: chest
@@ -315,6 +335,7 @@ IncursionRecords_Window:
     - [] [] [] [] [] [] [] [] []
     - [] [] [] [] [] [] [] [] []
     - [] [] [] [] [] [] [] [] []
+
 
 IncursionRecord_Item:
     type: item
@@ -338,6 +359,7 @@ EngagementRules_Window:
     - [] [EngageOnSight_Item] [] [EngageIfKingdom_Item] [] [GuardReportOnly_Item] [] [GuardDoNotEngage_Item] []
     - [] [] [] [] [GuardWindowBack_Item] [] [] [] []
 
+
 EngageOnSight_Item:
     type: item
     material: diamond_sword
@@ -349,6 +371,7 @@ EngageOnSight_Item:
     flags:
         engagementRule: always
 
+
 EngageIfKingdom_Item:
     type: item
     material: player_head
@@ -358,6 +381,7 @@ EngageIfKingdom_Item:
     flags:
         engagementRule: kingdom
 
+
 GuardReportOnly_Item:
     type: item
     material: writable_book
@@ -365,12 +389,14 @@ GuardReportOnly_Item:
     flags:
         engagementRule: report
 
+
 GuardDoNotEngage_Item:
     type: item
     material: barrier
     display name: "<gray><bold>Do Not Engage"
     flags:
         engagementRule: none
+
 
 GuardEngagement_Handler:
     type: world
@@ -427,6 +453,7 @@ GuardEngagement_Handler:
 
 ##############################################################################
 
+
 GuardKingdomEngagement_Window:
     type: inventory
     inventory: chest
@@ -435,12 +462,14 @@ GuardKingdomEngagement_Window:
     slots:
     - [] [GuardEngageRaptoran_Item] [] [GuardEngageCentran_Item] [] [GuardEngageCambrian_Item] [] [GuardEngageViridian_Item] []
 
+
 GuardEngageRaptoran_Item:
     type: item
     material: red_banner
     display name: <red><bold>Engage Members of <script[KingdomRealShortNames].data_key[raptoran]>
     flags:
         kingdom: raptoran
+
 
 GuardEngageCentran_Item:
     type: item
@@ -449,6 +478,7 @@ GuardEngageCentran_Item:
     flags:
         kingdom: centran
 
+
 GuardEngageCambrian_Item:
     type: item
     material: orange_banner
@@ -456,12 +486,14 @@ GuardEngageCambrian_Item:
     flags:
         kingdom: cambrian
 
+
 GuardEngageViridian_Item:
     type: item
     material: green_banner
     display name: <green><bold>Engage Members of <script[KingdomRealShortNames].data_key[viridian]>
     flags:
         kingdom: viridian
+
 
 GuardKingdomEngagement_Handler:
     type: world
@@ -494,11 +526,12 @@ GuardKingdomEngagement_Handler:
 
 ##############################################################################
 
+
 GuardSetup:
     type: task
     definitions: player
     script:
-    - define numberOfGuards <server.flag[CastleGuards].size>
+    - define numberOfGuards <server.flag[CastleGuards].size.if_null[0]>
 
     - create player "<red><bold>[<[numberOfGuards].add[1]>]Castle Guard" <[player].location> traits:sentinel save:new_guard
     - assignment set script:CastleGuard to:<entry[new_guard].created_npc>
@@ -532,43 +565,48 @@ GuardSetup:
     - flag server CastleGuards:->:<[npc]>
     - flag server CastleGuards:<server.flag[CastleGuards].deduplicate>
 
+
 GuardTargetSelection:
     type: procedure
     debug: false
     definitions: entity|context
     script:
+    - ratelimit <queue> 1s
     - define guard <[context]>
+    - define nearestPlayer <[guard].location.find_players_within[<[guard].sentinel.guard_distance_minimum>].get[1]>
+
+    - if !<[nearestPlayer].has_flag[kingdom]>:
+        - determine passively false
+        - execute as_server "sentinel forgive --id <[guard].id>" silent
+
     - define targetKingdoms <[guard].flag[targetInfo.whichAttack]>
     - define warnKingdoms <[guard].flag[targetInfo.whichWarn]>
     - define reportInc <[guard].flag[targetInfo.reportInc]>
-    - define kingdom <[entity].flag[kingdom]>
 
-    - if !<[entity].is_player>:
+    - if <[nearestPlayer].is_op>:
         - determine false
 
-    - if <[entity].is_op>:
-        - determine false
+    - if <[nearestPlayer].flag[kingdom]> == <[guard].flag[kingdom]>:
+        - determine passively false
+        - execute as_server "sentinel forgive --id <[guard].id>" silent
 
-    - if <[entity].flag[kingdom]> == <[guard].flag[kingdom]>:
-        - determine false
+    - if <[nearestPlayer].flag[kingdom].is_in[<[warnKingdoms]>]>:
+        #- chat talkers:<[guard]> targets:<[nearestPlayer]> "Hey! You there! This is restricted territory, you are prohibited from entering!"
+        - determine passively false
+        - execute as_server "sentinel forgive --id <[guard].id>" silent
 
-    - if <[kingdom].is_in[<[targetKingdoms].as[list]>]>:
-        - narrate format:debug targets:<server.online_ops> "Target Aquired!"
+    - if <[nearestPlayer].flag[kingdom].is_in[<[targetKingdoms].as[list]>]>:
         - determine true
 
-    - else if <[kingdom].is_in[<[warnKingdoms]>]>:
-        - chat talkers:<[guard]> targets:<[entity]> "Hey! You there! This is restricted territory, you are prohibited from entering!"
-        - determine false
-
     - else:
-        - if <[guard].flag[kingdom]> != <[kingdom]> && !<[entity].is_op>:
+        - if <[guard].flag[kingdom]> != <[nearestPlayer].flag[kingdom]> && !<[nearestPlayer].is_op>:
             - definemap incReport:
                 date: <util.time_now>
-                player: <[entity]>
-                kingdom: <[kingdom]>
+                player: <[nearestPlayer]>
+                kingdom: <[nearestPlayer].flag[kingdom]>
                 incNumber: 1
 
-            - if <[entity]> == <[guard].flag[incReports].last.get[player]> && <[guard].flag[incReports].last.get[date].from_now.in_seconds.is[OR_LESS].than[600]>:
+            - if <[nearestPlayer]> == <[guard].flag[incReports].last.get[player]> && <[guard].flag[incReports].last.get[date].from_now.in_seconds.is[OR_LESS].than[600]>:
                 - flag <[guard]> incReports:<-:<[guard].flag[incReports].last>
 
             - define currIncNumber <[incReport].get[incNumber]>
@@ -577,7 +615,9 @@ GuardTargetSelection:
             - if <[guard].flag[incReports].size.is[MORE].than[45]>:
                 - flag <[guard]> incReports:<[guard].flag[incReports].remove[1]>
 
-        - determine false
+        - determine passively false
+        - execute as_server "sentinel forgive --id <[guard].id>" silent
+
 
 GuardStaggeredPathfind:
     type: task
@@ -589,10 +629,8 @@ GuardStaggeredPathfind:
     - narrate format:debug REC:<[recursionDepth]>
 
     - if <[recursionDepth].is[MORE].than[49]>:
-        - if !<[npc].location.distance[<[endLocation]>].is[OR_MORE].than[3]>:
-            - teleport <[npc]> <[endLocation]>
-
-        - narrate format:debug targets:<server.online_ops> "Recursion Depth Exceeded <[recursionDepth]> Steps! Killing Queue: <script.queues.get[1]>"
+        - teleport <[npc]> <[endLocation]>
+        - narrate format:debug targets:<server.online_ops> "Recursion Depth Exceeded <[recursionDepth]> Steps! Killing Queue: <script.name>_<script.queues.get[1].numeric_id>"
         - determine cancelled
 
     - else:
@@ -601,13 +639,18 @@ GuardStaggeredPathfind:
         - narrate format:debug <[path]>
         - waituntil !<[npc].is_navigating>
 
-        - if <[npc].location.distance[<[endLocation]>].is[MORE].than[2.5]>:
+        - if <[npc].location.distance[<[endLocation]>].is[MORE].than[3.5]>:
             - narrate format:debug <[npc].location.distance[<[endLocation]>]>
-            #- ~run GuardStaggeredPathfind def.npc:<[npc]> def.endLocation:<[endLocation]> def.recursionDepth:<[recursionDepth].add[1]> def.speed:<[speed]>
+            - run GuardStaggeredPathfind def.npc:<[npc]> def.endLocation:<[endLocation]> def.recursionDepth:<[recursionDepth].add[1]> def.speed:<[speed]>
+
+        - else:
+            - teleport <[npc]> <[endLocation]>
+
 
 GuardTickEvent_Handler:
     type: world
     events:
         on sentinel npc has no more targets:
         - if <npc.has_flag[GuardPos]>:
-            - ~run GuardStaggeredPathfind def:<npc>|<npc.flag[GuardPos]>|0|1
+            - wait 1s
+            - run GuardStaggeredPathfind def.npc:<npc> def.endLocation:<npc.flag[GuardPos]> def.recustionDepth:0 def.speed:1
