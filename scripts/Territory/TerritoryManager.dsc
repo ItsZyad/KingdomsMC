@@ -4,6 +4,10 @@ Claim_Command:
     name: claim
     description: Claims kingdoms territory
     script:
+    - if !<player.has_flag[ClaimingMode]>:
+        - narrate format:callout "You have not selected a claiming mode! Please use <element[/k coreclaim].color[red]> or <element[/k castleclaim].color[red]> to use this command."
+        - determine cancelled
+
     - define kingdom <player.flag[kingdom]>
     - define coreMax <server.flag[kingdoms.<[kingdom]>.claims.coreMax].if_null[0]>
     - define castleMax <server.flag[kingdoms.<[kingdom]>.claims.castleMax].if_null[0]>
@@ -19,6 +23,12 @@ Claim_Command:
     # Calculation of chunk proximity #
     - if <[combinedChunks].size> != 0:
         - foreach <[combinedChunks]>:
+
+            ## IMPORTANT! THIS IS FOR DEBUGGING PURPOSES
+            ## DO NOT KEEP IN PRODUCTION!
+            - if <[value].world> != <player.location.world>:
+                - foreach next
+
             - define chunkX <[value].x>
             - define chunkZ <[value].z>
             - define chunkDiff <player.location.chunk.sub[<[chunkX]>,<[chunkZ]>]>
@@ -40,7 +50,7 @@ Claim_Command:
                 - narrate format:callout "You have already claimed this chunk."
                 - determine cancelled
 
-            - else if <[chunkConnected]>:
+            - else if !<[chunkConnected]> && <[combinedChunks].size> != 0:
                 - narrate format:callout "Chunks must be contigious."
                 - determine cancelled
 
@@ -91,6 +101,8 @@ Claim_Command:
                         - flag server kingdoms.<[kingdom]>.balance:-:<[corePrice]>
                         - flag server kingdoms.<[kingdom]>.upkeep:+:30
 
+            - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+
         - case CastleClaiming:
             - if <[castleChunks].contains[<[playerChunk]>]>:
                 - narrate format:callout "You have already claimed this chunk."
@@ -105,10 +117,11 @@ Claim_Command:
                 - flag server kingdoms.claimInfo.allClaims:->:<player.location.chunk>
                 - narrate format:callout Claimed!
 
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 FindKingdomOverlaps:
     type: task
+    debug: false
     definitions: currentClaim
     script:
     - foreach <server.flag[kingdoms.claimInfo.allClaims]>:
