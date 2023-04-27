@@ -50,53 +50,51 @@ SidebarLoader:
     - define war-true <red><bold>
     - define war-false <green>
     - define changeSBState <[changeSBState].if_null[true]>
+    - define target <[target].as[list]>
 
-    - if <[target].object_type> != List:
-        - define target <list[<[target]>]>
-
-    - foreach <[target]>:
-        - if !<[value].sidebar_lines.exists> && !<[changeSBState]>:
+    - foreach <[target]> as:player:
+        - if !<[player].sidebar_lines.exists> && !<[changeSBState]>:
             - foreach next
 
-        - if <[value].has_flag[kingdom]>:
+        - if <[player].is_online> && <[player].has_flag[kingdom]>:
 
             # Initialize and set Balance line
-            - define kingdom <[value].flag[kingdom]>
+            - define kingdom <[player].flag[kingdom]>
             - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
             - define kingdomData <server.flag[kingdoms.<[kingdom]>]>
             - define totalOutpostUpkeep <server.flag[<[kingdom]>.outposts.totalUpkeep].if_null[0]>
-            - sidebar set "title:<bold>  <[kingdomName].color[<script[KingdomTextColors].data_key[<[value].flag[kingdom]>]>]>  " "values:<&r>|<&sp>Balance: <yellow>$<[kingdomData].get[balance].round_down.format_number>" players:<[value]>
+            - sidebar set "title:<bold> <[kingdomName].color[<script[KingdomTextColors].data_key[<[player].flag[kingdom]>]>]>  " "values:<&r>|<&sp>Balance: <yellow>$<[kingdomData].get[balance].round_down.format_number>" players:<[player]>
 
             # Set Upkeep Line
             - if !<server.has_flag[PauseUpkeep]>:
-                - sidebar add "values:<&sp>Upkeep: <yellow>$<[kingdomData].get[upkeep].add[<[totalOutpostUpkeep].if_null[0]>].round_down.format_number>" players:<[value]>
+                - sidebar add "values:<&sp>Upkeep: <yellow>$<[kingdomData].get[upkeep].add[<[totalOutpostUpkeep].if_null[0]>].round_down.format_number>" players:<[player]>
 
             - else:
-                - sidebar add "values:<&sp>Upkeep: <aqua>Frozen!" players:<[value]>
+                - sidebar add "values:<&sp>Upkeep: <aqua>Frozen!" players:<[player]>
 
             - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influenceBonuses.bonusTax].exists>:
-                - sidebar add "values:<&sp>Fyndalin Tax Bonus: <green>$<server.flag[kingdoms.<[kingdom]>.powerstruggle.influenceBonuses.bonusTax].format_number>" players:<[value]>
+                - sidebar add "values:<&sp>Fyndalin Tax Bonus: <green>$<server.flag[kingdoms.<[kingdom]>.powerstruggle.influenceBonuses.bonusTax].format_number>" players:<[player]>
 
             # Set Core Claim amount line
-            - sidebar add "values:<&sp>Core Claims: <[kingdomData].deep_get[claims.core].size.if_null[0]> / <[kingdomData].deep_get[claims.coreMax]>" players:<[value]>
+            - sidebar add "values:<&sp>Core Claims: <[kingdomData].deep_get[claims.core].size.if_null[0]> / <[kingdomData].deep_get[claims.coreMax]>" players:<[player]>
 
             # Set Castle Territory line
-            - sidebar add "values:<&sp>Castle Claims: <[kingdomData].deep_get[claims.castle].size.if_null[0]> / <[kingdomData].deep_get[claims.castleMax]>" players:<[value]>
+            - sidebar add "values:<&sp>Castle Claims: <[kingdomData].deep_get[claims.castle].size.if_null[0]> / <[kingdomData].deep_get[claims.castleMax]>" players:<[player]>
 
             # Set War Status Line
-            - sidebar add "values:<&sp>War Status: <[war-<[kingdomData].deep_get[warStatus]>]><[kingdomData].deep_get[warStatus].if_true[At War].if_false[At Peace]>" players:<[value]>
+            - sidebar add "values:<&sp>War Status: <[war-<[kingdomData].deep_get[warStatus]>]><[kingdomData].deep_get[warStatus].if_true[At War].if_false[At Peace]>" players:<[player]>
 
             # Set Outpost Count Line
-            - sidebar add "values:<&sp>Outpost Count: <[kingdomData].deep_get[outposts.outpostList].size.if_null[0]>" players:<[value]>
+            - sidebar add "values:<&sp>Outpost Count: <[kingdomData].deep_get[outposts.outpostList].size.if_null[0]>" players:<[player]>
 
             # Set Prestige Line
-            - sidebar add "values:<&sp>Prestige: <[kingdomData].deep_get[prestige]> / 100" players:<[value]>
+            - sidebar add "values:<&sp>Prestige: <[kingdomData].deep_get[prestige]> / 100" players:<[player]>
 
             # Set Influences Line
-            - sidebar add "values:<&sp>Influence Points: <[kingdomData].deep_get[powerstruggle.influencePoints]>" players:<[value]>
+            - sidebar add "values:<&sp>Influence Points: <[kingdomData].deep_get[powerstruggle.influencePoints]>" players:<[player]>
 
             # Separator Line
-            - sidebar add values:<element[<&sp>].repeat[30]> players:<[value]>
+            - sidebar add values:<element[<&sp>].repeat[30]> players:<[player]>
 
         - else:
             - sidebar set title:<bold><gray>KINGDOMLESS
@@ -112,13 +110,13 @@ SidebarLoader:
 
         - define activeQuestCount 0
 
-        # - if <[value].in_group[BDagger]> || <[value].is_op>:
-        #     - sidebar add values:<underline><element[<&sp>].repeat[40]> players:<[value]>
-        #     - sidebar add values:<&sp> players:<[value]>
+        # - if <[player].in_group[BDagger]> || <[player].is_op>:
+        #     - sidebar add values:<underline><element[<&sp>].repeat[40]> players:<[player]>
+        #     - sidebar add values:<&sp> players:<[player]>
 
-        #     - sidebar add "values:<&sp><bold><blue>THE BLUE DAGGER" players:<[value]>
+        #     - sidebar add "values:<&sp><bold><blue>THE BLUE DAGGER" players:<[player]>
 
-        #     - sidebar add "values:<&sp>Balance<&co> <yellow>$<server.flag[bd.balance].if_null[0].format_number>" players:<[value]>
+        #     - sidebar add "values:<&sp>Balance<&co> <yellow>$<server.flag[bd.balance].if_null[0].format_number>" players:<[player]>
 
     - if <server.has_flag[RestrictedCreative]>:
         - bossbar remove resCre
@@ -132,8 +130,8 @@ SidebarSeparator:
     - define longestLine 0
 
     - foreach <[sidebar]>:
-        - if <[value].length.is[OR_MORE].than[<[longestLine]>]>:
-            - define longestLine <[value].length>
+        - if <[player].length.is[OR_MORE].than[<[longestLine]>]>:
+            - define longestLine <[player].length>
 
     - define outLine <list[<&sp>|<&n>]>
 
