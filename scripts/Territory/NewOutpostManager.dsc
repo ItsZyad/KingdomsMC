@@ -23,8 +23,6 @@ TempSaveInventory:
             - flag <[player]> inventory_hold_outposts:->:<[player].inventory.slot[<[value]>]>
             - inventory set slot:<[value]> origin:<item[air]>
 
-    - else:
-        - narrate format:debug "You are already in outpost mode!" if:<player.has_permission[kingdoms.admin]>
 
 LoadTempInventory:
     type: task
@@ -35,9 +33,6 @@ LoadTempInventory:
             - inventory set slot:<[value]> origin:<[player].flag[inventory_hold_outposts].get[<[value]>]>
 
         - flag <[player]> inventory_hold_outposts:!
-
-    - else:
-        - narrate format:debug "There is no saved inventory!" if:<player.has_permission[kingdoms.admin]>
 
 ##############################################################################
 
@@ -368,6 +363,8 @@ OutpostWand_Handler:
             - else:
                 - narrate format:callout "There is already an outpost by this name! Use <red>/outpost redefine <&6>or <red>/outpost rename to change an existing outpost"
 
+            - determine cancelled
+
         - else if <player.has_flag[outpostAlreadyNamed]>:
             - if <context.message.to_lowercase> == yes:
                 - define outpostName <player.flag[redefiningOutpost]>
@@ -391,6 +388,8 @@ OutpostWand_Handler:
             - else:
                 - narrate format:callout "Changes reverted."
 
+            - determine cancelled
+
         - run LoadTempInventory def:<player>
         - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
@@ -402,7 +401,6 @@ OutpostWand_Handler:
         - flag player redefiningOutpost:!
         - flag player outpostAlreadyNamed:!
 
-        - determine cancelled
 
 ##############################################################################
 
