@@ -200,6 +200,7 @@ CuboidIntersect:
 
 SplitKeep:
     type: task
+    debug: false
     definitions: text|delimiters|splitType
     script:
     - define letters <[text].to_list>
