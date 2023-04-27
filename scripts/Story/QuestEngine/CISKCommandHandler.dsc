@@ -201,7 +201,7 @@ WaitCommand_CISK:
     type: task
     PostEvaluationCode:
     - flag <[player]> KQuests.temp.wait:<[waitAmount].round_to_precision[0.01]>
-    - flag <[player]> KQuests.temp.wait.override:true if:<[waitOverride].equals[true]>
+    - flag <[player]> KQuests.temp.wait.override:true if:<[waitOverride].exists.and[<[waitOverride].equals[true]>]>
 
     script:
     - if <[attrVal].div[2].exists>:
@@ -397,6 +397,70 @@ StateCommand_CISK:
 
 
 # Example Usage:
+# <anchor set l:140,64,320 n:test>
+# <anchor set l:140,320 n:test>
+# <anchor remove n:test>
+# <anchor get n:test>
+AnchorCommand_CISK:
+    type: task
+    description:
+    - CISK COMMAND - Sets or removes an anchor location for the attached NPC to walk to
+    - Note: Users can ommit the y coordinates. Parser will automatically find the y of that loc.
+    - Example Usage-
+    - <&lt>anchor set l:140,64,320 n:test<&gt>
+    - <&lt>anchor set l:140,320 n:test<&gt>
+    - <&lt>anchor remove n:test<&gt>
+    - <&lt>anchor get n:test<&gt>
+    commandData:
+        attributeSubs:
+            location: l
+            name: n
+
+    PostEvaluationCode:
+    - if !<[anchorName].exists>:
+        - determine cancelled
+
+    - choose <[anchorMode]>:
+        - case set:
+            - if <[anchorLocationRaw].size> == 2:
+                - define anchorLocation <proc[IncompleteLocationGeneratorHelper_CISK].context[<[anchorLocationRaw]>]>
+
+            - else if <[anchorLocationRaw].size> >= 3:
+                - define anchorLocation <proc[LocationType_CISK].context[<[anchorLocationRaw].separated_by[,]>|<[player]>]>
+
+            - flag <npc> KQuests.anchors.<[anchorName]>:<[anchorLocation]> if:<[anchorLocation].exists>
+
+        - case get:
+            - determine <proc[LocationType_CISK].context[<npc.flag[KQuests.anchors.<[anchorName]>]>]>
+
+        - case remove:
+            - if <[npc].has_flag[KQuests.anchors.<[anchorName]>]>:
+                - flag <npc> KQuests.anchors.<[anchorName]>:!
+
+    script:
+    - choose <[attrKey]>:
+        - case location:
+            - define anchorLocationRaw <[attrVal].split[,]>
+
+        - case name:
+            - define anchorName <[attrVal]>
+
+        - case null:
+            - if !<[anchorMode].exists>:
+                - define anchorMode <[attrVal]>
+
+
+IncompleteLocationGeneratorHelper_CISK:
+    type: procedure
+    definitions: locationRaw[(ListTag) Anticipated Format: [x,z]]
+    script:
+    - define locationChunk <location[<[locationRaw].x>,64,<[locationRaw]>].chunk>
+    - define XZLocationList <[locationChunk].surface_blocks.parse_tag[<[parse_value].x>,<[parse_value].z>]>
+    - define realLocationIndex <[XZLocationList].find[<[locationRaw].comma_separated>]>
+    - determine <[locationChunk].surface_blocks.get[<[realLocationIndex]>]>
+
+
+# Example Usage:
 # <walk t:npc to:140,64,320>
 # <walk t:npc forward:10>
 # <walk t:npc anchor:ANCHOR_NAME>
@@ -407,6 +471,8 @@ WalkCommand_CISK:
     - Note: Will use Kingdoms walk which teleports the specified entity the last couple blocks due to Minecraft pathfinding failing
     - Example Usage<&co>
     - <&lt>walk t:npc to:140,64,320<&gt>
+    - <&lt>walk t:npc forward:10<&gt>
+    - <&lt>walk t:npc anchor:ANCHOR_NAME<&gt>
     commandData:
         attributeSubs:
             target: t|tr
@@ -416,9 +482,35 @@ WalkCommand_CISK:
 
     - run ProduceFlaggableObject_CISK def.text:<[walkTarget]> save:realTarget
     - define realTarget <entry[realTarget].created_queue.determination.get[1]>
-    - define realLocation <location[<[realTarget].location.world.name>,<[walkLocationRaw].comma_separated>]>
 
-    - walk <[realTarget]> <[realLocation]> auto_range
+    - if <[walkLocationRaw].exists>:
+        - define realLocation <location[<[realTarget].location.world.name>,<[walkLocationRaw].comma_separated>]>
+
+    - else if <[anchorName].exists>:
+        - define realLocation <[realTarget].flag[KQuests.anchors.<[anchorName]>].as[location]>
+
+    - else if <[relativeLocation].exists>:
+        - define direction <[relativeLocation].get[direction]>
+        - define distance <[relativeLocation].get[distance]>
+
+        - choose <[direction]>:
+            - case forward:
+                - define realLocation <[realTarget].location.forward_flat[<[distance]>]>
+
+            - case backward:
+                - define realLocation <[realTarget].location.backward_flat[<[distance]>]>
+
+            - case right:
+                - define realLocation <[realTarget].location.right[<[distance]>]>
+
+            - case left:
+                - define realLocation <[realTarget].location.left[<[distance]>]>
+
+    - if <[realLocation].distance[<[realTarget]>]> < 1.5:
+        - teleport <[realTarget]> <[realLocation]>
+
+    - else:
+        - ~run NPCWalkHelper_CISK def.target:<[realTarget]> def.location:<[realLocation]>
 
     script:
     - choose <[attrKey]>:
@@ -427,6 +519,24 @@ WalkCommand_CISK:
 
         - case to:
             - define walkLocationRaw <[attrVal].split[,]>
+
+        - case anchor:
+            - define anchorName <[attrVal]>
+
+        - default:
+            - if <[attrKey].is_in[forward|backward|left|right]>:
+                - definemap relativeLocation:
+                    distance: <[attrVal]>
+                    direction: <[attrKey]>
+
+
+NPCWalkHelper_CISK:
+    type: task
+    definitions: target|location
+    script:
+    - walk <[target]> <[location]> auto_range
+    - waituntil <[target].is_navigating.not> rate:10t
+    - teleport <[target]> <[location]>
 
 
 # Example Usage:

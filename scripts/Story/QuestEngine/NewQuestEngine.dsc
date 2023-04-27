@@ -142,7 +142,7 @@ SpeechHandler_CISK:
             - run SplitKeep def.text:<[line]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
             - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
-            - run CommandDelegator_CISK def.splitted:<[splitted]> def.player:<[player]> save:evaluated_line
+            - run CommandDelegator_CISK def.splitted:<[splitted]> def.player:<[player]> def.npc:<[npc]> save:evaluated_line
             - define evaluatedLine <entry[evaluated_line].created_queue.determination.get[1]>
             - define waitTime 0
 
