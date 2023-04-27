@@ -77,7 +77,7 @@ ReconstructionPermit_Handler:
 
         - inventory close
 
-        on player chats:
+        on player chats flagged:RequestedPayout:
         - if <player.flag[RequestedPayout]> == -1:
             - if <context.message.is_integer>:
                 - flag <player> PlotSizeReq:<context.message>
