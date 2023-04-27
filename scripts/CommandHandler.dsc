@@ -332,12 +332,12 @@ Kingdom_Command:
 
     - else if <context.raw_args> == coreclaim:
         #- if <player.has_permission[kingdom.cancoreclaim]>:
-        - if <player.flag[ClaimingMode]> == CoreClaiming:
-            - flag player ClaimingMode:!
+        - if <player.has_flag[ClaimingMode]> && <player.flag[ClaimingMode]> == CoreClaiming:
+            - flag <player> ClaimingMode:!
             - narrate format:callout "You have exited core claiming mode"
 
         - else:
-            - flag player ClaimingMode:CoreClaiming
+            - flag <player> ClaimingMode:CoreClaiming
             - narrate format:callout "You are now in core claiming mode"
             - narrate format:callout "Use /claim to claim a chunk for your kingdom!"
 
@@ -370,12 +370,12 @@ Kingdom_Command:
 
         - else:
             #- if <player.has_permission[kingdom.cancastleclaim]>:
-            - if <player.flag[ClaimingMode]> == CastleClaiming:
-                - flag player ClaimingMode:!
+            - if <player.has_flag[ClaimingMode]> && <player.flag[ClaimingMode]> == CastleClaiming:
+                - flag <player> ClaimingMode:!
                 - narrate format:callout "You have exited castle claiming mode"
 
             - else:
-                - flag player ClaimingMode:CastleClaiming
+                - flag <player> ClaimingMode:CastleClaiming
                 - narrate format:callout "You are now in castle claiming mode"
                 - narrate format:callout "Use /claim to claim a chunk for your castle!"
 
