@@ -41,16 +41,6 @@ Kingdoms_Command:
         - determine <[allStory]>
 
     script:
-    # - if <context.args.get[1]> == soldier:
-    #     - if <player.has_permission[kingdoms.admin]>:
-    #         - if <player.flag[ActiveWindow]> == SoldierCreate:
-    #             - flag player ActiveWindow:!
-    #             - narrate format:callout "Exited soldier creator"
-
-    #         - else:
-    #             - flag player ActiveWindow:SoldierCreate
-    #             - narrate format:callout "You are now in the soldier creator. Please click the NPC(s) you would like to make your soldier(s)"
-
     - if <context.args.get[1]> == version:
         - yaml load:kingdoms.yml id:kingdoms
         - define hoverTest "<&7>Code Compostion: 99.4<&pc> Denizen // 0<&pc> Java // 0.6<&pc> Python"
@@ -121,41 +111,50 @@ Kingdoms_Command:
             - narrate format:callout "You must specify a location to fast travel to!"
 
     - else if <context.args.get[1]> == chunkmap:
-        - define playerChunk <player.location.chunk>
-        - define chunkList <list[]>
+        - inject ChunkMap
 
-        - repeat 10 from:-5 as:zChunk:
-            - repeat 19 from:-9 as:xChunk:
-                - define currentChunk <[playerChunk].add[<[xChunk]>,<[zChunk]>]>
 
-                - if <server.flag[kingdoms.allClaims].contains[<[currentChunk]>]>:
-                    - foreach <server.flag[kingdoms].keys.exclude[allClaims]> as:kingdom:
-                        - define kingdomTerritory <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
-                        - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+ChunkMap:
+    type: task
+    debug: false
+    script:
+    - define playerChunk <player.location.chunk>
+    - define chunkList <list[]>
+    - define allClaims <server.flag[kingdoms.claimInfo.allClaims]>
+    - define kingdomList <script[KingdomRealNames].data_key[].keys.exclude[type]>
 
-                        - if <[currentChunk]> == <[playerChunk]>:
-                            - define chunkList:->:<element[P].color[<[kingdomColor]>]>
-                            - foreach stop
+    - repeat 10 from:-5 as:zChunk:
+        - repeat 19 from:-9 as:xChunk:
+            - define currentChunk <[playerChunk].add[<[xChunk]>,<[zChunk]>]>
+            #- narrate format:debug CUR:<[currentChunk]>
 
-                        - else:
-                            - if <[kingdomTerritory].contains[<[currentChunk]>]>:
-                                - define chunkList:->:<element[■].color[<[kingdomColor]>]>
+            - if <[allClaims].contains[<[currentChunk]>]>:
+                - foreach <[kingdomList]> as:kingdom:
+                    - define kingdomTerritory <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
+                    - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
 
-                            - foreach stop
+                    - if <[currentChunk]> == <[playerChunk]> && <[kingdomTerritory].contains[<[currentChunk]>]>:
+                        - define chunkList:->:<element[P].color[<[kingdomColor]>]>
+                        - foreach stop
 
-                - else if <[currentChunk]> != <[playerChunk]>:
-                    - define chunkList:->:<element[-].color[gray]>
+                    - else if <[kingdomTerritory].contains[<[currentChunk]>]>:
+                        - define chunkList:->:<element[■].color[<[kingdomColor]>]>
+                        - foreach stop
 
-                - else:
-                    - define chunkList:->:<element[P].color[white].on_hover[<[currentChunk]>]>
+            - else if <[currentChunk]> != <[playerChunk]>:
+                - define chunkList:->:<element[-].color[gray]>
 
-        - define chunkList <[chunkList].sub_lists[19]>
-        - narrate "<gold>=-=-=-=-=-= <element[Chunk Map].color[#f7c64b]> =-=-=-=-=-=-="
-        - narrate <[chunkList].parse_tag[<[parse_value].space_separated>].separated_by[<n>]>
-        - narrate "- : <gray>Wilderness"
-        - narrate "P : <blue>Player"
-        - narrate "■ : <gold>Kingdom Claim"
-        - narrate "▒ : <green>Kingdom Outpost"
+            - else:
+                - define chunkList:->:<element[P].color[white].on_hover[<[currentChunk]>]>
+
+    - define chunkList <[chunkList].sub_lists[19]>
+    - narrate "<gold>=-=-=-=-=-= <element[Chunk Map].color[#f7c64b]> =-=-=-=-=-=-="
+    - narrate <[chunkList].parse_tag[<[parse_value].reverse.space_separated>].separated_by[<n>]>
+    - narrate "- : <gray>Wilderness"
+    - narrate "P : <blue>Player"
+    - narrate "■ : <gold>Kingdom Claim"
+    - narrate "▒ : <green>Kingdom Outpost"
+
 
 ##############################################################################
 
