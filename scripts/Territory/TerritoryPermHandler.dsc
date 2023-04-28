@@ -68,9 +68,10 @@ TerritoryHandler:
                     - if <[value].cuboid.contains[<context.entity.location>]>:
                         - determine cancelled
 
-                - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
-                    - if <cuboid[<[value]>].players.contains[<player>]>:
-                        - determine cancelled
+                - if <server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList]>:
+                    - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
+                        - if <cuboid[<[value]>].players.contains[<player>]>:
+                            - determine cancelled
 
         on player empties bucket:
         - if <player.has_flag[kingdom]>:
