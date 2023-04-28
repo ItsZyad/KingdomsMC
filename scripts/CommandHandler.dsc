@@ -149,7 +149,7 @@ ChunkMap:
 
     - define chunkList <[chunkList].sub_lists[19]>
     - narrate "<gold>=-=-=-=-=-= <element[Chunk Map].color[#f7c64b]> =-=-=-=-=-=-="
-    - narrate <[chunkList].parse_tag[<[parse_value].reverse.space_separated>].separated_by[<n>]>
+    - narrate <[chunkList].parse_tag[<[parse_value].space_separated>].separated_by[<n>]>
     - narrate "- : <gray>Wilderness"
     - narrate "P : <blue>Player"
     - narrate "■ : <gold>Kingdom Claim"
