@@ -103,16 +103,12 @@ StateCommandMechanisms_CISK:
         - define dynamicMechName <[mechInfo].get[mech]>
         - define dynamicMechName <[mech]> if:<[mechInfo].get[mech].equals[/]>
 
-        # - narrate format:debug STM:<[stateMechanism]>
-        # - narrate format:debug DMN:<[dynamicMechName]>
-
         - if <[stateMechanism]> == <[dynamicMechName]>:
             - choose <[stateMechanism]>:
                 - case location:
                     - define stateMechanismSet <proc[LocationType_CISK].context[<[stateMechanismSet]>|<[player]>]>
 
             - execute as_server "ex adjust <[entityStateTarget]> <[dynamicMechName]>:<[stateMechanismSet]>"
-            # - narrate format:debug "ex adjust <[entityStateTarget]> <[dynamicMechName]>:<[stateMechanismSet]>"
             - foreach stop
 
     GetPlayer:
