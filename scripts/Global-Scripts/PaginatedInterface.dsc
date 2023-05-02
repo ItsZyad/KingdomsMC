@@ -37,7 +37,18 @@ GetTrueInterface_Proc:
 PaginatedInterface:
     type: task
     debug: false
-    definitions: itemList|page|player|footer|title
+    description:
+    - Generates a template paginated interface with the itemList given.
+    - Interface name is always: PaginatedInterface_Window
+    - -=-=-=-=-=-=-=-=-=-=-=-=-=-
+    - @itemList [ListTag[ItemTag]] A list of items to be displayed in the interface.
+    - @page: [ElementTag[Integer]] The page number that the interface starts on.
+    - @player: [PlayerTag] Player for which the interface will be displayed.
+    - ?footer: [InventoryTag] Additional buttons to add in the footer of the interface (other than prev/next page).
+    - ?title: [ElementTag[String]] Interface title.
+    - ?flag: [ElementTag[String]] A flag to be applied to the player while they are looking at the interface.
+
+    definitions: itemList|page|player|footer|title|flag
     ChangeFooter:
     - if <[footer].exists> && <[footer].size> == 9:
         - define interfaceBody <proc[GetTrueInterface_Proc].context[<[interface]>].get[1].to[<[itemsPerPage]>]>
@@ -84,6 +95,10 @@ PaginatedInterface:
     - definemap determination:
         newPageContents: <[interface].list_contents.get[1].to[<[itemsPerPage]>]>
         newPageNumber: <[page]>
+
+    - if <[flag].exists>:
+        - flag <[player]> datahold.paginated.tempFlagName:<[flag]>
+        - flag <[player]> <[flag]>
 
     - flag <[player]> dataHold.paginated.page:<[page]>
 
@@ -132,4 +147,5 @@ PaginatedInterface_Handler:
         - wait 2t
         - if <player.open_inventory> == <player.inventory>:
             - customevent id:PaginatedInvClose
+            - flag <player> <player.flag[datahold.paginated.tempFlagName]>:!
             - flag <player> dataHold.paginated:!
