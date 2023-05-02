@@ -90,7 +90,7 @@ RefreshBlackMarketMerchants:
                         - if <[currMerchantLoc]> == <[value].center>:
                             - flag <[merchant]> faction:<[factionName]>
                             - define factionColor <yaml[bmf].read[factiondata.<[factionName]>.color]>
-                            - adjust <[merchant]> hologram_lines:<list[<[factionColor].parsed><yaml[bmf].read[factiondata.<[factionName]>.name]>|Faction:]>
+                            - adjust <[merchant]> hologram_lines:<list[<yaml[bmf].read[factiondata.<[factionName]>.name].color[<[factonColor]>]>|Faction:]>
                             - adjust <[merchant]> hologram_line_height:0.3
 
                             - foreach stop
@@ -329,11 +329,10 @@ BMMerchant_Handler:
 
         - determine cancelled
 
-        on player closes inventory:
-        - if <player.has_flag[BMInteract]>:
-            - flag player BMInteract:!
-            - flag <context.inventory.id_holder> isTrading:!
-            #- narrate <context.inventory.id_holder>
+        on player closes inventory flagged:BMInteract:
+        - flag player BMInteract:!
+        - flag <context.inventory.id_holder> isTrading:!
+        #- narrate <context.inventory.id_holder>
 
 BMRefresh_Handler:
     type: world
