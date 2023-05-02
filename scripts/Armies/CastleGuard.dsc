@@ -234,7 +234,7 @@ GuardInterface_Handler:
         on player clicks GuardAnchorReturn_Item in Guard_Window:
         - inventory close
         - define anchorPosition <player.flag[clickedNPC].flag[guardPos]>
-        - ~run GuardStaggeredPathfind def.npc:<player.flag[clickedNPC]> def.endLocation:<[anchorPosition]> def.recursionDepth:0 def.speed:1.1
+        - run StaggeredPathfind def.npc:<player.flag[clickedNPC]> def.endLocation:<[anchorPosition]> def.recursionDepth:0 def.speed:1.1
 
         on player chats:
         - if <player.has_flag[redefiningGuardAnchor]>:
@@ -242,7 +242,7 @@ GuardInterface_Handler:
 
             - if <context.message> != cancel:
                 - flag <[guard]> guardPos:<player.location>
-                - ~run GuardStaggeredPathfind def.npc:<[guard]> def.endLocation:<player.location.center> def.recursionDepth:0 def.speed:1.1
+                - ~run StaggeredPathfind def.npc:<[guard]> def.endLocation:<player.location.center> def.recursionDepth:0 def.speed:1.1
 
             - else:
                 - narrate format:callout "Cancelled guard repositioning!"
@@ -619,7 +619,7 @@ GuardTargetSelection:
         - execute as_server "sentinel forgive --id <[guard].id>" silent
 
 
-GuardStaggeredPathfind:
+StaggeredPathfind:
     type: task
     definitions: npc|endLocation|recursionDepth|speed
     script:
@@ -641,7 +641,7 @@ GuardStaggeredPathfind:
 
         - if <[npc].location.distance[<[endLocation]>].is[MORE].than[3.5]>:
             - narrate format:debug <[npc].location.distance[<[endLocation]>]>
-            - run GuardStaggeredPathfind def.npc:<[npc]> def.endLocation:<[endLocation]> def.recursionDepth:<[recursionDepth].add[1]> def.speed:<[speed]>
+            - run StaggeredPathfind def.npc:<[npc]> def.endLocation:<[endLocation]> def.recursionDepth:<[recursionDepth].add[1]> def.speed:<[speed]>
 
         - else:
             - teleport <[npc]> <[endLocation]>
@@ -653,4 +653,4 @@ GuardTickEvent_Handler:
         on sentinel npc has no more targets:
         - if <npc.has_flag[GuardPos]>:
             - wait 1s
-            - run GuardStaggeredPathfind def.npc:<npc> def.endLocation:<npc.flag[GuardPos]> def.recustionDepth:0 def.speed:1
+            - run StaggeredPathfind def.npc:<npc> def.endLocation:<npc.flag[GuardPos]> def.recustionDepth:0 def.speed:1
