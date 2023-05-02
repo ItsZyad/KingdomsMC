@@ -94,7 +94,7 @@ LoggerGenerationHandler_NEW:
                 - wait 10t
 
             - if <util.random.int[1].to[50].is[OR_MORE].than[25]>:
-                - give <[npc].inventory> stick quantity:<util.random.int[1].to[5]>
+                - give to:<[npc].inventory> stick quantity:<util.random.int[1].to[5]>
 
             - give to:<[npc].inventory> <[currentBlock].material.name.split[_].get[1]>_log quantity:<[numOfLogs].mul[<[npc].flag[outputMod].add[1]>].round>
             - give to:<[npc].inventory> <[currentBlock].material.name.split[_].get[1]>_sapling quantity:<util.random.int[1].to[<util.random.int[1].to[4]>]>
@@ -178,6 +178,6 @@ LoggerGenerationHandler:
                 - give to:<[npc].inventory> <[currentBlock].material.name.split[_].get[1]>_sapling quantity:<util.random.int[1].to[<util.random.int[1].to[4]>]>
 
                 - if <util.random.int[1].to[50].is[OR_MORE].than[25]>:
-                    - give <[npc].inventory> stick quantity:<util.random.int[1].to[5]>
+                    - give to:<[npc].inventory> stick quantity:<util.random.int[1].to[5]>
 
                 - narrate format:debug <[currentTree]>
