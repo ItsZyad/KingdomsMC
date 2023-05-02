@@ -107,6 +107,7 @@ ReconstructionPermit_Handler:
 
 ReconstructionPermitSave:
     type: task
+    debug: false
     definitions: player
     script:
     - yaml id:recon load:reconstruction-permits.yml
