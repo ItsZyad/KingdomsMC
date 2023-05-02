@@ -76,11 +76,10 @@ BlockChecker_Handler:
             - flag player ChestCheckDef1:<context.location>
             - narrate format:admincallout "Location 1 Marked"
 
-        on player chats:
-        - if <player.has_flag[blockSearchQuery]>:
-            - run BlockChecker def:<player.flag[ChestCheckDef1]>|<player.flag[ChestCheckDef2]>|<context.message>
-            - flag player blockSearchQuery:!
-            - determine cancelled
+        on player chats flagged:blockSearchQuery:
+        - run BlockChecker def:<player.flag[ChestCheckDef1]>|<player.flag[ChestCheckDef2]>|<context.message>
+        - flag player blockSearchQuery:!
+        - determine cancelled
 
 BlockCheckWand:
     type: item

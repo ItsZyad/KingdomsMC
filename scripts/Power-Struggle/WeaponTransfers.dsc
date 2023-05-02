@@ -96,64 +96,63 @@ WeaponTransferOption_Handler:
             - else:
                 - narrate format:callout "You are already making a weapon transfer transaction"
 
-        on player chats:
-        - if <player.has_flag[transferData.transferType]>:
-            - if <context.message.to_lowercase> == cancel:
-                - flag <player> transferData:!
-                - narrate format:callout "Transfer cancelled!"
+        on player chats flagged:transferData.transferType:
+        - if <context.message.to_lowercase> == cancel:
+            - flag <player> transferData:!
+            - narrate format:callout "Transfer cancelled!"
 
-            - else:
-                - if !<context.message.is_integer>:
-                    - narrate format:callout "Please enter a valid order amount. (numbers only!)"
-                    - determine cancelled
+        - else:
+            - if !<context.message.is_integer>:
+                - narrate format:callout "Please enter a valid order amount. (numbers only!)"
+                - determine cancelled
+
+            - define kingdom <player.flag[kingdom]>
+
+            # If player does not cancel the transaction then extract
+            # the item transfer type and material name and add to a
+            # new flag which also has the amount of items to be tran-
+            # sfered
+
+            - define transferType <player.flag[transferData.transferType]>
+            - define transferItem <player.flag[transferData.material]>
+
+            - if <server.flag[kingdoms.powerstruggleInfo.transferItems.<[transferItem]>].is[OR_MORE].than[<context.message>]>:
+
+                - flag <player> transferData.amount:<context.message>
+                #- flag <player> influenceType:<list[weapons|mercenary]>
 
                 - define kingdom <player.flag[kingdom]>
+                - define sameMaterialTransfers <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<player.flag[transferData].get[material]>]>].exclude[false].size>
+                - define transferID <player.name>-<player.flag[transferData].get[material]><[sameMaterialTransfers]>
+                - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.influenceType:<player.flag[transferData].get[transferType]>
+                - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.material:<player.flag[transferData].get[material]>
+                - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.amount:<context.message>
+                - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.due:<util.time_now.add[1d]>
+                - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.madeBy:<player>
 
-                # If player does not cancel the transaction then extract
-                # the item transfer type and material name and add to a
-                # new flag which also has the amount of items to be tran-
-                # sfered
+                - runlater RemoveTransferAfterDue def:<[transferID]>|<[kingdom]> id:<[transferID]>
 
-                - define transferType <player.flag[transferData.transferType]>
-                - define transferItem <player.flag[transferData.material]>
+                # Just checks if the player still has the
+                # amount/transferData subflag (which is deleted
+                # if they go through) with the transaction and completed
 
-                - if <server.flag[kingdoms.powerstruggleInfo.transferItems.<[transferItem]>].is[OR_MORE].than[<context.message>]>:
+                - runlater DidTransferFail delay:24h def:<player>|transferData.amount
 
-                    - flag <player> transferData.amount:<context.message>
-                    #- flag <player> influenceType:<list[weapons|mercenary]>
-
-                    - define kingdom <player.flag[kingdom]>
-                    - define sameMaterialTransfers <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<player.flag[transferData].get[material]>]>].exclude[false].size>
-                    - define transferID <player.name>-<player.flag[transferData].get[material]><[sameMaterialTransfers]>
-                    - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.influenceType:<player.flag[transferData].get[transferType]>
-                    - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.material:<player.flag[transferData].get[material]>
-                    - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.amount:<context.message>
-                    - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.due:<util.time_now.add[1d]>
-                    - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.madeBy:<player>
-
-                    - runlater RemoveTransferAfterDue def:<[transferID]>|<[kingdom]> id:<[transferID]>
-
-                    # Just checks if the player still has the
-                    # amount/transferData subflag (which is deleted
-                    # if they go through) with the transaction and completed
-
-                    - runlater DidTransferFail delay:24h def:<player>|transferData.amount
-
-                    - if <[transferType]> != masons:
-                        - narrate format:callout "To fullfill this order, go to the Fyndalin City Militia office and hand the item(s) over to General Thorvald within 24 hours"
-
-                    - else:
-                        - narrate format:callout "You have 24 hours to place a sign on the chest you would like to use as a transfer vault."
-
-                    - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:-:1
-
-                    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+                - if <[transferType]> != masons:
+                    - narrate format:callout "To fullfill this order, go to the Fyndalin City Militia office and hand the item(s) over to General Thorvald within 24 hours"
 
                 - else:
-                    - narrate format:callout "There is not enough demand for you to fullfill that many orders!"
+                    - narrate format:callout "You have 24 hours to place a sign on the chest you would like to use as a transfer vault."
 
-            - flag <player> enteringTransferData:!
-            - determine cancelled
+                - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:-:1
+
+                - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+
+            - else:
+                - narrate format:callout "There is not enough demand for you to fullfill that many orders!"
+
+        - flag <player> enteringTransferData:!
+        - determine cancelled
 
         on player clicks WeaponTransfer_MercInfluence in MercenaryInfluence_Window:
         - ratelimit <player> 3t

@@ -69,7 +69,7 @@ BlackMarketInfluence_Handler:
         - else:
             - narrate format:callout "You have exhausted your influence points today."
 
-        on player chats:
+        on player chats flagged:noChat.BMInf:
 
         ## NOTE: Anything related to the faction numbers specified in the
         ##       factionInfo flag must be done in this queue or the one
@@ -77,7 +77,7 @@ BlackMarketInfluence_Handler:
 
         # If the player has noChat and factionInfo flags;
 
-        - if <player.has_flag[noChat.BMInf]> && <player.has_flag[factionInfo]>:
+        - if <player.has_flag[factionInfo]>:
 
             - define kingdom <player.flag[kingdom]>
             #- narrate format:debug FAC:<player.flag[factionInfo]>

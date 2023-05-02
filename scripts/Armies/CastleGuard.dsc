@@ -236,19 +236,18 @@ GuardInterface_Handler:
         - define anchorPosition <player.flag[clickedNPC].flag[guardPos]>
         - run StaggeredPathfind def.npc:<player.flag[clickedNPC]> def.endLocation:<[anchorPosition]> def.recursionDepth:0 def.speed:1.1
 
-        on player chats:
-        - if <player.has_flag[redefiningGuardAnchor]>:
-            - define guard <player.flag[clickedNPC]>
+        on player chats flagged:redefiningGuardAnchor:
+        - define guard <player.flag[clickedNPC]>
 
-            - if <context.message> != cancel:
-                - flag <[guard]> guardPos:<player.location>
-                - ~run StaggeredPathfind def.npc:<[guard]> def.endLocation:<player.location.center> def.recursionDepth:0 def.speed:1.1
+        - if <context.message> != cancel:
+            - flag <[guard]> guardPos:<player.location>
+            - ~run StaggeredPathfind def.npc:<[guard]> def.endLocation:<player.location.center> def.recursionDepth:0 def.speed:1.1
 
-            - else:
-                - narrate format:callout "Cancelled guard repositioning!"
+        - else:
+            - narrate format:callout "Cancelled guard repositioning!"
 
-            - flag player redefiningGuardAnchor:!
-            - determine cancelled
+        - flag player redefiningGuardAnchor:!
+        - determine cancelled
 
         on player clicks GuardDelete_Item in Guard_Window:
         - inventory open d:GuardDeleteConfirm_Window

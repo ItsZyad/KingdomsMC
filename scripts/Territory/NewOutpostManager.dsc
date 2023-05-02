@@ -308,11 +308,13 @@ OutpostWand_Handler:
                     - if <server.flag[kingdoms.<[kingdom]>.balance].is[OR_MORE].than[<[outpostCost]>]>:
 
                         - if !<player.has_flag[redefiningOutpost]>:
+                            - flag player noChat.outposts.definingOutpost
                             - flag player canNameOutpost
 
                             - narrate format:callout "Please type in chat the name you would like to give this outpost:"
 
                         - else:
+                            - flag player noChat.outposts.definingOutpost
                             - flag player outpostAlreadyNamed
 
                             - narrate format:callout "Are you sure you would like to redefine this outpost to these specifications? (yes/no)"
@@ -332,7 +334,7 @@ OutpostWand_Handler:
                     - flag player cornerOneDefined:!
                     - flag player cornerTwoDefined:!
 
-        on player chats:
+        on player chats flagged:noChat.outposts.definingOutpost:
         - define posOne <player.flag[cornerOneDefined]>
         - define posTwo <player.flag[cornerTwoDefined]>
         - define outpostCost <player.flag[outpostCost]>
