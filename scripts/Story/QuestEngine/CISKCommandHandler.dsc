@@ -200,7 +200,7 @@ ProduceFlaggableObject_CISK:
 WaitCommand_CISK:
     type: task
     PostEvaluationCode:
-    - flag <[player]> KQuests.temp.wait:<[waitAmount].round_to_precision[0.01]>
+    - flag <[player]> KQuests.temp.wait.amount:<[waitAmount].round_to_precision[0.01]>
     - flag <[player]> KQuests.temp.wait.override:true if:<[waitOverride].exists.and[<[waitOverride].equals[true]>]>
 
     script:
@@ -209,6 +209,7 @@ WaitCommand_CISK:
 
     - else if <[attrVal]> == override:
         - define waitOverride true
+
 
 # Example Usage:
 # <dataget t:npc n:x def:0>

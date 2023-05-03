@@ -136,8 +136,11 @@ SpeechHandler_CISK:
                 - case RANDOM:
                     - inject RandomizationHandler_CISK
 
+                - case REPEAT:
+                    - inject RepeatHandler_CISK
+
                 - default:
-                    - define errMsg "Unrecognized block '<[line].key>'. Could this be a typo?"
+                    - define errMsg "Unrecognized block '<[line].keys.get[1]>'. Could this be a typo?"
                     - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[currentBlock]> def.message:<[errMsg]>
                     - determine cancelled
 
@@ -155,15 +158,15 @@ SpeechHandler_CISK:
                 - chat targets:<[player]> talkers:<[npc]> <[evaluatedLine].space_separated>
 
         - if <[player].has_flag[KQuests.temp.wait.override]>:
-            - define waitOverride 0
+            - define waitOverride true
             - flag <[player]> KQuests.temp.wait.override:!
 
         - if !<[waitOverride].exists> || <[waitOverride]> == null:
             - wait <[waitTime]>s
 
-        - if <[player].has_flag[KQuests.temp.wait]>:
-            - wait <[player].flag[KQuests.temp.wait]>s
-            - flag <[player]> KQuests.temp.wait:!
+        - if <[player].has_flag[KQuests.temp.wait.amount]>:
+            - wait <[player].flag[KQuests.temp.wait.amount]>s
+            - flag <[player]> KQuests.temp.wait.amount:!
 
     - if <[shouldEngage]> && <[npc].engaged>:
         #TODO: UNCOMMENT ONCE IN PROD!
@@ -229,7 +232,7 @@ ConditionalHandler_CISK:
         - run SplitKeep def.text:<[operand]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
         - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
-        - run CommandDelegator_CISK def.splitted:<[splitted]> def.player:<[player]> save:evaluated_line
+        - ~run CommandDelegator_CISK def.splitted:<[splitted]> def.player:<[player]> save:evaluated_line
         - define evaluatedLine <entry[evaluated_line].created_queue.determination.get[1]>
         - define result <[evaluatedLine].get[1]>
 
@@ -295,6 +298,33 @@ DataHandler_CISK:
         - determine cancelled
 
     - flag <[dataTarget]> KQuests.data.<[dataName]>.value:<[dataVal]>
+
+
+RepeatHandler_CISK:
+    type: task
+    script:
+    ## Defs carried from MAINPARSER_CISK:
+    ## file, schema, handler, npc, player
+
+    ## Defs carried from SPEECHHANDLER_CISK:
+    ## waitTime, currentBlock, interactionAmounts, talkSpeed, shouldEngage, speech, hasBroken, line
+
+    - define handler <[line].keys.get[1]>
+    - define repeatBlock <[line].get[REPEAT]>
+    - define repeatAmount <[repeatBlock].get[loops]>
+    - define repeatActions <[repeatBlock].get[actions]>
+    - define repeatIncrement <[repeatBlock].get[increment].if_null[1]>
+    - define repeatIncrement 1 if:<[repeatIncrement].equals[0].or[<[repeatIncrement].is_integer.not>]>
+    - define repeatReverse false
+    - define repeatReverse true if:<[repeatAmount].is[LESS].than[0]>
+
+    - define indexRange <util.list_numbers[to=<[repeatAmount]>;from=1;every=<[repeatIncrement]>]>
+    - define indexRange <util.list_numbers[from=<[repeatAmount]>;to=0;every=<[repeatIncrement]>]> if:<[repeatReverse]>
+    - definemap repeatSpeech:
+        speech: <[repeatActions]>
+
+    - foreach <[indexRange]> as:repeatValue:
+        - ~run SpeechHandler_CISK defmap:<queue.definition_map.include[<[repeatSpeech]>]>
 
 
 RandomizationHandler_CISK:
@@ -416,3 +446,10 @@ CISKCommand:
             - flag <player> CISKAdmin.enabled
 
         - narrate format:admincallout "CISK NPC debug view: <red><player.flag[CISKAdmin].exists.if_true[Activated].if_false[Deactivated]>!"
+
+
+DEBUG_RepeatTest:
+    type: task
+    script:
+    - foreach <util.list_numbers[from=-5;to=5]>:
+        - narrate format:debug <[value]>
