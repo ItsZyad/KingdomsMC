@@ -65,7 +65,8 @@ FlagVisualizer:
 
 MakeTabbed:
     type: procedure
+    debug: false
     definitions: element|tabLevel
     script:
-    - define tabbedList "<list[<element[ ].repeat[<[tabLevel]>]>|<[element]>]>"
+    - define tabbedList <list[<element[ ].repeat[<[tabLevel]>]>|<[element]>]>
     - determine <[tabbedList].unseparated>

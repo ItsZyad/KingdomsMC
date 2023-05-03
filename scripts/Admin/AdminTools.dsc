@@ -12,6 +12,7 @@
 
 AdminTools_Command:
     type: command
+    debug: false
     usage: /kadmin
     name: kadmin
     description: Umbrella command for all things kingdoms admin.
@@ -56,11 +57,11 @@ AdminTools_Command:
             - if <context.args.size> <= 2:
                 - if <[object].regex_matches[^<&lt>.*\<&lb>.*\<&rb><&gt>$]>:
                     - define flagList <[object].parsed.list_flags>
-                    - define flagList <server.list_flags> if:<[object].equals[server]>
+                    - define flagList <server.list_flags[]> if:<[object].equals[server]>
                     - determine <[flagList].if_null[<list[]>]>
 
                 - else if <[object]> == server:
-                    - determine <server.list_flags>
+                    - determine <server.list_flags[]>
 
                 - else if <[object]> == player:
                     - determine <player.list_flags>
@@ -106,11 +107,11 @@ AdminTools_Command:
                 - else:
                     - if <[object].regex_matches[^<&lt>.*\<&lb>.*\<&rb><&gt>$]>:
                         - define flagList <[object].parsed.list_flags>
-                        - define flagList <server.list_flags> if:<[object].equals[server]>
+                        - define flagList <server.list_flags[]> if:<[object].equals[server]>
                         - determine <[flagList].if_null[<list[]>]>
 
                     - else if <[object]> == server:
-                        - determine <server.list_flags>
+                        - determine <server.list_flags[]>
 
     script:
     - define args <context.raw_args.split_args.get[1]>
