@@ -133,6 +133,9 @@ SpeechHandler_CISK:
                 - case CONDITIONAL:
                     - inject ConditionalHandler_CISK
 
+                - case RANDOM:
+                    - inject RandomizationHandler_CISK
+
                 - default:
                     - define errMsg "Unrecognized block '<[line].key>'. Could this be a typo?"
                     - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[currentBlock]> def.message:<[errMsg]>
@@ -183,7 +186,7 @@ OptionsHandler_CISK:
     - narrate <aqua><bold>OPTIONS<&co>
 
     - foreach <[line].get[OPTIONS]>:
-        - define index <[value].key>
+        - define index <[value].keys.get[1]>
         - define prompt <[value].get[prompt]>
         - define speech <[value].get[actions]>
 
@@ -292,6 +295,23 @@ DataHandler_CISK:
         - determine cancelled
 
     - flag <[dataTarget]> KQuests.data.<[dataName]>.value:<[dataVal]>
+
+
+RandomizationHandler_CISK:
+    type: task
+    script:
+    ## Defs carried from MAINPARSER_CISK:
+    ## file, schema, handler, npc, player
+
+    ## Defs carried from SPEECHHANDLER_CISK:
+    ## waitTime, currentBlock, interactionAmounts, talkSpeed, shouldEngage, speech, hasBroken, line
+
+    - define handler <[line].keys.get[1]>
+    - define randomBlock <[line].get[RANDOM]>
+    - define randomActions <[randomBlock].get[actions]>
+    - define randomIndex <util.random.int[1].to[<[randomActions].size>]>
+
+    - run SpeechHandler_CISK defmap:<queue.definition_map.include[speech=<[randomActions].get[<[randomIndex]>]>]>
 
 
 WriteCiskError:
