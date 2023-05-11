@@ -52,9 +52,12 @@ AdminTools_Command:
             - determine <server.players.parse_tag[<[parse_value].name>].include[*]>
 
         - case seeflag:
-            - define object <context.args.get[2]>
+            - define object <context.args.get[2]> if:<context.args.size.is[OR_MORE].than[2]>
 
-            - if <context.args.size> <= 2:
+            - if <context.args.size> == 1:
+                - determine <list[server|player|[flaggable object]]>
+
+            - else if <context.args.size> <= 2:
                 - if <[object].regex_matches[^<&lt>.*\<&lb>.*\<&rb><&gt>$]>:
                     - define flagList <[object].parsed.list_flags>
                     - define flagList <server.list_flags[]> if:<[object].equals[server]>
@@ -66,7 +69,8 @@ AdminTools_Command:
                 - else if <[object]> == player:
                     - determine <player.list_flags>
 
-                - determine "<list[server|player|[flaggable object]]>"
+                - else:
+                    - determine <list[server|player|[flaggable object]]>
 
             - else if <context.args.size> == 3:
                 - if <context.args.get[3].contains[.]>:
@@ -112,6 +116,9 @@ AdminTools_Command:
 
                     - else if <[object]> == server:
                         - determine <server.list_flags[]>
+
+                    - else if <[object]> == player:
+                        - determine <player.list_flags>
 
     script:
     - define args <context.raw_args.split_args.get[1]>
