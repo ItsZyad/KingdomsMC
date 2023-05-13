@@ -13,60 +13,135 @@
 NEW_DynmapFlagBuilder:
     type: task
     permission: kingdoms.admin
-    definitions: world
+    definitions: world|player|useCache
+    ShortLookaround:
+    - narrate format:debug <dark_purple>SHORT_LOOKAROUND
+    - define shortLookaround <list[left=<[currCoord].add[1,0,0]>|right=<[currCoord].add[0,0,1]>|forward=<[currCoord].add[-1,0,0]>|backward=<[currCoord].add[0,0,-1]>].parse_tag[<[parse_value].as[map]>]>
+
+    - foreach <[shortLookaround]>:
+        - define dir <[value].values.get[1]>
+        - define key <[value].keys.get[1]>
+
+        - if <[sortedCornerList].contains[<[dir]>]>:
+            - foreach next
+
+        - narrate format:debug <dark_purple>KEY:<[key]>
+        - narrate format:debug <dark_purple>DIR:<[dir]>
+
+        - if <[exteriorCorners].contains[<[dir]>]>:
+            - define sortedCornerList:->:<[dir]>
+            - define currCoord <[dir]>
+            - define previousPointDir <[key]>
+            - define lastJump 1
+            - define foundNextCoord true
+            - while next
+
+    NormalLookaround:
+    - foreach <[catchmentList]>:
+        - define dir <[value].values.get[1]>
+        - define key <[value].keys.get[1]>
+
+        - if <[sortedCornerList].contains[<[dir]>]>:
+            - foreach next
+
+        - narrate format:debug <red>KEY:<[key]>
+        - narrate format:debug <red>DIR:<[dir]>
+
+        - if <[exteriorCorners].contains[<[dir]>]>:
+            - define sortedCornerList:->:<[dir]>
+            - define currCoord <[dir]>
+            - define previousPointDir <[key]>
+            - define lastJump 15
+            - define foundNextCoord true
+            - while next
+
     script:
-    - define kingdomList <list[centran|cambrian|viridian|raptoran]>
+    #- define kingdomList <proc[GetKingdomList]>
+    - define useCache false if:<[useCache].exists.not>
+    ## For debug purposes keep it as this.
+    - define kingdomList <list[fyndalin]>
 
     - foreach <[kingdomList]> as:kingdom:
-        - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
-        - define castle <server.flag[kigndoms.<[kingdom]>.claims.castle].as[list]>
         - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
-        - define all <[core].include[<[castle]>]>
-        - define as_cuboid <[all].get[1].cuboid>
-        - define as_cuboid <[as_cuboid].add_member[<[all].get[2].to[last].parse_tag[<[parse_value].cuboid>]>]>
-        - define corners <[as_cuboid].corners>
-        - define uselessCorners <list[]>
+        - define core <server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>
+        - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>]>
+        - define allCuboids <[core].include[<[castle]>].parse_tag[<[parse_value].cuboid>]>
 
-        - foreach <[as_cuboid].outline_2d[100]> as:loc:
-            - foreach <list[16|-16]> as:xDiff:
-                - foreach <list[16|-16]> as:zDiff:
-                    - if <[as_cuboid].contains[<[loc].add[<[xDiff]>,0,<[zDiff]>]>]>:
-                        - define corners <[corners].exclude[<[loc].add[<[xDiff]>,0,<[zDiff]>]>]>
+        - if <[allCuboids].size> == 0:
+            - narrate format:admincallout SKIPPED <[kingdomName].color[gray].to_uppercase>!
+            - foreach next
 
-        # - narrate format:debug castle:<[castle]>
-        # - narrate format:debug core:<[core]>
+        - define allCorners <[allCuboids].parse_tag[<[parse_value].corners.parse_tag[<[parse_value].with_y[255]>]>].combine.deduplicate>
+        - define excludedCorners <list[]>
 
-        # - define as_polygon <polygon[<[world].name>,0,256,<[as_cuboid].corners.get[1].x>,<[as_cuboid].corners.get[1].z>]>
+        - showfake green_wool <[allCorners].parse_tag[<[parse_value].with_y[<[player].location.y.sub[25]>]>]>
 
-        # - narrate format:debug COR:<[as_cuboid].corners>
+        - foreach <[allCorners]> as:corner:
+            - define surroundingCuboid <cuboid[<[world].name>,<[corner].forward[8].left[8].up[1].xyz>,<[corner].backward[8].right[8].down[1].xyz>]>
+            - define amountofCorners 0
 
-        # - foreach <[as_cuboid].corners.get[2].to[last]> as:corner:
-        #    - define as_polygon <[as_polygon].with_corner[<[corner]>]>
+            - foreach <[allCorners]> as:comp:
+                - if <[amountOfCorners]> == 4:
+                    - define excludedCorners:->:<[corner]>
+                    - foreach stop
 
-        # - narrate format:debug POLY:<[as_polygon]>
-        # - narrate format:debug KING:<[kingdom]>
-        # - narrate format:debug CUBD:<[as_cuboid]>
+                - if <[comp].is_within[<[surroundingCuboid]>]>:
+                    - define amountOfCorners:++
 
-        # - showfake red_stained_glass <[as_polygon].outline_2d[<player.location.y>]> d:10s
-        - showfake green_stained_glass <[corners].parse_tag[<[parse_value].with_y[<player.location.y>]>]> d:20s
+        - run flagvisualizer def.flag:<[excludedCorners]> def.flagName:EXCL
+        - define exteriorCorners <[allCorners].exclude[<[excludedCorners]>]>
 
-        - narrate format:debug "Cancelled script!"
-        - determine cancelled
+        - showfake red_wool <[exteriorCorners].parse_tag[<[parse_value].with_y[<[player].location.y.sub[25]>]>]> d:30s
 
-        - flag <[world]> dynmap.kingdoms.<[kingdom]>.region:<list[<[kingdomName]>|<[as_cuboid]>]>
-        - define outposts <server.flag[kingdoms.<[kingdom]>.outpostList].to_pair_lists>
-        - flag <[world]> dynmap.kingdoms.<[kingdom]>.outposts:<list[]>
+        - define startCoord <[exteriorCorners].get[1]>
+        - define currCoord <[startCoord]>
+        - define sortedCornerList <list[<[currCoord]>]>
+        - define previousPointDir null
+        - define hasStarted false
+        - define lastJump 15
+        - definemap directionOpposites:
+            right: left
+            left: right
+            backward: forward
+            forward: backward
 
-        - foreach <[outposts]> as:outpost:
-            - define cornerone <[outpost].get[2].get[cornerone].xyz>
-            - define cornertwo <[outpost].get[2].get[cornertwo].xyz>
-            - define name <[outpost].get[2].get[name]>
+        ## Note: Remove 49 loop safeguard when tested fully/in prod.
+        - while <[startCoord]> != <[currCoord]> || !<[hasStarted]>:
+            - define hasStarted true
+            - define foundNextCoord false
 
-            - define region <cuboid[<player.location.world.name>,<[cornerone]>,<[cornertwo]>]>
+            - if <[loop_index]> >= 39:
+                - narrate format:debug "Loop exceeded <[loop_index]> iterations! Stopping Queue..."
+                - while stop
 
-            - flag <[world]> dynmap.kingdoms.<[kingdom]>.outposts:<[world].flag[dynmap].deep_get[kingdoms.<[kingdom]>.outposts].include_single[<[name]>|<[region]>]>
+            - narrate format:debug WHILE_INDEX:<[loop_index]>
 
-        - narrate format:debug -------------------------
+            - define catchmentList <list[left=<[currCoord].left[15]>|right=<[currCoord].right[15]>|forward=<[currCoord].forward_flat[15]>|backward=<[currCoord].backward_flat[15]>].parse_tag[<[parse_value].as[map]>]>
+
+            - if <[previousPointDir].is_in[left|right|backward|forward]>:
+                - narrate format:debug PPD:<[previousPointDir]>
+                - define catchmentList <[catchmentList].filter_tag[<[filter_value].keys.get[1].equals[<[previousPointDir]>].not>].include[<[catchmentList].filter_tag[<[filter_value].keys.get[1].equals[<[previousPointDir]>]>]>]>
+
+            # - narrate format:debug CAT:<[catchmentList]>
+            - narrate format:debug <gold><bold>CURR:<[currCoord]>
+
+            - if <[lastJump]> != 15:
+                - inject <script.name> path:ShortLookaround
+                - inject <script.name> path:NormalLookaround
+
+            - else:
+                - inject <script.name> path:NormalLookaround
+                - inject <script.name> path:ShortLookaround
+
+            - narrate format:debug ---------------------------
+
+        - narrate format:debug SCL:<[sortedCornerList]>
+
+        - wait 1s
+
+        - foreach <[sortedCornerList].parse_tag[<[parse_value].with_y[<[player].location.y.sub[25]>]>]>:
+            - showfake white_wool <[value]> d:30s
+            - wait 10t
 
 
 DynmapFlagBuilder:
@@ -78,7 +153,7 @@ DynmapFlagBuilder:
 
     - foreach <[kingdomList]> as:kingdom:
         - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
-        - define castle <server.flag[kigndoms.<[kingdom]>.claims.castle].as[list]>
+        - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
         - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
         - define all <[core].include[<[castle]>]>
         - define as_cuboid <[all].get[1].cuboid>
