@@ -4,7 +4,6 @@
 DenizenCISKMechMirrors:
     type: data
     entity:
-
         # PROPERTY-MECHANISM KEYS
         name:
             prop: /
@@ -59,6 +58,14 @@ DenizenCISKMechMirrors:
             prop: location.yaw.simple
         type:
             prop: entity_type
+
+    npc:
+        # PROPERTY-MECHANISM KEYS
+        lookclose:
+            prop: /
+            mech: /
+
+
 
 # TODO: Make more of these ^
 
@@ -120,6 +127,22 @@ StateCommandMechanisms_CISK:
             - define returnVal <[entityStateTarget].money>
 
     - determine <[returnVal]> if:<[returnVal].exists>
+
+    SetNPC:
+    - define npcMechs <script[DenizenCISKMechMirrors].data_key[npc]>
+
+    - foreach <[npcMechs].keys> as:mech:
+        - define mechInfo <[npcMechs].get[<[mech]>]>
+
+        - if !<[mechInfo].contains[mech]>:
+            - foreach next
+
+        - define dynamicMechName <[mechInfo].get[mech]>
+        - define dynamicMechName <[mech]> if:<[mechInfo].get[mech].equals[/]>
+
+        - if <[stateMechanism]> == <[dynamicMechName]>:
+            - execute as_server "ex adjust <[entityStateTarget]> <[dynamicMechName]>:<[stateMechanismSet]>"
+            - foreach stop
 
     GetKingdom:
     - define nonMapKeys <[targetKingdomFlag].keys.filter_tag[<[targetKingdomFlag].get[<[filter_value]>].deep_keys.exists.not>]>
@@ -217,3 +240,13 @@ StateCommandMechanisms_CISK:
 
                     - inject <script.name> path:SetEntity
                     #- inject <script.name> path:SetPlayer
+
+                - case npc:
+                    - if <[stateTarget].values.get[1]> == null:
+                        - define entityStateTarget <[npc]>
+
+                    - else:
+                        - define entityStateTarget <server.npcs.filter_tag[<[filter_value].name.equals[<[stateTarget].values.get[1]>]>].get[1]>
+
+                    - inject <script.name> path:SetEntity
+                    - inject <script.name> path:SetNPC
