@@ -5,6 +5,7 @@ FlagVisualizer:
     script:
     - define recursionDepth <[recursionDepth].if_null[0]>
     - define tabWidth <[recursionDepth].mul[4]>
+    - define flagName "Unnamed Flag" if:<[flagName].exists.not>
 
     - if <[recursionDepth]> > 49:
         - narrate format:admincallout "Recursion depth exceeded 50! Killing queue: <script.queues.get[1]>"
