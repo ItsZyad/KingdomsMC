@@ -16,6 +16,7 @@
 
 TempSaveInventory:
     type: task
+    debug: false
     definitions: player
     script:
     - if !<[player].has_flag[inventory_hold_outposts]>:
@@ -26,6 +27,7 @@ TempSaveInventory:
 
 LoadTempInventory:
     type: task
+    debug: false
     definitions: player
     script:
     - if <player.has_flag[inventory_hold_outposts]>:
