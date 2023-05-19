@@ -446,10 +446,3 @@ CISKCommand:
             - flag <player> CISKAdmin.enabled
 
         - narrate format:admincallout "CISK NPC debug view: <red><player.flag[CISKAdmin].exists.if_true[Activated].if_false[Deactivated]>!"
-
-
-DEBUG_RepeatTest:
-    type: task
-    script:
-    - foreach <util.list_numbers[from=-5;to=5]>:
-        - narrate format:debug <[value]>
