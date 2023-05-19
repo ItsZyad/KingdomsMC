@@ -101,7 +101,7 @@ Claim_Command:
                         - flag server kingdoms.<[kingdom]>.balance:-:<[corePrice]>
                         - flag server kingdoms.<[kingdom]>.upkeep:+:30
 
-            - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+            - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].if_null[<list[]>].include[<server.online_ops>]>
 
         - case CastleClaiming:
             - if <[castleChunks].contains[<[playerChunk]>]>:
@@ -117,7 +117,7 @@ Claim_Command:
                 - flag server kingdoms.claimInfo.allClaims:->:<player.location.chunk>
                 - narrate format:callout Claimed!
 
-        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+            - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].if_null[<list[]>].include[<server.online_ops>]>
 
 FindKingdomOverlaps:
     type: task
