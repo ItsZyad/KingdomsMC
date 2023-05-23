@@ -145,78 +145,6 @@ SquadSelectionGUI:
     - run PaginatedInterface def.itemList:<[itemList]> def.page:1 def.player:<player> def.footer:<inventory[SquadInterfaceFooter_Inventory]> def.title:Squads def.flag:viewingSquads
 
 
-ExitSquadControls_Item:
-    type: item
-    material: barrier
-    display name: <red>Exit Squad Controls
-
-
-SquadMoveTool_Item:
-    type: item
-    material: blaze_rod
-    display name: <gold><bold>Move Order
-    enchantments:
-    - sharpness:1
-    mechanisms:
-        hides: enchants
-
-
-SquadOrders_Handler:
-    type: world
-    events:
-        on player right clicks block with:SquadMoveTool_Item:
-        - ratelimit <player> 1s
-        - define kingdom <player.flag[kingdom]>
-        - define location <player.cursor_on_solid[50]>
-        - define squadInfo <player.flag[datahold.squadInfo]>
-        - define squadName <[squadInfo].get[internalName]>
-        - define npcList <[squadInfo].get[npcList]>
-        - define squadLeader <[squadInfo].get[squadLeader]>
-        - define displayName <[squadInfo].get[displayName]>
-
-        - narrate format:debug LOC:<[location]>
-        - narrate format:debug SQD:<[squadInfo]>
-
-        #- showfake red_stained_glass <[location]> d:10s
-        #- run FormationWalkThree def.npcList:<[npcList]> def.squadLeader:<npc[385]> def.npcsPerRow:3 def.finalLocation:<[location]>
-        - run FormationWalkFour_ALT def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.npcsPerRow:3 def.finalLocation:<[location].with_yaw[<player.location.yaw.round_to_precision[5]>]> def.lineLength:6 def.player:<player>
-
-        on player clicks block with:ExitSquadControls_Item:
-        - flag <player> datahold.squadInfo:!
-        - run LoadTempInventory def.player:<player>
-
-        on player drops SquadMoveTool_Item:
-        - determine cancelled
-
-        on player drops ExitSquadControls_Item:
-        - determine cancelled
-
-
-SquadControlOptions_Window:
-    type: inventory
-    inventory: chest
-    gui: true
-    title: Squad Controls
-    slots:
-    - [] [] [] [] [] [] [] [] []
-    - [] [SquadMoveTool_Item] [] [] [] [] [] [] []
-    - [] [] [] [] [ExitSquadControls_Item] [] [] [] []
-
-
-SquadOptions_Handler:
-    type: world
-    events:
-        on player clicks SquadMoveTool_Item in SquadControlOptions_Window:
-        - inventory close
-        - run TempSaveInventory def.player:<player>
-        - give SquadMoveTool_Item
-        - inventory set slot:9 origin:ExitSquadControls_Item
-        - adjust <player> item_slot:1
-
-        on player clicks ExitSquadControls_Item in SquadControlOptions_Window:
-        - run SquadSelectionGUI
-
-
 SquadFirstSpawnInfo_Item:
     type: item
     material: player_head
@@ -336,22 +264,20 @@ SpawnSquadNPCs:
     - define soldiers <[SMData].deep_get[squads.squadList.<[squadName]>.totalManpower]>
     - define soldierList <list[]>
 
+    - inject <script.name> path:SpawnSquadLeader
+
     - if !<[hasSpawned]>:
         - foreach <[SMData].deep_get[squads.squadList.<[squadName]>.squadComp]> key:type as:amount:
             - run SpawnNewSoldiers def.type:<[type]> def.location:<[spawnLocation]> def.amount:<[amount]> def.squadName:<[squadName]> def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> save:soldiers
             - define soldierList <[soldierList].include[<entry[soldiers].created_queue.determination.get[1]>]>
 
-    - inject <script.name> path:SpawnSquadLeader
-
     - flag <player> datahold.squadInfo.npcList:<[soldierList]>
     - flag <player> datahold.squadInfo.squadLeader:<[squadLeader]>
-    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.hasSpawned:true
-    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList:<[soldierList]>
+    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.hasSpawned:true
+    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<[soldierList]>
 
-    - run TempSaveInventory def.player:<player>
-    - give SquadMoveTool_Item
-    - inventory set slot:9 origin:ExitSquadControls_Item
-    - adjust <player> item_slot:1
+    - ~run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.player:<[player]>
+    - run GiveSquadTools def.player:<player>
 
     SpawnSquadLeader:
     - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
@@ -361,6 +287,7 @@ SpawnSquadNPCs:
     - flag <[squadLeader]> soldier.isSquadLeader:true
     - flag <[squadLeader]> soldier.squad:<[squadName]>
     - flag <[squadLeader]> soldier.kingdom:<[kingdom]>
+    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.squadLeader:<[squadLeader]>
 
     - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
     - execute as_server "sentinel respawntime -1 --id <[squadLeader].id>" silent
@@ -401,8 +328,8 @@ SpawnNewSoldiers:
         - define soldier <entry[new_soldier].created_npc>
         - define soldierList <[soldierList].include[<[soldier]>]>
 
-        - flag <[squadLeader]> soldier.squad:<[squadName]>
-        - flag <[squadLeader]> soldier.kingdom:<[kingdom]>
+        - flag <[soldier]> soldier.squad:<[squadName]>
+        - flag <[soldier]> soldier.kingdom:<[kingdom]>
         - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:->:<[soldier]>
 
         - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[soldier].id>" silent

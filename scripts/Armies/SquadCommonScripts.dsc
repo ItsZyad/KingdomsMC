@@ -85,3 +85,40 @@ WriteArmyDataToKingdom:
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>:<[SMData]>
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.location:<[SMLocation]>
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.stationedSquads:<[stationedSquads]>
+
+    - foreach <[SMLocation].flag[squadManager.squads.squadList]>:
+        - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[key]>:<[value]>
+
+
+GiveSquadTools:
+    type: task
+    definitions: player
+    script:
+    ## Replaces the provided player's hotbar with squad management tools
+    ##
+    ## player : [PlayerTag]
+
+    - define __player <[player]>
+    - flag <player> datahold.armies.previousItemSlot:<player.held_item_slot>
+
+    - run TempSaveInventory def.player:<player>
+    - give SquadMoveTool_Item
+    - inventory set slot:9 origin:ExitSquadControls_Item
+    - adjust <player> item_slot:1
+
+
+ResetSquadTools:
+    type: task
+    definitions: player
+    script:
+    ## Gives the player back the inventory they had before selecting the squad tools
+    ##
+    ## player : [PlayerTag]
+
+    - define __player <[player]>
+
+    - run LoadTempInventory def.player:<player>
+
+    - if <player.has_flag[datahold.armies.previousItemSlot]>:
+        - adjust <player> item_slot:<player.flag[datahold.armies.previousItemSlot]>
+        - flag <player> datahold.armies.previousItemSlot:!
