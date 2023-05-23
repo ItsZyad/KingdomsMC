@@ -7,6 +7,7 @@ SquadCompositionOneSoldier_Item:
     flags:
         displayItem: true
         amount: 1
+        unitType: swordsmen
 
 
 SquadCompositionFiveSoldiers_Item:
@@ -18,6 +19,7 @@ SquadCompositionFiveSoldiers_Item:
     flags:
         displayItem: true
         amount: 5
+        unitType: swordsmen
 
 
 SquadCompositionOneArcher_Item:
@@ -29,6 +31,7 @@ SquadCompositionOneArcher_Item:
     flags:
         displayItem: true
         amount: 1
+        unitType: archers
 
 
 SquadCompositionFiveArchers_Item:
@@ -40,6 +43,7 @@ SquadCompositionFiveArchers_Item:
     flags:
         displayItem: true
         amount: 5
+        unitType: archers
 
 
 SquadCompositionCancel_Item:
@@ -87,41 +91,109 @@ SquadComposition_Handler:
     type: world
     events:
         on player clicks item in SquadComposition_Interface:
+        - ratelimit <player> 2t
+
         - if <context.item.has_flag[displayItem]>:
             - determine passively cancelled
             - adjust <player> item_on_cursor:<context.item>
 
         - else if <player.item_on_cursor.has_flag[displayItem]> && <context.click> == LEFT && <context.item.material.name> == air:
-            - ratelimit <player> 1t
-
             - define placeItem <player.item_on_cursor>
             - define squadInfoItemSlot <context.inventory.find_item[SquadCompositionInfo_Item]>
             - define squadInfoItem <context.inventory.slot[<[squadInfoItemSlot]>]>
             - flag <player> datahold.armies.manpower:<player.flag[datahold.armies.manpower].if_null[0].add[<[placeItem].flag[amount]>]>
-            - inventory adjust slot:<[squadInfoItemSlot]> "lore:Total Manpower Required:|<bold><player.flag[datahold.armies.manpower].if_null[0]>" destination:<context.inventory>
+            - flag <player> datahold.armies.squadComp:->:<map[unit=<[placeItem].flag[unitType]>;amount=<[placeItem].flag[amount]>]>
 
+            - inventory adjust slot:<[squadInfoItemSlot]> "lore:Total Manpower Required:|<bold><player.flag[datahold.armies.manpower].if_null[0]>" destination:<context.inventory>
             - adjust def:placeItem display:<[placeItem].display.split[ ].remove[1].space_separated>
+
             - flag <[placeItem]> displayItem:!
 
             - inventory set slot:<context.slot> origin:<[placeItem]> destination:<context.inventory>
             - determine cancelled
 
         on player right clicks in SquadComposition_Interface:
+        - ratelimit <player> 2t
+
         - if <player.item_on_cursor.material.name> != air:
             - adjust <player> item_on_cursor:<item[air]>
             - determine cancelled
 
         - else if <context.item.material.name> != air:
-            - ratelimit <player> 1t
-
             - define squadInfoItemSlot <context.inventory.find_item[SquadCompositionInfo_Item]>
             - define squadInfoItem <context.inventory.slot[<[squadInfoItemSlot]>]>
             - flag <player> datahold.armies.manpower:<player.flag[datahold.armies.manpower].if_null[0].sub[<context.item.flag[amount]>]>
-            - inventory adjust slot:<[squadInfoItemSlot]> "lore:Total Manpower Required:|<bold><player.flag[datahold.armies.manpower].if_null[0]>" destination:<context.inventory>
+            - flag <player> datahold.armies.squadComp:<-:<map[unit=<[squadInfoItem].flag[unitType]>;amount=<[squadInfoItem].flag[amount]>]>
 
+            - inventory adjust slot:<[squadInfoItemSlot]> "lore:Total Manpower Required:|<bold><player.flag[datahold.armies.manpower].if_null[0]>" destination:<context.inventory>
             - inventory set slot:<context.slot> origin:air destination:<context.inventory>
 
             - determine cancelled
 
+        on player clicks SquadCompositionAccept_Item in SquadComposition_Interface:
+        - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
+        - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - define squadList <[squadManagerData].get[squadList].if_null[<list[]>]>
+        - define squadLimit <[squadManagerData].deep_get[levels.squadLimit]>
+        - define stationCapacity <[squadManagerData].deep_get[levels.stationCapacity]>
+        - define squadSizeLimit <[squadManagerData].deep_get[levels.squadSizeLimit]>
+        - define totalManpower <player.flag[datahold.armies.manpower]>
+        - narrate format:debug SMD:<[squadManagerData]>
+
+        - if <[squadList].size> >= <[squadLimit]>:
+            - narrate format:callout "These barracks already have the maximum amount of squads stationed in them! You must upgrade it first."
+            - determine cancelled
+
+        - if <[squadList].size> >= <[stationCapacity]>:
+            - narrate format:callout "These barracks do not have the capacity to hold a squad of this size. You must add more beds first."
+            - determine cancelled
+
+        - if <[totalManpower]> > <[squadSizeLimit]>:
+            - narrate format:callout "These barracks can only hold <[squadSizeLimit].color[red]> soldiers per squad."
+            - determine cancelled
+
+        - define squadComp <player.flag[datahold.armies.squadComp]>
+        - define unitTypes <[squadComp].parse_tag[<[parse_value].get[unit]>]>
+        - define squadCompSorted <map[]>
+
+        - foreach <[squadComp]>:
+            - define squadCompSorted.<[value].get[unit]>:+:<[value].get[amount]>
+
+        - definemap squadMap:
+            npcList: <list[]>
+            squadComp: <[squadCompSorted]>
+            totalManpower: <[totalManpower]>
+            hasSpawned: false
+
+        - run flagvisualizer def.flag:<[squadMap]> def.flagName:squadMap
+
+        - flag <player> datahold.armies.squadMap:<[squadMap]>
+        - flag <player> noChat.armies.namingSquad
+        - narrate format:callout "Please provide your squad a name (you can use spaces). Or type 'cancel':"
+        - inventory close
+
+        on player chats flagged:noChat.armies.namingSquad:
+        - if <context.message.to_lowercase> == cancel:
+            - narrate format:callout "Squad creation cancelled."
+            - flag <player> datahold.armies.namingSquad:!
+            - flag <player> noChat.armies:!
+            - determine cancelled
+
+        - define kingdom <player.flag[kingdom]>
+        - define displayName <context.message>
+        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+
+        - run CreateSquadReference def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]> def.displayName:<[displayName]>
+
+        - flag <player> datahold.armies.namingSquad:!
+        - flag <player> noChat.armies:!
+        - determine cancelled
+
+        on player clicks SquadCompositionCancel_Item in SquadComposition_Interface:
+        - flag <player> datahold.armies.manpower:!
+        - flag <player> datahold.armies.squadComp:!
+        - inventory open d:SquadManager_Interface
+
         on player closes SquadComposition_Interface:
         - flag <player> datahold.armies.manpower:!
+        - flag <player> datahold.armies.squadComp:!

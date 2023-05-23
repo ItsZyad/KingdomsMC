@@ -3,13 +3,12 @@
 ########################
 
 # TODO: Add if case in caller function which throws an error to the player if the squad isn't assigned a leader yet
-# Also TODO: Compensate for Denizen's shitty definition handling
 
 
 DEBUG_RunFormationWalk:
     type: task
     script:
-    - run FormationWalkTwo def.npcList:<server.flag[armies.cambrian.squads.test-1.npcList]> def.squadLeader:<npc[385]> def.npcsPerRow:3
+    - run FormationWalkThree def.npcList:<server.flag[armies.cambrian.squads.test-1.npcList]> def.squadLeader:<npc[385]> def.npcsPerRow:3
 
 
 ClosestSquadMember:
@@ -25,6 +24,124 @@ ClosestSquadMember:
             - define closestDist <[npc].location.distance[<[location]>]>
 
     - determine <[closestNpc]>
+
+
+DiagonalLineHelper:
+    type: procedure
+    definitions: loc|length
+    script:
+    - define locRight <[loc].with_yaw[<[loc].yaw.add[90]>]>
+    - define locLeft <[loc].with_yaw[<[loc].yaw.sub[90]>]>
+    - define pointOne <[locRight].add[<[locRight].direction.vector.mul[<[length]>]>]>
+    - define pointTwo <[locLeft].add[<[locLeft].direction.vector.mul[<[length]>]>]>
+    - determine <list[<[pointOne]>|<[pointTwo]>]>
+
+
+FormationWalkFour_ALT:
+    type: task
+    definitions: npcList|npcsPerRow|squadLeader|finalLocation|lineLength|player
+    script:
+    - define lineLength <[lineLength].if_null[6]>
+    - define rows <[npcList].size.div[<[npcsPerRow]>].round_up>
+    #- define verticalSpacing <[lineLength].div[<[npcsPerRow]>]>
+    - define verticalSpacing 2
+    - define sentNPCs <list[<[squadLeader]>]>
+
+    - repeat <[rows]> as:row:
+        - define formationLinePoints <proc[DiagonalLineHelper].context[<[finalLocation].backward_flat[<[row].sub[1].mul[<[verticalSpacing]>]>]>|<[lineLength]>]>
+        - define formationLine <[formationLinePoints].get[1].points_between[<[formationLinePoints].get[2]>].include[<[formationLinePoints]>]>
+        - define spacing <[formationLine].size.div[<[npcsPerRow]>].round>
+
+        - showfake green_wool <[formationLine]> players:<[player]>
+
+        - repeat <[npcsPerRow]> as:col:
+            - if <[row]> == 1 && <[col]> == <[npcsPerRow].div[2].round>:
+                - walk <[squadLeader]> <[finalLocation].with_y[<[finalLocation].y.add[1]>]>
+                - flag <[squadLeader]> dataHold.formationPathfinding:<[finalLocation].with_y[<[finalLocation].y.add[1]>]>
+                - showfake red_wool <[finalLocation]> players:<[player]>
+
+            - else:
+                - define lineDistanceVector <[formationLinePoints].get[1].sub[<[formationLinePoints].get[1].direction.vector.mul[<[col].sub[1].mul[<[spacing]>]>]>]>
+                - define lineDistanceVector <[lineDistanceVector].with_y[<[lineDistanceVector].y.add[1]>]>
+
+                - define locOnLine <[formationLine].get[<[col].mul[<[spacing]>]>]>
+                - run ClosestSquadMember def.npcList:<[npcList].exclude[<[sentNPCs]>]> def.location:<[lineDistanceVector]> save:closest
+                - define closestSquadMember <entry[closest].created_queue.determination.get[1]>
+
+                - walk <[closestSquadMember]> <[lineDistanceVector]>
+
+                - flag <[closestSquadMember]> dataHold.formationPathfinding:<[lineDistanceVector]>
+                - define sentNPCs:->:<[closestSquadMember]>
+
+
+FormationWalkFour:
+    type: task
+    definitions: npcList|npcsPerRow|squadLeader|finalLocation|lineLength|player
+    script:
+    - define lineLength <[lineLength].if_null[6]>
+    - define rows <[npcList].size.div[<[npcsPerRow]>].round_up>
+    - define verticalSpacing <[lineLength].div[<[npcsPerRow]>]>
+    - define sentNPCs <list[<[squadLeader]>]>
+
+    - repeat <[rows]> as:row:
+        - define formationLinePoints <proc[DiagonalLineHelper].context[<[finalLocation].backward_flat[<[row].sub[1].mul[<[verticalSpacing]>]>]>|<[lineLength]>]>
+        - define formationLine <[formationLinePoints].get[1].points_between[<[formationLinePoints].get[2]>].include[<[formationLinePoints]>]>
+        - define spacing <[formationLine].size.div[<[npcsPerRow]>].round>
+        - narrate format:debug SPAC:<[spacing]>
+
+        # - showfake green_wool <[formationLine]> players:<[player]>
+
+        - repeat <[npcsPerRow]> as:col:
+            - if <[row]> == 1 && <[col]> == <[npcsPerRow].div[2].round_up>:
+                - walk <[squadLeader]> <[finalLocation]>
+                - flag <[squadLeader]> dataHold.formationPathfinding:<[finalLocation].sub[0,-1,0]>
+                # - showfake red_wool <[finalLocation]> players:<[player]>
+
+            - else:
+                - define locOnLine <[formationLine].get[<[col].mul[<[spacing]>]>]>
+                - run ClosestSquadMember def.npcList:<[npcList].exclude[<[sentNPCs]>]> def.location:<[locOnLine].with_y[<[locOnLine].y.add[1]>]> save:closest
+                - define closestSquadMember <entry[closest].created_queue.determination.get[1]>
+
+                - walk <[closestSquadMember]> <[locOnLine].with_y[<[locOnLine].y.add[1]>]>
+
+                - flag <[closestSquadMember]> dataHold.formationPathfinding:<[locOnLine].with_y[<[locOnLine].y.add[1]>]>
+                - define sentNPCs:->:<[closestSquadMember]>
+                - fakespawn armor_stand <[locOnLine].with_y[<[locOnLine].y.add[1]>]> players:<[player]>
+
+
+
+FormationWalkThree:
+    type: task
+    definitions: npcList|squadLeader|npcsPerRow|finalLocation
+    script:
+    - define spacing 2
+    - define totalRows <[npcList].size.div[<[npcsPerRow]>].round_up>
+    - define sentNPCs <list[<[squadLeader]>]>
+
+    - repeat <[totalRows]> as:row:
+        - narrate format:debug ROW:<[row]>
+
+        - repeat <[npcsPerRow]> from:<[npcsPerRow].div[2].round_up.sub[<[npcsPerRow]>]> as:col:
+            - narrate format:debug COL:<[col]>
+
+            - if <[row]> == 1 && <[col]> == 0:
+                - walk <[squadLeader]> <[finalLocation]>
+                - flag <[squadLeader]> dataHold.formationPathfinding:<[finalLocation].sub[0,-1,0]>
+
+            - else:
+                - define newX <[col].mul[<[spacing]>]>
+                - define location <[finalLocation].sub[<[newX]>,-1,<[row]>]>
+
+                - run ClosestSquadMember def.npcList:<[npcList].exclude[<[sentNPCs]>]> def.location:<[location]> save:closest
+                - define closestSquadMember <entry[closest].created_queue.determination.get[1]>
+                - walk <[closestSquadMember]> <[location]>
+                - flag <[closestSquadMember]> dataHold.formationPathfinding:<[location]>
+
+                - define sentNPCs:->:<[closestSquadMember]>
+
+                - narrate format:debug LOC:<[location]>
+                - narrate format:debug ----------------------
+
 
 FormationWalkTwo:
     type: task
@@ -45,7 +162,7 @@ FormationWalkTwo:
 
             - else:
                 - define newX <[col].mul[<[spacing]>]>
-                - define location <[squadLeader].location.round.sub[<[newX]>,0,<[row]>].center>
+                - define location <[squadLeader].location.sub[<[newX]>,0,<[row]>].center>
 
                 - run ClosestSquadMember def.npcList:<[npcList].exclude[<[sentNPCs]>]> def.location:<[location]> save:closest
                 - define closestSquadMember <entry[closest].created_queue.determination.get[1]>
@@ -95,7 +212,7 @@ FormationWalkFix_Handler:
         - if <npc.has_flag[dataHold.formationPathfinding]>:
             - ratelimit <npc> 10t
             - define location <npc.flag[dataHold.formationPathfinding]>
-            - teleport <npc> <[location]>
+            - teleport <npc> <[location].with_yaw[<npc.location.yaw>].with_pitch[<npc.location.pitch>]>
             - flag <npc> dataHold.formationPathfinding:!
 
 
