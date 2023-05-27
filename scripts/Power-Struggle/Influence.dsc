@@ -323,7 +323,7 @@ DailyInfluenceRefresh:
     - define kingdomList <proc[GetKingdomList].context[true]>
 
     - foreach <[kingdomList]> as:kingdom:
-        - if <server.flag[kigndoms.<[kingdom]>.powerstruggle.influencePoints]> < 3:
+        - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influencePoints]> < 3:
             - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:3
 
     - run DailyOrderRefresh

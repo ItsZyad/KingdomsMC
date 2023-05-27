@@ -143,7 +143,7 @@ IngestMaterialTransfer:
                     - flag player transferVaultLoc:!
                     - flag player transferData:!
 
-                    - run SidebarLoader def.target:<server.flag[kigndoms.<[kingdom]>.members].include[<server.online_ops>]>
+                    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
                     - narrate format:callout "Materials sent! Any remaining blocks will be found in the chest"
 
                 - else:

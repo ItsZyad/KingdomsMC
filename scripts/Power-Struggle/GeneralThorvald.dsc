@@ -147,7 +147,7 @@ ChestTransferInfluenceCalc:
     - flag server kingdoms.<[kingdom]>.powerstruggle.mercenaryGuild:+:<[influenceEquation]>
     - flag server kingdoms.transferItemsToday.<[orderItem]>:-:<[orderAmount]>
 
-    - if <server.flag[kigndoms.<[kingdom]>.powerstruggle.mercenaryGuild].is[MORE].than[1]>:
+    - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.mercenaryGuild].is[MORE].than[1]>:
         - flag server kingdoms.<[kingdom]>.powerstruggle.mercenaryGuild:1
 
     - ~run CalcTotalInfluence def:<[kingdom]>
