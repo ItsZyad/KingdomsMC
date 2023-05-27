@@ -257,8 +257,10 @@ GuardInterface_Handler:
 
         on player clicks GuardConfirmDelete_Item in GuardDeleteConfirm_Window:
         - define guard <player.flag[clickedNPC]>
-        - define guardInListIndex <server.flag[CastleGuards].find[<[guard]>]>
-        - flag server CastleGuards:<server.flag[CastleGuards].remove[<[guardInListIndex]>]>
+        - define kingdom <[guard].flag[kingdom]>
+        - define guardInListIndex <server.flag[kingdoms.<[kingdom]>.castleGuards].find[<[guard]>]>
+
+        - flag server kingdoms.<[kingdom]>.castleGuards:<server.flag[kingdoms.<[kingdom]>.castleGuards].remove[<[guardInListIndex]>]>
 
         - remove <[guard]>
 
@@ -272,6 +274,7 @@ GuardInterface_Handler:
         - wait 2t
         - if !<player.open_inventory.exists>:
             - flag <player> clickedNPC:!
+
 
 ##############################################################################
 
@@ -530,7 +533,7 @@ GuardSetup:
     type: task
     definitions: player
     script:
-    - define numberOfGuards <server.flag[CastleGuards].size.if_null[0]>
+    - define numberOfGuards <server.flag[kingdoms.<[player].flag[kingdom]>.castleGuards].size.if_null[0]>
 
     - create player "<red><bold>[<[numberOfGuards].add[1]>]Castle Guard" <[player].location> traits:sentinel save:new_guard
     - assignment set script:CastleGuard to:<entry[new_guard].created_npc>
@@ -559,10 +562,11 @@ GuardSetup:
     - execute as_server "sentinel range 50 --id <[npc].id>" silent
     - execute as_server "sentinel chaserange 70 --id <[npc].id>" silent
 
-    - flag <[npc]> kingdom:<player.flag[kingdom]>
-    - flag <[npc]> GuardPos:<player.location>
-    - flag server CastleGuards:->:<[npc]>
-    - flag server CastleGuards:<server.flag[CastleGuards].deduplicate>
+    - define kingdom <[player].flag[kingdom]>
+    - flag <[npc]> kingdom:<[kingdom]>
+    - flag <[npc]> GuardPos:<[player].location>
+    - flag server kingdoms.<[kingdom]>.castleGuards:->:<[npc]>
+    - flag server kingdoms.<[kingdom]>.castleGuards:<server.flag[kingdoms.<[kingdom]>.castleGuards].deduplicate>
 
 
 GuardTargetSelection:
