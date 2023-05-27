@@ -13,8 +13,8 @@
 AreaAlert_Handler:
     type: world
     events:
-        on player enters *:
-        - if <context.area.split[@].get[2].starts_with[INTERNAL_STORY]>:
+        on player enters area:
+        - if <context.area.split[@].get[2].to_uppercase.starts_with[INTERNAL_STORY]>:
             # Gets rid of INTERNAL_STORY at the start of names
             - define realName <context.area.flag[name].replace[_].with[<&sp>].to_titlecase>
 

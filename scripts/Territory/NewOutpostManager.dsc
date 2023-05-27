@@ -412,7 +412,7 @@ OutpostHandler:
     type: world
     debug: false
     events:
-        on player enters *:
+        on player enters area:
         - if <script.queues.size.is[MORE].than[1]>:
             - queue clear <script.queues.get[1]>
 
@@ -429,7 +429,7 @@ OutpostHandler:
                     - actionbar "You are now entering a <server.flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>].color[<script[KingdomTextColors].data_key[<[whichKingdom]>]>]> outpost"
                     - wait 1s
 
-        on player exits *:
+        on player exits area:
         - if <script.queues.size.is[MORE].than[1]>:
             - queue clear <script.queues.get[1]>
 
