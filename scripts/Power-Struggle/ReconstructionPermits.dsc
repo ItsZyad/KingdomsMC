@@ -200,6 +200,7 @@ ReconstructionPermitAdmin_Function:
 
 ReconstructionPermitAdmin_Handler:
     type: world
+    debug: false
     events:
         on player clicks paper in ReconstructionPermitAdmin_Window:
         - yaml load:reconstruction-permits.yml id:recon
@@ -298,7 +299,6 @@ ReconstructionPermitAdmin_Handler:
         - determine cancelled
 
         on player joins:
-        - wait 2s
         - if <player.has_flag[approvedPermit]>:
             - narrate format:callout "Your request with id: <player.flag[approvedPermit].color[red]> for a reconstruction permit has been approved!"
             - flag player approvedPermit:!
