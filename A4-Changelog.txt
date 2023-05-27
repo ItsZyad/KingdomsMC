@@ -1,0 +1,57 @@
+Bug Fixes / Performance Upgrades:
+    - [Technical] Folded all flags that prevent the player from chatting (for inputting values and such) into a single flag (noChat) to improve stability.
+        - Players should no longer randomly lose the ability to chat after using certain influence features.
+    - [Technical] Server now runs PaperMC 1.19.x - noticable performance increases.
+    - [Technical] Guard pathfinding now runs on a separate thread to improve server performance while guards are moving.
+    - [Technical] Sidebar only runs for online players, greatly improving command performance.
+    - Adjusted mason/militia item order algorithm to favour more requests.
+    - Prevented general thorvald from starting two dialogues with you at the same time.
+    - Fixed material transfer chest issue where the sign wouldn't generate depending on which chest side you place it on.
+    - Adjusted some kingdom text colors.
+    - Fixed bug which allowed players to sit on chairs through walls
+    - Fixed a bug where under certain circustances the server join message would read 'null'
+        - Warping is significantly snappier. Lag is essentially eliminated however chunk loading may still take ~2-3 seconds;
+        - General FPS increase in the ballpark of 15-25%.
+        - Average script reload times are about 10% faster.
+    - Fixed guards attacking own kingdom members bug (I hope...).
+    - Fixed uncommon bug which crashes the server when guards attempt to pathfind.
+    - Fixed a bug which prevented players from claiming core chunks.
+    - Fixed a bug which caused the player to "discover" an area when sitting down on stairs.
+    - Fixed certain mechanics borking out because I misspelt the word 'kingdoms' in the code;
+        - Yes, I am very smart.
+
+Small Additions:
+    - Allowed possibility for kingdoms to have more than 3 influence points at a time.
+    - Players can now see all the active material/weapon transfer requests made by their kingdom;
+        - Allowed players to take over certain requests in their kingdom that weren't originally made by them.
+    - Added Factions-like chunk map (/ks chunkmap).
+    - Removed quest line from the sidebar;
+        - Added /quest command instead.
+    - War status line now reads 'At peace' or 'At war' instead of true and false.
+    - Added scripted mailboxes which can push news and important world events to certain kingdoms.
+
+Large Additions:
+    - Introduced CISK (Common Interface for Storywriting in Kingdoms), with the following base feature set:
+        - Data storage and retreival,
+        - Conditional blocks,
+        - Click triggers with interaction steps,
+        - Player-defined branches,
+        - Limited command implementation;
+            - <goto ...>
+            - <dataget ...>
+            - <datastore ...>
+            - <give ...>
+            - <state ...>
+            - etc.
+        - Some supplementary in-schema configurations;
+            - talkSpeed,
+            - blockingInteraction,
+            - debug,
+            - quest*,
+            - branches,
+    - Introduced dynamic markets with merchants that respond to changes in supply and demand.
+    - Added initial version of the squads & armies mechanics with features such as:
+        - Fully integrated barracks / squad-holding system,
+        - Basic squad management tools,
+        - Basic move and attack orders such as formation attack, formation walk using a squad orders wand,
+        - ...
