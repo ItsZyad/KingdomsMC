@@ -85,7 +85,7 @@ KingdomsChat_Handler:
         - else if <[player].flag[ChatMode]> == kingdom:
             - define kingdom <[player].flag[kingdom]>
             - define kingdomRealName <script[KingdomRealShortNames].data_key[<[kingdom]>]>
-            - define kingdomMembers <server.flag[kingdomplayerlist].get[<[player].flag[kingdom]>]>
+            - define kingdomMembers <server.flag[kingdoms.<[player].flag[kingdom]>.members]>
             - define onlineOps <server.online_ops>
 
             - narrate targets:<[onlineOps]> "<[opPrefix]><red>[SocSpy]<aqua>[<[kingdomRealName]> Kingdom] <gray><[player].name> <white><&gt><&gt> <&r><[message]>"
