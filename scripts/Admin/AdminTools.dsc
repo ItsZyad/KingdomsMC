@@ -86,7 +86,7 @@ AdminTools_Command:
                         - define adjustedKeyList <[keyList].separated_by[.]> if:<context.args.get[3].ends_with[.]>
                         - define currentKey * if:<context.args.get[3].ends_with[.]>
 
-                        - define keys <[object].parsed.flag[<[adjustedKeyList]>].keys.filter_tag[<[filter_value].advanced_matches[<[currentKey]>].or[<[filter_value].starts_with[<[currentKey]>]>]>]>
+                        - define keys <[object].parsed.flag[<[adjustedKeyList]>].keys.filter_tag[<[filter_value].advanced_matches[<[currentKey]>].or[<[filter_value].starts_with[<[currentKey]>]>]>].if_null[null]>
                         - define keys <server.flag[<[adjustedKeyList]>].keys.filter_tag[<[filter_value].advanced_matches[<[currentKey]>].or[<[filter_value].starts_with[<[currentKey]>]>]>]> if:<[object].equals[server]>
 
                         - if <[keys].exists>:
@@ -199,19 +199,20 @@ AdminTools_Command:
                     - define flag <server.flag[<[flagName]>]>
 
                 - if <[flag].exists>:
-                    - narrate "<element[                                                     ].strikethrough>"
+                    - narrate <element[                                                     ].strikethrough>
                     - inject FlagVisualizer
 
                     - if <script.queues.get[1].determination.get[1].exists>:
-                        - narrate "<element[<[flagName]>: ].color[green].italicize><script.queues.get[1].determination.get[1]>"
+                        - narrate <element[<[flagName]>: ].color[green].italicize><script.queues.get[1].determination.get[1]>
 
-                    - narrate "<element[                                                     ].strikethrough>"
+                    - narrate <element[                                                     ].strikethrough>
 
                 - else:
                     - narrate format:admincallout "Object: <[object]> does not have flag with name: <[flagName]>"
 
             - else:
                 - narrate format:admincallout "This subcommand can only be used by server developers!"
+
 
 KingdomSwitcher_Command:
     type: command
@@ -237,16 +238,17 @@ KingdomSwitcher_Command:
     - else:
         - narrate format:admincallout "That is not a valid kingdom"
 
+
 idCheck_Handler:
     type: world
     events:
-        on player right clicks npc:
-        - if <player.has_flag[AdminTools.id]>:
-            - ratelimit <player> 1t
-            - narrate format:admincallout "NPC Has ID: <npc.id>"
+        on player right clicks npc flagged:AdminTools.id:
+        - ratelimit <player> 1t
+        - narrate format:admincallout "NPC Has ID: <npc.id>"
 
-        on player quits:
+        on player quits flagged:AdminTools.id:
         - flag <player> AdminTools.id:!
+
 
 AdminOverallInfluence:
     type: inventory
@@ -265,12 +267,14 @@ AdminInfluence_K1:
     lore:
     - <proc[InfluenceGetter_Admin].context[viridian]>
 
+
 AdminInfluence_K2:
     type: item
     material: red_banner
     display name: "Dynastus Raptores:: Overall"
     lore:
     - <proc[InfluenceGetter_Admin].context[raptoran]>
+
 
 AdminInfluence_K3:
     type: item
@@ -279,12 +283,14 @@ AdminInfluence_K3:
     lore:
     - <proc[InfluenceGetter_Admin].context[centran]>
 
+
 AdminInfluence_K4:
     type: item
     material: orange_banner
     display name: "Cambrian Empire:: Overall"
     lore:
     - <proc[InfluenceGetter_Admin].context[cambrian]>
+
 
 # arrowRain:
 #     type: world
@@ -372,6 +378,7 @@ AdminInfluence_K4:
 
 #     - teleport <[hit_entities]> <[loc]>
 
+
 yamlHasAll:
     type: procedure
     definitions: file|values
@@ -384,19 +391,21 @@ yamlHasAll:
 
     - determine true
 
+
 NPCYeet_Item:
     type: item
     material: blaze_rod
     display name: "NPC YEETER"
 
+
 NPCYeet_Handler:
     type: world
     events:
         on player right clicks entity with:NPCYeet_Item:
-        - if <context.entity.entity_type> == PLAYER:
-            - if <context.entity.name.starts_with[Miner]> || <context.entity.name.starts_with[Farmer]>:
-                - narrate "Removed entity: <context.entity.id>"
-                - remove <context.entity>
+        - if <player.is_op> && !<context.entity.is_player>:
+            - narrate format:admincallout "Removed entity: <context.entity.id>"
+            - remove <context.entity>
+
 
 SuperWheat_Item:
     type: item
@@ -405,6 +414,7 @@ SuperWheat_Item:
     mechanisms:
         enchantments:
         - fortune:1
+
 
 SuperWheat_Handler:
     type: world
@@ -419,6 +429,7 @@ SuperWheat_Handler:
             - modifyblock <player.cursor_on[10].up[1]> wheat
             - adjustblock <player.cursor_on[10]> age:7
 
+
 NetherKey_Item:
     type: item
     material: carrot_on_a_stick
@@ -429,6 +440,7 @@ NetherKey_Item:
     mechanisms:
         custom_model_data: 123456
 
+
 KillForbiddenFunction:
     type: world
     debug: false
@@ -438,6 +450,7 @@ KillForbiddenFunction:
 
         - if <[forbiddenCommands].contains[<context.command>]>:
             - determine cancelled
+
 
 AddEssentialsWorthItems:
     type: task
@@ -457,6 +470,31 @@ AddEssentialsWorthItems:
 
     - yaml id:prices savefile:economy_data/price-info.yml
     - yaml id:prices unload
+
+
+##ignorewarning bad_execute
+ReloadVerbosity_Handler:
+    type: world
+    debug: false
+    events:
+        on ex command:
+        - if <context.source_type> == PLAYER && <context.args.get[1]> == reload && <context.args.size> == 1:
+            - determine passively cancelled
+            - define timeBeforeReload <util.current_time_millis>
+            - execute as_server "ex reload" silent
+            - flag server reloadoverride:<player>
+            - waituntil <server.has_flag[reloadoverride].not> max:10m
+            - define reloadTime <util.current_time_millis.sub[<[timeBeforeReload]>]>
+            - narrate "<yellow>[Kingdoms] <&gt><&gt> <white>Processed <util.scripts.size.color[red].bold> Scripts!"
+            - narrate "<yellow>[Kingdoms] <&gt><&gt> <white>See console for more information regarding STP & processed event paths."
+            - narrate "<yellow>[Kingdoms] <&gt><&gt> <white> Reloaded all scripts in: <aqua><[reloadTime]>ms<white>!"
+
+        on reload scripts server_flagged:reloadoverride:
+        - if <context.had_error>:
+            - narrate targets:<server.flag[reloadoverride]> "<yellow>[Kingdoms] <&gt><&gt> <red>WARNING! Error occured while reloading some or all scripts!"
+
+        - flag server reloadoverride:!
+
 
 DEBUG_GenerateKingdomFlags:
     type: task
