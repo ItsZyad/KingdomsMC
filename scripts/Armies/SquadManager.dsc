@@ -154,8 +154,17 @@ SquadManager_Handler:
     events:
         on player places SquadManager_Item:
         - define kingdom <player.flag[kingdom]>
-        - define numberOfExistingBarracks <server.flag[kingdoms.<[kingdom]>.armies.barracks].size.if_null[0]>
+        - define existingBarracks <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
+        - define barrackLocations <[existingBarracks].parse_value_tag[<[parse_value].get[location]>]>
+        - define numberOfExistingBarracks <[existingBarracks].size.if_null[0]>
         - define defaultName Barracks-<[numberOfExistingBarracks].add[1]>
+
+        # Closeness check to other SMs
+        - foreach <[barrackLocations]> as:loc:
+            # Note: future configurable
+            - if <context.location.distance[<[loc]>]> < 200:
+                - narrate format:callout "Invalid location! This location is too close to another squad manager belonging to your kingdom. Please relocate and try again."
+                - determine cancelled
 
         - definemap squadManagerData:
             name: <[defaultName]>
@@ -201,6 +210,7 @@ SquadManager_Handler:
         on player breaks lodestone location_flagged:squadManager:
         - flag <context.location> squadManager:!
 
+        ## Clicks SM
         on player clicks lodestone location_flagged:squadManager:
         - if <context.location.flag[squadManager.kingdom]> != <player.flag[kingdom]>:
             - determine cancelled
@@ -233,9 +243,11 @@ SquadManager_Handler:
         - define AOEItemSlot <context.inventory.find_item[SquadManagerShowAOE_Item]>
         - inventory set slot:<[AOEItemSlot]> o:SquadManagerShowAOEActive_Item d:<context.inventory>
 
+        ## Squad Sel.
         on player clicks SquadListInfo_Item in SquadManager_Interface:
         - run SquadSelectionGUI def.player:<player>
 
+        ## Stationing Re-eval.
         on player clicks SquadStationingEval_Item in SquadManager_Interface:
         - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
         - define bedCount <proc[CountBedsInSquadManagerArea].context[<[squadManagerLocation]>]>
@@ -247,6 +259,8 @@ SquadManager_Handler:
         on player clicks SquadManagerShowAOE_Item in SquadManager_Interface:
         - determine passively cancelled
 
+        # Runs the AOE show task script and replaces the SM interface button with a different
+        # colored button that cancels the AOE effect
         - if !<player.has_flag[datahold.armies.showAOE]>:
             - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
             - flag <player> datahold.armies.showAOE expire:1h
@@ -333,6 +347,8 @@ SquadManager_Handler:
         - flag <player> noChat.armies:!
 
         - narrate format:callout "Renamed barracks to: <context.message.color[red]>"
+        - inventory open d:SquadManager_Interface
+
         - determine cancelled
 
         ## Close Window
@@ -350,6 +366,7 @@ SquadManager_Handler:
 
 RecalculateSquadManagerAOE:
     type: task
+    debug: false
     definitions: AOESize|SMLocation|player|barracksArea
     AreaCalculation:
     - define AOEHalf <[AOESize].div[2].round_up>
@@ -371,6 +388,7 @@ RecalculateSquadManagerAOE:
 
 CountBedsInSquadManagerArea:
     type: procedure
+    debug: false
     definitions: location
     script:
     - define squadManagerData <[location].flag[squadManager]>

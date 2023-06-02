@@ -42,7 +42,7 @@ CreateSquadReference:
     type: task
     definitions: SMLocation|kingdom|displayName
     script:
-    ## Creates a new squad reference in the kingdoms.<...>.armies flag and the squadManager flag
+    ## Creates a new squad reference in the kingdoms.___.armies flag and the squadManager flag
     ## attached to the provided SMLocation. But does not create NPCs
     ##
     ## SMLocation  : [LocationTag]
@@ -122,3 +122,63 @@ ResetSquadTools:
     - if <player.has_flag[datahold.armies.previousItemSlot]>:
         - adjust <player> item_slot:<player.flag[datahold.armies.previousItemSlot]>
         - flag <player> datahold.armies.previousItemSlot:!
+
+
+OpenSquadControlOptions:
+    type: task
+    definitions: kingdom|squadName|player|fromSM
+    script:
+    ## Pre-loads the player's datahold flag with the relevant squad info before opening the squad
+    ## orders window
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ## player    : [PlayerTag]
+    ## fromSM    : [ElementTag<Boolen>]
+
+    - define __player <[player]>
+    - define fromSM <[fromSM].if_null[true]>
+    - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
+
+    - define squadControlWindow <inventory[SquadControlOptions_Window]>
+
+    # Deletes exit button which takes player to the squad list and replaces it with an exit button
+    # that just closes the window
+    - if !<[fromSM]>:
+        - define exitItemSlot <[squadControlWindow].find_item[ExitSquadControls_Item]>
+        - inventory set d:<[squadControlWindow]> slot:<[exitItemSlot]> o:AltExitSquadControls_Item
+
+    - inventory open d:<[squadControlWindow]> player:<player>
+
+
+GetSquadInfo:
+    type: task
+    definitions: kingdom|squadName
+    script:
+    ## Gets the full squad information of a given squad under the given kingdom
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+
+    # GlobalRef refers to the version of army data stored on the kingdoms.___.armies flag while
+    # LocalRef refers to the copy of data stored on each SM belonging to the kingdom
+    - define globalRef <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
+    - define barrackList <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
+    - define barrackLocation null
+    - define localRef null
+
+    - foreach <[barrackList]> as:barrack:
+        - if <[barrack].get[stationedSquads].contains[<[squadName]>]>:
+            - define barrackLocation <[barrack].get[location]>
+            - foreach stop
+
+    - if <[barrackLocation].has_flag[squadManager]>:
+        - define localRef <[barrackLocation].flag[squadManager].deep_get[squads.squadList.<[squadName]>]>
+
+        # TODO: find a way to properly compare these maps
+        - if !<[localRef].equals[<[globalRef]>]>:
+            - run flagvisualizer def.flag:<[localRef]> def.flagName:localRef
+            - determine <[localRef]>
+
+    - run flagvisualizer def.flag:<[globalRef]> def.flagName:globalRef
+    - determine <[globalRef]>

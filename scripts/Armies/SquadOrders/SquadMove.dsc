@@ -4,6 +4,12 @@ ExitSquadControls_Item:
     display name: <red>Exit Squad Controls
 
 
+AltExitSquadControls_Item:
+    type: item
+    material: barrier
+    display name: <red>Exit Squad Controls
+
+
 SquadMoveTool_Item:
     type: item
     material: blaze_rod
@@ -27,12 +33,7 @@ SquadOrders_Handler:
         - define squadLeader <[squadInfo].get[squadLeader]>
         - define displayName <[squadInfo].get[displayName]>
 
-        - narrate format:debug LOC:<[location]>
-        - narrate format:debug SQD:<[squadInfo]>
-
-        #- showfake red_stained_glass <[location]> d:10s
-        #- run FormationWalkThree def.npcList:<[npcList]> def.squadLeader:<npc[385]> def.npcsPerRow:3 def.finalLocation:<[location]>
-        - run FormationWalkFour_ALT def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.npcsPerRow:3 def.finalLocation:<[location].with_yaw[<player.location.yaw.round_to_precision[5]>]> def.lineLength:6 def.player:<player>
+        - run FormationWalk def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.npcsPerRow:3 def.finalLocation:<[location].with_yaw[<player.location.yaw.round_to_precision[5]>]> def.lineLength:6 def.player:<player>
 
         on player clicks block with:ExitSquadControls_Item:
         - flag <player> datahold.squadInfo:!

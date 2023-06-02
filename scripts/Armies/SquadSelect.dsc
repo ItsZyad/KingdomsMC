@@ -192,12 +192,14 @@ SquadSelection_Handler:
     events:
         ## CLICK SQUAD LIST ICON
         on player clicks SquadInterface_Item in PaginatedInterface_Window flagged:viewingSquads:
-        #- inventory open d:SquadControlOptions_Window
-        - run flagvisualizer def.flag:<context.item.flag[squadInfo]>
         - define kingdom <player.flag[kingdom]>
+        - define squadName <context.item.flag[squadInfo].get[internalName]>
         - define hasSpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<context.item.flag[squadInfo.internalName]>.hasSpawned]>
 
-        - if !<[hasSpawned]>:
+        - if <[hasSpawned]>:
+            - run OpenSquadControlOptions def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.player:<player>
+
+        - else:
             - inventory open d:SquadFirstTimeSpawnConfirmation_Window
             - flag <player> datahold.armies.squadInfo:<context.item.flag[squadInfo]>
 
