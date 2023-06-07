@@ -2,6 +2,9 @@ SquadManager_Item:
     type: item
     material: lodestone
     display name: <light_purple><bold>Squad Manager
+    lore:
+    - Interactive block which manages army squads
+    - <&r><bold>Costs $2000 to activate.
     enchantments:
     - sharpness:1
     mechanisms:
@@ -113,47 +116,61 @@ RenameBarracks_Item:
     display name: <&2><bold>Rename Barracks
 
 
+RelocateSquadManager_Item:
+    type: item
+    material: player_head
+    display name: <aqua><bold>Relocate Squad Manager
+    mechanisms:
+        skull_skin: 80286a7d-6180-47da-a7a0-fa7c2f1e9ffe|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzA5ZDY1NTBhOGI4OTZkZTMxMjMxYjNjZDE2MWY0N2IxNGI4NDUzMDM4MGExZDU2NWMzNjhkNzY3YmEwZmE0MiJ9fX0=
+
+
+SetArmoryLocations_Item:
+    type: item
+    material: player_head
+    display name: <white><bold>Set Armory Locations
+    mechanisms:
+        skull_skin: 554d6e02-1065-4867-876e-b0fd8b6fe76d|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWRjMzZjOWNiNTBhNTI3YWE1NTYwN2EwZGY3MTg1YWQyMGFhYmFhOTAzZThkOWFiZmM3ODI2MDcwNTU0MGRlZiJ9fX0=
+
+
 SquadManager_Interface:
     type: inventory
     inventory: chest
     gui: true
     title: Squad Manager
     slots:
-    - [] [] [SquadComposer_Item] [] [RenameBarracks_Item] [] [] [] []
-    - [] [] [SquadStationingEval_Item] [] [] [] [] [] []
+    - [] [] [SquadComposer_Item] [] [RenameBarracks_Item] [] [RelocateSquadManager_Item] [] []
+    - [] [] [SquadStationingEval_Item] [] [SetArmoryLocations_Item] [] [] [] []
     - [] [] [] [] [] [] [] [] []
     - [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadManagerInfo_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
     - [] [] [SquadListInfo_Item] [] [SquadManagerUpgradesDark_Item] [] [] [] []
     - [] [] [SquadManagerShowAOE_Item] [] [] [] [SquadManagerSetAOE_Item] [] []
 
 
-SquadManagerUpgrade_Interface:
-    type: inventory
-    inventory: chest
-    gui: true
-    title: Squad Manager Upgrades
-    slots:
-    - [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [] [] [] [] [] []
-    - [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [barrier] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
-
-
-# Later: Move to unified config file
-SquadManagerLevelData:
-    type: data
-    levelData:
-        AOELevel:
-            1: 20
-            2: 40
-            3: 80
+ArmoryWand_Item:
+    type: item
+    material: tipped_arrow
+    display name: <blue><bold>Armory Selection Wand
 
 
 SquadManager_Handler:
     type: world
     events:
-        on player places SquadManager_Item:
+        on SquadManager_Item recipe formed:
         - define kingdom <player.flag[kingdom]>
+        - define maxAllowedSMs <server.flag[kingdoms.<[kingdom]>.armies.maximumAllowedSMs].if_null[4]>
+        - define SMCount <server.flag[kingdoms.<[kingdom]>.armies.barracks].size>
+
+        - if <[SMCount]> >= <[maxAllowedSMs]>:
+            - narrate format:callout "You have already created the maximum amount of barracks in your kingdom. Consider upgrading existing squad managers, instead!"
+            - determine air
+
+        on player places SquadManager_Item flagged:!datahold.armies.movingSM:
+        - define kingdom <player.flag[kingdom]>
+
+        - if <server.flag[kingdoms.<[kingdom]>.balance]> < 2000:
+            - narrate format:callout "Your kingdom does not have sufficient funds to activate this squad manager.<n>You require at least $2000 in your kingdom's bank."
+            - determine cancelled
+
         - define existingBarracks <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
         - define barrackLocations <[existingBarracks].parse_value_tag[<[parse_value].get[location]>]>
         - define numberOfExistingBarracks <[existingBarracks].size.if_null[0]>
@@ -171,10 +188,11 @@ SquadManager_Handler:
             kingdom: <[kingdom]>
             id: <context.location.simple.split[,].remove[last].unseparated>
             levels:
-                AOELevel: 1
+                MaxAOESize: 20
                 squadLimit: 1
                 squadSizeLimit: 30
-            AOESize: 40
+                stationCapacity: 0
+            AOESize: 20
 
         # Generate cuboid consisting of all the kingdom's core claims
         - define coreClaims <server.flag[kingdoms.<[kingdom]>.claims.core]>
@@ -203,7 +221,7 @@ SquadManager_Handler:
             - run RecalculateSquadManagerAOE def.barracksArea:<[barracksArea]> def.SMLocation:<context.location> def.player:<player>
 
         - else:
-            - narrate format:callout "Please ensure that the squad manager is at least 20 blocks within your kingdom's core claims."
+            - narrate format:callout "Please ensure that the squad manager is at least 20 blocks within your kingdom's core/outpost claims."
             - narrate format:callout "<italic>Note: Barracks cannot be placed inside your kingdom's castle territory."
             - determine cancelled
 
@@ -284,8 +302,7 @@ SquadManager_Handler:
         ## AOE Set
         on player clicks SquadManagerSetAOE_Item in SquadManager_Interface:
         - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
-        - define AOELevel <[squadManagerData].deep_get[levels.AOELevel]>
-        - define maxAOESize <script[SquadManagerLevelData].data_key[levelData.AOELevel.<[AOELevel]>]>
+        - define maxAOESize <[squadManagerData].deep_get[levels.MaxAOESize]>
 
         - flag <player> noChat.armies.settingAOE:<[maxAOESize]>
 
@@ -307,6 +324,8 @@ SquadManager_Handler:
             - flag <player> noChat.armies:!
             - narrate format:callout "Set squad manager AOE to: <white><context.message>"
             - inventory open d:SquadManager_Interface
+
+            - flag <player> datahold.armies.showAOE:!
 
             - run RecalculateSquadManagerAOE def.AOESize:<context.message> def.SMLocation:<[squadManagerLocation]> def.player:<player>
 
@@ -351,6 +370,130 @@ SquadManager_Handler:
 
         - determine cancelled
 
+        ## SM Move Click
+        on player clicks RelocateSquadManager_Item in SquadManager_Interface:
+        - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
+        - flag <player> datahold.armies.movingSM.data:<[squadManagerData]>
+        - flag <player> datahold.armies.movingSM.location:<[squadManagerLocation]>
+        - flag <player> datahold.armies.showAOE:!
+
+        - narrate format:callout "Place down this Squad Manager item at the new desired location. Drop it to cancel."
+
+        - inventory close
+        - modifyblock <[squadManagerLocation]> air
+        - run TempSaveInventory def.player:<player>
+        - give to:<player.inventory> SquadManager_Item
+        - adjust <player> item_slot:1
+
+        ## SM Place After Move
+        on player places SquadManager_Item flagged:datahold.armies.movingSM:
+        - define kingdom <player.flag[kingdom]>
+        - define squadManagerData <player.flag[datahold.armies.movingSM.data]>
+        - define oldSquadManagerLocation <player.flag[datahold.armies.movingSM.location]>
+        - define newSquadManagerLocation <context.location>
+        - define existingBarrackID <[oldSquadManagerLocation].simple.split[,].remove[last].unseparated>
+        - define existingBarracks <server.flag[kingdoms.<[kingdom]>.armies.barracks].exclude[<[existingBarrackID]>]>
+        - define barrackLocations <[existingBarracks].parse_value_tag[<[parse_value].get[location]>]>
+
+        - foreach <[barrackLocations]> as:loc:
+            # Note: future configurable
+            - if <context.location.distance[<[loc]>]> < 200:
+                - narrate format:callout "Invalid location! This location is too close to another squad manager belonging to your kingdom. Try another spot..."
+                - determine cancelled
+
+        # Generate cuboid consisting of all the kingdom's core claims
+        - define coreClaims <server.flag[kingdoms.<[kingdom]>.claims.core]>
+        - define coreClaimsCuboid <[coreClaims].get[1].cuboid>
+
+        - foreach <[coreClaimsCuboid].remove[1]>:
+            - define coreClaimsCuboid <[coreClaimsCuboid].include[<[value]>]>
+
+        # Running path:AreaCalculation returns a cuboid of the barracks' area
+        - run RecalculateSquadManagerAOE path:AreaCalculation def.AOESize:<[squadManagerData].get[AOESize]> def.SMLocation:<context.location> save:area
+        - define barracksArea <entry[area].created_queue.determination.get[1]>
+
+        - if <[barracksArea].is_within[<[coreClaimsCuboid]>]> || <player.is_op>:
+            - flag <context.location> squadManager:<[squadManagerData]>
+            - define bedCount <proc[CountBedsInSquadManagerArea].context[<[newSquadManagerLocation]>]>
+
+            # Station count equation:
+            # s = round(sqrt(b) * b ^ 0.7)
+            - define stationCapacity <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
+
+            - define newBarrackID <context.location.simple.split[,].remove[last].unseparated>
+
+            # Flag new squad manager location with corrected data + remove old data
+            - define squadManagerData.area:<[barracksArea]>
+            - define squadManagerData.id:<[newBarrackID]>
+            - flag <[newSquadManagerLocation]> squadManager:<[squadManagerData]>
+            - flag <[oldSquadManagerLocation]> squadManager:!
+
+            # Remove old server-level reference to barrack and copy adjusted version over to new key
+            - define kingdomsFlagBarrackData <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[existingBarrackID]>]>
+            - define kingdomsFlagBarrackData.area:<[barracksArea]>
+            - define kingdomsFlagBarrackData.location:<[newSquadManagerLocation]>
+            - flag server kingdoms.<[kingdom]>.armies.barracks.<[newBarrackID]>:<[kingdomsFlagBarrackData]>
+            - flag server kingdoms.<[kingdom]>.armies.barracks.<[existingBarrackID]>:!
+
+            # Update datahold flags so that if the player interacts with the SM without re-opening
+            # it, the references aren't all wrong
+            - flag <player> datahold.armies.movingSM.data:!
+            - flag <player> datahold.armies.movingSM.location:!
+            - flag <player> datahold.armies.squadManagerLocation:<[newSquadManagerLocation]>
+            - flag <player> datahold.armies.squadManagerData:<[squadManagerData]>
+
+            # Running Recalc. task without path generates the barracks area and adds to the main
+            # kingdoms flag the corresponding cuboid
+            - run RecalculateSquadManagerAOE def.barracksArea:<[barracksArea]> def.SMLocation:<[newSquadManagerLocation]> def.player:<player>
+
+            - run LoadTempInventory def.player:<player>
+
+        - else:
+            - narrate format:callout "Please ensure that the squad manager is at least 20 blocks within your kingdom's core/outpost claims."
+            - narrate format:callout "<italic>Note: Barracks cannot be placed inside your kingdom's castle territory."
+            - determine cancelled
+
+        ## Player Drops SM While Moving
+        on player drops SquadManager_Item flagged:datahold.armies.movingSM:
+        - determine passively cancelled
+
+        - define squadManagerLocation <player.flag[datahold.armies.movingSM.location]>
+
+        - take from:<player.inventory>
+        - run LoadTempInventory def.player:<player>
+        - modifyblock <[squadManagerLocation]> Lodestone
+
+        ## Player Clicks Armory Set
+        on player clicks SetArmoryLocations_Item in SquadManager_Interface:
+        - inventory close
+
+        - narrate format:callout "Use the armory wand to designate chests, barrels, and other storage items as armories. Your squads will use these to get weapons and ammunition."
+        - narrate format:callout "<bold>Drop the armory wand when finished."
+
+        - run TempSaveInventory def.player:<player>
+        - give to:<player.inventory> ArmoryWand_Item
+        - adjust <player> item_slot:1
+
+        ## Player Selects Armory
+        on player right clicks block with:ArmoryWand_Item:
+        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+
+        - if <context.location.has_inventory>:
+            - flag <[SMLocation]> squadManager.armories:->:<context.location>
+            - narrate format:callout "Designated <context.location.simple.split[,].remove[last].comma_separated.color[red].bold> as an armory <context.location.material.name>"
+
+        - determine cancelled
+
+        ## Drops Armory Wand
+        on player drops ArmoryWand_Item:
+        - determine passively cancelled
+        - take from:<player.inventory> item:ArmoryWand_Item
+        - run LoadTempInventory def.player:<player>
+
+        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.player:<player>
+
         ## Close Window
         on player closes SquadManager_Interface flagged:datahold.armies.squadManagerData:
         - if !<player.has_flag[noChat.armies]>:
@@ -362,6 +505,105 @@ SquadManager_Handler:
         ## Leave Game
         on player quits flagged:datahold.armies:
         - flag <player> datahold.armies:!
+
+        ## Player Breaks SM
+        on player breaks block location_flagged:squadManager:
+        # TODO: SM destruction logic; display confirmation window,
+        # TODO/ Distribute squads to nearest barracks. If all barracks are full, display additional
+        # TODO/ information with confirmation window telling player that squads would have to be
+        # TODO/ disbanded if they do that
+        - define kingdom <player.flag[kingdom]>
+        - define SMInfo <context.location.flag[squadManager]>
+        - run GetSMID def.location:<context.location> save:smid
+        - define SMID <entry[smid].created_queue.determination.get[1]>
+        - define squadList <[SMInfo].deep_get[squads.squadList].keys>
+        - define barrackList <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
+        - flag <player> datahold.armies.showAOE:!
+
+        - if <[barrackList].size> == 1:
+            - narrate format:debug "Insert squad deletion notice w/confirmation window"
+            - determine cancelled
+
+        - define movableSquads <list[]>
+
+        - foreach <[barrackList]> as:barrack:
+            - define barrackSquadLimit <[barrack].deep_get[levels.squadLimit]>
+            - define barrackStationingCap <[barrack].deep_get[levels.stationingCapacity]>
+
+            - foreach <[squadList].exclude[<[movableSquads].parse_value_tag[<[parse_key]>]>]> as:squad:
+                - define passedConditions 0
+
+                - if <[squad].get[npcList].size> <= <[barrackStationingCap]>:
+                    - define passedConditions:++
+
+                - if <[barrack].deep_get[squads.squadList]> < <[barrackSquadLimit]>:
+                    - define passedConditions:++
+
+                - if <[passedConditions]> == 2:
+                    - define movableSquads:->:<[squad]>
+
+        - if <[movableSquads].size> == <[squadList].size>:
+            - flag <player> datahold.armies.SMDelete.squadList:<[squadList]>
+            - flag <player> datahold.armies.SMDelete.movableSquads:<[movableSquads]>
+            - flag <player> datahold.armies.SMDelete.SMID:<[SMID]>
+
+            - inventory open d:SquadManagerDeletionConfirmation_Window
+
+        - else:
+            - narrate format:debug "Insert squad deletion notice w/confirmation window"
+
+        - determine cancelled
+
+
+ConfirmSMDeletion_Item:
+    type: item
+    material: player_head
+    display name: <green><bold>Confirm Deletion
+    mechanisms:
+        skull_skin: afb405c1-16ea-4a23-883f-97867e7db3f9|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTc5YTVjOTVlZTE3YWJmZWY0NWM4ZGMyMjQxODk5NjQ5NDRkNTYwZjE5YTQ0ZjE5ZjhhNDZhZWYzZmVlNDc1NiJ9fX0=
+
+
+RejectSMDeletion_Item:
+    type: item
+    material: player_head
+    display name: <red><bold>Reject Deletion
+    mechanisms:
+        skull_skin: 5ecfabf0-5253-47b0-a44d-9a0c924081b9|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmViNTg4YjIxYTZmOThhZDFmZjRlMDg1YzU1MmRjYjA1MGVmYzljYWI0MjdmNDYwNDhmMThmYzgwMzQ3NWY3In19fQ==
+
+
+SMDeletionHeader_Item:
+    type: item
+    material: player_head
+    display name: <gold><bold>Confirm Squad Manager Deletion?
+    mechanisms:
+        skull_skin: da4d885d-2505-4f25-bfee-a0de07950191|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDAxYWZlOTczYzU0ODJmZGM3MWU2YWExMDY5ODgzM2M3OWM0MzdmMjEzMDhlYTlhMWEwOTU3NDZlYzI3NGEwZiJ9fX0=
+
+
+SquadManagerDeletionConfirmation_Window:
+    type: inventory
+    inventory: chest
+    gui: true
+    title: Confirm Squad Manager Deletion
+    slots:
+    - [] [] [] [] [] [] [] [] []
+    - [] [] [ConfirmSMDeletion_Item] [] [] [] [RejectSMDeletion_Item] [] []
+    - [] [] [] [] [SMDeletionHeader_Item] [] [] [] []
+    - [] [] [] [] [] [] [] [] []
+
+
+SquadManagerDeletion_Handler:
+    type: world
+    events:
+        on player opens SquadManagerDeletionConfirmation_Window:
+        - define infoItemSlot <context.inventory.find_item[SMDeletionHeader_Item]>
+        - define deletionInfo <player.flag[datahold.armies.SMDelete]>
+        - define movableSquads <[deletionInfo].get[movableSquads]>
+        - define deletedSquads <[deletionInfo].get[squadList].exclude[<[movableSquads]>]>
+        - define deletedSquads <list[None]> if:<[deletedSquads].size.equals[0]>
+        - define loreList <list[<element[Following squads will be moved:].color[aqua]>].include[<[movableSquads].parse_tag[<[parse_value].get[displayName]>]>]>
+        - define loreList <[loreList].include[Following squads will be deleted:].include[<[deletedSquads]>]>
+
+        - inventory adjust slot:<[infoItemSlot]> lore:<[loreList]> d:<context.inventory>
 
 
 RecalculateSquadManagerAOE:
@@ -384,6 +626,16 @@ RecalculateSquadManagerAOE:
     - flag <[SMLocation]> squadManager.area:<[barracksArea]>
     - ~run WriteArmyDataToKingdom def.player:<[player]> def.SMLocation:<[SMLocation]>
     - run ShowSquadManagerAOE def.area:<[barracksArea]> def.player:<[player]>
+
+
+CalculateSMCost:
+    type: procedure
+    definitions: kingdom
+    script:
+    # TODO: Temp calculation-- make sure you come back to this later and factor in prestige!
+    - define maxAllowedSMs <server.flag[kingdoms.<[kingdom]>.armies.maximumAllowedSMs].if_null[4]>
+    - define SMCount <server.flag[kingdoms.<[kingdom]>.armies.barracks].size>
+    - determine <element[2000].mul[<[maxAllowedSMs].mul[<[SMCount].sqrt>]>]>
 
 
 CountBedsInSquadManagerArea:

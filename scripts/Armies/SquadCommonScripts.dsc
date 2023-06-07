@@ -79,14 +79,14 @@ WriteArmyDataToKingdom:
     - define kingdom <[player].flag[kingdom]>
     - define squadManagerID <[SMLocation].simple.split[,].remove[last].unseparated>
     - define SMData <[SMLocation].flag[squadManager]>
-    - define stationedSquads <[SMData].deep_get[squads.squadList].keys>
+    - define stationedSquads <[SMData].deep_get[squads.squadList].keys> if:<[SMData].contains[squads.squadList]>
     - define SMData <[SMData].exclude[kingdom].exclude[id].deep_exclude[squads]>
 
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>:<[SMData]>
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.location:<[SMLocation]>
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.stationedSquads:<[stationedSquads]>
 
-    - foreach <[SMLocation].flag[squadManager.squads.squadList]>:
+    - foreach <[SMLocation].flag[squadManager.squads.squadList].if_null[<list[]>]>:
         - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[key]>:<[value]>
 
 
@@ -182,3 +182,14 @@ GetSquadInfo:
 
     - run flagvisualizer def.flag:<[globalRef]> def.flagName:globalRef
     - determine <[globalRef]>
+
+
+GetSMID:
+    type: task
+    definitions: location
+    script:
+    ## Generates the ID used to refer to SMs in the kingdom flag using the location of the SM
+    ##
+    ## location : [LocationTag]
+
+    - determine <[location].simple.split[,].remove[last].unseparated>
