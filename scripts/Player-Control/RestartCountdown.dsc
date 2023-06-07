@@ -15,15 +15,15 @@ RestartCountdown:
         - else:
             - narrate format:admincallout "Cannot set a restart timer longer than 1 hour!"
 
+
 RestartCounter:
     type: world
-    debug: false
+    #debug: false
     events:
-        on system time secondly every:1:
-        - if <server.has_flag[RestartTimer]>:
-            - if <server.flag[RestartTimer]> != 0:
-                - flag server RestartTimer:-:1
+        on system time secondly every:1 server_flagged:RestartTimer:
+        - if <server.flag[RestartTimer]> != 0:
+            - flag server RestartTimer:-:1
 
-            - else:
-                - flag server RestartTimer:!
-                - kick <server.online_players.exclude[<server.online_ops>]> "reason:Server restart commenced by admin! Please check back in a couple minutes, Thank you!"
+        - else:
+            - flag server RestartTimer:!
+            - kick <server.online_players.exclude[<server.online_ops>]> "reason:Server restart commenced by admin! Please check back in a couple minutes, Thank you!"
