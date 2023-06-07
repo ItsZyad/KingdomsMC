@@ -208,16 +208,25 @@ EntityTerritoryHandler:
         - define blockedSpawnTypes <list[NATURAL|LIGHTNING|SPAWNER|JOCKEY]>
 
         - if <[blockedSpawnTypes].contains[<context.reason>]>:
-            - define kingdomList <proc[GetKingdomList].context[true]>
+            - define allClaims <server.flag[kingdoms.claimInfo.allClaims].as[list].parse_tag[<[parse_value].cuboid>]>
 
-            - foreach <[kingdomList]> as:kingdom:
-                - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
-                - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
-                - define kingdomAllTerritory <[core].include[<[castle]>].exclude[0]>
+            - if <context.location.chunk.is_in[<[allClaims]>]>:
+                - determine cancelled
 
-                - foreach <[kingdomAllTerritory]>:
-                    - if <[value].cuboid.contains[<context.location>]>:
-                        - determine cancelled
+        # on entity spawns:
+        # - define blockedSpawnTypes <list[NATURAL|LIGHTNING|SPAWNER|JOCKEY]>
+
+        # - if <[blockedSpawnTypes].contains[<context.reason>]>:
+        #     - define kingdomList <proc[GetKingdomList].context[true]>
+
+        #     - foreach <[kingdomList]> as:kingdom:
+        #         - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
+        #         - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
+        #         - define kingdomAllTerritory <[core].include[<[castle]>].exclude[0]>
+
+        #         - foreach <[kingdomAllTerritory]>:
+        #             - if <[value].cuboid.contains[<context.location>]>:
+        #                 - determine cancelled
 
         on entity explodes:
         - define kingdomList <proc[GetKingdomList].context[true]>
