@@ -1,12 +1,11 @@
 ##
-## * A (lightly modified) Denizen-Dynmap hook for Kingdoms
+## * A (heavily modified) Denizen-Dynmap hook for Kingdoms
 ##
 ## @Author: (Icecapade#8825)
 ## @Editor: Zyad (ITSZYAD#9280)
 ## @Date: Jan 2022
-## @Script Ver: v1.5
-##
-## Modified for Kingdoms: Apr 2022
+## @Updated: May 2023
+## @Script Ver: v1.2
 ##
 ## ----------------END HEADER-----------------
 
@@ -99,7 +98,7 @@ NEW_DynmapFlagBuilder:
                 - define hasStarted true
                 - define foundNextCoord false
 
-                ## Note: Still keeping this here until I am absolutely sure that the algo is solid
+                ## Note: Still keeping this here until I am absolutely sure that the algo. is solid
                 ##       although I've upped the limit to 200.
                 - if <[loop_index]> >= 200:
                     - narrate format:debug "Loop exceeded <[loop_index]> iterations! Stopping Queue..."
