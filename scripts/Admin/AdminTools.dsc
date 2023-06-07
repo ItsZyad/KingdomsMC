@@ -23,7 +23,7 @@ AdminTools_Command:
     tab complete:
     - define mostFlags <list[]>
 
-    - choose <context.args.get[1]>:
+    - choose <context.args.get[1].if_null[null]>:
         - case purgeflag:
             - if <context.args.size> >= 2:
                 - define target <context.args.get[2]>
@@ -99,8 +99,11 @@ AdminTools_Command:
                     # /kadmin seeflag server economy.
                     # /kadmin seeflag server fyndalin
                     - else:
-                        - define keys <[object].parsed.flag[<[currentKey]>].keys>
-                        - define keys <server.flag[<[currentKey]>].keys> if:<[object].equals[server]>
+                        - if <[object]> == server:
+                            - define keys <server.flag[<[currentKey]>].keys>
+
+                        - else:
+                            - define keys <[object].parsed.flag[<[currentKey]>].keys>
 
                         - if <[keys].exists>:
                             - determine <[keys].parse_tag[<[keyList].separated_by[.]>.<[parse_value]>]>
@@ -191,12 +194,14 @@ AdminTools_Command:
 
                 - define object <[objectRef].get[<[objectParam]>].if_null[<[args].get[2].parsed>]>
                 - define flagName <[args].get[3]>
-                - define flag <[object].flag[<[flagName]>]>
 
                 # Can't put server: <server> in objectRef since the server
                 # is a pseudo-tag that cannot be used on its own :/
                 - if <[objectParam]> == server:
                     - define flag <server.flag[<[flagName]>]>
+
+                - else:
+                    - define flag <[object].flag[<[flagName]>]>
 
                 - if <[flag].exists>:
                     - narrate <element[                                                     ].strikethrough>
@@ -472,7 +477,6 @@ AddEssentialsWorthItems:
     - yaml id:prices unload
 
 
-##ignorewarning bad_execute
 ReloadVerbosity_Handler:
     type: world
     debug: false
@@ -481,7 +485,7 @@ ReloadVerbosity_Handler:
         - if <context.source_type> == PLAYER && <context.args.get[1]> == reload && <context.args.size> == 1:
             - determine passively cancelled
             - define timeBeforeReload <util.current_time_millis>
-            - execute as_server "ex reload" silent
+            - reload
             - flag server reloadoverride:<player>
             - waituntil <server.has_flag[reloadoverride].not> max:10m
             - define reloadTime <util.current_time_millis.sub[<[timeBeforeReload]>]>
@@ -543,6 +547,8 @@ DEBUG_GenerateKingdomFlags:
         - flag server kingdoms.<[kingdom]>.powerstruggle.prestigeMultiplier:<[YPI].get[perstigemultiplier]>
         - flag server kingdoms.<[kingdom]>.powerstruggle.electionInfluence:<[YPI].get[electioninfluence]>
         - flag server kingdoms.<[kingdom]>.powerstruggle.BMFactionInfluence:<[YBI]> if:<[YBI].exists>
+
+        - flag server kingdoms.<[kingdom]>.armies.maximumAllowedSMs:4
 
     - flag server kingdoms.claimInfo.allClaims:<yaml[kingdoms].read[all_claims]>
 

@@ -37,7 +37,7 @@ FlagVisualizer:
 
             - run FlagVisualizer def.flag:<[value]> def.flagName:<[key]> def.recursionDepth:<[recursionDepth].add[1]> save:Recur
 
-            - if <entry[Recur].created_queue.determination.get[1].as[list].size> == 1:
+            - if <entry[Recur].created_queue.determination.get[1].as[list].size.if_null[0]> == 1:
                 - define line "<list[<[key].color[aqua].italicize><&co> ]>"
                 - define line:->:<entry[Recur].created_queue.determination.get[1].color[white]>
                 - narrate <proc[MakeTabbed].context[<[line].unseparated>|<[tabWidth]>]>
@@ -57,7 +57,7 @@ FlagVisualizer:
 
             - run FlagVisualizer def.flag:<[value]> def.flagName:<&sp> def.recursionDepth:<[recursionDepth].add[1]> save:Recur
 
-            - if <entry[Recur].created_queue.determination.get[1].as[list].size> == 1:
+            - if <entry[Recur].created_queue.determination.get[1].as[list].size.if_null[0]> == 1:
                 - define formattedIndex <[loop_index].pad_left[<[longestNumber].length.sub[1]>].with[0]>
                 - narrate "<proc[MakeTabbed].context[<element[<[formattedIndex].color[gray]>: <entry[Recur].created_queue.determination.get[1].color[white]>]>|<[tabWidth]>]>"
 
