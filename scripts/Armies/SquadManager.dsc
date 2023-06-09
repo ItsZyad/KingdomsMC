@@ -62,27 +62,31 @@ SquadManagerUgradesLight_Item:
 
 SquadManagerShowAOE_Item:
     type: item
-    material: red_stained_glass
+    material: player_head
     display name: <red><bold>Show Squad Manager AOE
     lore:
         - <&r><red>INACTIVE
         - Show the limits of the barracks
         - <italic>(Helpful while building)
+    mechanisms:
+        skull_skin: 7ee4a2d5-3ac2-48cb-94a1-689f87c836fd|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmJkMmY5MzQ3NmFiNjlmYWY1YTUxOWViNTgzMmRiODQxYzg1MjY2ZTAwMWRlNWIyNmU0MjdmNDFkOThlNWM3ZSJ9fX0=
 
 
 SquadManagerShowAOEActive_Item:
     type: item
-    material: green_stained_glass
+    material: player_head
     display name: <green><bold>Show Squad Manager AOE
     lore:
         - <&r><green>ACTIVE
         - Show the limits of the barracks
         - <italic>(Helpful while building)
+    mechanisms:
+        skull_skin: a80e42d6-f307-40b3-ba5e-80602638d4d9|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTNiMjI4ZjcwYTM1ZDBhYTMyMzUwNDY3ZDllOGMwOWFhZTlhZTBhZTA4NzVmZGM4YzMxMWE4NzZiZTE5MDcxNyJ9fX0=
 
 
 SquadManagerSetAOE_Item:
     type: item
-    material: purple_stained_glass
+    material: nether_star
     display name: <light_purple><bold>Set Squad Manager AOE
 
 
@@ -132,6 +136,22 @@ SetArmoryLocations_Item:
         skull_skin: 554d6e02-1065-4867-876e-b0fd8b6fe76d|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWRjMzZjOWNiNTBhNTI3YWE1NTYwN2EwZGY3MTg1YWQyMGFhYmFhOTAzZThkOWFiZmM3ODI2MDcwNTU0MGRlZiJ9fX0=
 
 
+SeeArmoryLocations_Item:
+    type: item
+    material: player_head
+    display name: <gold><bold>Show Armory Locations
+    mechanisms:
+        skull_skin: 85f60aef-4945-4790-8a6e-853dd6a33617|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjM3Y2FlNWM1MWViMTU1OGVhODI4ZjU4ZTBkZmY4ZTZiN2IwYjFhMTgzZDczN2VlY2Y3MTQ2NjE3NjEifX19
+
+
+HideArmoryLocations_Item:
+    type: item
+    material: player_head
+    display name: <gray><bold>Hide Armory Locations
+    mechanisms:
+        skull_skin: 0f180111-6cc0-4789-8c7c-0dd0871857d3|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmU5NzNiNTBkMGIyZGE2ZTJhNTFlY2VlYTBkMjJkNjdhNjE3OThlOTc1OGZkZjViOTIzYjJhNTk1YzYxNzYifX19
+
+
 SquadManager_Interface:
     type: inventory
     inventory: chest
@@ -139,11 +159,11 @@ SquadManager_Interface:
     title: Squad Manager
     slots:
     - [] [] [SquadComposer_Item] [] [RenameBarracks_Item] [] [RelocateSquadManager_Item] [] []
-    - [] [] [SquadStationingEval_Item] [] [SetArmoryLocations_Item] [] [] [] []
+    - [] [] [SquadStationingEval_Item] [] [SquadManagerSetAOE_Item] [] [SetArmoryLocations_Item] [] []
     - [] [] [] [] [] [] [] [] []
     - [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadManagerInfo_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
-    - [] [] [SquadListInfo_Item] [] [SquadManagerUpgradesDark_Item] [] [] [] []
-    - [] [] [SquadManagerShowAOE_Item] [] [] [] [SquadManagerSetAOE_Item] [] []
+    - [] [] [SquadListInfo_Item] [] [SquadManagerUpgradesDark_Item] [] [SquadManagerShowAOE_Item] [] []
+    - [] [] [] [] [SeeArmoryLocations_Item] [] [] [] []
 
 
 ArmoryWand_Item:
@@ -260,6 +280,10 @@ SquadManager_Handler:
         on player opens SquadManager_Interface flagged:datahold.armies.showAOE:
         - define AOEItemSlot <context.inventory.find_item[SquadManagerShowAOE_Item]>
         - inventory set slot:<[AOEItemSlot]> o:SquadManagerShowAOEActive_Item d:<context.inventory>
+
+        on player opens SquadManager_Interface flagged:datahold.armies.showArmories:
+        - define AOEItemSlot <context.inventory.find_item[SeeArmoryLocations_Item]>
+        - inventory set slot:<[AOEItemSlot]> o:HideArmoryLocations_Item d:<context.inventory>
 
         ## Squad Sel.
         on player clicks SquadListInfo_Item in SquadManager_Interface:
@@ -480,6 +504,10 @@ SquadManager_Handler:
         - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
 
         - if <context.location.has_inventory>:
+            - if <[SMLocation].flag[squadManager.armories].contains[<context.location>]>:
+                - flag <[SMLocation]> squadManager.armories:<-:<context.location>
+                - determine cancelled
+
             - flag <[SMLocation]> squadManager.armories:->:<context.location>
             - narrate format:callout "Designated <context.location.simple.split[,].remove[last].comma_separated.color[red].bold> as an armory <context.location.material.name>"
 
@@ -493,6 +521,28 @@ SquadManager_Handler:
 
         - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
         - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.player:<player>
+
+        ## Player Clicks Armories AOE
+        on player clicks SeeArmoryLocations_Item in SquadManager_Interface:
+        - determine passively cancelled
+
+        - if <player.has_flag[datahold.armies.showArmories]>:
+            - flag <player> datahold.armies.showArmories:!
+
+        - else:
+            - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
+            - flag <player> datahold.armies.showArmories expire:1h
+            - run ShowArmoriesAOE def.player:<player> def.locationList:<[squadManagerData].get[armories]>
+            - inventory set slot:<context.slot> o:HideArmoryLocations_Item d:<context.inventory>
+            - inventory close
+
+        ## Player Cancels Armories AOE
+        on player clicks HideArmoryLocations_Item in SquadManager_Interface:
+        - determine passively cancelled
+
+        - if <player.has_flag[datahold.armies.showArmories]>:
+            - flag <player> datahold.armies.showArmories:!
+            - inventory set slot:<context.slot> o:SeeArmoryLocations_Item d:<context.inventory>
 
         ## Close Window
         on player closes SquadManager_Interface flagged:datahold.armies.squadManagerData:
@@ -521,7 +571,9 @@ SquadManager_Handler:
         - flag <player> datahold.armies.showAOE:!
 
         - if <[barrackList].size> == 1:
-            - narrate format:debug "Insert squad deletion notice w/confirmation window"
+            - narrate format:callout "<red><element[WARNING!].bold> Deleting this squad manager will result in some of its squads being deleted!"
+            - narrate format:callout "<red>Please ensure that you make space or upgrade other SMs, or transfer all squads manually!"
+            - inventory open d:SquadManagerDeletionConfirmation_Window
             - determine cancelled
 
         - define movableSquads <list[]>
@@ -541,7 +593,9 @@ SquadManager_Handler:
 
                 - if <[passedConditions]> == 2:
                     - define movableSquads:->:<[squad]>
+                    - define barrackList.<[key]>.squads.squadList:->:<[squad]>
 
+        # If all the squads in this SM can be moved to others
         - if <[movableSquads].size> == <[squadList].size>:
             - flag <player> datahold.armies.SMDelete.squadList:<[squadList]>
             - flag <player> datahold.armies.SMDelete.movableSquads:<[movableSquads]>
@@ -550,7 +604,10 @@ SquadManager_Handler:
             - inventory open d:SquadManagerDeletionConfirmation_Window
 
         - else:
-            - narrate format:debug "Insert squad deletion notice w/confirmation window"
+            #- narrate format:debug "Insert squad deletion notice w/confirmation window"
+            - narrate format:callout "<red><element[WARNING!].bold> Deleting this squad manager will result in some of its squads being deleted!"
+            - narrate format:callout "<red>Please ensure that you make space or upgrade other SMs, or transfer all squads manually!"
+            - inventory open d:SquadManagerDeletionConfirmation_Window
 
         - determine cancelled
 
@@ -647,6 +704,24 @@ CountBedsInSquadManagerArea:
     - define SMArea <[squadManagerData].get[area]>
     - define bedCount <[SMArea].blocks[*_bed].size.div[2]>
     - determine <[bedCount]>
+
+
+ShowArmoriesAOE:
+    type: task
+    debug: false
+    definitions: locationList|player
+    script:
+    - if <[locationList].filter_tag[<[filter_value].object_type.to_lowercase.equals[location]>].size> != <[locationList].size>:
+        - determine cancelled
+
+    - while <[player].has_flag[datahold.armies.showArmories]>:
+        - foreach <list[0.5|-0.5]> as:offset:
+            - playeffect at:<[locationList].parse_tag[<[parse_value].center.up[0.5].forward[<[offset]>].left[<[offset]>]>]> effect:WAX_OFF offset:0,0,0 quantity:1 targets:<[player]>
+            - playeffect at:<[locationList].parse_tag[<[parse_value].center.up[0.5].backward[<[offset]>].left[<[offset]>]>]> effect:WAX_OFF offset:0,0,0 quantity:1 targets:<[player]>
+            - playeffect at:<[locationList].parse_tag[<[parse_value].center.down[0.5].forward[<[offset]>].left[<[offset]>]>]> effect:WAX_OFF offset:0,0,0 quantity:1 targets:<[player]>
+            - playeffect at:<[locationList].parse_tag[<[parse_value].center.down[0.5].backward[<[offset]>].left[<[offset]>]>]> effect:WAX_OFF offset:0,0,0 quantity:1 targets:<[player]>
+
+        - wait 6t
 
 
 ShowSquadManagerAOE:
