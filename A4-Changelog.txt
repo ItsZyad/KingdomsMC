@@ -1,19 +1,20 @@
 Bug Fixes / Performance Upgrades:
     - [Technical] Folded all flags that prevent the player from chatting (for inputting values and such) into a single flag (noChat) to improve stability.
         - Players should no longer randomly lose the ability to chat after using certain influence features.
-    - [Technical] Server now runs PaperMC 1.19.x - noticable performance increases.
+    - [Technical] Server now runs PaperMC 1.19.4 - noticable performance increases;
+        - Warping is snappier however chunk loading may still take ~2-3 seconds;
+        - General FPS increase in the ballpark of 15-25%.
+        - Average script reload times are about 10% faster.
     - [Technical] Guard pathfinding now runs on a separate thread to improve server performance while guards are moving.
     - [Technical] Sidebar only runs for online players, greatly improving command performance.
     - [Technical] Reworked back-end data handler to use more modern APIs; Noticable performance increases.
     - Adjusted mason/militia item order algorithm to favour more requests.
     - Prevented general thorvald from starting two dialogues with you at the same time.
     - Fixed material transfer chest issue where the sign wouldn't generate depending on which chest side you place it on.
+    - Territory handling code should be more performant now.
     - Adjusted some kingdom text colors.
     - Fixed bug which allowed players to sit on chairs through walls
     - Fixed a bug where under certain circustances the server join message would read 'null'
-    - Warping is significantly snappier. However chunk loading may still take ~2-3 seconds;
-    - General FPS increase in the ballpark of 15-25%.
-    - Average script reload times are about 10% faster.
     - Fixed guards attacking own kingdom members bug (I hope...).
     - Fixed uncommon bug which crashes the server when guards attempt to pathfind.
     - Fixed a bug which prevented players from claiming core chunks.
@@ -54,5 +55,5 @@ Large Additions:
     - Added initial version of the squads & armies mechanics with features such as:
         - Fully integrated barracks / squad-holding system,
         - Basic squad management tools,
-        - Basic move and attack orders such as formation attack, formation walk using a squad orders wand,
+        - Basic orders such as formation attack, formation walk and retreat,
         - ...
