@@ -216,7 +216,7 @@ RNPCWindow_Handler:
 
                 # Change NPC's skin
 
-                - adjust def:<entry[latestNPC].created_npc> skin_blob:<script[RNPCSkins].data_key[farmer]>
+                - adjust <entry[latestNPC].created_npc> skin_blob:<script[RNPCSkins].data_key[farmer]>
 
                 - run FarmerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
 
