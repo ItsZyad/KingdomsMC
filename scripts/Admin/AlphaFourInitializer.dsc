@@ -6,6 +6,7 @@ GameStateAdjuster:
     type: task
     script:
     - run DEBUG_GenerateKingdomFlags
+    - run RNPCFlagGenerator
 
     ## Delete obsolete flags
     - flag server centran:!
