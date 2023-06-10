@@ -29,6 +29,7 @@ LoggerRangeFinder:
 
     - else:
         - note <[areaOfEffect]> as:INTERNAL_ranch_<[npc].flag[kingdom]>_<[npc].id>
+        - flag server kingdoms.<[npc].flag[kingdom]>.RNPCs.Loggers.<[npc].id>.area:<cuboid[INTERNAL_ranch_<[npc].flag[kingdom]>_<[npc].id>]>
 
 
 LoggerGenerationHandler_NEW:

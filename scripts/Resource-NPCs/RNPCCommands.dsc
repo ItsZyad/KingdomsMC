@@ -116,15 +116,11 @@ WriteRNPCData:
     definitions: createdNPC|spawnType
     script:
     - define kingdom <player.flag[kingdom]>
-    - yaml load:npclist.yml id:npcs
 
     # Write to the kingdom's NPC lists and increment the total
-    # npcs counter in the npclist.yml
 
-    - yaml id:npcs set <[kingdom]>.NPCAmount:+:1
-    - yaml id:npcs set <[kingdom]>.AllNPCs:->:<[createdNPC]>
-    - yaml id:npcs set <[kingdom]>.<[spawnType]>:->:<[createdNPC]>
     - flag server kingdoms.<[kingdom]>.npcTotal:++
+    - flag server kingdoms.<[kingdom]>.RNPCs.<[spawnType]>.<[createdNPC].id>.NPC:<[createdNPC]>
 
     # Flag the npc with its RNPC type
 
@@ -136,12 +132,8 @@ WriteRNPCData:
     # Add the npc's id and it's type to the universal server list
     # of RNPCs
 
-    - flag server RNPCS:->:<list[<[createdNPC].id>|<[spawnType]>]>
-
     - assignment set script:RNPCHandler to:<[createdNPC]>
 
-    - yaml id:npcs savefile:npclist.yml
-    - yaml id:npcs unload
 
 CalculateRNPCPrice:
     type: task
@@ -423,8 +415,8 @@ RNPCInfo_Handler:
         - define npc <player.flag[currNPC]>
         - define npcLoc <[npc].location>
         - define kingdom <[npc].flag[kingdom]>
-
         - define areaOfEffect <util.notes.get[<util.notes.find_partial[_<[npc].id>]>]>
+
         - showfake blue_stained_glass <[areaOfEffect].outline_2d[<player.location.y.add[3]>]> duration:10s
         - inventory close
 
@@ -457,18 +449,7 @@ RNPCInfo_Handler:
 
         - flag server kingdoms.<[kingdom]>.npcTotal:--
         - flag server kingdoms.<[kingdom]>.balance:+:<[refund].round>
-
-        - yaml load:npclist.yml id:npcl
-        - yaml id:npcl set <[kingdom]>.NPCAmount:--
-        - yaml id:npcl set <[kingdom]>.AllNPCs:<-:<[npc]>
-        - yaml id:npcl set <[kingdom]>.<[npc].flag[RNPC]>:<-:<[npc]>
-        - yaml id:npcl savefile:npclist.yml
-        - yaml id:npcl unload
-
-        - foreach <server.flag[RNPCs]>:
-            - if <[value].get[1]> == <[npc].id>:
-                - flag server RNPCs:<server.flag[RNPCs].remove[<[loop_index]>]>
-                - foreach stop
+        - flag server kingdoms.<[kingdom]>.RNPCs.<script[RNPCLandTypeRef].data_key[<[npc].nickname.split[<&sp>::].get[1]>]>.<[npc].id>:!
 
         - remove <[npc]>
         - inventory close

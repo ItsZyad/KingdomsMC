@@ -13,8 +13,6 @@ FarmerRangeFinder:
     type: task
     definitions: npc|radius
     script:
-    - narrate format:debug "For debug purposes, an AOE border will be shown"
-
     - define npcLoc <[npc].location>
     - define locOne <[npcLoc].right[<[radius]>].forward[<[radius]>]>
     - define locTwo <[npcLoc].left[<[radius]>].backward[<[radius]>]>
@@ -38,9 +36,8 @@ FarmerRangeFinder:
     - foreach <[farmerBlocks]>:
         - define numBlocks:+:<[areaOfEffect_DEBUG].blocks[<[value]>].size>
 
-    - narrate format:debug <[numBlocks]>
-
     - note <[areaOfEffect_DEBUG]> as:INTERNAL_farm_<[npc].flag[kingdom]>_<[npc].id>
+    - flag server kingdoms.<[npc].flag[kingdom]>.RNPCs.Farmers.<[npc].id>.area:<cuboid[INTERNAL_farm_<[npc].flag[kingdom]>_<[npc].id>]>
 
     - chunkload add <[areaOfEffect_DEBUG].chunks> duration:10s
 

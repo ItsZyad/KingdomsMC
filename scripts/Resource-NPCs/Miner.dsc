@@ -40,6 +40,7 @@ MinerSpec_Handler:
         # It is important that nothing tampers with the RNPCs server
         # flag between setting it and the player interaction with this
         # menu
+        # 2023/06/10 Note - Yeah well too bad, I'm tampering with it.
 
         on player clicks MinerSpec* in MinerSpecialization_Window:
         - define latestRNPC <npc[<server.flag[RNPCs].last.get[1]>]>
@@ -73,6 +74,7 @@ MinerRangeFinder:
 
     #                              1      2            3               4
     - note <[areaOfEffect]> as:INTERNAL_mine_<[npc].flag[kingdom]>_<[npc].id>
+    - flag server kingdoms.<[npc].flag[kingdom]>.RNPCs.Miners.<[npc].id>.area:<cuboid[INTERNAL_mine_<[npc].flag[kingdom]>_<[npc].id>]>
 
 ##ignorewarning raw_object_notation
 ##ignorewarning def_of_nothing
@@ -110,6 +112,27 @@ TrueItemRef:
     gravel: gravel
     lapis_ore: lapis_lazuli
     clay_block: clay
+
+
+MinerItemGenerator:
+    type: task
+    script:
+    - foreach <util.notes[cuboids].filter_tag[<[filter_value].starts_with[cu@INTERNAL_mine]>]> as:mine:
+        - define npcID <[value].split[_].get[4]>
+        - define npc <npc[<[npcID]>]>
+        - define kingdom <[npc].flag[kingdom]>
+
+        - if !<[kingdom].exists>:
+            - foreach next
+
+        - if <[npc].inventory.is_full>:
+            - foreach next
+
+        - if <proc[IsKingdomBankrupt].context[<server.flag[kingdoms.<[kingdom]>.balance]>|<[kingdom]>]>:
+            - foreach next
+
+        - define minerBlocks <list[stone|granite|andesite|diorite|gold_ore|iron_ore|diamond_ore|coal_ore|redstone_ore|obsidian|emerald_ore|gravel|lapis_ore|clay_block]>
+
 
 MinerGeneration:
     type: task
