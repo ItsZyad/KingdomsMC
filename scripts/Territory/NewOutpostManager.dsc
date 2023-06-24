@@ -8,11 +8,10 @@
 ## @Script Ver: v1.0
 ##
 ##ignorewarning invalid_data_line_quotes
+## This file exists courtesy of Max Chapman ##
 ## ----------------END HEADER-----------------
 
 #TODO: Comment this!
-
-# This file exists courtesy of Max Chapman #
 
 TempSaveInventory:
     type: task
