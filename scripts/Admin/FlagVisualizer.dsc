@@ -21,10 +21,10 @@ FlagVisualizer:
         - define ESTTime <[flag].to_zone[America/New_York]>
         - define formattedTime <[ESTTime].format[YYYY-MM-dd/hh:mm]>
 
-        - determine passively "<[flag].color[light_purple].on_hover[<[formattedTime]> UTC]>"
+        - determine passively <[flag].color[light_purple].on_hover[<[formattedTime]> UTC]>
 
     - else if <[flag].object_type> == Map:
-        - narrate "<proc[MakeTabbed].context[<element[MAP :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>"
+        - narrate <proc[MakeTabbed].context[<element[MAP :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
         - define tabWidth:+:4
 
         - foreach <[flag]>:
@@ -38,12 +38,12 @@ FlagVisualizer:
             - run FlagVisualizer def.flag:<[value]> def.flagName:<[key]> def.recursionDepth:<[recursionDepth].add[1]> save:Recur
 
             - if <entry[Recur].created_queue.determination.get[1].as[list].size.if_null[0]> == 1:
-                - define line "<list[<[key].color[aqua].italicize><&co> ]>"
+                - define line <list[<[key].color[aqua].italicize><&co> ]>
                 - define line:->:<entry[Recur].created_queue.determination.get[1].color[white]>
                 - narrate <proc[MakeTabbed].context[<[line].unseparated>|<[tabWidth]>]>
 
     - else if <[flag].object_type> == List:
-        - narrate "<proc[MakeTabbed].context[<element[LIST :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>"
+        - narrate <proc[MakeTabbed].context[<element[LIST :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
         - define longestNumber <[flag].length>
         - define tabWidth:+:4
 
@@ -59,7 +59,7 @@ FlagVisualizer:
 
             - if <entry[Recur].created_queue.determination.get[1].as[list].size.if_null[0]> == 1:
                 - define formattedIndex <[loop_index].pad_left[<[longestNumber].length.sub[1]>].with[0]>
-                - narrate "<proc[MakeTabbed].context[<element[<[formattedIndex].color[gray]>: <entry[Recur].created_queue.determination.get[1].color[white]>]>|<[tabWidth]>]>"
+                - narrate <proc[MakeTabbed].context[<element[<[formattedIndex].color[gray]>: <entry[Recur].created_queue.determination.get[1].color[white]>]>|<[tabWidth]>]>
 
     - else:
         - determine passively <[flag]>
