@@ -59,7 +59,7 @@ IntroTwoNPCs_HelpNotAccepted:
     type: task
     definitions: target
     script:
-    - glow <[target].flag[InteractingWith]> glow:false
+    - glow <[target].flag[InteractingWith]> false
     - flag <[target]> InteractingWith:!
     - narrate format:npctalk "hmph... fine then..."
 
@@ -149,7 +149,7 @@ IntroTwoNPCs_HelpAccepted2:
     - else if <[HelpAcceptedType]> == 3:
         - narrate format:npctalk "Anytime, buddy"
 
-    - glow <player.flag[InteractingWith]> glow:false
+    - glow <player.flag[InteractingWith]> false
     - flag <player> InteractingWith:!
     #- flag <player> DidIntro:2
 
