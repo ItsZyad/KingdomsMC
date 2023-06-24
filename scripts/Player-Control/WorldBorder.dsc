@@ -161,6 +161,7 @@ ReconfigureWorldBorder:
 
 WorldBorder_Handler:
     type: world
+    debug: false
     events:
         on player exits polygon:
         - if !<player.is_op>:
