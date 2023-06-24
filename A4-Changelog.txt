@@ -52,6 +52,9 @@ Large Additions:
             - quest*,
             - branches,
     - Introduced dynamic markets with merchants that respond to changes in supply and demand.
+        - Introduced fully purpose-built merchants with buy and sell menus
+        - Introduced World-wide record/ledger of market transactions
+        - Introduced merchants that respond effectively to immediate changes in player buying/selling habits
     - Added initial version of the squads & armies mechanics with features such as:
         - Fully integrated barracks / squad-holding system,
         - Basic squad management tools,
