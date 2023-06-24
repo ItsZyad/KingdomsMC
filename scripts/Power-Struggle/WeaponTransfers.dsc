@@ -124,11 +124,11 @@ WeaponTransferOption_Handler:
                 - define kingdom <player.flag[kingdom]>
                 - define sameMaterialTransfers <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers].values.parse_tag[<[parse_value].values.contains[<player.flag[transferData].get[material]>]>].exclude[false].size>
                 - define transferID <player.name>-<player.flag[transferData].get[material]><[sameMaterialTransfers]>
-                - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.influenceType:<player.flag[transferData].get[transferType]>
-                - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.material:<player.flag[transferData].get[material]>
-                - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.amount:<context.message>
-                - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.due:<util.time_now.add[1d]>
-                - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.madeBy:<player>
+                - flag server kingdoms.<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.influenceType:<player.flag[transferData].get[transferType]>
+                - flag server kingdoms.<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.material:<player.flag[transferData].get[material]>
+                - flag server kingdoms.<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.amount:<context.message>
+                - flag server kingdoms.<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.due:<util.time_now.add[1d]>
+                - flag server kingdoms.<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>.madeBy:<player>
 
                 - runlater RemoveTransferAfterDue def:<[transferID]>|<[kingdom]> id:<[transferID]>
 
@@ -173,7 +173,7 @@ RemoveTransferAfterDue:
     type: task
     definitions: transferID|kingdom
     script:
-    - flag server <[kingdom]>.powerstruggle.activeTransfers.<[transferID]>:!
+    - flag server kingdoms.<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>:!
 
 InitiateWeaponTransferWindow:
     type: world
