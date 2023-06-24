@@ -27,7 +27,7 @@ WorldNews_Command:
                     - determine <list[inhand]>
 
                 - case 2:
-                    - determine <list[expiry]>
+                    - determine <list[[expiry]]>
 
                 - case 3:
                     - determine <list[[title]]>
@@ -176,6 +176,7 @@ Mailbox_Handler:
         - flag <context.location> mailbox:!
 
         on player right clicks chest location_flagged:mailbox:
+        - ratelimit <player> 2t
         - determine passively cancelled
 
         - if <player.flag[kingdom]> == <context.location.flag[mailbox]> || <player.has_permission[kingdoms.admin.mailbox]>:
