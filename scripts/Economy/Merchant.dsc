@@ -95,14 +95,18 @@ KMerchantWindow_Handler:
         - define merchant <player.flag[dataHold.interactingMerchant]>
         - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
 
+        # SWITCHING TO SELL MODE
         - if <player.flag[dataHold.merchantMode]> == buy:
             - define itemList <list[]>
 
-            - foreach <[merchant].flag[merchantData.supply]>:
+            - foreach <[merchant].flag[merchantData.sellData.items]>:
                 - define name <[key]>
                 - define item <[name].as[item]>
+                - define price <[value].get[price]>
+                - flag <[item]> price:<[price]>
 
-                - adjust def:item "lore:<element[Work In Progress].color[gray]>"
+                - adjust def:item "lore:<element[Going Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>"
+                # - inventory adjust d:<[target].open_inventory> slot:<context.slot> "lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>" player:<[target]>
 
                 - define itemList:->:<[item]>
 
@@ -118,6 +122,7 @@ KMerchantWindow_Handler:
 
             - flag <player> dataHold.merchantMode:sell
 
+        # SWITCHING BACK TO BUY MODE
         - else:
             - if <[merchant].has_flag[cachedInterface]>:
                 - define title "Buy Menu"
@@ -129,8 +134,11 @@ KMerchantWindow_Handler:
 
             - flag <player> dataHold.merchantMode:buy
 
-        on player clicks in PaginatedInterface_Window flagged:dataHold.interactingMerchant:
+        on player clicks in PaginatedInterface_Window flagged:dataHold.interactingMerchant priority:1:
         - ratelimit player 3t
+
+        - if <context.slot> == -998:
+            - determine cancelled
 
         - if <player.flag[dataHold.merchantMode]> == buy:
             - if !<context.item.has_flag[price]>:
@@ -190,8 +198,53 @@ KMerchantWindow_Handler:
                     - narrate format:callout "There is not enough of this item to buy."
 
         - else:
-            # TODO: Start working on the sell mechanic
-            - narrate format:debug WIP
+            - if !<context.item.has_flag[price]>:
+                - determine cancelled
+
+            - define itemName <context.item.material.name>
+            - define price <context.item.flag[price]>
+            - define merchant <player.flag[dataHold.interactingMerchant]>
+            - define wealth <[merchant].flag[merchantData.wealth]>
+            - define sBias <[merchant].flag[merchantData.spendBias]>
+            - define merchantItemBudget <[merchant].flag[merchantData.sellData.items.<[itemName]>.alloc]>
+            - define merchantSpentItemBudget <[merchant].flag[merchantData.sellData.items.<[itemName]>.spent]>
+
+            # Minimum budget equation:
+            # x = 4.588y * (0.85 + s)
+            # where: y: wealth
+            #        s: sBias
+            - define minimumBudget <[wealth].mul[4.588].mul[<element[<[sbias].add[0.85]>]>]>
+
+            # If player shift clicks, sell 10 of the item instead of
+            # just 1
+
+            - if <context.click> == SHIFT_LEFT:
+                - define sellAmount 10
+
+                - if <[quantity]> < 10:
+                    - define sellAmount <[quantity]>
+
+            - else:
+                - define sellAmount 1
+
+            - if <[merchant].flag[merchantData.budget].sub[<[price].mul[<[sellAmount]>]>]> < <[minimumBudget]>:
+                - ratelimit <player> 10t
+                - narrate format:callout "The merchant does not have enough money to buy this from you!"
+                - determine cancelled
+
+            - if <[merchantItemBudget].add[<[price].mul[<[sellAmount]>]>]> > <[merchantSpentItemBudget]>:
+                - ratelimit <player> 10t
+                - narrate format:callout "The merchant is not accepting anymore of this item!"
+                - determine cancelled
+
+            - if !<player.inventory.contains_item[<[itemName]>].quantity[<[sellAmount]>]>:
+                - ratelimit <player> 10t
+                - narrate format:callout "You do not have enough of this item to sell!"
+                - determine cancelled
+
+            - take from:<player.inventory> item:<[itemName]> quantity:<[sellAmount]>
+            - money give players:<player> quantity:<[price].mul[<[sellAmount]>]>
+            - flag <[merchant]> merchantData.budget:-:<[price].mul[<[sellAmount]>]>
 
         - determine cancelled
 

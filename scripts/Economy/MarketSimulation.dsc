@@ -327,9 +327,93 @@ MerchantPurchaseDecider:
     - yaml id:prices unload
 
 
+MerchantSellDecider:
+    type: task
+    definitions: merchant|marketName
+    AnalyzeOneDay:
+    - define sellAttractivenessIndex <map[]>
+    - define marketTotalValue <[data].get[totalValue]>
+
+    - foreach <[data].get[items]> as:item key:itemName:
+        - if !<[itemName].is_in[<[merchant].flag[merchantData.supply].keys>]>:
+            - foreach next
+
+        - define SAR <[item].get[saleToAmountRatio]>
+        - define totalValue <[item].get[totalValueItem]>
+        - define totalAmount <[item].get[totalAmountItem]>
+        - define adjustedStDev <[totalAmount].div[<[item].deep_get[sellPriceInfo.stDev]>]>
+        - define adjustedStDev 0 if:<[adjustedStDev].equals[infinity]>
+
+        # Sell attractiveness equation:
+        # x = (20yv) / t * (d + 1)
+        # where: y: SAR
+        #        v: totalValue
+        #        t: marketTotalValue
+        #        d: adjustedStDev
+        - define sellAttractiveness <element[<[SAR].mul[<[totalValue]>].mul[20]>].div[<element[<[adjustedStDev].add[1]>].mul[<[marketTotalValue]>]>]>
+        - define sellAttractivenessIndex.<[itemName]>:<[sellAttractiveness].round_to_precision[0.0001]>
+
+    - define SAR:!
+    - define totalValue:!
+    - define totalAmount:!
+    - define adjustedStDev:!
+
+    AnalyzeOldData:
+    # Note: You could do something liek checking which items have been sold that day and then
+    #       just doing a general calculation using the overall SAR and then add a certain flat
+    #       value to to the attractiveness of every item that was sold that day
+    - narrate WIP
+
+    script:
+    - yaml load:economy_data/past-economy-data.yml id:p
+    - define marketFilteredRecentData <yaml[p].read[past_data.recent].as[map].parse_value_tag[<[parse_value].get[<[marketName]>]>]>
+    - define marketFilteredOldData <yaml[p].read[past_data.old].as[map].parse_value_tag[<[parse_value].get[<[marketName]>]>].if_null[null]>
+    - define grandTotalValue 0
+    - define grandTotalAmount 0
+
+    - if <[marketFilteredRecentData].is_empty>:
+        - determine cancelled
+
+    - if <yaml[p].contains[past_data.old]> || <[marketFilteredOldData]> != null:
+        - inject <script.name> path:AnalyzeOldData
+
+    - define overallSAI <map[]>
+
+    - foreach <[marketFilteredRecentData]> as:data:
+        - define grandTotalValue:+:<[data].get[totalValue]>
+        - define grandTotalAmount:+:<[data].get[totalAmount]>
+
+        - inject <script.name> path:AnalyzeOneDay
+
+        - define overallSAI <[overallSAI].parse_value_tag[<[parse_value].add[<[sellAttractivenessIndex].get[<[parse_key]>]>]>]>
+        - define overallSAI <[sellAttractivenessIndex]> if:<[overallSAI].is_empty>
+
+    - yaml id:p unload
+
+    - define overallSAI <[overallSAI].parse_value_tag[<[parse_value].div[<[marketFilteredRecentData].size>]>]>
+
+    # TODO: Do some analysis on the old data that would generated from path:AnalyzeOldData
+
+    - run flagvisualizer def.flag:<[overallSAI]> def.flagName:overall
+
+    - define sBias <[merchant].flag[merchantData.spendBias]>
+
+    - foreach <[overallSAI]> as:index:
+        ##
+        ## BIG NOTE: If ever you need to add large world economic events like financial crashes etc.
+        ##           and you need it to impact the way that merchants price their goods this is
+        ##           where you would modify that. VVV
+        ##
+        - define buyPrice <[merchant].flag[merchantData.supply.<[key]>.price]>
+        - define sellPrice <[buyPrice].mul[<element[1].sub[<[sBias].div[2]>]>].round_up_to_precision[0.05]>
+
+        - flag <[merchant]> merchantData.sellData.items.<[key]>.alloc:<[merchant].flag[merchantData.balance].mul[<[index]>]>
+        - flag <[merchant]> merchantData.sellData.items.<[key]>.spent:0
+        - flag <[merchant]> merchantData.sellData.items.<[key]>.price:<[sellPrice]>
+
 MarketDemandScript:
     type: task
-    definitions: price|item|amount|merchant|player|market
+    definitions: price|item|amount|merchant|player|market|mode
     StandardDevCalculator:
     - define n <[marketDemand].get[<[item]>].size>
     - define sum 0
@@ -347,6 +431,8 @@ MarketDemandScript:
     # This value is a ratio between the amount of an item that was sold in the past week
     # and the average amount of that item that gets spawned in merchant inventories weekly
     - define saleToAmountRatio <element[<[marketDemand].deep_get[<[item]>.totalAmount].div[<[supplyAmounts].get[<[item]>]>]>]>
+    ## NOTE: Uncomment when you introduce new transaction scheme
+    #- define allPrices <[marketDemand].deep_get[<[item]>.transactions].parse_tag[<[parse_value].deep_get[buy.price]>].if_null[null]>
     - define allPrices <[marketDemand].deep_get[<[item]>.transactions].parse_tag[<[parse_value].get[price]>]>
     - define averageSellPrice <[allPrices].average>
     - inject MarketDemandScript path:StandardDevCalculator
@@ -376,35 +462,139 @@ MarketDemandScript:
         - define marketAnalysis.totalAmount:<[marketDemand].get[totalAmount]>
         - define marketAnalysis.totalValue:<[marketDemand].get[totalValue]>
 
-    #- run FlagVisualizer def.flag:<[marketAnalysis]> "def.flagName:Kowalski, Analysis"
     - determine <[marketAnalysis]>
 
     script:
-    - define marketDemandItem <server.flag[economy.markets.<[market]>.marketDemand.<[item]>.transactions]>
-    - define containsSameItem <[marketDemandItem].parse_tag[<[parse_value].exclude[amount]>].contains[<map[price=<[price]>;merchant=<[merchant]>]>]>
+    - define mode <[mode].if_null[buy]>
 
-    # - narrate format:debug CSI:<[containsSameItem]>
-    # - narrate format:debug MDI:<[marketDemandItem]>
+    - if <[mode]> == buy:
+        - define transactions <server.flag[economy.markets.<[market]>.marketDemand.<[item]>.transactions.<[mode]>]>
+        - define transactionIndex <[transactions].parse_tag[<[parse_value].exclude[amount]>].find[<map[price=<[price]>;merchant=<[merchant]>]>]>
 
-    - if <[containsSameItem]>:
-        - define sameItemIndex <[marketDemandItem].parse_tag[<[parse_value].exclude[amount]>].find[<map[price=<[price]>;amount=<[amount]>;merchant=<[merchant]>]>]>
-        - define newAmount <[marketDemandItem].get[<[sameItemIndex]>].get[amount].add[1]>
-        - flag server economy.markets.<[market]>.marketDemand.<[item]>.transactions:<[marketDemandItem].overwrite[<map[price=<[price]>;amount=<[newAmount]>;merchant=<[merchant]>]>].at[<[sameItemIndex]>]>
+        - if <[transactionIndex]> != -1:
+            - define transaction <[transactions].get[<[transactionIndex]>]>
+            - define transaction.amount:+:<[amount]>
+            - flag server economy.markets.<[market]>.marketDemand.<[item]>.transactions.buy:<[transactions].overwrite[<[transaction]>].at[<[transactionIndex]>]>
+
+        - else:
+            - flag server economy.markets.<[market]>.marketDemand.<[item]>.transactions.buy:->:<map[price=<[price]>;amount=<[amount]>;merchant=<[merchant].as[entity]>]>
+
+        - flag server economy.markets.<[market]>.marketDemand.totalAmount:+:<[amount]>
+        - flag server economy.markets.<[market]>.marketDemand.totalValue:+:<[price]>
+        - flag server economy.markets.<[market]>.marketDemand.<[item]>.totalAmount:+:<[amount]>
+        - flag server economy.markets.<[market]>.marketDemand.<[item]>.totalValue:+:<[price]>
 
     - else:
-        - flag server economy.markets.<[market]>.marketDemand.<[item]>.transactions:->:<map[price=<[price]>;amount=<[amount]>;merchant=<[merchant].as[entity]>]>
+        - define transactions <server.flag[economy.markets.<[market]>.sellData.<[item]>.transactions.<[mode]>]>
+        - define transactionIndex <[transactions].parse_tag[<[parse_value].exclude[amount]>].find[<map[price=<[price]>;merchant=<[merchant]>]>]>
 
-    - flag server economy.markets.<[market]>.marketDemand.totalAmount:+:<[amount]>
-    - flag server economy.markets.<[market]>.marketDemand.totalValue:+:<[price]>
-    - flag server economy.markets.<[market]>.marketDemand.<[item]>.totalAmount:+:<[amount]>
-    - flag server economy.markets.<[market]>.marketDemand.<[item]>.totalValue:+:<[price]>
+        - if <[transactionIndex]> != -1:
+            - define transaction <[transactions].get[<[transactionIndex]>]>
+            - define transaction.amount:+:<[amount]>
+            - flag server economy.markets.<[market]>.sellData.<[item]>.transactions.sell:<[transactions].overwrite[<[transaction]>].at[<[transactionIndex]>]>
+
+        - else:
+            - flag server economy.markets.<[market]>.sellData.<[item]>.transactions.sell:->:<map[price=<[price]>;amount=<[amount]>;merchant=<[merchant].as[entity]>]>
+
+        - flag server economy.markets.<[market]>.sellData.totalAmount:+:<[amount]>
+        - flag server economy.markets.<[market]>.sellData.totalValue:+:<[price]>
+        - flag server economy.markets.<[market]>.sellData.<[item]>.totalAmount:+:<[amount]>
+        - flag server economy.markets.<[market]>.sellData.<[item]>.totalValue:+:<[price]>
+
+
+OldMarketDataRecorder:
+    type: task
+    AppendQueue:
+    - define joinedQueue <[queue].get[recent].include[<[stack].get[old]>]>
+    - define lastItemIndex <[joinedQueue].keys.highest>
+    - define firstItemIndex <[joinedQueue].keys.lowest>
+    - define tempNewQueue <map[]>
+    - define newQueue <map[]>
+
+    - foreach <[joinedQueue]>:
+        - define tempNewQueue.<[key].add[1]>:<[value]>
+
+    - define tempNewQueue.<[lastItemIndex]>:!
+    - define tempNewQueue.1:<[allMarketsMap]>
+
+    - if <[tempNewQueue].size> > <[recentMaxQueueSize]>:
+        - foreach <[tempNewQueue].get[<[recentMaxQueueSize].add[1]>]> as:market:
+            - define marketDemand <[market].get[market_demand]>
+            - run GenerateOldData def.marketAnalysis:<[marketDemand]> save:old_data_format
+            - define generatedOldData <entry[old_data_format].created_queue.determination.get[1]>
+            - define tempNewQueue.<[recentMaxQueueSize].add[1]>.<[key]>:<[generatedOldData]>
+
+        - define newQueue.recent:<[tempNewQueue].parse_value_tag[<[parse_key].is[OR_LESS].than[<[recentMaxQueueSize]>]>]>
+        - define newQueue.old:<[tempNewQueue].parse_value_tag[<[parse_key].is[MORE].than[<[recentMaxQueueSize]>]>]>
+        - define tempNewQueue:!
+
+    - else:
+        - define newQueue.recent:<[tempNewQueue]>
+        - define tempNewQueue:!
+
+    - run flagvisualizer def.flag:<[newQueue]> def.flagName:newQueue
+
+    # TODO: Write RefreshQueue/CheckQueueIntegrity which makes sure the past data queue remains in
+    # TODO/ the correct format.
+
+    script:
+    - define allMarketsMap <map[]>
+    - yaml load:economy_data/past-economy-data.yml id:past
+    # Note: future confirgurables
+    - define recentMaxQueueSize 7
+    - define maxQueueSize 31
+
+    - foreach <server.flag[economy.markets].keys> as:market:
+        - run MarketDemandScript path:MarketAnalysisGenerator def.market:<[market]> save:analysis
+        - define marketAnalysis <entry[analysis].created_queue.determination.get[1]>
+        - define marketTotals <[marketAnalysis].get_subset[totalValue|totalAmount]>
+        - define marketAnalysis <[marketAnalysis].get[items].parse_value_tag[<[parse_value].deep_exclude[sellPriceInfo.max|sellPriceInfo.min]>]>
+        - define allMarketsMap.<[market]>.items:<[marketAnalysis]>
+        - define allMarketsMap.<[market]>:<[allMarketsMap].get[<[market]>].include[<[marketTotals]>]>
+        - define marketTotals:!
+
+    - run flagvisualizer def.flag:<[allMarketsMap]> "def.flagName:Kowalski, Analysis"
+
+    - if <yaml[past].contains[past_data.recent]>:
+        - inject <script.name> path:AppendQueue
+
+    - else:
+        - define recentQueueSize <yaml[past].read[past_data.recent].size.if_null[0]>
+        - yaml id:past set past_data.recent.<[recentQueueSize].add[1]>:<[allMarketsMap]>
+
+    - yaml id:past savefile:economy_data/past-economy-data.yml
+    - yaml id:past unload
+
+    - narrate format:debug Saved!
+
+
+GenerateOldData:
+    type: task
+    definitions: marketAnalysis
+    script:
+    - define SARMap <[marketAnalysis].get[items].parse_value_tag[<[parse_value].get[saleToAmountRatio]>]>
+    - define SARList <[SARMap].values>
+    - define oSAR <[SARList].average>
+    - define itemsSold <[marketAnalysis].keys>
+    - define totalValue <[marketAnalysis].get[totalValue]>
+    - define totalAmount <[marketAnalysis].get[totalAmount]>
+    - define averagePrice <[totalValue].div[<[totalAmount]>]>
+
+    - definemap marketMap:
+        total_amount: <[totalAmount]>
+        total_value: <[totalValue]>
+        avg_price: <[averagePrice]>
+        o_sar: <[oSAR]>
+        items_sold: <[itemsSold]>
 
 
 ## Save previous market tendancies to YAML perhaps also save along with it global market demand
 ## figures for analysis by blackmarket factions or other omni-present economic forces.
-# MarketDemandHandler:
-#     type: world
-#     events:
-#         on system time hourly every:24:
-#         - foreach <server.flag[economy.markets].keys> as:market:
-#             - flag server economy.markets.<[market]>.marketDemand:!
+MarketDemandHandler:
+    type: world
+    events:
+        on system time hourly every:24:
+        - run OldMarketDataRecorder
+
+        - foreach <server.flag[economy.markets].keys> as:market:
+            - flag server economy.markets.<[market]>.marketDemand:!
