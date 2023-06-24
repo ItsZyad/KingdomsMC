@@ -21,6 +21,7 @@ GameStateAdjuster:
     - flag server squad1:!
     - flag server weekcounter:!
     - flag server npcID:!
+    - flag server RNPCs:!
 
 
 DEBUG_GenerateKingdomFlags:
@@ -91,11 +92,11 @@ RNPCFlagGenerator:
         - define areaType <[note].split[_].get[2].to_lowercase>
         - define NPCType <[RNPCNameEquivalents].get[<[areaType]>]>
 
-        - if !<[NPCType].exists>:
-            - foreach next
+        - if <[NPCType].exists>:
+            - define kingdom <[note].split[_].get[3]>
+            - define NPCID <[note].split[_].get[4]>
+            - define bothExist <[kingdom].exists.and[<[NPCID].exists>]>
 
-        - define kingdom <[note].split[_].get[3]>
-        - define NPCID <[note].split[_].get[4]>
-
-        - flag server kingdoms.<[kingdom]>.RNPCs.<[NPCType]>.<[NPCID]>.NPC:<npc[<[NPCID]>]>
-        - flag server kingdoms.<[kingdom]>.RNPCs.<[NPCType]>.<[NPCID]>.area:<[note]>
+            - if <[bothExist]>:
+                - flag server kingdoms.<[kingdom]>.RNPCs.<[NPCType]>.<[NPCID]>.NPC:<npc[<[NPCID]>]>
+                - flag server kingdoms.<[kingdom]>.RNPCs.<[NPCType]>.<[NPCID]>.area:<[note]>
