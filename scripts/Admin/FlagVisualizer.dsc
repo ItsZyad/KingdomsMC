@@ -15,7 +15,12 @@ FlagVisualizer:
         - define name <[flag].name.color[aqua]>
         - define uuid <[flag].uuid>
 
-        - determine passively "<[name]> <element[[uuid]].color[light_purple].on_hover[<[uuid].color[light_purple]>]>"
+        - if <[flag].object_type.to_uppercase.equals[NPC]>:
+            - define id <[flag].id>
+            - determine passively "<[name]> <element[[uuid]].color[light_purple].on_hover[<[uuid].color[light_purple]>]> <element[[id]].color[light_purple].on_hover[<[id].color[light_purple]>]>"
+
+        - else:
+            - determine passively "<[name]> <element[[uuid]].color[light_purple].on_hover[<[uuid].color[light_purple]>]>"
 
     - else if <[flag].time_zone_id.exists>:
         - define ESTTime <[flag].to_zone[America/New_York]>
