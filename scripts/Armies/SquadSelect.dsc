@@ -193,11 +193,31 @@ SquadSelection_Handler:
         ## CLICK SQUAD LIST ICON
         on player clicks SquadInterface_Item in PaginatedInterface_Window flagged:viewingSquads:
         - define kingdom <player.flag[kingdom]>
-        - define squadName <context.item.flag[squadInfo].get[internalName]>
-        - define hasSpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<context.item.flag[squadInfo.internalName]>.hasSpawned]>
+        - define squadName <context.item.flag[squadInfo.internalName]>
+        - define hasSpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.hasSpawned]>
+        - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList]>
+        - define squadLeader <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader]>
+        - define currentlySpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader].as[entity].is_spawned>
 
         - if <[hasSpawned]>:
-            - run OpenSquadControlOptions def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.player:<player>
+            - if <[currentlySpawned]>:
+                - run OpenSquadControlOptions def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.player:<player>
+
+            - else:
+                - define spawnLocation 0
+                - define SMLocation <player.flag[datahold.armies.SquadManagerLocation]>
+                - inject SpawnSquadNPCs path:FindSpacesAroundSM
+
+                - if <[spawnLocation]> != 0:
+                    - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
+                    - spawn <[npcList].include[<[squadLeader]>]> <[spawnLocation]>
+
+                    - run GiveSquadTools def.player:<player>
+
+                - else:
+                    - narrate format:debug "<red>[Internal Error SQA112] <&gt><&gt> <gold>Cannot generate SMLocation from squad reference."
+
+                - inventory close
 
         - else:
             - inventory open d:SquadFirstTimeSpawnConfirmation_Window
