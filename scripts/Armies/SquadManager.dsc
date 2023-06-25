@@ -140,6 +140,9 @@ SeeArmoryLocations_Item:
     type: item
     material: player_head
     display name: <gold><bold>Show Armory Locations
+    lore:
+        - Note: Armory locations may not show
+        - through walls.
     mechanisms:
         skull_skin: 85f60aef-4945-4790-8a6e-853dd6a33617|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjM3Y2FlNWM1MWViMTU1OGVhODI4ZjU4ZTBkZmY4ZTZiN2IwYjFhMTgzZDczN2VlY2Y3MTQ2NjE3NjEifX19
 
@@ -160,10 +163,10 @@ SquadManager_Interface:
     slots:
     - [] [] [SquadComposer_Item] [] [RenameBarracks_Item] [] [RelocateSquadManager_Item] [] []
     - [] [] [SquadStationingEval_Item] [] [SquadManagerSetAOE_Item] [] [SetArmoryLocations_Item] [] []
+    - [] [] [] [] [SquadManagerUpgradesDark_Item] [] [] [] []
     - [] [] [] [] [] [] [] [] []
     - [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadManagerInfo_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
-    - [] [] [SquadListInfo_Item] [] [SquadManagerUpgradesDark_Item] [] [SquadManagerShowAOE_Item] [] []
-    - [] [] [] [] [SeeArmoryLocations_Item] [] [] [] []
+    - [] [] [SquadListInfo_Item] [] [SeeArmoryLocations_Item] [] [SquadManagerShowAOE_Item] [] []
 
 
 ArmoryWand_Item:
@@ -555,6 +558,7 @@ SquadManager_Handler:
         ## Leave Game
         on player quits flagged:datahold.armies:
         - flag <player> datahold.armies:!
+        - flag <player> noChat.armies:!
 
         ## Player Breaks SM
         on player breaks block location_flagged:squadManager:
