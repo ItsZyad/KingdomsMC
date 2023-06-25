@@ -411,6 +411,7 @@ MerchantSellDecider:
         - flag <[merchant]> merchantData.sellData.items.<[key]>.spent:0
         - flag <[merchant]> merchantData.sellData.items.<[key]>.price:<[sellPrice]>
 
+
 MarketDemandScript:
     type: task
     definitions: price|item|amount|merchant|player|market|mode

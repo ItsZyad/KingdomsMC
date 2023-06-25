@@ -79,13 +79,6 @@ RunMerchantInterface:
     - define footer <inventory[MerchantInterfaceNewFooter_Window]>
     - inject RunMerchantInterface path:OpenInterface
 
-# KMerchant_Interact:
-#     type: interact
-#     steps:
-#         1:
-#             click trigger:
-#                 script:
-
 
 KMerchantWindow_Handler:
     type: world
@@ -227,12 +220,12 @@ KMerchantWindow_Handler:
             - else:
                 - define sellAmount 1
 
-            - if <[merchant].flag[merchantData.budget].sub[<[price].mul[<[sellAmount]>]>]> < <[minimumBudget]>:
+            - if <[merchant].flag[merchantData.budget].sub[<[price].mul[<[sellAmount]>]>]> > <[minimumBudget]>:
                 - ratelimit <player> 10t
                 - narrate format:callout "The merchant does not have enough money to buy this from you!"
                 - determine cancelled
 
-            - if <[merchantItemBudget].add[<[price].mul[<[sellAmount]>]>]> > <[merchantSpentItemBudget]>:
+            - if <[merchantItemBudget].add[<[price].mul[<[sellAmount]>]>]> < <[merchantSpentItemBudget]>:
                 - ratelimit <player> 10t
                 - narrate format:callout "The merchant is not accepting anymore of this item!"
                 - determine cancelled
@@ -245,6 +238,9 @@ KMerchantWindow_Handler:
             - take from:<player.inventory> item:<[itemName]> quantity:<[sellAmount]>
             - money give players:<player> quantity:<[price].mul[<[sellAmount]>]>
             - flag <[merchant]> merchantData.budget:-:<[price].mul[<[sellAmount]>]>
+            - flag <[merchant]> merchantData.sellData.items.<[itemName]>.spent:+:<[price].mul[<[sellAmount]>]>
+            - flag <[merchant]> merchantData.supply.<[itemName]>.quantity:+:<[sellAmount]>
+            - narrate format:callout "Sold <[itemName].color[white].italicize> for: <red>$<[price].mul[<[sellAmount]>].format_number[#,##0.0]>"
 
         - determine cancelled
 
