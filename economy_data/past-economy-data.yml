@@ -1,0 +1,83 @@
+pasta_data:
+  recent:
+    '1':
+      Fyndalin-1:
+        market_demand:
+        - '...'
+    '2':
+      Fyndalin-1:
+        market_demand:
+        - '...'
+    '3':
+      Fyndalin-1:
+        market_demand:
+        - '...'
+  old:
+    '8':
+      Fyndalin-1:
+        total_amount: '56'
+        total_value: '115'
+        avg_price: '2.054'
+        o_sar: '0.0132'
+        items_sold:
+        - birch_planks
+        - feather
+        - stick
+        - stone_axe
+        - string
+past_data:
+  recent:
+    '1':
+      Fyndalin-1:
+        items:
+          feather:
+            saleToAmountRatio: '0.0063'
+            totalAmountItem: '4'
+            totalValueItem: '12'
+            sellPriceInfo:
+              average: '3'
+              stDev: '0'
+          stone_axe:
+            saleToAmountRatio: '0.0062'
+            totalAmountItem: '2'
+            totalValueItem: '3'
+            sellPriceInfo:
+              average: '3'
+              stDev: '0'
+          string:
+            saleToAmountRatio: '0.0258'
+            totalAmountItem: '5'
+            totalValueItem: '5'
+            sellPriceInfo:
+              average: '5'
+              stDev: '0'
+          stone_button:
+            saleToAmountRatio: '0.0079'
+            totalAmountItem: '1'
+            totalValueItem: '6'
+            sellPriceInfo:
+              average: '6'
+              stDev: '0'
+          oak_planks:
+            saleToAmountRatio: '0.028'
+            totalAmountItem: '27'
+            totalValueItem: '40.5'
+            sellPriceInfo:
+              average: '1.5'
+              stDev: '0'
+          oak_log:
+            saleToAmountRatio: '0.0103'
+            totalAmountItem: '10'
+            totalValueItem: '15'
+            sellPriceInfo:
+              average: '1.5'
+              stDev: '0'
+          birch_stairs:
+            saleToAmountRatio: '0.0079'
+            totalAmountItem: '7'
+            totalValueItem: '10.5'
+            sellPriceInfo:
+              average: '1.5'
+              stDev: '0'
+        totalValue: '115'
+        totalAmount: '56'
