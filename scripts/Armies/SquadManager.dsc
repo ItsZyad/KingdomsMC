@@ -248,9 +248,6 @@ SquadManager_Handler:
             - narrate format:callout "<italic>Note: Barracks cannot be placed inside your kingdom's castle territory."
             - determine cancelled
 
-        on player breaks lodestone location_flagged:squadManager:
-        - flag <context.location> squadManager:!
-
         ## Clicks SM
         on player clicks lodestone location_flagged:squadManager:
         - if <context.location.flag[squadManager.kingdom]> != <player.flag[kingdom]>:
@@ -561,7 +558,7 @@ SquadManager_Handler:
         - flag <player> noChat.armies:!
 
         ## Player Breaks SM
-        on player breaks block location_flagged:squadManager:
+        on player breaks lodestone location_flagged:squadManager:
         # TODO: SM destruction logic; display confirmation window,
         # TODO/ Distribute squads to nearest barracks. If all barracks are full, display additional
         # TODO/ information with confirmation window telling player that squads would have to be
