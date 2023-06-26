@@ -315,7 +315,10 @@ Kingdom_Command:
         # excluding the first territory since the joinCuboid is initialized with the first
         # already added
 
-        - foreach <server.flag[kingdoms.<[kingdom]>.<[territoryType]>].exclude[<server.flag[kingdoms.<[kingdom]>.<[territoryType]>].get[1]>]>:
+        - foreach <server.flag[kingdoms.<[kingdom]>.claims.<[territoryType]>].exclude[<server.flag[kingdoms.<[kingdom]>.claims.<[territoryType]>].get[1]>]>:
+            - if <[value].cuboid.world> != <player.location.world>:
+                - foreach next
+
             - define jointCuboid <[jointCuboid].add_member[<[value].cuboid>]>
 
         # Show the borders at different altitudes depending on if the player is flying or
@@ -710,7 +713,7 @@ Kingdom_Command:
         - if <context.args.get[2]> == list || <context.args.size> == 1:
             - define kingdomGuardList <list[]>
 
-            - foreach <server.flag[CastleGuards]> as:guard:
+            - foreach <server.flag[kingdoms.<[kingdom]>.castleGuards]> as:guard:
                 - if <[guard].flag[kingdom]> == <[kingdom]>:
                     - define guardItem <item[GuardList_Item]>
                     - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
@@ -728,6 +731,9 @@ Kingdom_Command:
             - flag <player> guardListPage:1
             - flag <player> kingdomGuardItems:<[paginatedGuardList]>
             - inventory open d:KingdomGuardList_Window
+
+    - else:
+        - narrate format:callout "Unrecognized argument: <context.args.get[1].color[red]>"
 
     #------------------------------------------------------------------------------------------------------------------------
     #- START FOLDED COMMANDS
