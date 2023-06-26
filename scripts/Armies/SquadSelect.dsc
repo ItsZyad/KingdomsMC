@@ -201,7 +201,8 @@ SquadSelection_Handler:
 
         - if <[hasSpawned]>:
             - if <[currentlySpawned]>:
-                - run OpenSquadControlOptions def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.player:<player>
+                - run GiveSquadTools def.player:<player>
+                - inventory close
 
             - else:
                 - define spawnLocation 0

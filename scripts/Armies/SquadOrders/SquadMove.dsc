@@ -4,12 +4,6 @@ ExitSquadControls_Item:
     display name: <red>Exit Squad Controls
 
 
-AltExitSquadControls_Item:
-    type: item
-    material: barrier
-    display name: <red>Exit Squad Controls
-
-
 SquadMoveTool_Item:
     type: item
     material: blaze_rod

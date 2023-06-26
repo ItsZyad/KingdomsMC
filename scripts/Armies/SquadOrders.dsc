@@ -11,10 +11,13 @@ SoldierManager_Assignment:
         - define kingdom <npc.flag[soldier.kingdom]>
         - define squadName <npc.flag[soldier.squad]>
 
+        - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
+
         - if <player.flag[kingdom]> != <[kingdom]>:
             - determine cancelled
 
-        - run OpenSquadControlOptions def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.player:<player> def.fromSM:false
+        - inventory close
+        - run GiveSquadTools def.player:<player>
 
 
 SquadRecall_Item:
@@ -25,27 +28,29 @@ SquadRecall_Item:
         skull_skin: bd2c2584-f53e-4829-81a3-5cff044e4979|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGFhMTg3ZmVkZTg4ZGUwMDJjYmQ5MzA1NzVlYjdiYTQ4ZDNiMWEwNmQ5NjFiZGM1MzU4MDA3NTBhZjc2NDkyNiJ9fX0=
 
 
-# Note: Items referenced here are in SquadMove.dsc file
-SquadControlOptions_Window:
-    type: inventory
-    inventory: chest
-    gui: true
-    title: Squad Controls
-    slots:
-    - [] [] [] [] [] [] [] [] []
-    - [] [SquadMoveTool_Item] [] [] [] [] [] [SquadRecall_Item] []
-    - [] [] [] [] [ExitSquadControls_Item] [] [] [] []
+MiscOrders_Item:
+    type: item
+    material: player_head
+    display name: <blue><bold>Show Misc Orders
+    mechanisms:
+        skull_skin: 49821769-c171-4288-9b95-ba04b799186f|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2EzYjlkNzFiYjU5NDI2NTdkNjZhNjMwMzMyZGIyYjk2MTg5ZjI1MTI3MTBlYzhjMzE0OTIxOGM4NTNmZGRiNiJ9fX0=
 
 
 SquadOptions_Handler:
     type: world
     events:
-        on player clicks SquadMoveTool_Item in SquadControlOptions_Window:
-        - inventory close
-        - run GiveSquadTools def.player:<player>
+        on player right clicks block with:MiscOrders_Item flagged:datahold.armies.squadTools:
+        - if <player.flag[datahold.armies.squadTools]> != 1:
+            - run GiveSquadTools def.player:<player> def.saveInv:false
+
+        - else:
+            - repeat 7:
+                - inventory slot:<[value]> set origin:air
+
+            - give to:<player.inventory> SquadRecall_Item
 
         ## RECALL SQUAD
-        on player clicks SquadRecall_Item in SquadControlOptions_Window:
+        on player right clicks block with:SquadRecall_Item:
         - define kingdom <player.flag[kingdom]>
         - define squadInfo <player.flag[datahold.squadInfo]>
         - define npcList <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]>
@@ -61,7 +66,7 @@ SquadOptions_Handler:
             - narrate format:debug "<red>[Internal Error SQA111] <&gt><&gt> <gold>Cannot associate squad with barrack."
             - determine cancelled
 
-        - inventory close
+        - run ResetSquadTools def.player:<player>
 
         - define SMLocation <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.location]>
         - inject SpawnSquadNPCs path:FindSpacesAroundSM
@@ -70,13 +75,7 @@ SquadOptions_Handler:
             - run WalkSoldierToSM_Helper def.npc:<[npc]> def.location:<[spawnLocation]>
 
         - narrate format:callout "Stashing squad at barracks: <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.name].color[red]>..."
-        - narrate format:callout "To respawn squad click on their icon in the squad list option in your SM."
-
-        on player clicks AltExitSquadControls_Item in SquadControlOptions_Window:
-        - inventory close
-
-        on player clicks ExitSquadControls_Item in SquadControlOptions_Window:
-        - run SquadSelectionGUI def.player:<player>
+        - narrate format:callout "To respawn the squad click on their icon in the squad list option in your SM."
 
 
 WalkSoldierToSM_Helper:

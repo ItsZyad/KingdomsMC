@@ -92,18 +92,23 @@ WriteArmyDataToKingdom:
 
 GiveSquadTools:
     type: task
-    definitions: player
+    definitions: player|saveInv
     script:
     ## Replaces the provided player's hotbar with squad management tools
     ##
     ## player : [PlayerTag]
 
     - define __player <[player]>
+    - define saveInv true if:<[saveInv].exists.not>
     - flag <player> datahold.armies.previousItemSlot:<player.held_item_slot>
+    - flag <player> datahold.armies.squadTools:1
 
-    - run TempSaveInventory def.player:<player>
+    - if <[saveInv]>:
+        - run TempSaveInventory def.player:<player>
+
     - give SquadMoveTool_Item
     - inventory set slot:9 origin:ExitSquadControls_Item
+    - inventory set slot:8 origin:MiscOrders_Item
     - adjust <player> item_slot:1
 
 
@@ -122,33 +127,6 @@ ResetSquadTools:
     - if <player.has_flag[datahold.armies.previousItemSlot]>:
         - adjust <player> item_slot:<player.flag[datahold.armies.previousItemSlot]>
         - flag <player> datahold.armies.previousItemSlot:!
-
-
-OpenSquadControlOptions:
-    type: task
-    definitions: kingdom|squadName|player|fromSM
-    script:
-    ## Pre-loads the player's datahold flag with the relevant squad info before opening the squad
-    ## orders window
-    ##
-    ## kingdom   : [ElementTag<String>]
-    ## squadName : [ElementTag<String>]
-    ## player    : [PlayerTag]
-    ## fromSM    : [ElementTag<Boolen>]
-
-    - define __player <[player]>
-    - define fromSM <[fromSM].if_null[true]>
-    - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
-
-    - define squadControlWindow <inventory[SquadControlOptions_Window]>
-
-    # Deletes exit button which takes player to the squad list and replaces it with an exit button
-    # that just closes the window
-    - if !<[fromSM]>:
-        - define exitItemSlot <[squadControlWindow].find_item[ExitSquadControls_Item]>
-        - inventory set d:<[squadControlWindow]> slot:<[exitItemSlot]> o:AltExitSquadControls_Item
-
-    - inventory open d:<[squadControlWindow]> player:<player>
 
 
 GetSquadInfo:
