@@ -44,6 +44,7 @@ SquadOptions_Handler:
         - inventory close
         - run GiveSquadTools def.player:<player>
 
+        ## RECALL SQUAD
         on player clicks SquadRecall_Item in SquadControlOptions_Window:
         - define kingdom <player.flag[kingdom]>
         - define squadInfo <player.flag[datahold.squadInfo]>
@@ -60,10 +61,13 @@ SquadOptions_Handler:
             - narrate format:debug "<red>[Internal Error SQA111] <&gt><&gt> <gold>Cannot associate squad with barrack."
             - determine cancelled
 
+        - inventory close
+
         - define SMLocation <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.location]>
+        - inject SpawnSquadNPCs path:FindSpacesAroundSM
 
         - foreach <[npcList]> as:npc:
-            - run WalkSoldierToSM_Helper def.npc:<[npc]> def.location:<[SMLocation]>
+            - run WalkSoldierToSM_Helper def.npc:<[npc]> def.location:<[spawnLocation]>
 
         - narrate format:callout "Stashing squad at barracks: <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.name].color[red]>..."
         - narrate format:callout "To respawn squad click on their icon in the squad list option in your SM."

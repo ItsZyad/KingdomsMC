@@ -79,12 +79,12 @@ WriteArmyDataToKingdom:
     - define kingdom <[player].flag[kingdom]>
     - define squadManagerID <[SMLocation].simple.split[,].remove[last].unseparated>
     - define SMData <[SMLocation].flag[squadManager]>
-    - define stationedSquads <[SMData].deep_get[squads.squadList].keys> if:<[SMData].contains[squads.squadList]>
+    - define stationedSquads <[SMData].deep_get[squads.squadList].keys> if:<[SMData].deep_get[squads.squadList].exists>
     - define SMData <[SMData].exclude[kingdom].exclude[id].deep_exclude[squads]>
 
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>:<[SMData]>
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.location:<[SMLocation]>
-    - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.stationedSquads:<[stationedSquads]>
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.stationedSquads:<[stationedSquads]> if:<[stationedSquads].exists>
 
     - foreach <[SMLocation].flag[squadManager.squads.squadList].if_null[<list[]>]>:
         - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[key]>:<[value]>

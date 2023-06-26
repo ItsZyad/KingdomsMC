@@ -22,4 +22,4 @@ SquadManagerUpgrade_Handler:
     type: world
     events:
         on player clicks barrier in SquadManagerUpgrade_Interface:
-        - inventory open SquadManager_Interface
+        - inventory open d:SquadManager_Interface

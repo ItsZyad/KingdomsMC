@@ -197,7 +197,7 @@ SquadSelection_Handler:
         - define hasSpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.hasSpawned]>
         - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList]>
         - define squadLeader <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader]>
-        - define currentlySpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader].as[entity].is_spawned>
+        - define currentlySpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader].as[npc].is_spawned>
 
         - if <[hasSpawned]>:
             - if <[currentlySpawned]>:
@@ -304,7 +304,7 @@ SpawnSquadNPCs:
     SpawnSquadLeader:
     - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
 
-    - create player <element[Squad Leader].color[<[kingdomColor]>]> <[spawnLocation]> traits:sentinel save:squad_leader
+    - create player "&4Squad Leader" <[spawnLocation]> traits:sentinel save:squad_leader
     - define squadLeader <entry[squad_leader].created_npc>
     - flag <[squadLeader]> soldier.isSquadLeader:true
     - flag <[squadLeader]> soldier.squad:<[squadName]>
@@ -313,6 +313,8 @@ SpawnSquadNPCs:
 
     - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
     - execute as_server "sentinel respawntime -1 --id <[squadLeader].id>" silent
+
+    - assignment set to:<[squadLeader]> script:SoldierManager_Assignment
 
     script:
     - define kingdom <[player].flag[kingdom]>
