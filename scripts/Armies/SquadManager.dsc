@@ -187,6 +187,7 @@ SquadManager_Handler:
             - narrate format:callout "You have already created the maximum amount of barracks in your kingdom. Consider upgrading existing squad managers, instead!"
             - determine air
 
+        ## Places SM
         on player places SquadManager_Item flagged:!datahold.armies.movingSM:
         - define kingdom <player.flag[kingdom]>
 
@@ -228,7 +229,19 @@ SquadManager_Handler:
         - run RecalculateSquadManagerAOE path:AreaCalculation def.AOESize:<[squadManagerData].get[AOESize]> def.SMLocation:<context.location> save:area
         - define barracksArea <entry[area].created_queue.determination.get[1]>
 
-        - if <[barracksArea].is_within[<[coreClaimsCuboid]>]> || <player.is_op>:
+        - define withinOutpost false
+
+        # Check if barracks are contained within outpost cuboids
+        - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList]> key:outpostName as:outpost:
+            - define cornerOne <[outpost].get[cornerone].simple.split[,].remove[last].separated_by[,]>
+            - define cornerTwo <[outpost].get[cornertwo].simple.split[,].remove[last].separated_by[,]>
+            - define outpostCuboid <cuboid[<player.location.world.name>,<[cornerOne]>,<[cornerTwo]>]>
+
+            - if <[barracksArea].is_within[<[outpostCuboid]>]>:
+                - define withinOutpost false
+                - foreach stop
+
+        - if <[barracksArea].is_within[<[coreClaimsCuboid]>]> || <[withinOutpost]> || <player.is_op>:
             - flag <context.location> squadManager:<[squadManagerData]>
             - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
             - define bedCount <proc[CountBedsInSquadManagerArea].context[<[squadManagerLocation]>]>
