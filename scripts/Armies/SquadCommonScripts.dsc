@@ -171,7 +171,26 @@ GetSquadInfo:
     - determine <[globalRef]>
 
 
-GetSMID:
+GetSquadSMLocation:
+    type: task
+    definitions: kingdom|squadName
+    script:
+    ## Gets the SM associated with the squad provided
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+
+    - define barracks <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
+    - define stationingInfo <[barracks].parse_value_tag[<[parse_value].get[stationedSquads]>]>
+
+    - foreach <[stationingInfo]>:
+        - if <[value].contains[<[squadName]>]>:
+            - define SMID <[key]>
+            - define location <[barracks].get[<[SMID]>].get[location]>
+            - determine <[location]>
+
+
+GenerateSMID:
     type: task
     definitions: location
     script:
