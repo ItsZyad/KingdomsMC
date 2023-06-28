@@ -18,6 +18,8 @@ DeleteSquad:
     ## kingdom      : [ElementTag<String>]
     ## deletedSquad : [MapTag]
     ##                Format: [internalName;displayName;npcList]
+    ##
+    ## >>> [Void]
 
     - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[deletedSquad].get[internalName]>]>
 
@@ -38,6 +40,8 @@ DeleteSquadReference:
     ## kingdom      : [ElementTag<String>]
     ## deletedSquad : [MapTag]
     ##                Format: [internalName;displayName;npcList]
+    ##
+    ## >>> [Void]
 
     - flag <[SMLocation]> squadManager.squads.squadList.<[deletedSquad].get[internalName]>:!
     - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[deletedSquad].get[internalName]>:!
@@ -57,6 +61,8 @@ CreateSquadReference:
     ## SMLocation  : [LocationTag]
     ## kingdom     : [ElementTag<String>]
     ## displayName : [ElementTag<String>]
+    ##
+    ## >>> [Void]
 
     - define barrackID <[SMLocation].xyz.replace_text[,]>
 
@@ -84,6 +90,8 @@ WriteArmyDataToKingdom:
     ##
     ## SMLocation : [LocationTag]
     ## player     : [PlayerTag]
+    ##
+    ## >>> [Void]
 
     - define kingdom <[player].flag[kingdom]>
     - define squadManagerID <[SMLocation].simple.split[,].remove[last].unseparated>
@@ -106,6 +114,8 @@ GiveSquadTools:
     ## Replaces the provided player's hotbar with squad management tools
     ##
     ## player : [PlayerTag]
+    ##
+    ## >>> [Void]
 
     - define __player <[player]>
     - define saveInv true if:<[saveInv].exists.not>
@@ -128,6 +138,8 @@ ResetSquadTools:
     ## Gives the player back the inventory they had before selecting the squad tools
     ##
     ## player : [PlayerTag]
+    ##
+    ## >>> [Void]
 
     - define __player <[player]>
 
@@ -146,6 +158,8 @@ GetSquadInfo:
     ##
     ## kingdom   : [ElementTag<String>]
     ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [MapTag]
 
     # GlobalRef refers to the version of army data stored on the kingdoms.___.armies flag while
     # LocalRef refers to the copy of data stored on each SM belonging to the kingdom
@@ -179,6 +193,8 @@ GetSquadSMLocation:
     ##
     ## kingdom   : [ElementTag<String>]
     ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [LocationTag]
 
     - define barracks <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
     - define stationingInfo <[barracks].parse_value_tag[<[parse_value].get[stationedSquads]>]>
@@ -197,5 +213,7 @@ GenerateSMID:
     ## Generates the ID used to refer to SMs in the kingdom flag using the location of the SM
     ##
     ## location : [LocationTag]
+    ##
+    ## >>> [ElementTag<Integer>]
 
     - determine <[location].simple.split[,].remove[last].unseparated>
