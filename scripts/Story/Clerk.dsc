@@ -26,7 +26,7 @@ ClerkNPC_AssignKingdom:
     script:
     - flag <[target]> kingdom:<[kingdom]>
     - run SidebarLoader def:<player>
-    - narrate format:npctalk "Alrighty! Great to hear! You can use <blue>/kingdom warp <&r>to go to your new kingdom's territory!"
+    - narrate format:npctalk "Alrighty! Great to hear! You can use <blue>/kingdom warp <&r> or <blue>/k warp <&r>to go to your new kingdom's territory!"
     - wait 2s
     - narrate format:npctalk "I also have this encyclopedia filled with (almost) everything there is to know about about your kingdom is run!"
     - wait 5s
