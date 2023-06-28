@@ -39,7 +39,7 @@ MiscOrders_Item:
 ExitSquadControls_Item:
     type: item
     material: barrier
-    display name: <red>Exit Squad Controls
+    display name: <red><bold>Exit Squad Controls
 
 
 SquadMoveTool_Item:
@@ -55,6 +55,7 @@ SquadMoveTool_Item:
 SquadOptions_Handler:
     type: world
     events:
+        ## MISC ORDERS
         on player right clicks block with:MiscOrders_Item flagged:datahold.armies.squadTools:
         - if <player.flag[datahold.armies.squadTools]> != 1:
             - run GiveSquadTools def.player:<player> def.saveInv:false
@@ -93,6 +94,7 @@ SquadOptions_Handler:
         - narrate format:callout "Stashing squad at barracks: <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.name].color[red]>..."
         - narrate format:callout "To respawn the squad click on their icon in the squad list option in your SM."
 
+        ## REG. MOVE SQUAD
         on player right clicks block with:SquadMoveTool_Item:
         - ratelimit <player> 1s
         - define kingdom <player.flag[kingdom]>
@@ -105,6 +107,7 @@ SquadOptions_Handler:
 
         - run FormationWalk def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.npcsPerRow:3 def.finalLocation:<[location].with_yaw[<player.location.yaw.round_to_precision[5]>]> def.lineLength:6 def.player:<player>
 
+        ## EXITS ORDERS
         on player clicks block with:ExitSquadControls_Item:
         - flag <player> datahold.squadInfo:!
         - run ResetSquadTools def.player:<player>
