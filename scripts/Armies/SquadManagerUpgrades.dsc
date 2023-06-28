@@ -1,3 +1,13 @@
+##
+## [ WIP ]
+## All scripts related to upgrading the SM will be found here.
+##
+## @Author: Zyad (ITSZYAD#9280)
+## @Date: Jun 2023
+## @Script Ver: v1.0
+##
+## ----------------END HEADER-----------------
+
 SquadManagerAOEUpgrade_Item:
     type: item
     material: player_head

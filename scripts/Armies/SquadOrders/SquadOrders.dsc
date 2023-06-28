@@ -1,3 +1,13 @@
+##
+## All of the smaller squad order scripts can be found here + some move/attack related helper tasks.
+##
+## @Author: Zyad (ITSZYAD#9280)
+## @Date: May 2023
+## @Script Ver: v1.1
+##
+## ----------------END HEADER-----------------
+
+
 SoldierManager_Assignment:
     type: assignment
     actions:

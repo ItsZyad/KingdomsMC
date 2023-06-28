@@ -1,3 +1,15 @@
+##
+## All tasks and helpers related to making squads move will be found here.
+##
+## @Author: Zyad (ITSZYAD#9280)
+## @Date: Mar 2023
+## @Updated: Jun 2023
+##           -- All useless helper functions and test scripts were removed and remaining items
+##              cleaned in prep for A4.
+## @Script Ver: v2.0
+##
+## ----------------END HEADER-----------------
+
 # TODO: Add if case in caller function which throws an error to the player if the squad isn't assigned a leader yet
 
 ClosestSquadMember:

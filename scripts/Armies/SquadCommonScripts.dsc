@@ -1,3 +1,12 @@
+##
+## All general-purpose, reusable functions related to the squads mechanics can be found here.
+##
+## @Author: Zyad (ITSZYAD#9280)
+## @Date: Jun 2023
+## @Script Ver: v1.0
+##
+## ----------------END HEADER-----------------
+
 DeleteSquad:
     type: task
     definitions: SMLocation|kingdom|deletedSquad

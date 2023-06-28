@@ -1,4 +1,14 @@
+##
+## Scripts related to the squad list window in the SM are here + some old scripts from 0.3p5 squad
+## tests kept around in case I need "spare parts".
+##
+## @Author: Zyad (ITSZYAD#9280)
+## @Date: Sep 2022
+## @Updated: Jul 2023
+## @Script Ver: v2.0
+##
 ##ignorewarning invalid_data_line_quotes
+## ----------------END HEADER-----------------
 
 SquadEditConfirm_Item:
     type: item
