@@ -98,7 +98,6 @@ UsableBookshelf_Handler:
 
         - flag <player> BookshelfLocation:!
 
-#TODO: FIND SOMEONE TO TEST THIS WITH; SEE IF THIS ACTUALLY MAKES THEM SEE THE SAME INVENTORY!
 BookshelfClone:
     type: procedure
     #definitions: inventoryName

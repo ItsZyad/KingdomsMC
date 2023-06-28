@@ -10,6 +10,7 @@
 ##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------
 
+# Note: future configurable
 CustomJoinMessages:
     type: data
     player_list:
