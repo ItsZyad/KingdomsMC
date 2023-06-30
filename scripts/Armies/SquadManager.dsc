@@ -15,6 +15,7 @@ SquadManager_Item:
     lore:
     - Interactive block which manages army squads
     - <&r><bold>Costs $2000 to activate.
+    - <&3><bold>Costs $500 to upkeep daily
     enchantments:
     - sharpness:1
     mechanisms:
@@ -188,6 +189,7 @@ ArmoryWand_Item:
 SquadManager_Handler:
     type: world
     events:
+        ## Crafts SM
         on SquadManager_Item recipe formed:
         - define kingdom <player.flag[kingdom]>
         - define maxAllowedSMs <server.flag[kingdoms.<[kingdom]>.armies.maximumAllowedSMs].if_null[4]>
@@ -227,6 +229,7 @@ SquadManager_Handler:
                 squadSizeLimit: 30
                 stationCapacity: 0
             AOESize: 20
+            upkeep: 500
 
         # Generate cuboid consisting of all the kingdom's core claims
         - define coreClaims <server.flag[kingdoms.<[kingdom]>.claims.core]>
@@ -265,6 +268,11 @@ SquadManager_Handler:
             # Running Recalc. task without path generates the barracks area and adds to the main
             # kingdoms flag the corresponding cuboid
             - run RecalculateSquadManagerAOE def.barracksArea:<[barracksArea]> def.SMLocation:<context.location> def.player:<player>
+
+            - if !<server.has_flag[PauseUpkeep]>:
+                - flag server kingdoms.<[kingdom]>.balance:-:2000
+                # Note: future configurable
+                - flag server kingdoms.<[kingdom]>.upkeep:+:500
 
         - else:
             - narrate format:callout "Please ensure that the squad manager is at least 20 blocks within your kingdom's core/outpost claims."
@@ -588,7 +596,7 @@ SquadManager_Handler:
         # TODO/ disbanded if they do that
         - define kingdom <player.flag[kingdom]>
         - define SMInfo <context.location.flag[squadManager]>
-        - run GetSMID def.location:<context.location> save:smid
+        - run GenerateSMID def.location:<context.location> save:smid
         - define SMID <entry[smid].created_queue.determination.get[1]>
         - define squadList <[SMInfo].deep_get[squads.squadList].keys>
         - define barrackList <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
@@ -685,6 +693,8 @@ SquadManagerDeletion_Handler:
         - define loreList <[loreList].include[Following squads will be deleted:].include[<[deletedSquads]>]>
 
         - inventory adjust slot:<[infoItemSlot]> lore:<[loreList]> d:<context.inventory>
+
+        # TODO: Add handlers for confirm click/reject click
 
 
 RecalculateSquadManagerAOE:
