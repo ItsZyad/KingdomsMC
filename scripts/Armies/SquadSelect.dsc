@@ -302,7 +302,11 @@ SpawnSquadNPCs:
     - if !<[hasSpawned]>:
         - foreach <[SMData].deep_get[squads.squadList.<[squadName]>.squadComp]> key:type as:amount:
             - run SpawnNewSoldiers def.type:<[type]> def.location:<[spawnLocation]> def.amount:<[amount]> def.squadName:<[squadName]> def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> save:soldiers
-            - define soldierList <[soldierList].include[<entry[soldiers].created_queue.determination.get[1]>]>
+            - define soldier <entry[soldiers].created_queue.determination.get[1]>
+            - flag <[soldier]> soldier.isSquadLeader:false
+            - flag <[squadLeader]> soldier.squad:<[squadName]>
+            - flag <[squadLeader]> soldier.kingdom:<[kingdom]>
+            - define soldierList <[soldierList].include[<[soldier]>]>
 
     - flag <player> datahold.squadInfo.npcList:<[soldierList]>
     - flag <player> datahold.squadInfo.squadLeader:<[squadLeader]>
