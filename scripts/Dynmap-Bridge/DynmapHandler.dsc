@@ -1,13 +1,115 @@
 ##
 ## * A (heavily modified) Denizen-Dynmap hook for Kingdoms
 ##
-## @Author: (Icecapade#8825)
-## @Editor: Zyad (ITSZYAD#9280)
+## @Author: (@icecapade/Icecapade#8825)
+## @Supplementary Scripts: Maxime (@mrm/Maxime#9999)
+## @Editor: Zyad (@itszyad/ITSZYAD#9280)
 ## @Date: Jan 2022
-## @Updated: May 2023
-## @Script Ver: v1.2
+## @Updated: May-Jun 2023
+## @Script Ver: v2.0
 ##
 ## ----------------END HEADER-----------------
+
+DynmapFlagBuilderV2:
+  type: task
+  definitions: kingdom|worldName
+  script:
+    ## Original script by: @mrm/Maxime#9999
+    ## *also no, I'm not going to change the varibale scheme to match...*
+    ##
+    ## Generates the corners for the provided territoryType and the provided kingdom and caches the
+    ## output in the world-specific dynmap flag
+    ##
+    ## kingdom       : [ElementTag<String>]
+    ## worldName     : [ElementTag<String>]
+    ##
+    ## >>> [ListTag<LocationTag>]
+
+    - define territoryType <[territoryType].to_lowercase.if_null[core]>
+    - define kingdomData <server.flag[kingdoms.<[kingdom]>]>
+    - define world <server.worlds.filter_tag[<[filter_value].name.to_lowercase.equals[<[worldName].to_lowercase>]>]>
+    - define chunks <[kingdomData].deep_get[claims.core].if_null[<list[]>].include[<[kingdomData].deep_get[claims.castle].if_null[<list[]>]>]>
+
+    - if !<[world].exists>:
+        - narrate format:admincallout "<red>[Internal Error INTD01] <&gt><&gt><&r>Could not determine world name. Please contact a dev or server owner."
+        - determine cancelled
+
+    - determine <list> if:<[chunks].is_empty>
+
+    - define min_x <[chunks].sort_by_value[x].get[1].x>
+    - define min_z <[chunks].filter[x.equals[<[min_x]>]].sort_by_value[z].get[1].z>
+    - define start_chunk <chunk[<[min_x]>,<[min_z]>,<[worldName]>]>
+    - define init_x <[min_x]>
+    - define init_z <[min_z]>
+    - define tar_x <[min_x]>
+    - define tar_z <[min_z]>
+    - define dir x_plus
+    - define corners <list>
+    - define corners <[corners].include[<chunk[<[tar_x]>,<[tar_z]>,<[worldName]>].cuboid.corners.parse[with_y[64]].deduplicate.get[1]>]>
+
+    - while !<[tar_x].equals[<[min_x]>]> || !<[tar_z].equals[<[min_z]>]> || !<[dir].equals[z_minus]>:
+        - while stop if:<[loop_index].equals[1000]>
+
+        - choose <[dir]>:
+            - case x_plus:
+                - if !<[chunks].contains[<chunk[<[tar_x].add[1]>,<[tar_z]>,<[worldName]>]>]>:
+                    - define corners <[corners].include[<chunk[<[tar_x].add[1]>,<[tar_z]>,<[worldName]>].cuboid.corners.parse[with_y[64]].deduplicate.get[1]>]>
+                    - define dir z_plus
+
+                - else if !<[chunks].contains[<chunk[<[tar_x].add[1]>,<[tar_z].sub[1]>,<[worldName]>]>]>:
+                    - define tar_x:++
+
+                - else:
+                    - define corners <[corners].include[<chunk[<[tar_x].add[1]>,<[tar_z]>,<[worldName]>].cuboid.corners.parse[with_y[64]].deduplicate.get[1]>]>
+                    - define dir z_minus
+                    - define tar_x:++
+                    - define tar_z:--
+
+            - case z_plus:
+                - if !<[chunks].contains[<chunk[<[tar_x]>,<[tar_z].add[1]>,<[worldName]>]>]>:
+                    - define corners <[corners].include[<chunk[<[tar_x].add[1]>,<[tar_z].add[1]>,<[worldName]>].cuboid.corners.parse[with_y[64]].deduplicate.get[1]>]>
+                    - define dir x_minus
+
+                - else if !<[chunks].contains[<chunk[<[tar_x].add[1]>,<[tar_z].add[1]>,<[worldName]>]>]>:
+                    - define tar_z:++
+
+                - else:
+                    - define corners <[corners].include[<chunk[<[tar_x].add[1]>,<[tar_z].add[1]>,<[worldName]>].cuboid.corners.parse[with_y[64]].deduplicate.get[1]>]>
+                    - define dir x_plus
+                    - define tar_x:++
+                    - define tar_z:++
+
+            - case x_minus:
+                - if !<[chunks].contains[<chunk[<[tar_x].sub[1]>,<[tar_z]>,<[worldName]>]>]>:
+                    - define corners <[corners].include[<chunk[<[tar_x]>,<[tar_z].add[1]>,<[worldName]>].cuboid.corners.parse[with_y[64]].deduplicate.get[1]>]>
+                    - define dir z_minus
+
+                - else if !<[chunks].contains[<chunk[<[tar_x].sub[1]>,<[tar_z].add[1]>,<[worldName]>]>]>:
+                    - define tar_x:--
+
+                - else:
+                    - define corners <[corners].include[<chunk[<[tar_x]>,<[tar_z].add[1]>,<[worldName]>].cuboid.corners.parse[with_y[64]].deduplicate.get[1]>]>
+                    - define dir z_plus
+                    - define tar_x:--
+                    - define tar_z:++
+
+            - case z_minus:
+                - if !<[chunks].contains[<chunk[<[tar_x]>,<[tar_z].sub[1]>,<[worldName]>]>]>:
+                    - define corners <[corners].include[<chunk[<[tar_x]>,<[tar_z]>,<[worldName]>].cuboid.corners.parse[with_y[64]].deduplicate.get[1]>]>
+                    - define dir x_plus
+
+                - else if !<[chunks].contains[<chunk[<[tar_x].sub[1]>,<[tar_z].sub[1]>,<[worldName]>]>]>:
+                    - define tar_z:--
+
+                - else:
+                    - define corners <[corners].include[<chunk[<[tar_x]>,<[tar_z]>,<[worldName]>].cuboid.corners.parse[with_y[64]].deduplicate.get[1]>]>
+                    - define dir x_minus
+                    - define tar_x:--
+                    - define tar_z:--
+
+    - flag <[world]> dynmap.cache.<[kingdom]>.cornerList:<[corners]>
+    - determine <[corners]>
+
 
 NEW_DynmapFlagBuilder:
     type: task
@@ -122,52 +224,6 @@ NEW_DynmapFlagBuilder:
     - foreach <[sortedCornerList].parse_tag[<[parse_value].with_y[<[player].location.y.sub[25]>]>]>:
         - showfake red_wool <[value]> d:30s
         - wait 10t
-
-
-DynmapFlagBuilder:
-    type: task
-    permission: kingdoms.admin
-    definitions: world
-    script:
-    - define kingdomList <list[centran|cambrian|viridian|raptoran]>
-
-    - foreach <[kingdomList]> as:kingdom:
-        - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
-        - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
-        - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
-        - define all <[core].include[<[castle]>]>
-        - define as_cuboid <[all].get[1].cuboid>
-        - narrate format:debug castle:<[castle]>
-        - narrate format:debug core:<[core]>
-
-        - foreach <[all]> as:chunk:
-            - define as_cuboid <[as_cuboid].include[<[chunk].cuboid>]>
-
-        - define x_size <[as_cuboid].max.x.sub[<[as_cuboid].min.x>]>
-        - define z_size <[as_cuboid].max.z.sub[<[as_cuboid].min.z>]>
-
-        - narrate format:debug XSIZ:<[x_size]>
-
-        - flag <[world]> dynmap.kingdoms.<[kingdom]>.region:<list[<[kingdomName]>|<[as_cuboid]>]>
-
-        - narrate format:debug KING:<[kingdom]>
-        - narrate format:debug CUBD:<[as_cuboid]>
-        - narrate format:debug SIZE:<[x_size].mul[<[z_size]>]>
-
-        - define outposts <server.flag[kingdoms.<[kingdom]>.outpostList].to_pair_lists>
-
-        - flag <[world]> dynmap.kingdoms.<[kingdom]>.outposts:<list[]>
-
-        - foreach <[outposts]> as:outpost:
-            - define cornerone <[outpost].get[2].get[cornerone].xyz>
-            - define cornertwo <[outpost].get[2].get[cornertwo].xyz>
-            - define name <[outpost].get[2].get[name]>
-
-            - define region <cuboid[<player.location.world.name>,<[cornerone]>,<[cornertwo]>]>
-
-            - flag <[world]> dynmap.kingdoms.<[kingdom]>.outposts:<[world].flag[dynmap].deep_get[kingdoms.<[kingdom]>.outposts].include_single[<[name]>|<[region]>]>
-
-        - narrate format:debug -------------------------
 
 
 DynmapTask:
