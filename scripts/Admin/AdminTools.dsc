@@ -55,7 +55,7 @@ AdminTools_Command:
             - define object <context.args.get[2]> if:<context.args.size.is[OR_MORE].than[2]>
 
             - if <context.args.size> == 1:
-                - determine <list[server|player|[flaggable object]]>
+                - determine <list[server|world|player|[flaggable object]]>
 
             - else if <context.args.size> <= 2:
                 - if <[object].regex_matches[^<&lt>.*\<&lb>.*\<&rb><&gt>$]>:
@@ -69,8 +69,11 @@ AdminTools_Command:
                 - else if <[object]> == player:
                     - determine <player.list_flags>
 
+                - else if <[object]> == world:
+                    - determine <player.location.world.list_flags>
+
                 - else:
-                    - determine <list[server|player|[flaggable object]]>
+                    - determine <list[server|world|player|[flaggable object]]>
 
             - else if <context.args.size> == 3:
                 - if <context.args.get[3].contains[.]>:
@@ -194,16 +197,17 @@ AdminTools_Command:
 
                 - define object <[objectRef].get[<[objectParam]>].if_null[<[args].get[2].parsed>]>
                 - define flagName <[args].get[3]>
+                - define flag null
 
                 # Can't put server: <server> in objectRef since the server
                 # is a pseudo-tag that cannot be used on its own :/
                 - if <[objectParam]> == server:
-                    - define flag <server.flag[<[flagName]>]>
+                    - define flag <server.flag[<[flagName]>]> if:<server.has_flag[<[flagName]>]>
 
                 - else:
-                    - define flag <[object].flag[<[flagName]>]>
+                    - define flag <[object].flag[<[flagName]>]> if:<[object].has_flag[<[flagName]>]>
 
-                - if <[flag].exists>:
+                - if <[flag]> != null:
                     - narrate <element[                                                     ].strikethrough>
                     - inject FlagVisualizer
 
@@ -213,7 +217,9 @@ AdminTools_Command:
                     - narrate <element[                                                     ].strikethrough>
 
                 - else:
-                    - narrate format:admincallout "Object: <[object]> does not have flag with name: <[flagName]>"
+                    - narrate <element[                                                     ].strikethrough>
+                    - narrate "<italic><[flagName].color[green]> does not exist :/"
+                    - narrate <element[                                                     ].strikethrough>
 
             - else:
                 - narrate format:admincallout "This subcommand can only be used by server developers!"
