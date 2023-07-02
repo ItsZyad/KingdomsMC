@@ -28,6 +28,21 @@ FlagVisualizer:
 
         - determine passively <[flag].color[light_purple].on_hover[<[formattedTime]> UTC]>
 
+    - else if <[flag].object_type> == Item:
+        - define itemPropertiesList <[flag].property_map>
+
+        - if !<[itemPropertiesList].is_empty>:
+            - define formattedItemProperties <list[]>
+
+            - foreach <[itemPropertiesList]>:
+                - define formattedItemProperties:->:<element[<[key]><&co> <[value]>]>
+
+            - define formattedItemProperties <[formattedItemProperties].separated_by[<n>]>
+
+            - determine passively "<element[i<&at><[flag].material.name>].color[aqua]> <element[[nbt]].color[light_purple].on_hover[<[formattedItemProperties]>]>"
+
+        - determine passively <element[i<&at><[flag].material.name>].color[aqua]>
+
     - else if <[flag].object_type> == Map:
         - narrate <proc[MakeTabbed].context[<element[MAP :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
         - define tabWidth:+:4
@@ -49,7 +64,7 @@ FlagVisualizer:
 
     - else if <[flag].object_type> == List:
         - narrate <proc[MakeTabbed].context[<element[LIST :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
-        - define longestNumber <[flag].length>
+        - define longestNumber <[flag].size>
         - define tabWidth:+:4
 
         - foreach <[flag]>:
@@ -63,11 +78,12 @@ FlagVisualizer:
             - run FlagVisualizer def.flag:<[value]> def.flagName:<&sp> def.recursionDepth:<[recursionDepth].add[1]> save:Recur
 
             - if <entry[Recur].created_queue.determination.get[1].as[list].size.if_null[0]> == 1:
-                - define formattedIndex <[loop_index].pad_left[<[longestNumber].length.sub[1]>].with[0]>
+                - define formattedIndex <[loop_index].pad_left[<[longestNumber].length>].with[0]>
                 - narrate <proc[MakeTabbed].context[<element[<[formattedIndex].color[gray]>: <entry[Recur].created_queue.determination.get[1].color[white]>]>|<[tabWidth]>]>
 
     - else:
         - determine passively <[flag]>
+
 
 MakeTabbed:
     type: procedure
