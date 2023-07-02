@@ -182,8 +182,9 @@ SquadComposition_Handler:
         - define kingdom <player.flag[kingdom]>
         - define displayName <context.message>
         - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - define squadMap <player.flag[datahold.armies.squadMap]>
 
-        - run CreateSquadReference def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]> def.displayName:<[displayName]>
+        - run CreateSquadReference def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]> def.displayName:<[displayName]> def.totalManpower:<[squadMap].get[totalManpower]> def.squadComp:<[squadMap].get[squadComp]>
 
         - flag <player> datahold.armies.namingSquad:!
         - flag <player> noChat.armies:!

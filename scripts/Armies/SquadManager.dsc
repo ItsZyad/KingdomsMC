@@ -326,7 +326,7 @@ SquadManager_Handler:
         - define bedCount <proc[CountBedsInSquadManagerArea].context[<[squadManagerLocation]>]>
         - define stationCapacity <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
         - flag <[squadManagerLocation]> squadManager.levels.stationCapacity:<[stationCapacity]>
-        - ~run WriteArmyDataToKingdom def.player:<player> def.SMLocation:<[squadManagerLocation]>
+        - ~run WriteArmyDataToKingdom def.kingdom:<player.flag[kingdom]> def.SMLocation:<[squadManagerLocation]>
 
         ## AOE Show
         on player clicks SquadManagerShowAOE_Item in SquadManager_Interface:
@@ -417,7 +417,7 @@ SquadManager_Handler:
             - determine cancelled
 
         - flag <[squadManagerLocation]> squadManager.name:<context.message>
-        - run WriteArmyDataToKingdom def.SMLocation:<[squadManagerLocation]> def.player:<player>
+        - run WriteArmyDataToKingdom def.SMLocation:<[squadManagerLocation]> def.kingdom:<player.flag[kingdom]>
         - flag <player> noChat.armies:!
 
         - narrate format:callout "Renamed barracks to: <context.message.color[red]>"
@@ -551,7 +551,7 @@ SquadManager_Handler:
         - run LoadTempInventory def.player:<player>
 
         - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
-        - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.player:<player>
+        - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<player.flag[kingdom]>
 
         ## Player Clicks Armories AOE
         on player clicks SeeArmoryLocations_Item in SquadManager_Interface:
@@ -715,7 +715,7 @@ RecalculateSquadManagerAOE:
         - define barracksArea <entry[area].created_queue.determination.get[1]>
 
     - flag <[SMLocation]> squadManager.area:<[barracksArea]>
-    - ~run WriteArmyDataToKingdom def.player:<[player]> def.SMLocation:<[SMLocation]>
+    - ~run WriteArmyDataToKingdom def.kingdom:<[player].flag[kingdom]> def.SMLocation:<[SMLocation]>
     - run ShowSquadManagerAOE def.area:<[barracksArea]> def.player:<[player]>
 
 

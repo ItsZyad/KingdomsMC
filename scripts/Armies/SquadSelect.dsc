@@ -197,13 +197,58 @@ SquadFirstTimeSpawnConfirmation_Window:
     - [] [] [] [] [] [] [] [] []
 
 
+SquadEquipmentSet_Item:
+    type: item
+    material: player_head
+    display name: <yellow><bold>Set Squad Equipment
+    mechanisms:
+        skull_skin: c11efdef-80c0-4909-8d8c-a6951fc28c47|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I5MjRiMzdmZTMyOTQyNzNhNzQzODZjODc4Y2EyMTBmYzg5ZjQ3ODcwMjk0M2EwMjcyZTcxMzk1NjMwYmVkYSJ9fX0=
+
+
+SquadOrders_Item:
+    type: item
+    material: player_head
+    display name: <red><bold>Give Squad Orders
+    mechanisms:
+        skull_skin: 99d1db69-a107-4227-b575-cb40c9f37092|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTVkNzZkOTBiMzc4MDgzZDE0Nzc1NjgwNTA1ZGRiMWU2YzJjNmRjZjRkZGU3ZjliMWY1ODgwOWJlYzZjNjVjOCJ9fX0=
+
+
+SquadOptions_Window:
+    type: inventory
+    inventory: chest
+    gui: true
+    title: Squad Options
+    slots:
+    - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [] [] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
+    - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [SquadOrders_Item] [] [SquadEquipmentSet_Item] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
+    - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [] [] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
+    - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [] [Back_Item] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
+
+
+SquadEquipment_Window:
+    type: inventory
+    inventory: chest
+    gui: true
+    title: Squad Equipment
+    slots:
+    - [InterfaceFiller_Item] [leather_helmet] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item]
+    - [InterfaceFiller_Item] [leather_chestplate] [InterfaceFiller_Item] [] [] [] [] [] [InterfaceFiller_Item]
+    - [InterfaceFiller_Item] [leather_leggings] [InterfaceFiller_Item] [] [] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
+    - [InterfaceFiller_Item] [leather_boots] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item]
+
+
 SquadSelection_Handler:
     type: world
     events:
         ## CLICK SQUAD LIST ICON
         on player clicks SquadInterface_Item in PaginatedInterface_Window flagged:viewingSquads:
+        - inventory open d:SquadOptions_Window
+        - flag <player> datahold.armies.squadInfo:<context.item.flag[squadInfo]>
+
+        ## CLICK SQUAD ORDERS
+        on player clicks SquadOrders_Item in SquadOptions_Window:
         - define kingdom <player.flag[kingdom]>
-        - define squadName <context.item.flag[squadInfo.internalName]>
+        - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
         - define hasSpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.hasSpawned]>
         - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList]>
         - define squadLeader <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader]>
@@ -233,6 +278,95 @@ SquadSelection_Handler:
         - else:
             - inventory open d:SquadFirstTimeSpawnConfirmation_Window
             - flag <player> datahold.armies.squadInfo:<context.item.flag[squadInfo]>
+
+        ## EQUIPMENT WINDOW SETUP
+        on player opens SquadEquipment_Window:
+        - define leatherItems <context.inventory.find_all_items[leather_*]>
+
+        - if !<[leatherItems].is_empty>:
+            - define kingdom <player.flag[kingdom]>
+            - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>].as[color]>
+            - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
+
+            #- IMPORTANT: If you do follow through on making default equipment customizable then
+            #-            you will need to add a line under the inventory adjust that changes that
+            #-            in the interface.
+
+            - foreach <[leatherItems]> as:slot:
+                - inventory adjust slot:<[slot]> color:<[kingdomColor]> d:<context.inventory>
+
+        - run flagvisualizer def.flag:<[squadManagerData]>
+
+        - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
+        - define hotbarSlots <context.inventory.list_contents.parse_tag[<[parse_value].material.name>].find_all[air]>
+        - define armorSlots <context.inventory.list_contents.parse_tag[<[parse_value].material.name>].find_all_matches[*_boots|*_leggings|*_chestplate|*_helmet]>
+        - define hotbarItems <[squadManagerData].deep_get[squads.squadList.<[squadName]>.standardEquipment.hotbar].if_null[<list[]>]>
+        - flag <player> datahold.hotbarSlots:<[hotbarSlots]>
+        - flag <player> datahold.armorSlots:<[armorSlots]>
+
+        - foreach <[hotbarItems]> as:item:
+            - inventory set slot:<[hotbarSlots].get[<[loop_index]>]> origin:<[item]> d:<context.inventory>
+
+        ## ADD ITEM IN EQUIPMENT WINDOW
+        on player left clicks item in SquadEquipment_Window:
+        - ratelimit <player> 1t
+        - define hotbarSlots <player.flag[datahold.hotbarSlots]>
+        - define armorSlots <player.flag[datahold.armorSlots]>
+
+        - if <[hotbarSlots].contains[<context.slot>]>:
+            - define cursorItem <context.cursor_item>
+            - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+            - define kingdom <player.flag[kingdom]>
+            - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
+
+            - inventory set d:<context.inventory> origin:<context.cursor_item> slot:<context.slot>
+            - define hotbarItems <[SMLocation].flag[squadManager.standardEquipment.hotbar].if_null[<list[]>]>
+            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.standardEquipment.hotbar:<[hotbarItems].remove[<[hotbarSlots].find[<context.slot>]>].include[<context.cursor_item>]>
+            - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]>
+
+        - else if <[armorSlots].contains[<context.slot>]>:
+            - define cursorItem <context.cursor_item>
+            - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+            - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
+            - define armorType <context.item.material.name.split[_].get[2]>
+            - define cursorItemType <context.item.material.name.split[_].get[2]>
+
+            - if <[cursorItemType]> == <[armorType]>:
+                - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.standardEquipment.<[armorType]>:<[cursorItem]>
+                - inventory set d:<context.inventory> origin:<[cursorItem]> slot:<context.slot>
+
+        ## REMOVE ITEM IN EQUIPMENT WINDOW
+        on player right clicks item in SquadEquipment_Window:
+        - ratelimit <player> 1t
+        - define hotbarSlots <player.flag[datahold.hotbarSlots]>
+        - define armorSlots <player.flag[datahold.armorSlots]>
+
+        - if <[hotbarSlots].contains[<context.slot>]>:
+            - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+            - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
+            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.standardEquipment.hotbar:<-:<context.item>
+
+            - inventory set d:<context.inventory> origin:air slot:<context.slot>
+
+        - else if <[armorSlots].contains[<context.slot>]>:
+            - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+            - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
+            - define armorType <context.item.material.name.split[_].get[2]>
+            - inventory set d:<context.inventory> origin:air slot:<context.slot>
+
+            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.standardEquipment.<[armorType]>:<item[air]>
+
+        ## CLOSES EQUIPMENT WINDOW
+        on player closes SquadEquipment_Window:
+        - flag <player> datahold.hotbarSlots:!
+
+        ## CLICKS SQUAD EQUIPMENT
+        on player clicks SquadEquipmentSet_Item in SquadOptions_Window:
+        - inventory open d:SquadEquipment_Window
+
+        ## EXITS SQUAD OPTIONS
+        on player clicks Back_Item in SquadOptions_Window:
+        - run SquadSelectionGUI def.player:<player>
 
         ## EXITS SQUAD LIST
         on player clicks ExitSquadSelector_Item in PaginatedInterface_Window flagged:viewingSquads:
@@ -295,6 +429,7 @@ SpawnSquadNPCs:
     - define SMData <[SMLocation].flag[squadManager]>
     - define hasSpawned <[SMData].deep_get[squads.squadList.<[squadName]>.hasSpawned]>
     - define soldiers <[SMData].deep_get[squads.squadList.<[squadName]>.totalManpower]>
+    - define equipment <[SMData].deep_get[squads.squadList.<[squadName]>.standardEquipment]>
     - define soldierList <list[]>
 
     - inject <script.name> path:SpawnSquadLeader
@@ -304,16 +439,19 @@ SpawnSquadNPCs:
             - run SpawnNewSoldiers def.type:<[type]> def.location:<[spawnLocation]> def.amount:<[amount]> def.squadName:<[squadName]> def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> save:soldiers
             - define soldier <entry[soldiers].created_queue.determination.get[1]>
             - flag <[soldier]> soldier.isSquadLeader:false
-            - flag <[squadLeader]> soldier.squad:<[squadName]>
-            - flag <[squadLeader]> soldier.kingdom:<[kingdom]>
+            - flag <[soldier]> soldier.squad:<[squadName]>
+            - flag <[soldier]> soldier.kingdom:<[kingdom]>
             - define soldierList <[soldierList].include[<[soldier]>]>
+
+            - equip <[soldier]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]>
+            - inventory fill d:<[soldier].inventory> o:<[equipment].get[hotbar]>
 
     - flag <player> datahold.squadInfo.npcList:<[soldierList]>
     - flag <player> datahold.squadInfo.squadLeader:<[squadLeader]>
     - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.hasSpawned:true
     - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<[soldierList]>
 
-    - ~run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.player:<[player]>
+    - ~run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[player].flag[kingdom]>
     - run GiveSquadTools def.player:<player>
 
     SpawnSquadLeader:

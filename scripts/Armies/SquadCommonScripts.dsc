@@ -53,14 +53,16 @@ DeleteSquadReference:
 
 CreateSquadReference:
     type: task
-    definitions: SMLocation|kingdom|displayName
+    definitions: SMLocation|kingdom|displayName|squadComp|totalManpower
     script:
     ## Creates a new squad reference in the kingdoms.___.armies flag and the squadManager flag
     ## attached to the provided SMLocation. But does not create NPCs
     ##
-    ## SMLocation  : [LocationTag]
-    ## kingdom     : [ElementTag<String>]
-    ## displayName : [ElementTag<String>]
+    ## SMLocation    : [LocationTag]
+    ## kingdom       : [ElementTag<String>]
+    ## displayName   : [ElementTag<String>]
+    ## squadComp     : [MapTag<ElementTag<String>;ElementTag<Integer>>]
+    ## totalManpower : [ElementTag<Integer>]
     ##
     ## >>> [Void]
 
@@ -72,28 +74,42 @@ CreateSquadReference:
 
     - define internalName <[displayName].replace_text[ ].with[-]>
     - define squadID <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].last.get[ID].add[1].if_null[1]>
-    - define squadMap <player.flag[datahold.armies.squadMap].include[name=<[internalName]>;displayName=<[displayName]>;ID=<[squadID]>]>
+    - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+    - definemap squadMap:
+        npcList: <list[]>
+        squadComp: <[squadComp]>
+        totalManpower: <[totalManpower]>
+        hasSpawned: false
+        displayName: <[displayName]>
+        ID: <[squadID]>
+        name: <[internalName]>
+        # Note: could be an upgrade to allow for better default equipment(?)
+        standardEquipment:
+            helmet: <item[leather_helmet[color=<[kingdomColor]>]].with_flag[defaultArmor]>
+            chestplate: <item[leather_chestplate].with_flag[defaultArmor]>
+            leggings: <item[leather_leggings].with_flag[defaultArmor]>
+            boots: <item[leather_boots].with_flag[defaultArmor]>
+            hotbar: <list[wooden_sword]>
 
-    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[internalName]>:<[squadMap]>
-    - flag server kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.stationedSquads:->:<[internalName]>
     - flag <[SMLocation]> squadManager.squads.squadList.<[internalName]>:<[squadMap]>
+    - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]>
 
-    - narrate format:callout "Created squad with name: <[displayName]>"
+    - if <player.exists>:
+        - narrate format:callout "Created squad with name: <[displayName]>"
 
 
 WriteArmyDataToKingdom:
     type: task
-    definitions: SMLocation|player
+    definitions: SMLocation|kingdom
     script:
     ## Ensures that the kingdom.armies flag contains the same information as the squad manager
     ## flag of the provided SMLocation
     ##
     ## SMLocation : [LocationTag]
-    ## player     : [PlayerTag]
+    ## kingdom    : [ElementTag<String>]
     ##
     ## >>> [Void]
 
-    - define kingdom <[player].flag[kingdom]>
     - define squadManagerID <[SMLocation].simple.split[,].remove[last].unseparated>
     - define SMData <[SMLocation].flag[squadManager]>
     - define stationedSquads <[SMData].deep_get[squads.squadList].keys> if:<[SMData].deep_get[squads.squadList].exists>
@@ -181,7 +197,7 @@ GetSquadInfo:
             - run flagvisualizer def.flag:<[localRef]> def.flagName:localRef
             - determine <[localRef]>
 
-    - run flagvisualizer def.flag:<[globalRef]> def.flagName:globalRef
+    # - run flagvisualizer def.flag:<[globalRef]> def.flagName:globalRef
     - determine <[globalRef]>
 
 
@@ -204,6 +220,60 @@ GetSquadSMLocation:
             - define SMID <[key]>
             - define location <[barracks].get[<[SMID]>].get[location]>
             - determine <[location]>
+
+
+GiveSoldierItemFromArmory:
+    type: task
+    definitions: soldier|squadName|kingdom|armories|item
+    script:
+    ## Gives the provided soldier an item from their squad's armory if it exists
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ## soldier   : [NPCTag]
+    ## item      : [ItemTag]
+    ## armories  : ?[ListTag<LocationTag>]
+    ##
+    ## >>> [Void]
+
+    - if !<[armories].exists>:
+        - run GetSquadSMLocation def.squadName:<[squadName]> def.kingdom:<[kingdom]> save:SMLocation
+        - define SMLocation <entry[SMLocation].created_queue.determination.get[1]>
+        - define filledArmories <[SMLocation].flag[squadManager.armories].filter_tag[<[filter_value].inventory.is_empty.not>]>
+
+    - else:
+        - define filledArmories <[armories].filter_tag[<[filter_value].inventory.is_empty.not>]>
+
+    - define anyInvHasItem <[filledArmories].parse_tag[<[parse_value].inventory.list_contents.find_all_matches[<[item]>]>]>
+
+    # Start tomorrow: next-best-item search.
+    # - if !<[anyInvHasItem]>:
+    #     - define expandedSearch <[filledArmories].parse_tag[<[parse_value].inventory.list_contents.parse_tag[<[parse_value].material.name>]>]>
+    #     - define anyInvHasItem <[expandedSearch]>
+
+    - narrate format:debug CANCELLED if:<[anyInvHasItem].is_empty>
+    - determine cancelled if:<[anyInvHasItem].is_empty>
+
+    - foreach <[filledArmories]> as:loc:
+        - if <[loc].inventory.list_contents.contains[<[item]>]>:
+            - if <[item].advanced_matches[*_boots|*_chestplate|*_leggings|*_helmet]>:
+                - define oldArmor <[soldier].equipment>
+
+                - equip <[soldier]> boots:<[item]> if:<[item].advanced_matches[*_boots]>
+                - equip <[soldier]> head:<[item]> if:<[item].advanced_matches[*_helmet]>
+                - equip <[soldier]> legs:<[item]> if:<[item].advanced_matches[*_leggings]>
+                - equip <[soldier]> chest:<[item]> if:<[item].advanced_matches[*_chestplate]>
+
+                - define replacedItem <[soldier].equipment.exclude[<[oldArmor]>]>
+                - give to:<[loc].inventory> <[soldier].slot[<[replacedItem]>]>
+
+            - else:
+                - define nextHotbarItemSlot <[soldier].inventory.find_item[*]>
+                - give to:<[loc].inventory> <[soldier].slot[<[nextHotbarItemSlot]>]>
+                - give to:<[soldier].inventory> <[item]>
+                - adjust <[soldier]> item_slot:1
+
+            - take from:<[loc].inventory> item:<[item]>
 
 
 GenerateSMID:
