@@ -1,0 +1,99 @@
+##
+## Common scripts that allow the dev to get and set internal game states and interact with the
+## server and worlds directly as opposed to the kingdoms API.
+##
+## @Author: Zyad (ITSZYAD#9280)
+## @Date: Jun 2023
+## @Script Ver: v1.0
+##
+## ----------------END HEADER-----------------
+
+GenerateKingdomsDebug:
+    type: task
+    definitions: type|message|silent
+    script:
+    ## Writes a given message to the debug console, with 'type' being the debug message type.
+    ## See the Denizen debug command for more info: http://meta.denizenscript.com/Docs/Commands/debug
+    ## Kingdoms debug messages are silent by default, meaning they do not show to the attached
+    ## player if they are an admin/op.
+    ##
+    ## message : [ElementTag<String>]
+    ## type    : ?[ElementTag<String>]
+    ## silent  : ?[ElementTag<Boolean>]
+    ##
+    ## >>> [Void]
+
+    - define silent <[silent].if_null[false]>
+    - define type <[type].if_null[DEBUG]>
+
+    - define messagePrefix <element[[Kingdoms Debug] <&gt><&gt> ]>
+    - define messagePrefix <[messagePrefix].color[yellow]>
+    - define messagePrefix <[messagePrefix].color[red]> if:<[type].to_lowercase.equals[error]>
+    - define messagePrefix <[messagePrefix].color[gray]> if:<[type].to_lowercase.equals[log]>
+
+    - define formattedMessage <[messagePrefix]><[message]>
+    - debug <[type]> <[formattedMessage]>
+
+    - if !<[silent]> && <player.exists> && <player.has_permission[kingdoms.admin]>:
+        - narrate <[formattedMessage]>
+
+
+InternalErrorCategories_Data:
+    type: data
+    errorCats:
+        generic: GEN
+        internal: INT
+        squads: SQA
+        armies: SQA
+        quests: QUE
+        npcs: NPC
+        rnpcs: NPC
+        territory: TER
+        economy: ECO
+        blackmarket: BMA
+        powerstrugle: PWR
+
+
+GenerateInternalError:
+    type: task
+    definitions: message|silent|category|id|codeOverride
+    script:
+    #TODO: Update this docstring
+    ## Writes a given message to the debug console with the 'ERROR' type and the provided internal
+    ## error code. Narrates this message to the attached player if they are an have the
+    ## kingdoms.admin permission or are ops when silent is provided as 'true'. It is set to 'false'
+    ## by default
+    ##
+    ## id           : [ElementTag<Integer>]
+    ## category     : [ElementTag<String>]
+    ## message      : ?[ElementTag<String>]
+    ## silent       : ?[ElementTag<Boolean>]
+    ## codeOverride : ?[ElementTag<Boolean>]
+    ##
+    ## >>> [Void]
+
+    - define silent <[silent].if_null[false]>
+    - define categoryCode <script[InternalErrorCategories_Data].data_key[errorCats.<[category]>]>
+    - define codeOverride <[codeOverride].if_null[false]>
+
+    - if !<[categoryCode].exists>:
+        - run GenerateInternalError def.message:<element[Cannot generate internal error: CatCode not provided]> def.id:001B def.category:internal def.silent:false
+        - determine cancelled
+
+    - if !<[id].exists>:
+        - run GenerateInternalError def.message:<element[Cannot generate internal error: ID not provided]> def.id:001A def.category:internal def.silent:false
+        - determine cancelled
+
+    - define messagePrefix <element[[Internal Error <[categoryCode]><[id]>] <&gt><&gt>].color[red]>
+
+    - if <server.has_flag[kingdomsCache.errorCodes.<[categoryCode]><[id]>]> && !<[codeOverride]>:
+        - define formattedMessage <[messagePrefix]><server.flag[kingdomsCache.errorCodes.<[categoryCode]><[id]>]>
+
+    - else:
+        - define formattedMessage <[messagePrefix]><[message].color[white]>
+        - flag server kingdomsCache.errorCodes.<[categoryCode]><[id]>:<[formattedMessage]>
+
+    - debug ERROR <[formattedMessage]>
+
+    - if !<[silent]>:
+        - narrate <[formattedMessage]>

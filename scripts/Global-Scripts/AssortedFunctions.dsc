@@ -15,49 +15,6 @@ NPCLevelProgress:
 
     - determine "<[levelGraphic].unseparated> - <[justDecimal].round_to_precision[0.01]><&pc>"
 
-# Process of adding a new kingdom:
-# Add new kingdom data to kingdoms.yml such as balance etc.
-# Add influence data for new kingdom to powerstruggle.yml
-# Add new kingdom name to kingdoms.yml -> kingdom_real_names
-# Copy real kingdom name to KingdomRealNames in this file
-
-GetKingdomList:
-    type: procedure
-    debug: false
-    definitions: isCodeNames
-    script:
-    - define kingdomRealNames <script[KingdomRealNames].data_key[].values.exclude[data]>
-    - define kingdomCodeNames <script[KingdomRealNames].data_key[].keys.exclude[type]>
-    - define isCodeNames <[isCodeNames].if_null[true]>
-
-    - if <[isCodeNames]>:
-        - determine <[kingdomCodeNames]>
-
-    - determine <[kingdomRealNames]>
-
-KingdomRealNames:
-    type: data
-    centran: "Dominion of Muspelheim"
-    viridian: "Commonwealth of Viriditas"
-    raptoran: "Republic of Altea"
-    cambrian: "Grovelian Empire"
-    fyndalin: "Fyndalin Trust Territory"
-
-KingdomRealShortNames:
-    type: data
-    centran: Muspelheim
-    viridian: Viridia
-    raptoran: Altea
-    cambrian: Grovelia
-    fyndalin: Fyndalin
-
-KingdomTextColors:
-    type: data
-    centran: blue
-    viridian: lime
-    raptoran: red
-    cambrian: gold
-    fyndalin: gray
 
 KingdomNameReplacer:
     type: procedure
