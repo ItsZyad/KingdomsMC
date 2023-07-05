@@ -7,7 +7,7 @@ ItemOrderWeightings:
     diamond_sword: 0.3
     diamond_axe: 0.25
     netherite_sword: 0.05
-    netherite_axe: 0.075
+    netherite_axe: 0.035
     bow: 0.8
     crossbow: 0.5
     arrow: 0.95
@@ -66,11 +66,11 @@ ItemGradientData:
     iron_axe: 600
     diamond_sword: 900
     diamond_axe: 1000
-    netherite_sword: 100
+    netherite_sword: 60
     netherite_axe: 90
     bow: 400
     crossbow: 375
-    arrow: 6000
+    arrow: 7000
     iron_helmet: 200
     iron_chestplate: 200
     iron_leggings: 200
@@ -83,10 +83,10 @@ ItemGradientData:
     diamond_chestplate: 200
     diamond_leggings: 200
     diamond_boots: 200
-    netherite_helmet: 120
-    netherite_chestplate: 90
-    netherite_leggings: 120
-    netherite_boots: 130
+    netherite_helmet: 100
+    netherite_chestplate: 80
+    netherite_leggings: 105
+    netherite_boots: 120
     bricks: 1550
     oak_planks: 2005
     spruce_planks: 2000
@@ -127,6 +127,25 @@ ItemGradientData:
 
 DailyOrderRefresh:
     type: task
+    debug: false
+    script:
+    - foreach <server.flag[kingdoms.powerstruggleInfo.transferItems]> key:item as:amount:
+        - define itemWeight <script[ItemOrderWeightings].data_key[<[item]>]>
+        - define dataKey <script[ItemGradientData].data_key[<[item]>]>
+        - define itemAmountWeight <util.random.int[32].to[<[dataKey].div[2]>].div[2].round_up.if_null[1]>
+        - define itemAmount <util.random.int[<[itemAmountWeight].div[2].round_up>].to[<[itemAmountWeight]>]>
+
+        - if <player.exists> && <player.has_permission[kingdoms.admin]>:
+            - narrate format:debug ITEM:<[item]>
+            - narrate format:debug IAW:<[itemAmountWeight]>
+            - narrate format:debug AMOUNT:<[itemAmount]>
+            - narrate format:debug ----------------------------
+
+        - flag server kingdoms.powerstruggleInfo.transferItems.<[item]>:<[itemAmount]>
+
+
+OLD_DailyOrderRefresh:
+    type: task
     script:
     - define refreshDecider <util.random.decimal[0.1].to[1]>
 
@@ -161,11 +180,15 @@ DailyOrderRefresh:
 
         - narrate format:debug -----------------------------
 
+    - narrate format:debug REF:<[refreshDecider]>
+
+
 DailyOrderRefresh_Handler:
     type: world
     events:
         on system time hourly every:24:
         - run DailyOrderRefresh
+
 
 TransferTakeoverChecker:
     type: task
@@ -189,6 +212,7 @@ TransferTakeoverChecker:
         - if <[originalPlayer].is_online>:
             - narrate format:callout targets:<[originalPlayer]> "Player: <[newPlayer].name.color[red].bold> made a request to takeover a material/weapon transfer request you made with ID: <[transferID].color[red]>. Due to your inactivity they have taken over this request."
 
+
 TransferClaimConfirm_Window:
     type: inventory
     inventory: chest
@@ -196,6 +220,7 @@ TransferClaimConfirm_Window:
     title: Confirm Claim?
     slots:
     - [] [] [TransferClaimYes_Item] [] [] [] [TransferClaimNo_Item] [] []
+
 
 TransferClaimYes_Item:
     type: item
@@ -206,10 +231,12 @@ TransferClaimYes_Item:
     - request, allowing you to do it for them if they don't
     - contest your claim in 24 hours.
 
+
 TransferClaimNo_Item:
     type: item
     material: red_wool
     display name: <red><bold>Cancel
+
 
 TransferClaimConfirm_Handler:
     type: world
@@ -286,13 +313,19 @@ TransferTracker_Window:
     - [] [] [] [] [] [] [] [] []
     - [] [] [] [] [] [] [] [] []
 
+
 TransferWindow_Handler:
     type: world
     events:
         on player clicks item in TransferTracker_Window:
+        - if <context.item.flag[transferInfo.madeBy].as[player]> == <player>:
+            - narrate format:callout "You cannot claim a transfer request that you made!"
+            - determine cancelled
+
         - if <context.item.has_flag[claimable]>:
             - flag <player> transferInfo:<context.item.flag[transferInfo]>
             - inventory open d:TransferClaimConfirm_Window
+
 
 TransferTracker_Command:
     type: command
@@ -304,15 +337,24 @@ TransferTracker_Command:
     - define transferFlag <server.flag[kingdoms.<[kingdom]>.powerstruggle.activeTransfers]>
     - define transferItemList <list[]>
 
+    - if !<[transferFlag].exists> || <[transferFlag].is_empty>:
+        - define noTransfersItem <item[barrier]>
+        - adjust def:noTransfersItem display:<element[No Transfer Requests].color[red].bold>
+
+        - define transferWindow <inventory[TransferTracker_Window]>
+        - inventory open d:<[transferWindow]>
+        - inventory set slot:23 o:<[noTransfersItem]> d:<[transferWindow]>
+        - determine cancelled
+
     - foreach <[transferFlag]> as:request:
         - narrate format:debug <[request].get[madeBy]>
 
         - define transferItem <[request].get[material].as[item]>
-        - adjust def:transferItem "lore:<element[Transfer ID: ].color[aqua]><[key].color[gray]>|<element[Request Originally Made By: ].color[aqua]><[request].get[madeBy].name.color[gray].italicize>|<element[Amount: ].color[aqua]><element[$<[request].get[amount].format_number>].color[red]>|<element[Due by: ].color[aqua]><element[<[request].get[due].to_local.format>]>"
+        - adjust def:transferItem lore:<element[Transfer ID: ].color[aqua]><[key].color[gray]>|<element[Request Originally Made By: ].color[aqua]><[request].get[madeBy].name.color[gray].italicize>|<element[Amount: ].color[aqua]><element[$<[request].get[amount].format_number>].color[red]>|<element[Due by: ].color[aqua]><element[<[request].get[due].to_local.format>]>
         - flag <[transferItem]> transferInfo:<[request].include[transferID=<[key]>]>
 
         #- if <[request].get[madeBy]> != <player>:
-        - adjust def:transferItem "lore:<[transferItem].lore.include[|<element[CLICK TO CLAIM].color[green].bold>]>"
+        - adjust def:transferItem lore:<[transferItem].lore.include[|<element[CLICK TO CLAIM].color[green].bold>]>
         - flag <[transferItem]> claimable:true
 
         - define transferItemList:->:<[transferItem]>
