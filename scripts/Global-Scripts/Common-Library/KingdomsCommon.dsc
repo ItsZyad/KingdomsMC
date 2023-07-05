@@ -229,8 +229,8 @@ SubUpkeep:
     script:
     ## Subtracts a given amount from the kingdom's upkeep
     ##
-    ## amount  : [ElementTag<Float>]
     ## kingdom : [ElementTag<String>]
+    ## amount  : [ElementTag<Float>]
     ##
     ## >>> [Void]
 
@@ -246,6 +246,25 @@ SubUpkeep:
     - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
+IsKingdomBankrupt:
+    type: procedure
+    definitions: kingdom
+    script:
+    ## Checks if the provided kingdom is bankrupt
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - define balance <proc[GetBalance].context[<[kingdom]>]>
+
+    - if <[balance].is[LESS].than[0]>:
+        - if <server.flag[indebtedKingdoms].get[<[kingdom]>].is[OR_MORE].than[4]>:
+            - determine true
+
+    - determine false
+
+
 GetMembers:
     type: procedure
     definitions: kingdom
@@ -257,6 +276,17 @@ GetMembers:
     ## >>> [ListTag<PlayerTag>]
 
     - determine <server.flag[kingdoms.<[kingdom]>.members]>
+
+
+GetAllMembers:
+    type: procedure
+    script:
+    ## Returns a list of all the members in all kingdoms
+    ##
+    ## >>> [ListTag<PlayerTag>]
+
+    - define allKingdoms <proc[GetKingdomList]>
+    - determine <[allKingdoms].parse_tag[<server.flag[kingdoms.<[parse_value]>.members]>].combine.deduplicate>
 
 
 GetClaims:
@@ -325,7 +355,7 @@ ALT_GetAllOutposts:
     ##
     ## kingdom : [ElementTag<String>]
     ##
-    ## >>> [MapTag<CuboidTag;ElementTag(...);>]
+    ## >>> [MapTag<CuboidTag;ElementTag;>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:generic message:<element[Invalid kingdom code provided: <[kingdom]>]> def.id:003

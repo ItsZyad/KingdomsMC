@@ -43,7 +43,7 @@ LoggerGenerationHandler_NEW:
             - define npcID <[ranch].split[_].get[4]>
             - define npc <npc[<[npcID]>]>
             - define kingdom <[ranch].split[_].get[3]>
-            - define isKingdomBankrupt <proc[IsKingdomBankrupt].context[<server.flag[kingdoms.<[kingdom]>.balance]>|<[kingdom]>]>
+            - define isKingdomBankrupt <proc[IsKingdomBankrupt].context[<[kingdom]>]>
             - define npcLevel <[npc].flag[Level]>
             - define npcIteration <element[100].sub[<[npcLevel]>].round_up_to_precision[10].div[10]>
             - define lowestY 1000
@@ -117,7 +117,7 @@ LoggerGenerationHandler:
             - define npcID <[value].split[_].get[4]>
             - define npc <npc[<[npcID]>]>
 
-            - if !<proc[IsKingdomBankrupt].context[<server.flag[kingdoms.<[npc].flag[kingdom]>.balance]>|<[npc].flag[kingdom]>]>:
+            - if !<proc[IsKingdomBankrupt].context[<[npc].flag[kingdom]>]>:
                 - define npcLevel <[npc].flag[Level]>
                 - define npcIteration <element[100].sub[<[npcLevel]>].round_up_to_precision[10].div[10]>
 

@@ -216,7 +216,7 @@ InfluenceStatus_Command:
         - determine cancelled
 
     - define kingdom <player.flag[kingdom]>
-    - define isBankrupt <proc[IsKingdomBankrupt].context[<server.flag[kingdoms.<[kingdom]>.balance]>|<[kingdom]>]>
+    - define isBankrupt <proc[IsKingdomBankrupt].context[<[kingdom]>]>
 
     - if !<[isBankrupt]>:
         - if <context.args.size> == 0 || <context.args.get[1]> == info:

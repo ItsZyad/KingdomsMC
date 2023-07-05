@@ -71,7 +71,6 @@ FarmerGenerationHandler:
             - define npcID <[farmArea].split[_].get[4]>
             - define npc <npc[<[npcID]>]>
             - define outpostMod <[npc].flag[outpostMod]>
-            - define kingdomBalance <server.flag[kingdoms.<[kingdom]>.balance]>
 
             # Loop through all the blocks in the farm area that are valid food types...
             - foreach <[farmArea].blocks> as:block:
@@ -92,7 +91,7 @@ FarmerGenerationHandler:
                     # - narrate format:debug targets:<server.online_ops> TOTA:<[totalDrop]>
 
                     # Ensure the farmer's kingdom is not bankrupt
-                    - if !<proc[IsKingdomBankrupt].context[<[kingdomBalance]>|<[kingdom]>]>:
+                    - if !<proc[IsKingdomBankrupt].context[<[kingdom]>]>:
                         - if <[npc].inventory.can_fit[<[block].material.name>].quantity[<[totalDrop]>]>:
                             - define plantableFood <[block].material>
                             - adjust def:plantableFood age:0

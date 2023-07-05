@@ -33,15 +33,6 @@ KingdomUpkeepHandler:
 
                 - run SidebarLoader def.target:<server.online_players>
 
-IsKingdomBankrupt:
-    type: procedure
-    definitions: KingdomBalance|kingdom
-    script:
-    - if <[KingdomBalance].is[LESS].than[0]>:
-        - if <server.flag[indebtedKingdoms].get[<[kingdom]>].is[OR_MORE].than[4]>:
-            - determine true
-
-    - determine false
 
 NegativeBalanceAlert:
     type: world
