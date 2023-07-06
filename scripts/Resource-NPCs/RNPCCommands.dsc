@@ -124,7 +124,7 @@ WriteRNPCData:
 
     # Flag the npc with its RNPC type
 
-    - flag <[createdNPC]> RNPC:<context.item.flag[spawnType]>
+    - flag <[createdNPC]> RNPC:<[spawnType]>
     - flag <[createdNPC]> Level:1
     - flag <[createdNPC]> outputMod:0
     - flag <[createdNPC]> kingdom:<player.flag[kingdom]>
@@ -239,7 +239,7 @@ RNPCWindow_Handler:
                     # If the NPC is spawned into an outpost of its corresponding specialization type,
                     # assign it a modifier
                     - flag <entry[latestNPC].created_npc> outpostMod:<[NPCOutpostMod]>
-                    - run MinerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
+                    - ~run MinerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
 
                     # Write relevant RNPC data
                     - run WriteRNPCData def:<entry[latestNPC].created_npc>|<context.item.flag[spawnType]>
@@ -440,6 +440,7 @@ RNPCHandler:
 
 RNPCHandler_I:
     type: interact
+    debug: false
     steps:
         1:
             click trigger:
