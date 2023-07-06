@@ -145,6 +145,7 @@ CalculateRNPCPrice:
 
     - run SidebarLoader def.target:<server.flag[<[player].flag[kingdom]>.members].include[<server.online_ops>]>
 
+
 RNPCWindow_Handler:
     type: world
     events:
@@ -158,11 +159,8 @@ RNPCWindow_Handler:
 
         # Prestige modifier for RNPC Spawning:
         # y = 4log(invPrestige + k)^-1 - gradient * k
-
         - define prestigeModifier <element[4].mul[<[invPrestige].add[<[k]>].log[10].power[-1]>].sub[<[gradient].mul[<[k]>]>].round_to_precision[0.01]>
         - define truePrice <[prestigeModifier].mul[<[basePrice]>]>
-
-        #- narrate format:debug <[prestigeModifier]>
 
         - foreach <util.notes[cuboids]>:
             - if <[value].contains[<player.location>]>:
@@ -172,23 +170,19 @@ RNPCWindow_Handler:
                 - narrate format:callout "You cannot spawn an RNPC in the AOE of another RNPC!"
                 - determine cancelled
 
-        # If the kingdom bank has enough money to buy an NPC with the
-        # price modified by the prestige value
-
+        # If the kingdom bank has enough money to buy an NPC with the price modified by the
+        # prestige value
         - if <server.flag[kingdoms.<[kingdom]>.balance].is[OR_MORE].than[<[truePrice]>]>:
 
             # Deduct amount from kingdom balance and add to NPC total
-
             - define nameType <context.item.display.split[Spawn<&sp>a<&sp>].get[2]>
             - define prestige <server.flag[kingdoms.<[kingdom]>.prestige]>
             - define NPCOutpostMod 1|1
             - define specType null
 
-            # Find if the player is currently standing in an outpost that
-            # their kingdom owns, if so, define values for the outpost's
-            # specialization type and how much of a modifier should be
-            # applied
-
+            # Find if the player is currently standing in an outpost that their kingdom owns,
+            # if so, define values for the outpost's specialization type and how much of a modifier
+            # should be applied
             - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
                 - if <cuboid[<[value]>].contains[<player.location>]>:
                     - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[value]>.specType]>:
@@ -198,85 +192,65 @@ RNPCWindow_Handler:
                             - define NPCOutpostMod <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[value]>.specMod]>
 
             ## >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            # If spawned NPC is a farmer type
+            ## If spawned NPC is a farmer type
 
             - if <context.item.flag[spawnType]> == farmers:
                 - create player <player.location> "<[nameType]> :: Lvl 1" save:latestNPC
 
-                # Make the AOE scale with half the kingdom's prestige with
-                # a minimum radius of 5
-
+                # Make the AOE scale with half the kingdom's prestige with a minimum radius of 5
                 - define radius <[prestige].div[2].round>
                 - define radius 5 if:<[prestige].round.is[LESS].than[10]>
 
-                # If the NPC is spawned into an outpost of its correspond-
-                # ing specialization type, assign it a modifier
-
+                # If the NPC is spawned into an outpost of its corresponding specialization type,
+                # assign it a modifier
                 - flag <entry[latestNPC].created_npc> outpostMod:<[NPCOutpostMod].as[list]>
 
                 # Change NPC's skin
-
                 - adjust <entry[latestNPC].created_npc> skin_blob:<script[RNPCSkins].data_key[farmer]>
 
                 - run FarmerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
 
                 # Write relevant RNPC data
-
                 - run WriteRNPCData def:<entry[latestNPC].created_npc>|<context.item.flag[spawnType]>
                 - run CalculateRNPCPrice def.truePrice:<[truePrice]> def.player:<player>
 
             ## >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            # If spawned NPC is a miner type
+            ## If spawned NPC is a miner type
 
             - else if <context.item.flag[spawnType]> == miners:
                 - define npcLoc <player.location>
 
-                # A sample of blocks above the npc by 10 blocks with a
-                # dimension of 4x4
-
+                # A sample of blocks above the npc by 10 blocks with a dimension of 4x4
                 - define tenBlocksAbove <cuboid[<[npcLoc].location.world.name>,<[npcLoc].x.sub[1]>,<[npcLoc].y.add[10]>,<[npcLoc].z.sub[1]>,<[npcLoc].x.add[1]>,<[npcLoc].y>,<[npcLoc].z.add[1]>]>
                 - define numOfAir 0
-
-                # - narrate format:debug TBA:<[tenBlocksAbove].blocks>
 
                 - foreach <[tenBlocksAbove].blocks>:
                     - if <[value].material.name> == air:
                         - define numOfAir:++
 
-                # If the ratio of air blocks in the sample is below
-                # 40% then initialize the miner NPC
-
-                # - narrate format:debug NOA:<[numOfAir]>
-                # - narrate format:debug NOA_DIV:<[numOfAir].div[<[tenBlocksAbove].volume>]>
-                #- determine cancelled
-
+                # If the ratio of air blocks in the sample is below 40% then initialize the miner
+                # NPC
                 - if <[numOfAir].div[<[tenBlocksAbove].volume>].is[OR_LESS].than[0.6]> || <[numOfAir]> == 0:
-
                     - create player <player.location> "<[nameType]> :: Lvl 1" save:latestNPC
 
                     - define radius <[prestige].sqrt.mul[3.9].round>
                     - define radius 10 if:<[prestige].round.is[LESS].than[10]>
 
-                    # If the NPC is spawned into an outpost of its correspond
-                    # .ing specialization type, assign it a modifier
-
+                    # If the NPC is spawned into an outpost of its corresponding specialization type,
+                    # assign it a modifier
                     - flag <entry[latestNPC].created_npc> outpostMod:<[NPCOutpostMod]>
-
                     - run MinerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
 
                     # Write relevant RNPC data
-
                     - run WriteRNPCData def:<entry[latestNPC].created_npc>|<context.item.flag[spawnType]>
                     - run CalculateRNPCPrice def.truePrice:<[truePrice]> def.player:<player>
 
-                # If not then remove the NPC just created and its ref
-                # in the server RNPC flag
-
+                # If not then remove the NPC just created and its ref in the server RNPC flag
                 - else:
                     - narrate format:callout "You can't create a miner NPC here! These need to be at least 10 blocks below solid ground."
 
             ## >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            # If spawned NPC is a logger type
+            ## If spawned NPC is a logger type
 
             - else if <context.item.flag[spawnType]> == loggers:
                 - create player <player.location> "<[nameType]> :: Lvl 1" save:latestNPC
@@ -284,20 +258,17 @@ RNPCWindow_Handler:
                 - define radius <[prestige].sqrt.mul[6.2].round>
                 - define radius 20 if:<[prestige].round.is[LESS].than[10]>
 
-                # If the NPC is spawned into an outpost of its correspond
-                # .ing specialization type, assign it a modifier
-
+                # If the NPC is spawned into an outpost of its corresponding specialization
+                # type, assign it a modifier
                 - flag <entry[latestNPC].created_npc> outpostMod:<[NPCOutpostMod]>
-
                 - run LoggerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
 
                 # Write relevant RNPC data
-
                 - run WriteRNPCData def:<entry[latestNPC].created_npc>|<context.item.flag[spawnType]>
                 - run CalculateRNPCPrice def.truePrice:<[truePrice]> def.player:<player>
 
             ## >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            # If spawned NPC is a guard type
+            ## If spawned NPC is a guard type
 
             - else if <context.item.flag[spawnType]> == guard:
                 - define isInCastleLoc <server.flag[kingdoms.<[kingdom]>.claims.castle].contains[<player.location.chunk>]>
@@ -428,14 +399,12 @@ RNPCInfo_Handler:
 
         on player clicks ConfirmDeleteRNPC_Item in DeleteConfirm_Window:
 
-        # When the player deletes the RNPC, also delete the noted
-        # AOE cuboidTag as well as its entry in the universal list
-        # of RNPCs attached to the server
-
+        # When the player deletes the RNPC, also delete the noted AOE cuboidTag as well as its
+        # entry in the universal list of RNPCs attached to the server
         - define npc <player.flag[currNPC]>
         - define kingdom <[npc].flag[kingdom]>
 
-        # Refund code
+        # Refund code:
         # Equation: mult = log(prestige + 18) - 1.25
         - define prestige <server.flag[kingdoms.<[kingdom]>.prestige]>
         - define refundMultiplier <[prestige].add[18].log[10].sub[1.25]>
@@ -446,7 +415,6 @@ RNPCInfo_Handler:
         - note as:INTERNAL_<script[RNPCLandTypeRef].data_key[<[npc].nickname.split[<&sp>::].get[1]>]>_<[kingdom]>_<[npc].id> remove
 
         # Remove all references of NPC from YAML files
-
         - flag server kingdoms.<[kingdom]>.npcTotal:--
         - flag server kingdoms.<[kingdom]>.balance:+:<[refund].round>
         - flag server kingdoms.<[kingdom]>.RNPCs.<script[RNPCLandTypeRef].data_key[<[npc].nickname.split[<&sp>::].get[1]>]>.<[npc].id>:!
