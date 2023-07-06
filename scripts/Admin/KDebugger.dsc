@@ -23,7 +23,7 @@ Debugger:
         - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
             - narrate format:debug <queue.script.original_name>
 
-            - narrate "<element[                                  ].strikethrough>"
+            - narrate <element[                                  ].strikethrough>
 
             - flag <player> adminTools.debugMode:<queue>
             - define breakpointCount <[breakpointCount].add[1].if_null[1]>
@@ -34,7 +34,7 @@ Debugger:
             - narrate "<gold><italic>Breakpoint #<[breakpointCount]>"
             - run FlagVisualizer def.flag:<queue.definition_map.exclude[breakpointCount]> def.flagName:<queue.script.name.bold><&sp>defs
             - narrate <n>
-            - narrate "<element[Player Context].color[aqua]>:<element[Click here].underline.on_hover[Player context map].on_click[]>"
+            - narrate <element[Player Context].color[aqua]>:<element[Click here].underline.on_hover[Player context map].on_click[]>
 
             - define breakpoints <[breakpoints].if_null[activated]>
 
@@ -47,9 +47,9 @@ Debugger:
                     - flag <player> adminTools.killedQueue
 
                 - narrate <n>
-                - narrate "<element[Continue script execution].underline.on_click[<entry[debugContinue].command>]>"
+                - narrate <element[Continue script execution].underline.on_click[<entry[debugContinue].command>]>
                 - narrate <n>
-                - narrate "<element[Stop Queue].underline.on_click[<entry[debugStop].commands>]>"
+                - narrate <element[Stop Queue].underline.on_click[<entry[debugStop].commands>]>
 
                 - define beforeWaitTime <util.time_now.epoch_millis>
 
@@ -67,7 +67,7 @@ Debugger:
                 - narrate "<red><bold>User Stopped Queue Execution."
                 - stop
 
-            - narrate "<element[                                  ].strikethrough>"
+            - narrate <element[                                  ].strikethrough>
 
 
     - else:
