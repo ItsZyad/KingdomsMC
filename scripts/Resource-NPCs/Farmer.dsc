@@ -43,12 +43,12 @@ FarmerRangeFinder:
 
 FoodExperienceGain:
     type: data
-    carrots: 0.5
-    potato: 0.5
-    potatoes: 0.5
-    wheat: 0.3
-    beetroot: 0.25
-    sugar_cane: 0.1
+    carrots: 0.25
+    potato: 0.25
+    potatoes: 0.25
+    wheat: 0.15
+    beetroot: 0.1
+    sugar_cane: 0.03
 
 FoodSingulars:
     type: data
