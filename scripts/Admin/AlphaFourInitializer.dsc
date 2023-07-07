@@ -95,8 +95,11 @@ RNPCFlagGenerator:
         - if <[NPCType].exists>:
             - define kingdom <[note].split[_].get[3]>
             - define NPCID <[note].split[_].get[4]>
-            - define bothExist <[kingdom].exists.and[<[NPCID].exists>]>
+            - define NPC <npc[<[NPCID]>]>
+            - define bothExist <[kingdom].exists.and[<[NPC].exists>]>
 
             - if <[bothExist]>:
                 - flag server kingdoms.<[kingdom]>.RNPCs.<[NPCType]>.<[NPCID]>.NPC:<npc[<[NPCID]>]>
                 - flag server kingdoms.<[kingdom]>.RNPCs.<[NPCType]>.<[NPCID]>.area:<[note]>
+
+                - flag <[NPC]> AOE:<[note]>

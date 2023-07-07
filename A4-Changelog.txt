@@ -13,8 +13,9 @@ Bug Fixes / Performance Upgrades:
     - Fixed material transfer chest issue where the sign wouldn't generate depending on which chest side you place it on.
     - Territory handling code should be more performant now.
     - Adjusted some kingdom text colors.
-    - Fixed bug which allowed players to sit on chairs through walls
-    - Fixed a bug where under certain circustances the server join message would read 'null'
+    - Balanced weapon/material transfer daily amounts.
+    - Fixed bug which allowed players to sit on chairs through walls.
+    - Fixed a bug where under certain circustances the server join message would read 'null'.
     - Fixed guards attacking own kingdom members bug (I hope...).
     - Fixed uncommon bug which crashes the server when guards attempt to pathfind.
     - Fixed a bug which prevented players from claiming core chunks.
@@ -31,6 +32,7 @@ Small Additions:
         - Added /quest command instead.
     - War status line now reads 'At peace' or 'At war' instead of true and false.
     - Added scripted mailboxes which can push news and important world events to certain kingdoms.
+    - Heavily nerfed EXP gained by miner and farmer NPCs.
 
 Large Additions:
     - Introduced CISK (Common Interface for Storywriting in Kingdoms), with the following base feature set:
@@ -52,9 +54,9 @@ Large Additions:
             - quest*,
             - branches,
     - Introduced dynamic markets with merchants that respond to changes in supply and demand.
-        - Introduced fully purpose-built merchants with buy and sell menus
-        - Introduced World-wide record/ledger of market transactions
-        - Introduced merchants that respond effectively to immediate changes in player buying/selling habits
+        - Introduced fully purpose-built merchants with buy and sell menus,
+        - Introduced world-wide ledger of market transactions,
+        - Introduced merchants that respond effectively to immediate changes in player buying/selling habits.
     - Added initial version of the squads & armies mechanics with features such as:
         - Fully integrated barracks / squad-holding system,
         - Basic squad management tools,

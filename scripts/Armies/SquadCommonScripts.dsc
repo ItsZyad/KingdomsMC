@@ -61,7 +61,7 @@ CreateSquadReference:
     ## SMLocation    : [LocationTag]
     ## kingdom       : [ElementTag<String>]
     ## displayName   : [ElementTag<String>]
-    ## squadComp     : [MapTag<ElementTag<String>;ElementTag<Integer>>]
+    ## squadComp     : [MapTag<[ElementTag<String>];[ElementTag<Integer>]>]
     ## totalManpower : [ElementTag<Integer>]
     ##
     ## >>> [Void]
@@ -194,7 +194,7 @@ GetSquadInfo:
 
         # TODO: find a way to properly compare these maps
         - if !<[localRef].equals[<[globalRef]>]>:
-            - run flagvisualizer def.flag:<[localRef]> def.flagName:localRef
+            # - run flagvisualizer def.flag:<[localRef]> def.flagName:localRef
             - determine <[localRef]>
 
     # - run flagvisualizer def.flag:<[globalRef]> def.flagName:globalRef

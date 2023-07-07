@@ -12,6 +12,7 @@
 
 MerchantTutorial_Handler:
     type: world
+    enabled: false
     events:
         on player enters cuboid:
         - if <context.area.name> == MerchantTutorialLoc:

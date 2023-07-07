@@ -19,6 +19,7 @@ MinerSpecialization_Window:
     - [] [] [] [] [] [] [] [] []
     - [] [] [] [] [] [] [] [] []
 
+
 MinerSpecOres:
     type: item
     material: iron_ore
@@ -26,12 +27,14 @@ MinerSpecOres:
     flags:
         specType: ores
 
+
 MinerSpecStones:
     type: item
     material: stone
     display name: "Specialize in Stones"
     flags:
         specType: stones
+
 
 MinerSpec_Handler:
     type: world
@@ -47,9 +50,11 @@ MinerSpec_Handler:
 
         - flag <[latestRNPC]> spec:<context.item.flag[specType]>
 
+
 MinerRangeFinder:
     type: task
-    definitions: npc|radius
+    debug: false
+    definitions: npc|radius|regenAOE
     script:
 
     # Have it check that the NPC is at least 10 blocks below ground
@@ -60,41 +65,53 @@ MinerRangeFinder:
     # in it's direct vicinity but that will be rare and will heavily
     # depend on NPC level and exp.
 
+    - define regenAOE <[regenAOE].if_null[true]>
     - define npcLoc <[npc].location>
-    - define locOne <[npcLoc].right[<[radius]>].forward[<[radius]>]>
-    - define locTwo <[npcLoc].left[<[radius]>].backward[<[radius]>]>
-    - define areaOfEffect <cuboid[<[npc].location.world.name>,<[locOne].x>,<[npcLoc].y.add[<[radius].mul[2]>]>,<[locOne].z>,<[locTwo].x>,<[npcLoc].y.sub[<[radius]>]>,<[locTwo].z>]>
+    - define locOne <[npcLoc].add[<[radius]>,<[radius].div[2].round>,<[radius]>]>
+    - define locTwo <[npcLoc].sub[<[radius]>,<[radius].div[2].round>,<[radius]>]>
+    - define areaOfEffect <cuboid[<[npc].location.world.name>,<[locOne].simple.split[,].remove[last].separated_by[,]>,<[locTwo].simple.split[,].remove[last].separated_by[,]>]>
 
-    - foreach <[areaOfEffect].blocks> as:block:
-       - flag <[npc]> blockBuildup.<[block].material.name>:++
-       - flag <[npc]> blockBuildup.totalBlocks:++
+    - if <[regenAOE]>:
+        - flag <[npc]> blockbuildup:!
 
-    - narrate format:debug <[areaOfEffect]>
+        - foreach <[areaOfEffect].blocks> as:block:
+            - if <[block].material.name> == air:
+                - foreach next
+
+            - flag <[npc]> blockBuildup.<[block].material.name>:++
+            - flag <[npc]> blockBuildup.totalBlocks:++
+
+    - narrate format:debug <[areaOfEffect].blocks.size>
     - narrate format:debug <[npc].flag[blockBuildup]>
+
+    - showfake red_stained_glass <[areaOfEffect].outline> if:<[areaOfEffect].exists>
 
     #                              1      2            3               4
     - note <[areaOfEffect]> as:INTERNAL_mine_<[npc].flag[kingdom]>_<[npc].id>
     - flag server kingdoms.<[npc].flag[kingdom]>.RNPCs.Miners.<[npc].id>.area:<cuboid[INTERNAL_mine_<[npc].flag[kingdom]>_<[npc].id>]>
+    - flag server kingdoms.<[npc].flag[kingdom]>.RNPCs.Miners.<[npc].id>.NPC:<[npc]>
+    - flag <[npc]> AOE:<[areaOfEffect]>
 
 ##ignorewarning raw_object_notation
 ##ignorewarning def_of_nothing
 
 MineExperienceGain:
     type: data
-    stone: 0.01
-    granite: 0.03
-    andesite: 0.03
-    diorite: 0.03
-    gold_ore: 0.25
-    iron_ore: 0.05
-    diamond_ore: 0.45
+    stone: 0.005
+    granite: 0.015
+    andesite: 0.013
+    diorite: 0.01
+    gold_ore: 0.20
+    iron_ore: 0.03
+    diamond_ore: 0.3
     coal_ore: 0.02
-    redstone_ore: 0.1
-    obsidian: 0.99
-    emerald_ore: 0.9
-    gravel: 0.01
+    redstone_ore: 0.07
+    obsidian: 0.6
+    emerald_ore: 0.7
+    gravel: 0.004
     lapis_ore: 0.07
-    clay_block: 0.02
+    clay_block: 0.01
+
 
 TrueItemRef:
     type: data
@@ -114,13 +131,26 @@ TrueItemRef:
     clay_block: clay
 
 
+## NOTE: This is a stopgap. Rewrite all RNPCs code for A5!!
 MinerItemGenerator:
     type: task
     script:
-    - foreach <util.notes[cuboids].filter_tag[<[filter_value].starts_with[cu@INTERNAL_mine]>]> as:mine:
+    - define kingdomList <proc[GetKingdomList]>
+    - define allMiners <list[]>
+
+    - foreach <[kingdomList]> as:kingdom:
+        - if !<server.has_flag[kingdoms.<[kingdom]>.RNPCs.miners]>:
+            - foreach next
+
+        - define minerData <server.flag[kingdoms.<[kingdom]>.RNPCs.miners].parse_value_tag[<[parse_value].include[kingdom=<[kingdom]>]>]>
+        - define allMiners:->:<[minerData]>
+
+    - run flagvisualizer def.flag:<[allMiners]>
+    - determine cancelled
+
+    - foreach <[allMiners]>:
         - define npcID <[value].split[_].get[4]>
         - define npc <npc[<[npcID]>]>
-        - define kingdom <[npc].flag[kingdom]>
 
         - if !<[kingdom].exists>:
             - foreach next
@@ -128,15 +158,48 @@ MinerItemGenerator:
         - if <[npc].inventory.is_full>:
             - foreach next
 
-        - if <proc[IsKingdomBankrupt].context[<server.flag[kingdoms.<[kingdom]>.balance]>|<[kingdom]>]>:
+        - if <proc[IsKingdomBankrupt].context[<[kingdom]>]>:
             - foreach next
 
-        - define minerBlocks <list[stone|granite|andesite|diorite|gold_ore|iron_ore|diamond_ore|coal_ore|redstone_ore|obsidian|emerald_ore|gravel|lapis_ore|clay_block]>
+        - define surroundingMiners <[npc].find_npcs_within[10].parse_tag[<[parse_value].flag[type].equals[miners]>]>
+        - define overcrowdingPenalty <[surroundingMiners].sub[1].mul[25]>
+        - define overcrowdingPenalty 100 if:<[overcrowdingPenalty].is[MORE].than[100]>
+
+        - if <[surroundingMiners].is[MORE].than[1]>:
+            - adjust <[npc]> hologram_lines:<list[Overcrowding Penalty:<[overcrowdingPenalty]><&pc>]>
+            - adjust <[npc]> hologram_line_height:0.25
+            - flag <[npc]> overcrowdingPen:<[overcrowdingPenalty]>
+
+            - if <[overcrowdingPenalty]> == 100:
+                - adjust <[npc]> hologram_lines:<list[Overcrowding Penalty:<red><[overcrowdingPenalty]><&pc>|This miner is disabled]>
+                - foreach next
+
+        # Note: future configurable
+        - flag <[npc]> nextGen:<util.time_now.add[35s]>
+        - define minerBlocks <script[TrueItemRef].data_key[].keys>
+        - define volume <[mine].volume>
+        - define generationProfile <[npc].flag[blockBuildup].exclude[totalBlocks].get_subset[<[minerBlocks]>]>
+        - define npcLevel <[npc].flag[Level]>
+
+        - foreach <[generationProfile]> key:block as:amount:
+            - define spawnChance <util.random.int[<util.random.int[0].to[<[npcLevel].round>]>].to[100]>
+
+            - if <[spawnChance].is[LESS].than[37]>:
+                - foreach next
+
+            - define trueItem <script[TrueItemRef].data_key[<[key]>]>
+            - define dropAmount <util.random.int[0].to[<util.random.int[<[val]>].to[99]>]>
+            - define outpostMod <[npc].flag[outpostMod]>
+            - define outputMod <[npc].flag[outputMod]>
+            - define itemModifier <element[1.01].sub[<script[MineExperienceGain].data_key[<[key]>]>].mul[<[spawnChance]>].div[8].mul[<[outpostMod].get[1]>].mul[<[outputMod].add[1]>].round_down>
+
+            - inject Debugger
 
 
 MinerGeneration:
     type: task
     debug: false
+    enabled: false
     script:
     # Loop through all the noted regions that start with 'mine'
     # and run the generation code relating to their NPCs.
@@ -157,7 +220,7 @@ MinerGeneration:
         # If the NPC's kingdom is not currently in a state of bankruptcy (4+
         # days in debt)
 
-        - if !<proc[IsKingdomBankrupt].context[<server.flag[kingdoms.<[npc].flag[kingdom]>.balance]>|<[npc].flag[kingdom]>]>:
+        - if !<proc[IsKingdomBankrupt].context[<[npc].flag[kingdom]>]>:
             - define npcLevel <[npc].flag[Level]>
             #- define npcIteration <element[100].sub[<[npcLevel]>].round_up_to_precision[10].div[10]>
             - define npcIteration 1
@@ -228,12 +291,31 @@ MinerGeneration:
     - if <server.flag[iterations]> == 10:
         - flag server iterations:0
 
+
+MinerGenerationNoticeUpdater:
+    type: task
+    debug: false
+    script:
+    - repeat 35:
+        - define timeStart <util.current_time_millis>
+
+        - foreach <util.notes[cuboids].filter_tag[<[filter_value].starts_with[cu@INTERNAL_mine]>]>:
+            - define npc <npc[<[value].split[_].get[4]>]>
+            - define nextGen <[npc].flag[nextGen]>
+
+            - adjust <[npc]> hologram_lines:<[npc].hologram_lines.include[<element[Generating in: <[nextGen].from_now>]>]>
+
+        - wait <element[1000].sub[<util.current_time_millis.sub[<[timeStart]>]>].div[1000].mul[20].round>t
+
+
 MinerGeneration_Handler:
     type: world
     debug: false
+    enabled: false
     events:
         on system time secondly every:35:
         - inject MinerGeneration
+        #- run MinerGenerationNoticeUpdater
 
         #on player places block in:mine*:
         #- determine cancelled

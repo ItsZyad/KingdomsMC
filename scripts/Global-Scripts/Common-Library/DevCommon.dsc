@@ -10,6 +10,7 @@
 
 GenerateKingdomsDebug:
     type: task
+    debug: false
     definitions: type|message|silent
     script:
     ## Writes a given message to the debug console, with 'type' being the debug message type.
@@ -26,16 +27,28 @@ GenerateKingdomsDebug:
     - define silent <[silent].if_null[false]>
     - define type <[type].if_null[DEBUG]>
 
+    - if !<[message].exists>:
+        - determine cancelled
+
     - define messagePrefix <element[[Kingdoms Debug] <&gt><&gt> ]>
     - define messagePrefix <[messagePrefix].color[yellow]>
     - define messagePrefix <[messagePrefix].color[red]> if:<[type].to_lowercase.equals[error]>
     - define messagePrefix <[messagePrefix].color[gray]> if:<[type].to_lowercase.equals[log]>
 
-    - define formattedMessage <[messagePrefix]><[message]>
-    - debug <[type]> <[formattedMessage]>
+    - define formattedMessage <element[<[messagePrefix]><[message]>]>
+    - run debug_debug def.type:<[type]> def.formattedMessage:<[formattedMessage]>
 
     - if !<[silent]> && <player.exists> && <player.has_permission[kingdoms.admin]>:
         - narrate <[formattedMessage]>
+
+
+# wow so meta...
+DEBUG_DEBUG:
+    type: task
+    definitions: type|formattedMessage
+    script:
+    - debug DEBUG --------------------------
+    - debug type:<[type]> <[formattedMessage]>
 
 
 InternalErrorCategories_Data:
@@ -93,6 +106,7 @@ GenerateInternalError:
         - define formattedMessage <[messagePrefix]><[message].color[white]>
         - flag server kingdomsCache.errorCodes.<[categoryCode]><[id]>:<[formattedMessage]>
 
+    - debug DEBUG --------------------------
     - debug ERROR <[formattedMessage]>
 
     - if !<[silent]>:
