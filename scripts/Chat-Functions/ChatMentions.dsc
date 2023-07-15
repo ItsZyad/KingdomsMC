@@ -1,5 +1,6 @@
 ChatMentions:
     type: world
+    debug: false
     events:
         on player chats:
         - if <context.message.contains[@]>:
