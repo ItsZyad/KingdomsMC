@@ -450,6 +450,7 @@ SpawnSquadNPCs:
     - flag <player> datahold.squadInfo.squadLeader:<[squadLeader]>
     - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.hasSpawned:true
     - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<[soldierList]>
+    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.sentinelSquad:<[kingdom]>_<[squadName]>
 
     - ~run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[player].flag[kingdom]>
     - run GiveSquadTools def.player:<player>
