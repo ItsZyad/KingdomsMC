@@ -11,6 +11,9 @@ FlagVisualizer:
         - narrate format:admincallout "Recursion depth exceeded 50! Killing queue: <script.queues.get[1]>"
         - determine cancelled
 
+    - if !<[flag].exists>:
+        - determine cancelled
+
     - if <[flag].as[entity].exists>:
         - define name <[flag].name.color[aqua]>
         - define uuid <[flag].uuid>
@@ -42,6 +45,13 @@ FlagVisualizer:
             - determine passively "<element[i<&at><[flag].material.name>].color[aqua]> <element[[nbt]].color[light_purple].on_hover[<[formattedItemProperties]>]>"
 
         - determine passively <element[i<&at><[flag].material.name>].color[aqua]>
+
+    - else if <[flag].object_type> == Chunk:
+        - define cornerOne <[flag].cuboid.corners.get[1].simple.split[,].remove[last].remove[2].separated_by[,]>
+        - define cornerTwo <[flag].cuboid.corners.get[2].simple.split[,].remove[last].remove[2].separated_by[,]>
+        - define coordRange "<[cornerOne]> -<&gt> <[cornerTwo]>"
+
+        - determine passively "<[flag].color[aqua]> <element[[range]].color[light_purple].on_hover[<[coordRange]>]>"
 
     - else if <[flag].object_type> == Map:
         - narrate <proc[MakeTabbed].context[<element[MAP :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
