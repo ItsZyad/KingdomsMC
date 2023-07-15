@@ -7,6 +7,7 @@ Amogus:
 
     - determine <[text]>
 
+
 AmogusToggler:
     type: command
     name: amogus
@@ -20,6 +21,7 @@ AmogusToggler:
         - flag <player> amogus
         - narrate format:callout "You will now ඞ <&gt>:)"
 
+
 AmogusMode:
     type: task
     definitions: text|player
@@ -30,10 +32,10 @@ AmogusMode:
 
     - determine <[text]>
 
+
 MuteHandler:
     type: world
     events:
-        on player chats:
-        - if <server.has_flag[BlanketMute]>:
-            - if !<player.has_permission[kingdoms.admin]>:
-                - determine cancelled
+        on player chats server_flagged:BlanketMute:
+        - if !<player.has_permission[kingdoms.admin]>:
+            - determine cancelled
