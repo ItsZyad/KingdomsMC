@@ -172,9 +172,9 @@ SquadManager_Interface:
     gui: true
     title: Squad Manager
     slots:
+    - [] [] [] [] [] [] [] [] []
     - [] [] [SquadComposer_Item] [] [RenameBarracks_Item] [] [RelocateSquadManager_Item] [] []
-    - [] [] [SquadStationingEval_Item] [] [SquadManagerSetAOE_Item] [] [SetArmoryLocations_Item] [] []
-    - [] [] [] [] [SquadManagerUpgradesDark_Item] [] [] [] []
+    - [] [] [SquadManagerUpgradesDark_Item] [] [SquadManagerSetAOE_Item] [] [SetArmoryLocations_Item] [] []
     - [] [] [] [] [] [] [] [] []
     - [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadManagerInfo_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
     - [] [] [SquadListInfo_Item] [] [SeeArmoryLocations_Item] [] [SquadManagerShowAOE_Item] [] []
@@ -224,7 +224,7 @@ SquadManager_Handler:
             kingdom: <[kingdom]>
             id: <context.location.simple.split[,].remove[last].unseparated>
             levels:
-                MaxAOESize: 20
+                AOELevel: 0
                 squadLimit: 1
                 squadSizeLimit: 30
                 stationCapacity: 0
@@ -320,13 +320,44 @@ SquadManager_Handler:
         on player clicks SquadListInfo_Item in SquadManager_Interface:
         - run SquadSelectionGUI def.player:<player>
 
+        # TODO(Low): Do something about code duplication
+
+        ## Breaks Bed in SM Area
+        on player breaks *_bed:
+        - define SMLocation <proc[BedSMLocation].context[<player>|<context.location>]>
+
+        - if <[SMLocation].exists> && <[SMLocation].world> == <player.location.world>:
+            - define SMData <[SMLocation].flag[squadManager]>
+            - define bedCount <proc[CountBedsInSquadManagerArea].context[<[SMLocation]>]>
+            - define stationCapacity <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
+
+            - flag <[SMLocation]> squadManager.levels.stationCapacity:<[stationCapacity]>
+            - ~run WriteArmyDataToKingdom def.kingdom:<player.flag[kingdom]> def.SMLocation:<[SMLocation]>
+
+        ## Places Bed in SM Area
+        on player places *_bed:
+        - define SMLocation <proc[BedSMLocation].context[<player>|<context.location>]>
+
+        - if <[SMLocation].exists> && <[SMLocation].world> == <player.location.world>:
+            - define SMData <[SMLocation].flag[squadManager]>
+            - define bedCount <proc[CountBedsInSquadManagerArea].context[<[SMLocation]>]>
+            - define stationCapacity <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
+
+            - flag <[SMLocation]> squadManager.levels.stationCapacity:<[stationCapacity]>
+            - ~run WriteArmyDataToKingdom def.kingdom:<player.flag[kingdom]> def.SMLocation:<[SMLocation]>
+
         ## Stationing Re-eval.
-        on player clicks SquadStationingEval_Item in SquadManager_Interface:
-        - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
-        - define bedCount <proc[CountBedsInSquadManagerArea].context[<[squadManagerLocation]>]>
-        - define stationCapacity <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
-        - flag <[squadManagerLocation]> squadManager.levels.stationCapacity:<[stationCapacity]>
-        - ~run WriteArmyDataToKingdom def.kingdom:<player.flag[kingdom]> def.SMLocation:<[squadManagerLocation]>
+        # on player clicks SquadStationingEval_Item in SquadManager_Interface:
+        # - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
+        # - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
+        # - define bedCount <proc[CountBedsInSquadManagerArea].context[<[squadManagerLocation]>]>
+        # - define stationCapacity <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
+
+        # - flag <[squadManagerLocation]> squadManager.levels.stationCapacity:<[stationCapacity]>
+        # - ~run WriteArmyDataToKingdom def.kingdom:<player.flag[kingdom]> def.SMLocation:<[squadManagerLocation]>
+
+        # - define barracksInfoSlot <context.inventory.find_item[SquadManagerInfo_Item]>
+        # - inventory adjust slot:<[barracksInfoSlot]> "lore:<gray>Name: <&r><[squadManagerData].get[name]>|<gray>Squad Limit: <&r><[squadManagerData].deep_get[levels.squadLimit]>|<gray>Squad Size Limit: <&r><[squadManagerData].deep_get[levels.squadSizeLimit]>|<gray>Stationing Capacity: <&r><[squadManagerData].deep_get[levels.stationCapacity]>" destination:<context.inventory>
 
         ## AOE Show
         on player clicks SquadManagerShowAOE_Item in SquadManager_Interface:
@@ -356,8 +387,8 @@ SquadManager_Handler:
 
         ## AOE Set
         on player clicks SquadManagerSetAOE_Item in SquadManager_Interface:
-        - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
-        - define maxAOESize <[squadManagerData].deep_get[levels.MaxAOESize]>
+        - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - define maxAOESize <proc[GetMaxSMAOESize].context[<[squadManagerLocation]>]>
 
         - flag <player> noChat.armies.settingAOE:<[maxAOESize]>
 
@@ -523,6 +554,8 @@ SquadManager_Handler:
         on player clicks SetArmoryLocations_Item in SquadManager_Interface:
         - inventory close
 
+        - flag <player> datahold.armies.keepCache
+
         - narrate format:callout "Use the armory wand to designate chests, barrels, and other storage items as armories. Your squads will use these to get weapons and ammunition."
         - narrate format:callout "<bold>Drop the armory wand when finished."
 
@@ -547,9 +580,25 @@ SquadManager_Handler:
         ## Drops Armory Wand
         on player drops ArmoryWand_Item:
         - determine passively cancelled
+        - wait 1t
         - take from:<player.inventory> item:ArmoryWand_Item
         - run LoadTempInventory def.player:<player>
 
+        - flag <player> datahold.armies.keepCache:!
+        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<player.flag[kingdom]>
+
+        ## Clicks Armory Wand In Inv.
+        on player clicks ArmoryWand_Item in inventory:
+        - determine passively cancelled
+        - wait 3t
+        - narrate format:callout "You are not allowed to move this item in your inventory."
+
+        - take from:<player.inventory> item:ArmoryWand_Item
+        - adjust <player> item_on_cursor:<item[air]>
+        - flag <player> datahold.armies.keepCache:!
+
+        - run LoadTempInventory def.player:<player>
         - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
         - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<player.flag[kingdom]>
 
@@ -562,6 +611,11 @@ SquadManager_Handler:
 
         - else:
             - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
+
+            - if !<[squadManagerData].contains[armories]>:
+                - narrate format:callout "You have not set any armories for these barracks yet!"
+                - determine cancelled
+
             - flag <player> datahold.armies.showArmories expire:1h
             - run ShowArmoriesAOE def.player:<player> def.locationList:<[squadManagerData].get[armories]>
             - inventory set slot:<context.slot> o:HideArmoryLocations_Item d:<context.inventory>
@@ -577,11 +631,16 @@ SquadManager_Handler:
 
         ## Close Window
         on player closes SquadManager_Interface flagged:datahold.armies.squadManagerData:
-        - if !<player.has_flag[noChat.armies]>:
-            - wait 5t
-            - if <player.open_inventory> == <player.inventory>:
-                - flag <player> datahold.armies.squadManagerData:!
-                - flag <player> datahold.armies.squadManagerLocation:!
+        - wait 10t
+        - if <player.has_flag[noChat.armies]>:
+            - stop
+
+        - if <player.has_flag[datahold.armies.keepCache]>:
+            - stop
+
+        - if <player.open_inventory> == <player.inventory>:
+            - flag <player> datahold.armies.squadManagerData:!
+            - flag <player> datahold.armies.squadManagerLocation:!
 
         ## Leave Game
         on player quits flagged:datahold.armies:
@@ -590,7 +649,7 @@ SquadManager_Handler:
 
         ## Player Breaks SM
         on player breaks lodestone location_flagged:squadManager:
-        # TODO: SM destruction logic; display confirmation window,
+        # TODO(High): SM destruction logic; display confirmation window,
         # TODO/ Distribute squads to nearest barracks. If all barracks are full, display additional
         # TODO/ information with confirmation window telling player that squads would have to be
         # TODO/ disbanded if they do that
@@ -694,7 +753,7 @@ SquadManagerDeletion_Handler:
 
         - inventory adjust slot:<[infoItemSlot]> lore:<[loreList]> d:<context.inventory>
 
-        # TODO: Add handlers for confirm click/reject click
+        # TODO(High): Add handlers for confirm click/reject click
 
 
 RecalculateSquadManagerAOE:
@@ -702,6 +761,13 @@ RecalculateSquadManagerAOE:
     debug: false
     definitions: AOESize|SMLocation|player|barracksArea
     AreaCalculation:
+    ## Generates the cuboid object representing the SM's area
+    ##
+    ## AOESize    : [ElementTag<Integer>]
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [CuboidTag]
+
     - define AOEHalf <[AOESize].div[2].round_up>
     - define topCorner <[SMLocation].add[<[AOEHalf]>,<[AOEHalf]>,<[AOEHalf]>]>
     - define bottomCorner <[SMLocation].sub[<[AOEHalf]>,<[AOEHalf]>,<[AOEHalf]>]>
@@ -710,6 +776,16 @@ RecalculateSquadManagerAOE:
     - determine <[barracksArea]>
 
     script:
+    ## Based on the provided AOESize definition, this task resizes the area of effect of a given SM
+    ## identified by its location.
+    ##
+    ## AOESize      : [ElementTag<Integer>]
+    ## SMLocation   : [LocationTag]
+    ## player       : [PlayerTag]
+    ## barracksArea : [CuboidTag]
+    ##
+    ## >>> [Void]
+
     - if !<[barracksArea].exists>:
         - run <script.name> path:AreaCalculation def.AOESize:<[AOESize]> def.SMLocation:<[SMLocation]> save:area
         - define barracksArea <entry[area].created_queue.determination.get[1]>
@@ -721,12 +797,41 @@ RecalculateSquadManagerAOE:
 
 CalculateSMCost:
     type: procedure
+    debug: false
     definitions: kingdom
     script:
+    ## Calculates the amount of funds needed to activate an SM
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Float>]
+
     # TODO: Temp calculation-- make sure you come back to this later and factor in prestige!
     - define maxAllowedSMs <server.flag[kingdoms.<[kingdom]>.armies.maximumAllowedSMs].if_null[4]>
     - define SMCount <server.flag[kingdoms.<[kingdom]>.armies.barracks].size>
     - determine <element[2000].mul[<[maxAllowedSMs].mul[<[SMCount].sqrt>]>]>
+
+
+BedSMLocation:
+    type: procedure
+    definitions: player|bedLocation
+    script:
+    ## Returns the cuboid area that contains the provided location, if any.
+    ##
+    ## bedLocation : [LocationTag]
+    ## player      : [PlayerTag]
+    ##
+    ## >>> [LocationTag<?>]
+
+    - define kingdom <[player].flag[kingdom]>
+    - define barracks <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
+
+    - if !<[barracks].exists>:
+        - determine cancelled
+
+    - foreach <[barracks].values>:
+        - if <[value].get[area].contains[<[bedLocation]>]>:
+            - determine <[value].get[location]>
 
 
 CountBedsInSquadManagerArea:
@@ -734,6 +839,13 @@ CountBedsInSquadManagerArea:
     debug: false
     definitions: location
     script:
+    ## Counts the number of beds contained within the area of a squadManager. the SM is identified
+    ## by its location, passed in by definition
+    ##
+    ## location : [LocationTag]
+    ##
+    ## >>> [ElementTag<Integer>]
+
     - define squadManagerData <[location].flag[squadManager]>
     - define SMArea <[squadManagerData].get[area]>
     - define bedCount <[SMArea].blocks[*_bed].size.div[2]>
@@ -745,6 +857,14 @@ ShowArmoriesAOE:
     debug: false
     definitions: locationList|player
     script:
+    ## Displays to the given player a set of glimmering particles indicating at the given list of
+    ## locations.
+    ##
+    ## locationList : [ListTag<LocationTag>]
+    ## player       : [PlayerTag]
+    ##
+    ## >>> [Void]
+
     - if <[locationList].filter_tag[<[filter_value].object_type.to_lowercase.equals[location]>].size> != <[locationList].size>:
         - determine cancelled
 
@@ -763,6 +883,13 @@ ShowSquadManagerAOE:
     debug: false
     definitions: area|player
     script:
+    ## Displays to the given player a box-shaped outline of the given area
+    ##
+    ## area   : [CuboidTag]
+    ## player : [PlayerTag]
+    ##
+    ## >>> [Void]
+
     - define waitTime 3t
     - define effect CLOUD
     - define location <[area].outline.parse_tag[<[parse_value].center>]>
