@@ -77,6 +77,7 @@ FormationWalk:
 
 FormationWalkFix_Handler:
     type: world
+    debug: false
     events:
         on npc completes navigation:
         - if <npc.has_flag[dataHold.formationPathfinding]>:

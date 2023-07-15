@@ -23,6 +23,11 @@ SquadRemoveAllOrders:
     - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
 
     - foreach <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]> as:soldier:
+        - define proceduralTargets <[soldier].sentinel.targets.filter_tag[<[filter_value].starts_with[denizen_proc]>]>
+
+        - foreach <[proceduralTargets]> as:proc:
+            - execute as_server "sentinel removetarget <[proc]> --id:<[soldier].id>"
+
         - execute as_server "sentinel forgive --id <[soldier].id>" silent
 
 ## Target Procs
@@ -30,16 +35,21 @@ SquadRemoveAllOrders:
 
 SquadAttackAll_Procedure:
     type: procedure
+    debug: false
     definitions: entity|context
     script:
     - ratelimit <queue> 1s
+    - define soldier <[context].as[npc]>
 
     - if !<[entity].has_flag[soldier]>:
+        - execute as_server "sentinel forgive --id <[soldier].id>"
         - determine false
 
-    - define soldier <[context]>
-    - define friendlyKingdom <[context].flag[soldier.kingdom]>
+    - define friendlyKingdom <[soldier].flag[soldier.kingdom]>
     - define enemyKingdoms <proc[GetKingdomList].exclude[<[friendlyKingdom]>]>
 
     - if <[entity].flag[soldier.kingdom].is_in[<[enemyKingdoms]>]>:
         - determine true
+
+    - execute as_server "sentinel forgive --id <[soldier].id>"
+    - determine false
