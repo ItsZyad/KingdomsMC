@@ -287,3 +287,22 @@ GenerateSMID:
     ## >>> [ElementTag<Integer>]
 
     - determine <[location].simple.split[,].remove[last].unseparated>
+
+
+GetMaxSMAOESize:
+    type: procedure
+    definitions: SMLocation
+    script:
+    ## Gets the maximum size that a squad manager's AOE can be at its current level.
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [ElementTag<Integer>]
+
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+
+    - run GetSquadInfo def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]> save:squadInfo
+    - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
+    - define AOELevel <[squadInfo].deep_get[levels.AOELevel]>
+
+    - determine <script[SquadManagerUpgrade_Data].data_key[levels.AOE.<[AOELevel]>.value]>
