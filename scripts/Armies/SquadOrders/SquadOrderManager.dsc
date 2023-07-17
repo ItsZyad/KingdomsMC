@@ -27,6 +27,7 @@ SoldierManager_Assignment:
             - determine cancelled
 
         - inventory close
+        - wait 1t
         - run GiveSquadTools def.player:<player>
 
 
@@ -134,7 +135,7 @@ SquadOptions_Handler:
         - define kingdom <player.flag[kingdom]>
         - define location <player.cursor_on_solid[50]>
         - define squadInfo <player.flag[datahold.squadInfo]>
-        - define squadName <[squadInfo].get[internalName]>
+        - define squadName <[squadInfo].get[name]>
         - define npcList <[squadInfo].get[npcList]>
         - define squadLeader <[squadInfo].get[squadLeader]>
         - define displayName <[squadInfo].get[displayName]>
@@ -145,6 +146,7 @@ SquadOptions_Handler:
         on player clicks block with:ExitSquadControls_Item:
         - flag <player> datahold.squadInfo:!
         - run ResetSquadTools def.player:<player>
+        - determine cancelled
 
         on player places ExitSquadControl_Item:
         - determine cancelled

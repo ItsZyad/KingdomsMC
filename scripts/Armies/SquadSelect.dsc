@@ -250,11 +250,12 @@ SquadSelection_Handler:
         - define kingdom <player.flag[kingdom]>
         - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
         - define hasSpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.hasSpawned]>
-        - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList]>
-        - define squadLeader <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader]>
-        - define currentlySpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader].as[npc].is_spawned>
 
         - if <[hasSpawned]>:
+            - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList]>
+            - define squadLeader <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader]>
+            - define currentlySpawned <[squadLeader].as[npc].is_spawned>
+
             - if <[currentlySpawned]>:
                 - run GiveSquadTools def.player:<player>
                 - inventory close
@@ -266,9 +267,9 @@ SquadSelection_Handler:
 
                 - if <[spawnLocation]> != 0:
                     - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
-                    - spawn <[npcList].include[<[squadLeader]>]> <[spawnLocation]>
-
                     - run GiveSquadTools def.player:<player>
+
+                    - spawn <[npcList].include[<[squadLeader]>]> <[spawnLocation]>
 
                 - else:
                     - narrate format:debug "<red>[Internal Error SQA112] <&gt><&gt> <gold>Cannot generate SMLocation from squad reference."
@@ -277,7 +278,7 @@ SquadSelection_Handler:
 
         - else:
             - inventory open d:SquadFirstTimeSpawnConfirmation_Window
-            - flag <player> datahold.armies.squadInfo:<context.item.flag[squadInfo]>
+            # - flag <player> datahold.armies.squadInfo:<context.item.flag[squadInfo]>
 
         ## EQUIPMENT WINDOW SETUP
         on player opens SquadEquipment_Window:
@@ -294,8 +295,6 @@ SquadSelection_Handler:
 
             - foreach <[leatherItems]> as:slot:
                 - inventory adjust slot:<[slot]> color:<[kingdomColor]> d:<context.inventory>
-
-        - run flagvisualizer def.flag:<[squadManagerData]>
 
         - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
         - define hotbarSlots <context.inventory.list_contents.parse_tag[<[parse_value].material.name>].find_all[air]>
@@ -443,7 +442,7 @@ SpawnSquadNPCs:
             - flag <[soldier]> soldier.kingdom:<[kingdom]>
             - define soldierList <[soldierList].include[<[soldier]>]>
 
-            - equip <[soldier]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]>
+            - equip <[soldier]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]> hand:<[equipment].get[hotbar].get[1]>
             - inventory fill d:<[soldier].inventory> o:<[equipment].get[hotbar]>
 
     - flag <player> datahold.squadInfo.npcList:<[soldierList]>
@@ -464,6 +463,8 @@ SpawnSquadNPCs:
     - flag <[squadLeader]> soldier.squad:<[squadName]>
     - flag <[squadLeader]> soldier.kingdom:<[kingdom]>
     - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.squadLeader:<[squadLeader]>
+
+    - equip <[squadLeader]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]> hand:<[equipment].get[hotbar].get[1]>
 
     - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
     - execute as_server "sentinel respawntime -1 --id <[squadLeader].id>" silent

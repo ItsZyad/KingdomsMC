@@ -192,3 +192,12 @@ SplitKeep:
 
     # - narrate format:debug <[outList]>
     - determine <[outList]>
+
+
+ClearDatahold_Handler:
+    type: world
+    events:
+        on player quits:
+        - define persistentData <player.flag[datahold.persistent]>
+        - flag <player> datahold:!
+        - flag <player> datahold.persistent:<[persistentData]>
