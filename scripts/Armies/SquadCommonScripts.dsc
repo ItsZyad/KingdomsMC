@@ -27,28 +27,27 @@ DeleteSquad:
         - foreach <[npcList]> as:soldier:
             - remove <[soldier]>
 
-    - run DeleteSquadReference def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.deletedSquad:<[deletedSquad]>
+    - run DeleteSquadReference def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.internalName:<[deletedSquad].get[internalName]>
 
 
 DeleteSquadReference:
     type: task
-    definitions: SMLocation|kingdom|deletedSquad
+    definitions: SMLocation|kingdom|internalName
     script:
     ## Removes the provided squad from all flag structures that contain it.
     ##
     ## SMLocation   : [LocationTag]
     ## kingdom      : [ElementTag<String>]
-    ## deletedSquad : [MapTag]
-    ##                Format: [internalName;displayName;npcList]
+    ## internalName : [ElementTag<String>]
     ##
     ## >>> [Void]
 
-    - flag <[SMLocation]> squadManager.squads.squadList.<[deletedSquad].get[internalName]>:!
-    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[deletedSquad].get[internalName]>:!
+    - flag <[SMLocation]> squadManager.squads.squadList.<[internalName]>:!
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[internalName]>:!
 
     - foreach <server.flag[kingdoms.<[kingdom]>.armies.barracks]> as:barrack:
-        - if <[barrack].get[stationedSquads].contains[<[deletedSquad].get[internalName]>]>:
-            - flag server kingdoms.<[kingdom]>.armies.barracks.<[key]>.stationedSquads:<-:<[deletedSquad].get[internalName]>
+        - if <[barrack].get[stationedSquads].contains[<[internalName]>]>:
+            - flag server kingdoms.<[kingdom]>.armies.barracks.<[key]>.stationedSquads:<-:<[internalName]>
 
 
 CreateSquadReference:
@@ -68,7 +67,7 @@ CreateSquadReference:
 
     - define barrackID <[SMLocation].xyz.replace_text[,]>
 
-    - if <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.stationedSquads].size> >= <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.levels.squadLimit]>:
+    - if <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.stationedSquads].size.if_null[0]> >= <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.levels.squadLimit]>:
         - narrate format:callout "These barracks have already reached their stationing capacity!<n>You must upgrade your squad manager to increase its stationing capacity."
         - determine cancelled
 
@@ -246,7 +245,7 @@ GiveSoldierItemFromArmory:
 
     - define anyInvHasItem <[filledArmories].parse_tag[<[parse_value].inventory.list_contents.find_all_matches[<[item]>]>]>
 
-    # Start tomorrow: next-best-item search.
+    # TODO(Medium): next-best-item search.
     # - if !<[anyInvHasItem]>:
     #     - define expandedSearch <[filledArmories].parse_tag[<[parse_value].inventory.list_contents.parse_tag[<[parse_value].material.name>]>]>
     #     - define anyInvHasItem <[expandedSearch]>
