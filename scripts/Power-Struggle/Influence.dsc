@@ -171,26 +171,6 @@ InfluenceBonusDisplay_Handler:
 
 ##############################################################################
 
-InfluenceGetter_Admin:
-    type: procedure
-    definitions: kingdom
-    debug: false
-    script:
-    - define influencePercentage <server.flag[kingdoms.<[kingdom]>.powerstruggle.totalInfluence].mul[100]>
-    - define influenceGraphic <list>
-
-    - repeat <[influencePercentage].div[5]>:
-        - define influenceGraphic:->:█
-
-    - repeat <element[20].sub[<[influencePercentage].div[5]>]>:
-        - define influenceGraphic:->:░
-
-    - define influenceGraphic:->:<&sp>-<&sp>
-    - define influenceGraphic:->:<[influencePercentage].round_to_precision[0.01]><element[%].escaped>
-    - determine <[influenceGraphic].unseparated>
-
-##############################################################################
-
 InfluenceTextRef:
     type: data
     controlStatus:

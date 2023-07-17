@@ -23,12 +23,14 @@ LoanAdmin_Window:
     - [] [] [] [] [] [] [] [] []
     - [] [] [] [Page_Back] [] [Page_Forward] [] [] []
 
+
 LoanAdminOffer_Item:
     type: item
     material: player_head
     display name: <blue><bold>Loan Offer
     mechanisms:
         skull_skin: 7193fa7b-4dbe-4e92-a840-3d95d2839240|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDllOTA2OGQxNWI0ZDhhNGI2NGZiYjA2NzQ0MTBkYjM0OWE2YzZhYWQ3OWZlOGE1YWI3MWU5NGRhMjQwZmZmNiJ9fX0=
+
 
 LoanAdminGeneration_Proc:
     type: procedure

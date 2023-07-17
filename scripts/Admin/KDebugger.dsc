@@ -73,6 +73,7 @@ Debugger:
     - else:
         - narrate format:admincallout "Queue at breakpoint in script:<queue.script.name.color[red]> does not have attached player!"
 
+
 DebugMode_Handler:
     type: world
     events:
@@ -83,21 +84,3 @@ DebugMode_Handler:
 
         # on scripts loaded:
         # - narrate test targets:<server.online_ops>
-
-TestScript_KDebug:
-    type: task
-    script:
-    - define someNumber 4
-    - define someEquation <[someNumber].log[10].mul[0.5]>
-
-    - run TestScript2_KDebug def.eq:<[someEquation]>
-
-TestScript2_KDebug:
-    type: task
-    definitions: eq
-    script:
-    - define someBoolean <[eq].is[MORE].than[2]>
-    # a comment
-    - inject Debugger
-
-    - narrate format:debug "Script complete!"
