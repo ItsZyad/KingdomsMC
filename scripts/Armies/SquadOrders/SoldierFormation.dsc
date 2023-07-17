@@ -43,7 +43,8 @@ FormationWalk:
     definitions: npcList|npcsPerRow|squadLeader|finalLocation|lineLength|player
     script:
     - define lineLength <[lineLength].if_null[6]>
-    - define rows <[npcList].size.div[<[npcsPerRow]>].round_up>
+    # Note: adding one to the npcList size to account for squad leader;
+    - define rows <[npcList].size.add[1].div[<[npcsPerRow]>].round_up>
     #- define verticalSpacing <[lineLength].div[<[npcsPerRow]>]>
     - define verticalSpacing 2
     - define sentNPCs <list[<[squadLeader]>]>
@@ -56,6 +57,9 @@ FormationWalk:
         - showfake green_wool <[formationLine]> players:<[player]>
 
         - repeat <[npcsPerRow]> as:col:
+            - if <[npcList].exclude[<[sentNPCs]>].is_empty>:
+                - repeat stop
+
             - if <[row]> == 1 && <[col]> == <[npcsPerRow].div[2].round>:
                 - walk <[squadLeader]> <[finalLocation].with_y[<[finalLocation].y.add[1]>]>
                 - flag <[squadLeader]> dataHold.formationPathfinding:<[finalLocation].with_y[<[finalLocation].y.add[1]>]>
