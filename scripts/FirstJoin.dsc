@@ -51,6 +51,7 @@ KingdomSelection_Handler:
                 - define joinMsg "has returned at last!"
                 - define joinMsg "has dropped by for some Kingdoms"
                 - define joinMsg "has joined the game, hope you brought pizza!"
+                - define joinMsg "has just landed!"
                 - define joinMsg "has joined the game"
                 - define joinMsg "has joined the game"
                 - define joinMsg "has joined the game"
