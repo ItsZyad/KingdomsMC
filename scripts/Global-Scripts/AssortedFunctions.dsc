@@ -198,6 +198,6 @@ ClearDatahold_Handler:
     type: world
     events:
         on player quits:
-        - define persistentData <player.flag[datahold.persistent]>
+        - define persistentData <player.flag[datahold.persistent]> if:<player.has_flag[datahold.persistent]>
         - flag <player> datahold:!
-        - flag <player> datahold.persistent:<[persistentData]>
+        - flag <player> datahold.persistent:<[persistentData]> if:<player.has_flag[datahold.persistent]>
