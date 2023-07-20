@@ -1,6 +1,6 @@
 ##
 ## Common scripts that allow the dev to get and set internal game states and interact with the
-## server and worlds directly as opposed to the kingdoms API.
+## server and worlds directly as opposed to the Kingdoms API.
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Jun 2023
@@ -14,7 +14,7 @@ GenerateKingdomsDebug:
     definitions: type|message|silent
     script:
     ## Writes a given message to the debug console, with 'type' being the debug message type.
-    ## See the Denizen debug command for more info: http://meta.denizenscript.com/Docs/Commands/debug
+    ## See the debug command meta for more info: http://meta.denizenscript.com/Docs/Commands/debug
     ## Kingdoms debug messages are silent by default, meaning they do not show to the attached
     ## player if they are an admin/op.
     ##
@@ -111,3 +111,40 @@ GenerateInternalError:
 
     - if !<[silent]>:
         - narrate <[formattedMessage]>
+
+
+ActionBarToggler:
+    type: task
+    definitions: player|message|toggleType
+    script:
+    ## Toggles a consistent message to be displayed to the player's actionbar based on the
+    ## toggleType provided. If no toggleType is provided then the script will disable any enabled
+    ## actionbar message.
+    ##
+    ## player     : [PlayerTag]
+    ## message    : [ElementTag]
+    ## toggleType : ?[ElementTag<String>]
+    ##
+    ## >>> [Void]
+
+    - define toggleType <[toggleType].if_null[false]>
+
+    - if <[toggleType]>:
+        - flag <[player]> datahold.persistentActionbar
+
+    - else:
+        - flag <[player]> datahold.persistentActionbar:!
+
+    - define existingActionbar <n><player.flag[datahold.actionbar].if_null[<element[]>]>
+
+    - while <[player].has_flag[datahold.persistentActionBar]>:
+        - actionbar <element[<[message]><[existingActionbar]>]> targets:<[player]>
+        - wait 2s
+        - define existingActionbar <element[]>
+
+
+Actionbar_Handler:
+    type: world
+    events:
+        on player receives actionbar:
+        - flag <player> datahold.actionbar:<context.message> expire:2s

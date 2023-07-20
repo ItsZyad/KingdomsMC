@@ -9,45 +9,44 @@
 
 DeleteSquad:
     type: task
-    definitions: SMLocation|kingdom|deletedSquad
+    definitions: SMLocation|kingdom|squadName
     script:
     ## Removes the provided squad from all flag structures that contain it as well as the actual
     ## NPCs that comprise it.
     ##
     ## SMLocation   : [LocationTag]
     ## kingdom      : [ElementTag<String>]
-    ## deletedSquad : [MapTag]
-    ##                Format: [internalName;displayName;npcList]
+    ## squadName    : [ElementTag<String>]
     ##
     ## >>> [Void]
 
-    - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[deletedSquad].get[internalName]>]>
+    - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
 
     - if <[npcList].size> > 0:
         - foreach <[npcList]> as:soldier:
             - remove <[soldier]>
 
-    - run DeleteSquadReference def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.internalName:<[deletedSquad].get[internalName]>
+    - run DeleteSquadReference def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.squadName:<[squadName]>
 
 
 DeleteSquadReference:
     type: task
-    definitions: SMLocation|kingdom|internalName
+    definitions: SMLocation|kingdom|squadName
     script:
     ## Removes the provided squad from all flag structures that contain it.
     ##
     ## SMLocation   : [LocationTag]
     ## kingdom      : [ElementTag<String>]
-    ## internalName : [ElementTag<String>]
+    ## squadName    : [ElementTag<String>]
     ##
     ## >>> [Void]
 
-    - flag <[SMLocation]> squadManager.squads.squadList.<[internalName]>:!
-    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[internalName]>:!
+    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>:!
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>:!
 
     - foreach <server.flag[kingdoms.<[kingdom]>.armies.barracks]> as:barrack:
-        - if <[barrack].get[stationedSquads].contains[<[internalName]>]>:
-            - flag server kingdoms.<[kingdom]>.armies.barracks.<[key]>.stationedSquads:<-:<[internalName]>
+        - if <[barrack].get[stationedSquads].contains[<[squadName]>]>:
+            - flag server kingdoms.<[kingdom]>.armies.barracks.<[key]>.stationedSquads:<-:<[squadName]>
 
 
 CreateSquadReference:
@@ -141,6 +140,7 @@ GiveSquadTools:
         - run TempSaveInventory def.player:<player>
 
     - give SquadMoveTool_Item
+    - give SquadAttackTool_Item
     - inventory set slot:9 origin:ExitSquadControls_Item
     - inventory set slot:8 origin:MiscOrders_Item
     - adjust <player> item_slot:1
@@ -250,7 +250,6 @@ GiveSoldierItemFromArmory:
     #     - define expandedSearch <[filledArmories].parse_tag[<[parse_value].inventory.list_contents.parse_tag[<[parse_value].material.name>]>]>
     #     - define anyInvHasItem <[expandedSearch]>
 
-    - narrate format:debug CANCELLED if:<[anyInvHasItem].is_empty>
     - determine cancelled if:<[anyInvHasItem].is_empty>
 
     - foreach <[filledArmories]> as:loc:

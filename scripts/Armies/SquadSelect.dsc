@@ -132,8 +132,9 @@ SquadSelectionGUI:
 
         - adjust def:squadItem display:<gold><bold><[displayName]>
 
-        - if <[squad].get[npcList].size.if_null[0]> > 0:
-            - define npcListShort <[squad].get[npcList].get[1].to[4]>
+        - if <[squad].get[hasSpawned]>:
+            - define npcListShort <[squad].get[npcList].get[1].to[4].if_null[<list[]>]>
+            - define npcListShort <[npcListShort].include[<[squad].get[squadLeader]>]>
 
             - if <[npcListShort].size> < <[squad].get[npcList]>:
                 - define remainingNpcNumber <[squad].get[npcList].size.sub[<[npcListShort].size>]>
@@ -208,7 +209,7 @@ SquadEquipmentSet_Item:
 SquadOrders_Item:
     type: item
     material: player_head
-    display name: <red><bold>Give Squad Orders
+    display name: <light_purple><bold>Give Squad Orders
     mechanisms:
         skull_skin: 99d1db69-a107-4227-b575-cb40c9f37092|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTVkNzZkOTBiMzc4MDgzZDE0Nzc1NjgwNTA1ZGRiMWU2YzJjNmRjZjRkZGU3ZjliMWY1ODgwOWJlYzZjNjVjOCJ9fX0=
 
@@ -220,7 +221,7 @@ SquadOptions_Window:
     title: Squad Options
     slots:
     - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [] [] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
-    - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [SquadOrders_Item] [] [SquadEquipmentSet_Item] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
+    - [InterfaceFiller_Item] [InterfaceFiller_Item] [SquadOrders_Item] [] [SquadDelete_Item] [] [SquadEquipmentSet_Item] [InterfaceFiller_Item] [InterfaceFiller_Item]
     - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [] [] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
     - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [] [Back_Item] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
 
@@ -257,6 +258,7 @@ SquadSelection_Handler:
             - define currentlySpawned <[squadLeader].as[npc].is_spawned>
 
             - if <[currentlySpawned]>:
+                - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
                 - run GiveSquadTools def.player:<player>
                 - inventory close
 
@@ -279,6 +281,10 @@ SquadSelection_Handler:
         - else:
             - inventory open d:SquadFirstTimeSpawnConfirmation_Window
             # - flag <player> datahold.armies.squadInfo:<context.item.flag[squadInfo]>
+
+        ## CLICK SQUAD DELETE
+        on player clicks SquadDelete_Item in SquadOptions_Window:
+        - inventory open d:SquadDeleteConfirmation_Window
 
         ## EQUIPMENT WINDOW SETUP
         on player opens SquadEquipment_Window:
@@ -410,7 +416,12 @@ SquadDeletion_Handler:
 
         - narrate format:callout "Deleted squad with name: <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadInfo].get[internalName]>.displayName].color[red]>"
 
-        - run DeleteSquad def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.deletedSquad:<[squadInfo]>
+        - run DeleteSquad def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.squadName:<[squadInfo].get[internalName]>
+
+        - run SquadSelectionGUI def.player:<player>
+
+        on player clicks SquadReject_Item in SquadDeleteConfirmation_Window:
+        - run SquadSelectionGUI def.player:<player>
 
 
 SpawnSquadNPCs:
@@ -468,6 +479,14 @@ SpawnSquadNPCs:
 
     - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
     - execute as_server "sentinel respawntime -1 --id <[squadLeader].id>" silent
+    - execute as_server "sentinel addtarget event:pvsentinel --id <[squadLeader].id>" silent
+    - execute as_server "sentinel addignore squad:<[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
+    - execute as_server "sentinel attackrate 0.5 --id <[squadLeader].id>" silent
+    - execute as_server "sentinel speed 1.15 --id <[squadLeader].id>" silent
+    - execute as_server "sentinel accuracy 2.7 --id <[squadLeader].id>" silent
+
+    - foreach <proc[GetMembers].context[<[kingdom]>]> as:player:
+        - execute as_server "sentinel addignore player:<[player].name>"
 
     - assignment set to:<[squadLeader]> script:SoldierManager_Assignment
 
@@ -499,6 +518,16 @@ SpawnNewSoldiers:
     type: task
     definitions: type|location|amount|squadName|kingdom|SMLocation
     script:
+    ## NOTE: Script is bound change as I introduce new soldier types
+    ## Spawns in the specified amount of the given soldier type at the provided location.
+    ##
+    ## type       : [ElementTag<String>]
+    ## location   : [LocationTag]
+    ## amount     : [ElementTag<Integer>]
+    ## squadName  : [ElementTag<String>]
+    ## kingdom    : [ElementTag<String>]
+    ## SMLocation : [LocationTag]
+
     - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
     - define soldierList <list[]>
 
@@ -513,6 +542,17 @@ SpawnNewSoldiers:
 
         - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[soldier].id>" silent
         - execute as_server "sentinel respawntime -1 --id <[soldier].id>" silent
+        - execute as_server "sentinel addtarget event:pvsentinel --id <[soldier].id>" silent
+        - execute as_server "sentinel addignore squad:<[kingdom]>_<[squadName]> --id <[soldier].id>" silent
+        - execute as_server "sentinel attackrate 0.5 --id <[soldier].id>" silent
+        - execute as_server "sentinel speed 1.15 --id <[soldier].id>" silent
+        - execute as_server "sentinel accuracy 2.7 --id <[soldier].id>" silent
 
-    - narrate format:debug LST:<[soldierList]>
+        - foreach <proc[GetMembers].context[<[kingdom]>]> as:player:
+            - execute as_server "sentinel addignore player:<[player].name>"
+
+        # Note: could have a system where the NPCs can specialize in a certain type of weapon
+        #       thus utilizing something like:
+        #       - execute as_server "sentinel weapondirect iron_axe diamond_axe"
+
     - determine <[soldierList]>

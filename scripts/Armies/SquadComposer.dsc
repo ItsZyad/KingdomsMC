@@ -91,7 +91,7 @@ SquadComposition_Handler:
     type: world
     events:
         on player clicks item in SquadComposition_Interface:
-        - ratelimit <player> 2t
+        - ratelimit <player> 1t
 
         - if <context.item.has_flag[displayItem]>:
             - determine passively cancelled
@@ -113,7 +113,7 @@ SquadComposition_Handler:
             - determine cancelled
 
         on player right clicks in SquadComposition_Interface:
-        - ratelimit <player> 2t
+        - ratelimit <player> 1t
 
         - if <player.item_on_cursor.material.name> != air:
             - adjust <player> item_on_cursor:<item[air]>

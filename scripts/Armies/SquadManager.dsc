@@ -655,6 +655,10 @@ SquadManager_Handler:
         # TODO/ disbanded if they do that
         - define kingdom <player.flag[kingdom]>
         - define SMInfo <context.location.flag[squadManager]>
+
+        - if <[kingdom]> != <[SMInfo].get[kingdom]>:
+            - determine cancelled
+
         - run GenerateSMID def.location:<context.location> save:smid
         - define SMID <entry[smid].created_queue.determination.get[1]>
         - define squadList <[SMInfo].deep_get[squads.squadList].keys>

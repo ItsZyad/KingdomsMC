@@ -27,8 +27,9 @@ SoldierManager_Assignment:
             - determine cancelled
 
         - inventory close
-        - wait 1t
+        - wait 3t
         - run GiveSquadTools def.player:<player>
+        - run ActionBarToggler def.player:<player> def.message:<element[Now Commanding: <player.flag[datahold.squadInfo.displayName].color[red]>]> def.toggleType:true
 
 
 SquadRecall_Item:
@@ -66,10 +67,10 @@ SquadMoveTool_Item:
 SquadAttackTool_Item:
     type: item
     material: tipped_arrow
-    display name: <light_purple><bold>Attack Order
+    display name: <red><bold>Attack All Order
     mechanisms:
         potion_effects:
-        - [type=TURTLE_MASTER]
+        - [type=INSTANT_HEAL]
         hides: ALL
 
 
@@ -114,7 +115,8 @@ SquadOptions_Handler:
         - foreach <[npcList]> as:npc:
             - run WalkSoldierToSM_Helper def.npc:<[npc]> def.location:<[spawnLocation]>
 
-        - run SquadEquipmentChecker def.squadName:<[squadInfo].get[internalName]> def.kingdom:<[kingdom]>
+        - run SquadEquipmentChecker def.squadName:<[squadInfo].get[name]> def.kingdom:<[kingdom]>
+        - run ActionBarToggler def.player:<player> def.toggleType:false
 
         - narrate format:callout "Stashing squad at barracks: <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.name].color[red]>..."
         - narrate format:callout "To respawn the squad click on their icon in the squad list option in your SM."
@@ -122,12 +124,27 @@ SquadOptions_Handler:
 
         ## ATTACK ORDER: ALL
         on player right clicks block with:SquadAttackTool_Item:
-        - define <player.flag[kingdom]>
+        - ratelimit <player> 10t
+
+        - define kingdom <player.flag[kingdom]>
         - define squadInfo <player.flag[datahold.squadInfo]>
         - define squadName <[squadInfo].get[name]>
-        - run GetSquadSMLocation def.kingdom:<[kingdom]> def.squadName:<[squadName]> save:SMLocation
-        - define SMLocation <entry[SMLocation].created_queue.determination.get[1]>
-        - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.attack:all expire:1h
+        - define squadLeader <[squadInfo].get[squadLeader]>
+        - define npcList <[squadInfo].get[npcList]>
+
+        # If the squad already has the attackAll order
+        - if <[squadLeader].has_flag[soldier.order]> && <[squadLeader].flag[soldier.order]> == attackAll:
+            - flag <[squadLeader]> datahold.armies.particles:!
+            - flag <[squadLeader]> soldier.order:!
+
+            - run SquadRemoveAllOrders def.kingdom:<[kingdom]> def.squadName:<[squadName]>
+
+        - else:
+            - flag <[squadLeader]> datahold.armies.particles
+            - flag <[squadLeader]> soldier.order:attackAll
+
+            - run SquadAttackAllOrder def.kingdom:<[kingdom]> def.squadName:<[squadName]>
+            - run SoldierParticleGenerator def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.orderType:attackAll
 
         ## REG. MOVE SQUAD
         on player right clicks block with:SquadMoveTool_Item:
@@ -146,7 +163,13 @@ SquadOptions_Handler:
         on player clicks block with:ExitSquadControls_Item:
         - flag <player> datahold.squadInfo:!
         - run ResetSquadTools def.player:<player>
+        - run ActionBarToggler def.player:<player> def.toggleType:false
+
         - determine cancelled
+
+        on player quits flagged:datahold.armies.squadTools:
+        - run ActionBarToggler def.player:<player> def.toggleType:false
+        - run ResetSquadTools def.player:<player>
 
         on player places ExitSquadControl_Item:
         - determine cancelled
@@ -156,6 +179,33 @@ SquadOptions_Handler:
 
         on player drops ExitSquadControls_Item:
         - determine cancelled
+
+
+SoldierParticleGenerator:
+    type: task
+    debug: false
+    definitions: npcList|squadLeader|orderType
+    script:
+    ## Applies a particle effect to a list of soldiers which changes depending on the type of order
+    ## they are given.
+    ##
+    ## npcList     : [ListTag<NPCTag>]
+    ## squadLeader : [NPCTag]
+    ## orderType   : ?[ElementTag<String>]
+    ##               Accepted Values: attackAll, attackSome
+
+    - define waitTime 7t
+    - definemap orderFormats:
+        attackAll: 2|red
+        attackSome: 1.5|orange
+
+    - define orderType attackAll if:<[orderType].exists.not.or[<[orderType].is_in[<[orderFormats].keys>]>]>
+
+    - while <[squadLeader].exists> && <[squadLeader].has_flag[datahold.armies.particles]>:
+        - foreach <[npcList].include[<[squadLeader]>]> as:soldier:
+            - playeffect at:<[soldier].location.up[3]> effect:REDSTONE special_data:<[orderFormats].get[<[orderType]>]> quantity:3 offset:0,0,0
+
+        - wait <[waitTime]>
 
 
 SquadEquipmentChecker:
