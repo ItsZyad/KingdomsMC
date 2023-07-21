@@ -62,3 +62,7 @@ Large Additions:
         - Basic squad management tools,
         - Basic orders such as formation attack, formation walk and retreat,
         - ...
+
+Known bugs (Should be patched soon:tm:):
+    - Under some circumstances squad orders can just stop working randomly. This can be temporarily remedied by exiting squad orders and re-entering;
+        - Likely caused by a misreferenced variable somewhere-- so should be an easy fix when I find it.
