@@ -15,6 +15,13 @@ SquadAttackAllOrder:
     type: task
     definitions: kingdom|squadName
     script:
+    ## Causes the given squad to attack all other soliders regardless of kingdom
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [Void]
+
     - run GetSquadInfo def.kingdom:<[kingdom]> def.squadName:<[squadName]> save:squadInfo
     - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
 
@@ -25,10 +32,43 @@ SquadAttackAllOrder:
         - execute as_server "sentinel addtarget denizen_proc:SquadAttackAll_Procedure:<[soldier]> --id <[soldier].id>" silent
 
 
+SquadAttackSquadOrder:
+    type: task
+    definitions: kingdom|squadName|enemyKingdom|enemySquadName
+    script:
+    ## Causes the given squad to attack an enemy squad only. Will cancel if the 'enemy' squad
+    ## provided is of the same kingdom.
+    ##
+    ## kingdom        : [ElementTag<String>]
+    ## squadName      : [ElementTag<String>]
+    ## enemyKingdom   : [ElementTag<String>]
+    ## enemySquadName : [ElementTag<String>]
+    ##
+    ## >>> [Void]
+
+    - run GetSquadInfo def.kingdom:<[kingdom]> def.squadName:<[squadName]> save:squadInfo
+    - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
+    - define fullNPCList <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]>
+
+    - run GetSquadInfo def.kingdom:<[enemyKingdom]> def.squadName:<[enemySquadName]> save:enemySquadInfo
+    - define enemySquadInfo <entry[enemySquadInfo].created_queue.determination.get[1]>
+    - define enemySquadSentinelName <[enemySquadInfo].get[sentinelSquad]>
+
+    - foreach <[fullNPCList]> as:soldier:
+        - execute as_server "sentinel addtarget squad:<[enemySquadSentinelName]> --id <[soldier].id>" silent
+
+
 SquadRemoveAllOrders:
     type: task
     definitions: kingdom|squadName
     script:
+    ## Cancels a given squads active orders and causes all of its soldiers to forgive their targets
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [Void]
+
     - run GetSquadInfo def.kingdom:<[kingdom]> def.squadName:<[squadName]> save:squadInfo
     - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
 

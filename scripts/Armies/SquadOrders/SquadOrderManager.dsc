@@ -29,7 +29,7 @@ SoldierManager_Assignment:
         - inventory close
         - wait 3t
         - run GiveSquadTools def.player:<player>
-        - run ActionBarToggler def.player:<player> def.message:<element[Now Commanding: <player.flag[datahold.squadInfo.displayName].color[red]>]> def.toggleType:true
+        - run ActionBarToggler def.player:<player> def.message:<element[Now Commanding: <player.flag[datahold.squadInfo.displayName].color[red].bold>]> def.toggleType:true
 
 
 SquadRecall_Item:
@@ -64,13 +64,23 @@ SquadMoveTool_Item:
         hides: enchants
 
 
-SquadAttackTool_Item:
+SquadAttackAllTool_Item:
     type: item
     material: tipped_arrow
     display name: <red><bold>Attack All Order
     mechanisms:
         potion_effects:
         - [type=INSTANT_HEAL]
+        hides: ALL
+
+
+SquadAttackTool_Item:
+    type: item
+    material: tipped_arrow
+    display name: <element[Attack Squad Order].color[fuchsia].bold>
+    mechanisms:
+        potion_effects:
+        - [type=REGEN]
         hides: ALL
 
 
@@ -123,7 +133,7 @@ SquadOptions_Handler:
         - determine cancelled
 
         ## ATTACK ORDER: ALL
-        on player right clicks block with:SquadAttackTool_Item:
+        on player right clicks block with:SquadAttackAllTool_Item:
         - ratelimit <player> 10t
 
         - define kingdom <player.flag[kingdom]>
@@ -143,12 +153,47 @@ SquadOptions_Handler:
             - flag <[squadLeader]> datahold.armies.particles
             - flag <[squadLeader]> soldier.order:attackAll
 
+            - run SquadRemoveAllOrders def.kingdom:<[kingdom]> def.squadName:<[squadName]>
             - run SquadAttackAllOrder def.kingdom:<[kingdom]> def.squadName:<[squadName]>
             - run SoldierParticleGenerator def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.orderType:attackAll
+
+        ## ATTACK ORDER: SQUAD
+        on player clicks block with:SquadAttackTool_Item:
+        - ratelimit <player> 10t
+
+        # Note: future configurable
+        - if !<player.cursor_on[100].exists>:
+            - determine cancelled
+
+        - define kingdom <player.flag[kingdom]>
+        - define squadInfo <player.flag[datahold.squadInfo]>
+        - define squadName <[squadInfo].get[name]>
+        - define squadLeader <[squadInfo].get[squadLeader]>
+        - define npcList <[squadInfo].get[npcList]>
+
+        - if <[squadLeader].has_flag[soldier.order]> && <[squadLeader].flag[soldier.order]> == attackSquad:
+            - flag <[squadLeader]> datahold.armies.particles:!
+            - flag <[squadLeader]> soldier.order:!
+
+            - run SquadRemoveAllOrders def.kingdom:<[kingdom]> def.squadName:<[squadName]>
+
+        - else:
+            - flag <[squadLeader]> datahold.armies.particles
+            - flag <[squadLeader]> soldier.order:attackSquad
+
+            - run FindClickedSquad def.location:<player.cursor_on[100]> def.kingdom:<[kingdom]> def.range:10 save:enemySquadInfo
+            - define enemySquadInfo <entry[enemySquadInfo].created_queue.determination.get[1]>
+
+            - narrate format:callout "Attacking Squad: <[enemySquadInfo].get[name].color[red]> from: <[enemySquadInfo].get[kingdom].color[red]>"
+
+            - run SquadRemoveAllOrders def.kingdom:<[kingdom]> def.squadName:<[squadName]>
+            - run SquadAttackSquadOrder def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.enemyKingdom:<[enemySquadInfo].get[squadLeader].flag[soldier.kingdom]> def.enemySquadName:<[enemySquadInfo].get[name]>
+            - run SoldierParticleGenerator def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.orderType:attackSquad
 
         ## REG. MOVE SQUAD
         on player right clicks block with:SquadMoveTool_Item:
         - ratelimit <player> 1s
+
         - define kingdom <player.flag[kingdom]>
         - define location <player.cursor_on_solid[50]>
         - define squadInfo <player.flag[datahold.squadInfo]>
@@ -192,12 +237,12 @@ SoldierParticleGenerator:
     ## npcList     : [ListTag<NPCTag>]
     ## squadLeader : [NPCTag]
     ## orderType   : ?[ElementTag<String>]
-    ##               Accepted Values: attackAll, attackSome
+    ##               Accepted Values: attackAll, attackSquad
 
     - define waitTime 7t
     - definemap orderFormats:
         attackAll: 2|red
-        attackSome: 1.5|orange
+        attackSquad: 1.5|fuchsia
 
     - define orderType attackAll if:<[orderType].exists.not.or[<[orderType].is_in[<[orderFormats].keys>]>]>
 
@@ -251,6 +296,31 @@ SquadEquipmentChecker:
 
         - foreach <[missingEquipment]>:
             - run GiveSoldierItemFromArmory def.soldier:<[soldier]> def.squadName:<[squadName]> def.kingdom:<[kingdom]> def.item:<[value]> def.armories:<[filledArmories]>
+
+
+FindClickedSquad:
+    type: task
+    definitions: location|kingdom|range
+    script:
+    ## Finds the nearest squad to the location provided within the range provided. If no range
+    ## argument is provided, it will default to 10.
+    ##
+    ## location : [LocationTag]
+    ## kingdom  : [ElementTag<String>]
+    ## range    : ?[ElementTag<Float>]
+    ##
+    ## >>> [MapTag]
+
+    - define range <[range].if_null[10]>
+    - define range 10 if:<[range].sin.exists.not>
+    - define nearbySoldiers <[location].find_npcs_within[<[range]>].filter_tag[<[filter_value].has_flag[soldier]>]>
+    - define nearbyEnemySoldiers <[nearbySoldiers].filter_tag[<[filter_value].flag[soldier.kingdom].equals[<[kingdom]>].not>]>
+
+    - if <[nearbyEnemySoldiers].size> == 0:
+        - determine <map[]>
+
+    - run GetSquadInfo def.kingdom:<[nearbySoldiers].get[1].flag[soldier.kingdom]> def.squadName:<[nearbySoldiers].get[1].flag[soldier.squad]> save:squadInfo
+    - determine <entry[squadInfo].created_queue.determination.get[1]>
 
 
 DEBUG_ClearSquadEquipment:

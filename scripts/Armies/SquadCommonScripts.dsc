@@ -140,6 +140,7 @@ GiveSquadTools:
         - run TempSaveInventory def.player:<player>
 
     - give SquadMoveTool_Item
+    - give SquadAttackAllTool_Item
     - give SquadAttackTool_Item
     - inventory set slot:9 origin:ExitSquadControls_Item
     - inventory set slot:8 origin:MiscOrders_Item
