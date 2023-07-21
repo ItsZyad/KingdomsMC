@@ -214,6 +214,12 @@ SquadOrders_Item:
         skull_skin: 99d1db69-a107-4227-b575-cb40c9f37092|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTVkNzZkOTBiMzc4MDgzZDE0Nzc1NjgwNTA1ZGRiMWU2YzJjNmRjZjRkZGU3ZjliMWY1ODgwOWJlYzZjNjVjOCJ9fX0=
 
 
+SquadRename_Item:
+    type: item
+    material: name_tag
+    display name: <white><bold>Rename Squad
+
+
 SquadOptions_Window:
     type: inventory
     inventory: chest
@@ -221,8 +227,8 @@ SquadOptions_Window:
     title: Squad Options
     slots:
     - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [] [] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
-    - [InterfaceFiller_Item] [InterfaceFiller_Item] [SquadOrders_Item] [] [SquadDelete_Item] [] [SquadEquipmentSet_Item] [InterfaceFiller_Item] [InterfaceFiller_Item]
-    - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [] [] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
+    - [InterfaceFiller_Item] [InterfaceFiller_Item] [SquadOrders_Item] [] [SquadRename_Item] [] [SquadEquipmentSet_Item] [InterfaceFiller_Item] [InterfaceFiller_Item]
+    - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [] [SquadDelete_Item] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
     - [InterfaceFiller_Item] [InterfaceFiller_Item] [] [] [Back_Item] [] [] [InterfaceFiller_Item] [InterfaceFiller_Item]
 
 
@@ -285,6 +291,35 @@ SquadSelection_Handler:
         ## CLICK SQUAD DELETE
         on player clicks SquadDelete_Item in SquadOptions_Window:
         - inventory open d:SquadDeleteConfirmation_Window
+
+        ## CLICK SQUAD RENAME
+        on player clicks SquadRename_Item in SquadOptions_Window:
+        - flag <player> noChat.armies.renamingSquad
+        - narrate format:callout "Type the squad's new name here, or type 'cancel' (you can use spaces):"
+        - inventory close
+
+        ## PLAYER TYPES NEW SQUAD NAME
+        on player chats flagged:noChat.armies.renamingSquad:
+        - if <context.message.to_lowercase> == cancel:
+            - narrate format:callout "Cancelled squad renaming."
+
+        - else:
+            - define kingdom <player.flag[kingdom]>
+            - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+            - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
+            - define newInternalName <context.message.replace_text[ ].with[-]>
+            - define squadInfo <[SMLocation].flag[squadManager.squads.squadList.<[squadName]>]>
+            - define squadInfo <[squadInfo].with[name].as[<[newInternalName]>].with[displayName].as[<context.message>]>
+
+            - flag <[SMLocation]> squadManager.squads.squadList.<[newInternalName]>:<[squadInfo]>
+            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>:!
+
+            - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
+
+            - narrate format:callout "Renamed <[squadName].replace[-].with[ ].color[gray]> to: <context.message.color[red]>."
+
+        - flag <player> noChat.armies.renamingSquad:!
+        - determine cancelled
 
         ## EQUIPMENT WINDOW SETUP
         on player opens SquadEquipment_Window:
