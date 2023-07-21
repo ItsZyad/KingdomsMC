@@ -115,6 +115,7 @@ GenerateInternalError:
 
 ActionBarToggler:
     type: task
+    debug: false
     definitions: player|message|toggleType
     script:
     ## Toggles a consistent message to be displayed to the player's actionbar based on the
@@ -145,6 +146,7 @@ ActionBarToggler:
 
 Actionbar_Handler:
     type: world
+    debug: false
     events:
         on player receives actionbar:
         - flag <player> datahold.actionbar:<context.message> expire:2s
