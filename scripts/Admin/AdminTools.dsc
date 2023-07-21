@@ -92,7 +92,7 @@ AdminTools_Command:
                         - define keys <[object].parsed.flag[<[adjustedKeyList]>].keys.filter_tag[<[filter_value].advanced_matches[<[currentKey]>].or[<[filter_value].starts_with[<[currentKey]>]>]>].if_null[null]>
                         - define keys <server.flag[<[adjustedKeyList]>].keys.filter_tag[<[filter_value].advanced_matches[<[currentKey]>].or[<[filter_value].starts_with[<[currentKey]>]>]>]> if:<[object].equals[server]>
 
-                        - if <[keys].exists>:
+                        - if <[keys]> != null:
                             - determine <[keys].parse_tag[<[adjustedKeyList]>.<[parse_value]>]>
 
                         - else:
@@ -106,7 +106,7 @@ AdminTools_Command:
                             - define keys <server.flag[<[currentKey]>].keys>
 
                         - else:
-                            - define keys <[object].parsed.flag[<[currentKey]>].keys>
+                            - define keys <element[<&lt><[object]><&gt>].parsed.flag[<[currentKey]>].keys>
 
                         - if <[keys].exists>:
                             - determine <[keys].parse_tag[<[keyList].separated_by[.]>.<[parse_value]>]>
@@ -160,22 +160,22 @@ AdminTools_Command:
 
     # ---------------------- START INJECTED SUBCOMMANDS ----------------------#
 
-        - case purgeflag:
-            - define purgeTarget <[args].get[2]>
-            - define flagTargets <[args].get[3].split[,]>
+        # - case purgeflag:
+        #     - define purgeTarget <[args].get[2]>
+        #     - define flagTargets <[args].get[3].split[,]>
 
-            - clickable save:confirm_purge until:30s usages:1:
-                - narrate format:admincallout "Starting flag purge..."
-                - run PurgeFlags_Subcommand def.player:<[purgeTarget]> def.flag:<[flagTargets]>
+        #     - clickable save:confirm_purge until:30s usages:1:
+        #         - narrate format:admincallout "Starting flag purge..."
+        #         - run PurgeFlags_Subcommand def.player:<[purgeTarget]> def.flag:<[flagTargets]>
 
-            - clickable save:cancel_purge until:30s usages:1:
-                - narrate format:admincallout "Action cancelled!"
-                - determine cancelled
+        #     - clickable save:cancel_purge until:30s usages:1:
+        #         - narrate format:admincallout "Action cancelled!"
+        #         - determine cancelled
 
-            - narrate format:admincallout "Please confirm that you wish to clear the following flags:"
-            - narrate <[flagTargets].comma_separated>
-            - narrate format:admincallout "From the following players:"
-            - narrate <[purgeTarget].comma_separated>
+        #     - narrate format:admincallout "Please confirm that you wish to clear the following flags:"
+        #     - narrate <[flagTargets].comma_separated>
+        #     - narrate format:admincallout "From the following players:"
+        #     - narrate <[purgeTarget].comma_separated>
 
         - case seeflag:
             - if <player.is_op> || <player.has_permission[kingdoms.developer]>:
