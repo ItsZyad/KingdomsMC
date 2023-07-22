@@ -306,7 +306,7 @@ SquadManager_Handler:
         on player opens SquadManager_Interface:
         - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
         - define barracksInfoSlot <context.inventory.find_item[SquadManagerInfo_Item]>
-        - inventory adjust slot:<[barracksInfoSlot]> "lore:<gray>Name: <&r><[squadManagerData].get[name]>|<gray>Squad Limit: <&r><[squadManagerData].deep_get[levels.squadLimit]>|<gray>Squad Size Limit: <&r><[squadManagerData].deep_get[levels.squadSizeLimit]>|<gray>Stationing Capacity: <&r><[squadManagerData].deep_get[levels.stationCapacity]>" destination:<context.inventory>
+        - inventory adjust slot:<[barracksInfoSlot]> "lore:<gray>Name: <&r><[squadManagerData].get[name]>|<gray>Squad Limit: <&r><[squadManagerData].deep_get[levels.squadLimit]>|<gray>Squad Size Limit: <&r><[squadManagerData].deep_get[levels.squadSizeLimit]>|<gray>Stationing Capacity: <&r><[squadManagerData].deep_get[levels.stationCapacity]>|<gray>Max AOE Size: <&r><script[SquadManagerUpgrade_Data].data_key[levels.AOE.<[squadManagerData].deep_get[levels.AOELevel]>.value]>" destination:<context.inventory>
 
         on player opens SquadManager_Interface flagged:datahold.armies.showAOE:
         - define AOEItemSlot <context.inventory.find_item[SquadManagerShowAOE_Item]>
