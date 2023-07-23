@@ -65,8 +65,10 @@ CreateSquadReference:
     ## >>> [Void]
 
     - define barrackID <[SMLocation].xyz.replace_text[,]>
+    - define squadLimitLevel <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.levels.squadLimitLevel]>
+    - define squadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[squadLimitLevel]>.value]>
 
-    - if <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.stationedSquads].size.if_null[0]> >= <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.levels.squadLimit]>:
+    - if <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.stationedSquads].size.if_null[0]> >= <[squadLimit]>:
         - narrate format:callout "These barracks have already reached their stationing capacity!<n>You must upgrade your squad manager to increase its stationing capacity."
         - determine cancelled
 
@@ -116,6 +118,7 @@ WriteArmyDataToKingdom:
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>:<[SMData]>
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.location:<[SMLocation]>
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.stationedSquads:<[stationedSquads]> if:<[stationedSquads].exists>
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList:!
 
     - foreach <[SMLocation].flag[squadManager.squads.squadList].if_null[<list[]>]>:
         - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[key]>:<[value]>

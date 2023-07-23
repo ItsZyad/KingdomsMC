@@ -225,8 +225,8 @@ SquadManager_Handler:
             id: <context.location.simple.split[,].remove[last].unseparated>
             levels:
                 AOELevel: 0
-                squadLimit: 1
-                squadSizeLimit: 30
+                squadLimitLevel: 1
+                squadSizeLevel: 0
                 stationCapacity: 0
             AOESize: 20
             upkeep: 500
@@ -303,10 +303,16 @@ SquadManager_Handler:
         on player clicks SquadComposer_Item in SquadManager_Interface:
         - inventory open d:SquadComposition_Interface
 
+        ## Setup SM Interface
         on player opens SquadManager_Interface:
         - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
         - define barracksInfoSlot <context.inventory.find_item[SquadManagerInfo_Item]>
-        - inventory adjust slot:<[barracksInfoSlot]> "lore:<gray>Name: <&r><[squadManagerData].get[name]>|<gray>Squad Limit: <&r><[squadManagerData].deep_get[levels.squadLimit]>|<gray>Squad Size Limit: <&r><[squadManagerData].deep_get[levels.squadSizeLimit]>|<gray>Stationing Capacity: <&r><[squadManagerData].deep_get[levels.stationCapacity]>|<gray>Max AOE Size: <&r><script[SquadManagerUpgrade_Data].data_key[levels.AOE.<[squadManagerData].deep_get[levels.AOELevel]>.value]>" destination:<context.inventory>
+        - define squadLimitLevel <[squadManagerData].deep_get[levels.squadLimitLevel]>
+        - define squadSizeLevel <[squadManagerData].deep_get[levels.squadSizeLevel]>
+        - define squadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[squadLimitLevel]>.value]>
+        - define squadSize <script[SquadManagerUpgrade_Data].data_key[levels.SquadSize.<[squadSizeLevel]>.value]>
+
+        - inventory adjust slot:<[barracksInfoSlot]> "lore:<gray>Name: <&r><[squadManagerData].get[name]>|<gray>Squad Limit: <&r><[squadLimit]>|<gray>Squad Size Limit: <&r><[squadSize]>|<gray>Stationing Capacity: <&r><[squadManagerData].deep_get[levels.stationCapacity]>|<gray>Max AOE Size: <&r><script[SquadManagerUpgrade_Data].data_key[levels.AOE.<[squadManagerData].deep_get[levels.AOELevel]>.value]>" destination:<context.inventory>
 
         on player opens SquadManager_Interface flagged:datahold.armies.showAOE:
         - define AOEItemSlot <context.inventory.find_item[SquadManagerShowAOE_Item]>
@@ -345,19 +351,6 @@ SquadManager_Handler:
 
             - flag <[SMLocation]> squadManager.levels.stationCapacity:<[stationCapacity]>
             - ~run WriteArmyDataToKingdom def.kingdom:<player.flag[kingdom]> def.SMLocation:<[SMLocation]>
-
-        ## Stationing Re-eval.
-        # on player clicks SquadStationingEval_Item in SquadManager_Interface:
-        # - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
-        # - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
-        # - define bedCount <proc[CountBedsInSquadManagerArea].context[<[squadManagerLocation]>]>
-        # - define stationCapacity <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
-
-        # - flag <[squadManagerLocation]> squadManager.levels.stationCapacity:<[stationCapacity]>
-        # - ~run WriteArmyDataToKingdom def.kingdom:<player.flag[kingdom]> def.SMLocation:<[squadManagerLocation]>
-
-        # - define barracksInfoSlot <context.inventory.find_item[SquadManagerInfo_Item]>
-        # - inventory adjust slot:<[barracksInfoSlot]> "lore:<gray>Name: <&r><[squadManagerData].get[name]>|<gray>Squad Limit: <&r><[squadManagerData].deep_get[levels.squadLimit]>|<gray>Squad Size Limit: <&r><[squadManagerData].deep_get[levels.squadSizeLimit]>|<gray>Stationing Capacity: <&r><[squadManagerData].deep_get[levels.stationCapacity]>" destination:<context.inventory>
 
         ## AOE Show
         on player clicks SquadManagerShowAOE_Item in SquadManager_Interface:
@@ -674,7 +667,8 @@ SquadManager_Handler:
         - define movableSquads <list[]>
 
         - foreach <[barrackList]> as:barrack:
-            - define barrackSquadLimit <[barrack].deep_get[levels.squadLimit]>
+            - define barrackSquadLimitLevel <[barrack].deep_get[levels.squadLimitLevel]>
+            - define barrackSquadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[barrackSquadLimitLevel]>]>
             - define barrackStationingCap <[barrack].deep_get[levels.stationingCapacity]>
 
             - foreach <[squadList].exclude[<[movableSquads].parse_value_tag[<[parse_key]>]>]> as:squad:

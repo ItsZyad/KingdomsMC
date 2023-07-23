@@ -134,9 +134,11 @@ SquadComposition_Handler:
         - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
         - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
         - define squadList <[squadManagerData].get[squadList].if_null[<list[]>]>
-        - define squadLimit <[squadManagerData].deep_get[levels.squadLimit]>
+        - define squadLimitLevel <[squadManagerData].deep_get[levels.squadLimitLevel]>
+        - define squadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[squadLimitLevel]>.value]>
         - define stationCapacity <[squadManagerData].deep_get[levels.stationCapacity]>
-        - define squadSizeLimit <[squadManagerData].deep_get[levels.squadSizeLimit]>
+        - define squadSizeLevel <[squadManagerData].deep_get[levels.squadSizeLevel]>
+        - define squadSizeLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadSize.<[squadSizeLevel]>.value]>
         - define totalManpower <player.flag[datahold.armies.manpower]>
         - narrate format:debug SMD:<[squadManagerData]>
 

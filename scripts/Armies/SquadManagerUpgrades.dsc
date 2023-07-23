@@ -1,6 +1,5 @@
 ##
-## [ WIP ]
-## All scripts related to upgrading the SM will be found here.
+## All scripts related to upgrading the Squad manager will be found here.
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Jun 2023
@@ -19,6 +18,28 @@ SquadManagerAOEUpgrade_Item:
         upgradeTitle: <element[Upgrade SM AOE]>
 
 
+SquadManagerLimitUpgrade_Item:
+    type: item
+    material: player_head
+    display name: <light_purple><bold>Upgrade Squad Limit
+    mechanisms:
+        skull_skin: 1c1a29a3-769f-4080-b90e-beaf561cddcd|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWVhMjk5Zjk3NmUyYzE0MmY5MmY4N2NkNWQyYjQ5N2E4MDk4NzM4NDRhZDY4ZTRjMzZiZjA1NWNkMjI0YTlmNSJ9fX0=
+    flags:
+        upgradeType: SquadAmount
+        upgradeTitle: <element[Upgrade Squad Limit]>
+
+
+SquadManagerSizeUpgrade_Item:
+    type: item
+    material: player_head
+    display name: <light_purple><bold>Upgrade Squad Size
+    mechanisms:
+        skull_skin: 86324d7a-d1ae-4682-bf77-c1c272fc3523|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjBiNTVmNzQ2ODFjNjgyODNhMWMxY2U1MWYxYzgzYjUyZTI5NzFjOTFlZTM0ZWZjYjU5OGRmMzk5MGE3ZTcifX19
+    flags:
+        upgradeType: SquadSize
+        upgradeTitle: <element[Upgrade Squad Size]>
+
+
 SquadManagerUpgrade_Interface:
     type: inventory
     inventory: chest
@@ -26,9 +47,9 @@ SquadManagerUpgrade_Interface:
     title: Squad Manager Upgrades
     slots:
     - [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
-    - [] [SquadManagerAOEUpgrade_Item] [] [] [] [] [] [] []
-    - [] [] [] [] [] [] [] [] []
-    - [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [barrier] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
+    - [SquadInfoSeparator_Item] [] [] [SquadManagerAOEUpgrade_Item] [SquadManagerLimitUpgrade_Item] [SquadManagerSizeUpgrade_Item] [] [] [SquadInfoSeparator_Item]
+    - [SquadInfoSeparator_Item] [] [] [] [] [] [] [] [SquadInfoSeparator_Item]
+    - [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [Back_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
 
 
 LevelOneInactive_Item:
@@ -159,7 +180,7 @@ SquadManagerUpgrade_Subwindow:
     slots:
     - [] [] [] [] [LevelZeroActive_Item] [] [] [] []
     - [] [] [LevelOneInactive_Item] [LevelTwoInactive_Item] [LevelThreeInactive_Item] [LevelFourInactive_Item] [LevelFiveInactive_Item] [] []
-    - [] [] [] [] [] [] [] [] []
+    - [] [] [] [] [Back_Item] [] [] [] []
 
 
 SquadManagerUpgrade_Data:
@@ -168,7 +189,7 @@ SquadManagerUpgrade_Data:
         AOE:
             0:
                 value: 20
-                cost: 1000
+                cost: 0
                 upkeepAdd: 0
                 message:
                 - <element[Base maximum AOE size:].color[green]>
@@ -209,16 +230,104 @@ SquadManagerUpgrade_Data:
                 - <element[Increases maximum AOE size to:].color[green]>
                 - <aqua><[currentLevelData].get[value]>
 
+        SquadAmount:
+            0:
+                value: 1
+                cost: 0
+                upkeepAdd: 0
+                message:
+                - <element[Base SM squad limit:]>
+                - <aqua><[currentLevelData].get[value]>
+            1:
+                value: 2
+                cost: 600
+                upkeepAdd: 100
+                message:
+                - <element[Increases this SM's maximum amount].color[green]>
+                - <element[of held squads to:].color[green]> <aqua><[currentLevelData].get[value]>
+            2:
+                value: 3
+                cost: 800
+                upkeepAdd: 150
+                message:
+                - <element[Increases this SM's maximum amount].color[green]>
+                - <element[of held squads to:].color[green]> <aqua><[currentLevelData].get[value]>
+            3:
+                value: 4
+                cost: 1000
+                upkeepAdd: 200
+                message:
+                - <element[Increases this SM's maximum amount].color[green]>
+                - <element[of held squads to:].color[green]> <aqua><[currentLevelData].get[value]>
+            4:
+                value: 5
+                cost: 1200
+                upkeepAdd: 250
+                message:
+                - <element[Increases this SM's maximum amount].color[green]>
+                - <element[of held squads to:].color[green]> <aqua><[currentLevelData].get[value]>
+            5:
+                value: 6
+                cost: 1400
+                upkeepAdd: 300
+                message:
+                - <element[Increases this SM's maximum amount].color[green]>
+                - <element[of held squads to:].color[green]> <aqua><[currentLevelData].get[value]>
+
+        SquadSize:
+            0:
+                value: 15
+                cost: 0
+                upkeepAdd: 0
+                message:
+                - <element[Base squad size:]>
+                - <aqua><[currentLevelData].get[value]>
+            1:
+                value: 25
+                cost: 3500
+                upkeepAdd: 500
+                message:
+                - <element[Increases this SM's maximum squad size to:].color[green]>
+                - <aqua><[currentLevelData].get[value]>
+            2:
+                value: 35
+                cost: 4250
+                upkeepAdd: 650
+                message:
+                - <element[Increases this SM's maximum squad size to:].color[green]>
+                - <aqua><[currentLevelData].get[value]>
+            3:
+                value: 50
+                cost: 6000
+                upkeepAdd: 850
+                message:
+                - <element[Increases this SM's maximum squad size to:].color[green]>
+                - <aqua><[currentLevelData].get[value]>
+            4:
+                value: 60
+                cost: 7000
+                upkeepAdd: 1000
+                message:
+                - <element[Increases this SM's maximum squad size to:].color[green]>
+                - <aqua><[currentLevelData].get[value]>
+            5:
+                value: 75
+                cost: 8250
+                upkeepAdd: 1200
+                message:
+                - <element[Increases this SM's maximum squad size to:].color[green]>
+                - <aqua><[currentLevelData].get[value]>
+
 
 SquadManagerUpgrade_Handler:
     type: world
     events:
         ## Player Exits Upgrade Window
-        on player clicks barrier in SquadManagerUpgrade_Interface:
+        on player clicks Back_Item in SquadManagerUpgrade_Interface:
         - inventory open d:SquadManager_Interface
 
         ## Player Clicks AOE Upgrade
-        on player clicks SquadManagerAOEUpgrade_Item in SquadManagerUpgrade_Interface:
+        on player clicks *Upgrade_Item in SquadManagerUpgrade_Interface:
         - if <context.item.has_flag[upgradetype]>:
             - flag <player> datahold.armies.upgradingSM.type:<context.item.flag[upgradeType]>
             - define upgradeSubwindow <inventory[SquadManagerUpgrade_Subwindow]>
@@ -233,6 +342,10 @@ SquadManagerUpgrade_Handler:
         - define upgradeType <player.flag[datahold.armies.upgradingSM.type]>
         - definemap upgradeTypeToPath:
             AOE: levels.AOELevel
+            SquadAmount: levels.squadLimitLevel
+            SquadSize: levels.squadSizeLevel
+
+        - flag <player> datahold.armies.upgradingSM.typeToPath:<[upgradeTypeToPath].get[<[upgradeType]>].split[.].get[2]>
 
         - define currentLevel <[squadManagerData].deep_get[<[upgradeTypeToPath].get[<[upgradeType]>]>]>
         - define levelData <script[SquadManagerUpgrade_Data].data_key[levels.<[upgradeType]>]>
@@ -278,19 +391,27 @@ SquadManagerUpgrade_Handler:
             - narrate format:callout "Your kingdom does not have enough funds to purchase this upgrade!"
             - determine cancelled
 
+        - flag <[SMLocation]> squadManager.levels.<player.flag[datahold.armies.upgradingSM.typeToPath]>:<[chosenLevel]>
+
         - run SubBalance def.kingdom:<[kingdom]> def.amount:<context.item.flag[upgradeInfo.cost]>
         - run AddUpkeep def.kingdom:<[kingdom]> def.amount:<context.item.flag[upgradeInfo.upkeepAdd]>
+        - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
 
-        - flag <[SMLocation]> squadManager.levels.AOELevel:<[chosenLevel]>
         - define itemName <context.item.script.name>
         - define activeItem <element[<[itemName].split[Inactive].get[1]>active_item].as[item]>
         - define upgradeType <player.flag[datahold.armies.upgradingSM.type]>
         - define currentLevelData <script[SquadManagerUpgrade_Data].data_key[levels.<[upgradeType]>.<[chosenLevel]>]>
 
         - adjust def:activeItem lore:<[activeItem].lore.include[<[currentLevelData].get[message]>].parsed.unescaped>
-
         - inventory set slot:<context.slot> o:<[activeItem]> d:<context.inventory>
+
         - narrate format:callout "Succesfully activated level <[chosenLevel].color[red]>!"
+
+        - flag <player> datahold.armies.upgradingSM:!
+
+        ## Player Exits Subwindow
+        on player clicks Back_Item in SquadManagerUpgrade_Subwindow:
+        - inventory open d:SquadManagerUpgrade_Interface
 
         ## Player Closes Subwindow
         on player closes SquadManagerUpgrade_Subwindow:
