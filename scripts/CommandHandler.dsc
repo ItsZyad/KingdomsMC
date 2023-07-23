@@ -449,7 +449,7 @@ Kingdom_Command:
             - money give to:<player> quantity:<[amount]>
             - flag server kingdoms.<[kingdom]>.balance:-:<[amount]>
 
-            - narrate format:callout "Successfully withdrawn: $<[amount]>"
+            - narrate format:callout "Successfully withdrawn: $<[amount].as_money>"
 
         - else:
             - narrate format:callout "You do not have sufficient funds in your kingdom to withdraw"
@@ -826,7 +826,7 @@ KingdomGuardList_Handler:
 
 debug:
     type: format
-    format: "<&l>Kingdoms Debug:: <&7><[text]>"
+    format: "<gray>[Kingdoms Debug] <&gt><&gt> <[text]>"
 
 information:
     type: format
@@ -834,7 +834,7 @@ information:
 
 callout:
     type: format
-    format: "<&5>Kingdoms:: <&6><[text]>"
+    format: "<white>[Kingdoms] <&gt><&gt> <&6><[text]>"
 
 npctalk:
     type: format
