@@ -28,7 +28,7 @@ Small Additions:
     - Players can now see all the active material/weapon transfer requests made by their kingdom;
         - Allowed players to take over certain requests in their kingdom that weren't originally made by them.
     - Added Factions-like chunk map (/ks chunkmap).
-    - Removed quest line from the sidebar;
+    - Removed quest line from the sidebar, making it significantly smaller;
         - Added /quest command instead.
     - War status line now reads 'At peace' or 'At war' instead of true and false.
     - Added scripted mailboxes which can push news and important world events to certain kingdoms.
