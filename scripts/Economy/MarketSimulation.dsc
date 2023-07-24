@@ -14,7 +14,7 @@ DailySimulationUpdate:
             - flag <[merc]> merchantData.balance:<[wealth]> if:<[balance].exists.not>
             - flag <[merc]> merchantData.balance:<[wealth].add[<[balance]>]> if:<[balance].exists>
 
-            - run MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]> save:purchaseDecider
+            - run MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
 
 
 # Runs for every merchant in a market and calculates what items it should prioritize buying
@@ -116,7 +116,7 @@ MerchantPurchaseDecider:
     - define strategyQuals <script[MerchantStrategy_Qualifiers].data_key[strategy_list]>
     - inject <script.name> path:CalculateCloseness
 
-    - run FlagVisualizer def.flag:<[closenessMap]> def.flagName:closenessMap
+    ##- run FlagVisualizer def.flag:<[closenessMap]> def.flagName:closenessMap
 
     - definemap closestStrat:
         name: null
@@ -129,7 +129,6 @@ MerchantPurchaseDecider:
             - define closestStrat.closeness:<[stratCloseness]>
             - define closestStrat.name:<[strat]>
 
-
     - define strategyBehaviour <script[MerchantStrategy_Behaviour].data_key[strategy_list.<[closestStrat].get[name]>]>
     - define strategyLoopIter <[strategyBehaviour].get[loop_iterations].if_null[2]>
     - define strategyLoopIter 7 if:<[strategyLoopIter].is[MORE].than[7]>
@@ -140,7 +139,10 @@ MerchantPurchaseDecider:
     - define priceControlledItems <[allItems].filter_tag[<[filter_value].get[base].is[OR_LESS].than[<[priceFilterHigh]>].and[<[filter_value].get[base].is[OR_MORE].than[<[priceFilterLow]>]>]>].sort_by_value[get[base]]>
 
     # - narrate format:debug ALL:<[allItems]>
-    #- narrate format:debug PCI_OLD:<[priceControlledItems]>
+    # - narrate format:debug PCI_OLD:<[priceControlledItems]>
+
+    ##- run flagvisualizer def.flag:<[priceControlledItems]> def.flagName:PCI
+    ##- determine cancelled
 
     - if <[priceControlledItems].size> < 2:
         - define allItemsSorted <[allItems].sort_by_value[get[base]]>
@@ -164,7 +166,7 @@ MerchantPurchaseDecider:
     - define priceBiasThreshold <[priceControlledItems].size.mul[<[strategyPriceBias]>].round>
     - define afterThresholdItems <[priceControlledItems].get[<[priceBiasThreshold]>].to[last]>
     - define newFirstItemIndex <[priceBiasThreshold].sub[<[afterThresholdItems].size>]>
-    - define newFirstItemIndex 0 if:<[newFirstItem].is[LESS].than[0]>
+    - define newFirstItemIndex 1 if:<[newFirstItemIndex].is[OR_LESS].than[0]>
     - define beforeThresholdItems <[priceControlledItems].get[<[newFirstItemIndex]>].to[<[priceBiasThreshold]>]>
 
     # - narrate format:debug PBT:<[priceBiasThreshold]>
@@ -177,7 +179,9 @@ MerchantPurchaseDecider:
     - define originalSpendableBalance <[balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
     - define iterations 0
 
-    # - run FlagVisualizer def.flagName:BCI_NEW def.flag:<[biasControlledItems]>
+    # - run FlagVisualizer def.flagName:BCI_NEW def.flag:<[biasControlledItems].random[<[biasControlledItems].size>]>
+    # - run FlagVisualizer def.flag:<[strategyBehaviour]> def.flagName:strat
+    # - determine cancelled
 
     # - narrate format:debug BAL:<[balance]>
     # - narrate format:debug COR_BAL:<[merchant].flag[merchantData.balance].sub[<[originalBalance].div[50]>]>
@@ -185,6 +189,8 @@ MerchantPurchaseDecider:
 
     - while <[iterations]> < <[strategyLoopIter]> && <[merchant].flag[merchantData.balance].sub[<[originalBalance].div[50]>]> > <[originalBalance].sub[<[originalSpendableBalance]>]>:
         - foreach <[biasControlledItems].random[<[biasControlledItems].size>]> as:item:
+
+            # If the market does not contain the current item then skip
             - if !<server.flag[economy.markets.<[marketName]>.supplyMap.current].keys.contains[<[item].get[name]>]>:
                 - foreach next
 

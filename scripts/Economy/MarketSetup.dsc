@@ -24,7 +24,6 @@ MarketCreation_Command:
     - define args <context.raw_args.split_args>
     - define action <[args].get[1]>
     - define name <[args].get[2]>
-    - define attractiveness <[args].get[3]>
     - define maxSize <[args].get[4].if_null[n/a]>
 
     - if <[action]> == name:
@@ -49,12 +48,16 @@ MarketCreation_Command:
                     - define spawnChance <[args].get[3]>
 
                 - define merchantAmount <server.flag[economy.markets.<[name]>.merchants].size>
+
                 - run SupplyAmountCalculator def.marketSize:<[merchantAmount]> def.spawnChance:<[spawnChance]> save:supplyAmount
+
                 - define supply <entry[supplyAmount].created_queue.determination.get[1]>
                 - flag server economy.markets.<[name]>.supplyMap.original:<[supply]>
                 - flag server economy.markets.<[name]>.supplyMap.current:<[supply]>
 
             - case create:
+                - define attractiveness <[args].get[3]>
+
                 - flag server economy.markets.<[name]>.ID:<server.flag[economy.markets].size.if_null[0].add[1]>
                 - flag server economy.markets.<[name]>.merchants:<list[]>
                 - flag server economy.markets.<[name]>.attractiveness:<[attractiveness]>
@@ -85,6 +88,7 @@ MarketCreation_Command:
 
                     - if <[point].y> > <[maxY]>:
                         - define maxY <[point].y>
+
                     - if <[point].y> < <[minY]>:
                         - define minY <[point].y>
 
@@ -153,7 +157,7 @@ MerchantCreation_Command:
     tab complete:
     - define args <context.raw_args.split_args>
 
-    - if <[args].get[1]> == create:
+    - if <[args].size> >= 1 && <[args].get[1]> == create:
         - yaml load:economy_data/price-info.yml id:prices
         - define groups <yaml[prices].read[price_info.items].keys>
         - yaml id:prices unload
@@ -283,7 +287,7 @@ MerchantPlacement_Handler:
 
         - if <context.message> == *auto:
             - foreach <[markets]> as:market:
-                - define marketName <[market].key>
+                - define marketName <[key]>
                 - define marketArea <[market].get[marketArea]>
 
                 - if <[marketArea].contains[<[merchantPos]>]>:

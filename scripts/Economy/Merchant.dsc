@@ -61,7 +61,7 @@ RunMerchantInterface:
 
         - define name <[key]>
         - define price <[value].get[price]>
-        - define lastWeekAvg <[value].get[lastWeekAvg]>
+        - define lastWeekAvg <[value].get[lastWeekAvg].if_null[null]>
         - define item <[name].as[item]>
         - flag <[item]> quantity:<[quantity]>
         - flag <[item]> price:<[price]>
@@ -87,6 +87,9 @@ KMerchantWindow_Handler:
         on player clicks MerchantInterfaceChangeMode_Item in inventory flagged:dataHold.merchantMode:
         - define merchant <player.flag[dataHold.interactingMerchant]>
         - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
+
+        - if !<player.has_flag[datahold.merchantMode]>:
+            - determine cancelled
 
         # SWITCHING TO SELL MODE
         - if <player.flag[dataHold.merchantMode]> == buy:
