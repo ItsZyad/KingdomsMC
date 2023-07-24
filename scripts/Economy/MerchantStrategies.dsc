@@ -28,6 +28,22 @@ MerchantStrategy_Qualifiers:
                 tolerance: 2.5
             quantityBias:
                 min: 0.45
+        Buy_Lots:
+            balance:
+                min: 3000
+            spendBias:
+                min: 0.5
+            quantityBias:
+                is: 0.65
+                tolerance: 0.7
+        Buy_Frugal:
+            balance:
+                max: 5000
+            spendBias:
+                min: 0.65
+            quantityBias:
+                is: 0.4
+                tolerance: 0.5
 
 MerchantStrategy_Behaviour:
     type: data
@@ -55,3 +71,17 @@ MerchantStrategy_Behaviour:
             # If ommitted, merchant will use price_filter.shift as a fallback.
             price_shift: 0.37
             loop_iterations: 4
+        Buy_Lots:
+            price_filter:
+                low: 0
+                high: 800
+                bias: 0.2
+            price_shift: 0.4
+            loop_iterations: 4
+        Buy_Frugal:
+            price_filter:
+                low: 0
+                high: 2000
+                bias: 0.4
+            price_shift: 0.4
+            loop_iterations: 2
