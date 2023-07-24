@@ -10,7 +10,7 @@ Prospective contributors to Kingdoms must first have a solid grasp of Denizen, a
 
 ## Pull Requests
 
-Before submitting any pull request to the public Kingdoms repository, please ensure of all the following points:
+Before submitting any pull request to the public Kingdoms repository, please check your code against all of the following points:
 
 - The code you are submitting for review must either be entirely yours or is free/safe to use (i.e. entirely public domain).
   - If your code is under any pre-existing license, you must note it in the pull request.
