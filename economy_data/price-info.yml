@@ -123,18 +123,22 @@ price_info:
         base: '420'
         gov_cap: '588'
         supply_prob: '0.19'
+        amount_mod: '0.37'
       diamond_pickaxe:
         base: '650'
         gov_cap: '910'
         supply_prob: '0.2'
+        amount_mod: '0.38'
       diamond_axe:
         base: '650'
         gov_cap: '910'
         supply_prob: '0.21'
+        amount_mod: '0.39'
       diamond_hoe:
         base: '400'
         gov_cap: '560'
         supply_prob: '0.25'
+        amount_mod: '0.4'
       leather_helmet:
         base: '52'
         gov_cap: '72.8'
@@ -377,12 +381,15 @@ price_info:
       brown_mushroom:
         base: '2'
         gov_cap: '2.8'
+        supply_prob: '0.86'
       red_mushroom:
         base: '2'
         gov_cap: '2.8'
+        supply_prob: '0.86'
       sugar_cane:
         base: '10'
         gov_cap: '14'
+        supply_prob: '0.91'
       cooked_chicken:
         base: '66'
         gov_cap: '90'
