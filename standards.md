@@ -1,3 +1,6 @@
+
+---
+
 # DKingdoms Contribution Standards
 
 This document exists for the benefit of tenured developers and contributors to the DKingdoms project ('Kingdoms'). Please refer to this document should you wish to submit a pull request to the [Kingdoms public repository](https://github.com/ItsZyad/KingdomsMC). Failure to meet the standards and guidelines laid out in this document may result in the rejection of your PR or significant delay in its acceptance.
@@ -18,20 +21,26 @@ Before submitting any pull request to the public Kingdoms repository, please che
 - PRs must adhere to the Kingdoms Style Guide, outlined below. 
   - **Important:** To encourage involvement in the project, reviewers will exercise leniency on this rule with first or second-time contributors.
   - For regular contributors, minor style violations will not lead to an outright rejection of a PR. however reviewers **will** reject PRs should they find too many style violations.
+​
+---
 
-## DKingdoms Style Guide
+# DKingdoms Style Guide
 
-### Basic Conventions
+## Basic Conventions
 
-#### Naming Scheme
-All definitions and flags in Kingdoms are camel-cased. For example;
+### Naming Scheme
+All definitions, flags, and entry names in Kingdoms are camel-cased. For example;
 
 ```DenizenScript
-- define someElement <element[Hello World]>
+- define playerKingdom <player.flag[kingdom]>
+
+- run GetSomeData def.kingdom:<[kingdom]> save:someData
+- define someData <entry[someData].created_queue.determination.get[1]>
+
 - flag server anotherElement:<[someElement]>
 ```
 
-While script names are all in Pascal-case;
+Additionally any named command modifiers, such as `key:` and `as:` on `foreach` loops are to be defined in camel-case, while all script names are all in Pascal-case;
 
 ```DenizenScript
 SomeWorldScript:
@@ -41,7 +50,7 @@ SomeWorldScript:
         - narrate format:callout "Bye bye, <player.name>!"
 ```
 
-Definition and flag names may not start with numbers or symbols. These names may only start with a character matching: `[A-z]|[0-9]`. The only exception to this rule is the utilization of the underscore character to modify queue-level 'fake' definitions like `__player` and `__npc`.
+Definition and flag names may not start with numbers or symbols. These names may only start with a character matching: `[A-z]`. The only exception to this rule is the utilization of the underscore character to modify queue-level 'fake' definitions like `__player` and `__npc`.
 
 ### Spacing
 There must be exactly two lines of whitespace between scripts and one line **after** subpaths, events, tab completes, descriptions, and any other multi-line script section;
@@ -99,7 +108,7 @@ Comments must also be preceded with at least one line of whitespace. Optionally,
 ...
 ```
 
-Finally, the last place where whitespace is necessitated is between commands that directly affect player, entities, or the world, adn those that do not. Blocks of such commands can be placed together without an empty line between them. Commands which fall into this category are:
+Finally, the last place where whitespace is necessitated is between commands that directly affect players, entities, or the world, and those that do not. Commands which fall into this category are:
 
 - All commands under the `entity`, `npc`, `player`, `item`, and `world` sections on the [Denizen meta page](https://meta.denizenscript.com/Docs/Commands)
 - `clientrun` (if Clientizen is installed)
@@ -107,16 +116,22 @@ Finally, the last place where whitespace is necessitated is between commands tha
 - `adjustblock`
 - `note`
 
-Beyond this, developers and contributors have the discretion to add any other whitespace to make their code more readable or to emphasize certain blocks or sections of scripts.
+Beyond this, developers and contributors have the discretion to add any other whitespace to make their code more readable, or to emphasize certain sections of script that they believe warrant emphasizing.
 
 ## Direct Flag References
 
-Where ever possible contributors and developers must avoid using direct references to player, world, entity, and server-level flags such as `server.kingdoms` or `npc.merchantData`, for example. Directly modifying the contents of flags considered essential to the functioning of Kingdoms could result in unpredictable behaviour that may corrupt game data.
+_Important Note: This section of standards will not apply until KAPI is fully implemented_
 
-Almost every flag action relating to Kingdoms can be carried out through the Kingdoms API (KAPI). For example, adding funds to kingdom's balance should always be done using the relevant task script: `AddBalance`;
+---
+
+Where ever possible contributors and developers must avoid using direct references to kingdoms-related flags such as `server.kingdoms` or `npc.merchantData`, for example. Directly modifying the contents of flags considered essential to the functioning of Kingdoms could result in unpredictable behaviour that may corrupt game data.
+
+Almost every flag action relating to Kingdoms can be carried out through the Kingdoms API (KAPI). For example, adding funds to a kingdom's balance, setting upkeep, or modifying claims can be done through direct flag actions, however all have KAPI equivalents;
 
 ```DenizenScript
 - run AddBalance def.kingdom:<[kingdom]> def.amount:100
+- run SetUpkeep def.kingdom:<[kingdom]> def.amount:500
+- run AddCoreClaim def.kingdom:<[kingdom]> def.chunk:<chunk[1,1]>
 ```
 
 All KAPI scripts can be found under the `scripts/Global-Scripts/Common-Library` directory.
@@ -144,12 +159,12 @@ SampleTaskScript:
     ##
     ## >>> [Void]
     
-    - <...>
+    ...
 ```
 
-All definitions' type contracts must be established below the docstring description. Since Denizen is dynamically typed there are a number of type conventions we will utilize that do not have an analogue in Denizen. For example, Element tags can hold an array of types that are often separate in regular programming languages like integers, floats, booleans, or strings. For that reason, when documenting an ElementTag you must also provide the exact type expected within angle-brackets.
+All definitions' type contracts must be established below the docstring description. Since Denizen is dynamically typed, there are a number of type conventions we will utilize that do not have an analogue in Denizen. For example, Element tags can hold an array of types that are often separate in regular programming languages like integers, floats, booleans, or strings. For that reason, when documenting an ElementTag you must also provide the exact type expected within angle-brackets.
 
-Under all definition type contracts must be an additional type contract for the return value. If the task/procedure has no return value then simply indicate that using: `>>> [Void]`.
+Under all definition type contracts must be an additional type contract for the return value. If the task has no return value then simply indicate that using: `>>> [Void]`. However all procedure scripts must have a return value.
 
 Formatting conventions for all type contracts are listed below:
 
