@@ -199,11 +199,6 @@ EntityTerritoryHandler:
         - if <server.has_flag[PreGameStart]>:
             - determine cancelled
 
-        - define weightedRandom <util.random.decimal[0].to[<util.random.decimal[0.5].to[1]>]>
-
-        - if <[weightedRandom]> < 0.3:
-            - determine cancelled
-
         on entity spawns:
         - define blockedSpawnTypes <list[NATURAL|LIGHTNING|SPAWNER|JOCKEY]>
 
