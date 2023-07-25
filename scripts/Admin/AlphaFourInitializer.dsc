@@ -22,6 +22,9 @@ GameStateAdjuster:
     - flag server weekcounter:!
     - flag server npcID:!
     - flag server RNPCs:!
+    - flag server MinerList:!
+    - flag server selectedNPC:!
+    - flag server server:!
 
 
 DEBUG_GenerateKingdomFlags:
