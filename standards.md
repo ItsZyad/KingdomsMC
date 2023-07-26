@@ -37,7 +37,7 @@ All definitions, flags, and entry names in Kingdoms are camel-cased. For example
 - run GetSomeData def.kingdom:<[kingdom]> save:someData
 - define someData <entry[someData].created_queue.determination.get[1]>
 
-- flag server anotherElement:<[someElement]>
+- flag server anotherDataPoint:<[someData]>
 ```
 
 Additionally any named command modifiers, such as `key:` and `as:` on `foreach` loops are to be defined in camel-case, while all script names are all in Pascal-case;
@@ -131,7 +131,7 @@ Almost every flag action relating to Kingdoms can be carried out through the Kin
 ```DenizenScript
 - run AddBalance def.kingdom:<[kingdom]> def.amount:100
 - run SetUpkeep def.kingdom:<[kingdom]> def.amount:500
-- run AddCoreClaim def.kingdom:<[kingdom]> def.chunk:<chunk[1,1]>
+- run AddCoreClaim def.kingdom:<[kingdom]> def.chunk:<chunk[1,1,world]>
 ```
 
 All KAPI scripts can be found under the `scripts/Global-Scripts/Common-Library` directory.
