@@ -229,6 +229,7 @@ SquadManager_Handler:
                 squadSizeLevel: 0
                 stationCapacity: 0
             AOESize: 20
+            # Note: future configurable
             upkeep: 500
 
         # Generate cuboid consisting of all the kingdom's core claims
@@ -270,9 +271,8 @@ SquadManager_Handler:
             - run RecalculateSquadManagerAOE def.barracksArea:<[barracksArea]> def.SMLocation:<context.location> def.player:<player>
 
             - if !<server.has_flag[PauseUpkeep]>:
-                - flag server kingdoms.<[kingdom]>.balance:-:2000
-                # Note: future configurable
-                - flag server kingdoms.<[kingdom]>.upkeep:+:500
+                - run AddUpkeep def.kingdom:<[kingdom]> def.amount:500
+                - run SubBalance def.kingdom:<[kingdom]> def.amount:2000
 
         - else:
             - narrate format:callout "Please ensure that the squad manager is at least 20 blocks within your kingdom's core/outpost claims."
@@ -642,10 +642,6 @@ SquadManager_Handler:
 
         ## Player Breaks SM
         on player breaks lodestone location_flagged:squadManager:
-        # TODO(High): SM destruction logic; display confirmation window,
-        # TODO/ Distribute squads to nearest barracks. If all barracks are full, display additional
-        # TODO/ information with confirmation window telling player that squads would have to be
-        # TODO/ disbanded if they do that
         - define kingdom <player.flag[kingdom]>
         - define SMInfo <context.location.flag[squadManager]>
 
@@ -659,45 +655,51 @@ SquadManager_Handler:
         - flag <player> datahold.armies.showAOE:!
 
         - if <[barrackList].size> == 1:
+            - flag <player> datahold.armies.SMDelete.squadList:<[squadList]> if:<[squadList].is_empty.not>
+
+            - clickable for:<player> usages:1 until:10m save:YesDelete:
+                - inventory open d:SquadManagerDeletionConfirmation_Window
+
+            - clickable for:<player> usages:1 until:10m save:NoDelete:
+                - narrate format:callout "Cancelled deletion process."
+                - clickable cancel:<entry[YesDelete].id>
+
             - narrate format:callout "<red><element[WARNING!].bold> Deleting this squad manager will result in some of its squads being deleted!"
             - narrate format:callout "<red>Please ensure that you make space or upgrade other SMs, or transfer all squads manually!"
-            - inventory open d:SquadManagerDeletionConfirmation_Window
+            - narrate format:callout "<red>Are you sure you want to delete this squad manager?<n><n><element[Yes].color[green].bold.on_click[<entry[YesDelete].command>]> / <element[No].color[gray].bold.on_click[<entry[NoDelete].command>]>"
+
             - determine cancelled
 
         - define movableSquads <list[]>
 
-        - foreach <[barrackList]> as:barrack:
+        - foreach <[barrackList].filter_tag[<[filter_value].get[name].equals[<[SMInfo].get[name]>].not>]> as:barrack:
+            - define barrack <[barrack].get[location].flag[squadManager]>
             - define barrackSquadLimitLevel <[barrack].deep_get[levels.squadLimitLevel]>
-            - define barrackSquadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[barrackSquadLimitLevel]>]>
-            - define barrackStationingCap <[barrack].deep_get[levels.stationingCapacity]>
+            - define barrackSquadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[barrackSquadLimitLevel]>.value]>
+            - define barrackStationingCap <[barrack].deep_get[levels.stationCapacity]>
 
-            - foreach <[squadList].exclude[<[movableSquads].parse_value_tag[<[parse_key]>]>]> as:squad:
+            - foreach <[squadList].exclude[<[movableSquads].parse_value_tag[<[parse_key]>]>]> as:squadName:
                 - define passedConditions 0
+                - define squad <[SMInfo].deep_get[squads.squadList.<[squadName]>]>
 
                 - if <[squad].get[npcList].size> <= <[barrackStationingCap]>:
                     - define passedConditions:++
 
-                - if <[barrack].deep_get[squads.squadList]> < <[barrackSquadLimit]>:
+                - if <[barrack].deep_get[squads.squadList].size.if_null[0]> < <[barrackSquadLimit]>:
                     - define passedConditions:++
 
                 - if <[passedConditions]> == 2:
-                    - define movableSquads:->:<[squad]>
-                    - define barrackList.<[key]>.squads.squadList:->:<[squad]>
+                    - define movableSquads.<[squadName]>.kingdom:<[barrack].get[kingdom]>
+                    - define movableSquads.<[squadName]>.barrackID:<[barrack].get[id]>
 
-        # If all the squads in this SM can be moved to others
-        - if <[movableSquads].size> == <[squadList].size>:
-            - flag <player> datahold.armies.SMDelete.squadList:<[squadList]>
-            - flag <player> datahold.armies.SMDelete.movableSquads:<[movableSquads]>
-            - flag <player> datahold.armies.SMDelete.SMID:<[SMID]>
+        - flag <player> datahold.armies.SMDelete.squadList:<[squadList]>
+        - flag <player> datahold.armies.SMDelete.movableSquads:<[movableSquads]>
+        - flag <player> datahold.armies.SMDelete.SMID:<[SMID]>
 
-            - inventory open d:SquadManagerDeletionConfirmation_Window
+        - narrate format:callout "<red><element[WARNING!].bold> Deleting this squad manager will result in some of its squads being deleted!"
+        - narrate format:callout "<red>Please ensure that you make space or upgrade other SMs, or transfer all squads manually!"
 
-        - else:
-            #- narrate format:debug "Insert squad deletion notice w/confirmation window"
-            - narrate format:callout "<red><element[WARNING!].bold> Deleting this squad manager will result in some of its squads being deleted!"
-            - narrate format:callout "<red>Please ensure that you make space or upgrade other SMs, or transfer all squads manually!"
-            - inventory open d:SquadManagerDeletionConfirmation_Window
-
+        - inventory open d:SquadManagerDeletionConfirmation_Window
         - determine cancelled
 
 
@@ -729,7 +731,7 @@ SquadManagerDeletionConfirmation_Window:
     type: inventory
     inventory: chest
     gui: true
-    title: Confirm Squad Manager Deletion
+    title: Re-Confirm SM Deletion
     slots:
     - [] [] [] [] [] [] [] [] []
     - [] [] [ConfirmSMDeletion_Item] [] [] [] [RejectSMDeletion_Item] [] []
@@ -741,17 +743,61 @@ SquadManagerDeletion_Handler:
     type: world
     events:
         on player opens SquadManagerDeletionConfirmation_Window:
-        - define infoItemSlot <context.inventory.find_item[SMDeletionHeader_Item]>
         - define deletionInfo <player.flag[datahold.armies.SMDelete]>
-        - define movableSquads <[deletionInfo].get[movableSquads]>
-        - define deletedSquads <[deletionInfo].get[squadList].exclude[<[movableSquads]>]>
-        - define deletedSquads <list[None]> if:<[deletedSquads].size.equals[0]>
-        - define loreList <list[<element[Following squads will be moved:].color[aqua]>].include[<[movableSquads].parse_tag[<[parse_value].get[displayName]>]>]>
-        - define loreList <[loreList].include[Following squads will be deleted:].include[<[deletedSquads]>]>
 
-        - inventory adjust slot:<[infoItemSlot]> lore:<[loreList]> d:<context.inventory>
+        - if !<[deletionInfo].get[squadList].is_empty>:
+            - define movableSquads <[deletionInfo].get[movableSquads].keys.if_null[<list[]>]>
+            - define deletedSquads <[deletionInfo].get[squadList].exclude[<[movableSquads].keys>].if_null[<list[]>]>
 
-        # TODO(High): Add handlers for confirm click/reject click
+            - define loreList <list[<element[Following squads will be moved:].color[aqua]>].include[<[movableSquads]>]>
+            - define loreList <list[<element[Following squads will be moved:].color[aqua]>].include[None]> if:<[movableSquads].is_empty>
+
+            - define loreList <[loreList].include[<element[Following squads will be deleted:].color[aqua]>].include[<[deletedSquads].parse_tag[<white>- <[parse_value]>]>]> if:<[deletedSquads].is_empty.not>
+            - define loreList <[loreList].include[<element[Following squads will be deleted:].color[aqua]>].include[None]> if:<[deletedSquads].is_empty>
+
+            - define infoItemSlot <context.inventory.find_item[SMDeletionHeader_Item]>
+
+            - inventory adjust slot:<[infoItemSlot]> lore:<[loreList]> d:<context.inventory>
+
+        on player clicks ConfirmSMDeletion_Item in SquadManagerDeletionConfirmation_Window:
+        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - define deletionInfo <player.flag[datahold.armies.SMDelete]>
+
+        - if !<[deletionInfo].get[squadList].is_empty>:
+            - define movableSquads <list[]>
+
+            - if <[movableSquads].exists>:
+                - define movableSquads <[deletionInfo].get[movableSquads]>
+
+                - foreach <[movableSquads]> key:squad:
+                    - define kingdom <[value].get[kingdom]>
+                    - define barrackID <[value].get[barrackID]>
+                    - define newSMLocation <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.location]>
+
+                    - run GetSquadInfo def.kingdom:<player.flag[kingdom]> def.squadName:<[squad]> save:squadInfo
+                    - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
+
+                    - flag <[newSMLocation]> squadManager.squads.squadList.<[squad]>:<[squadInfo]>
+                    - flag server kingdoms.<player.flag[kingdom]>.armies.barracks.<[SMLocation].flag[squadManager.id]>:!
+
+                    - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[newSMLocation]>
+
+            - narrate "<gold>Moved the following squads: <n><[movableSquads].keys.parse_tag[<white>- <[parse_value]>].separated_by[<n>]>" if:<[movableSquads].is_empty.not>
+
+            - define deletedSquads <[deletionInfo].get[squadList].exclude[<[movableSquads].keys>].if_null[<list[]>]>
+
+            - if <[deletedSquads].size.is[MORE].than[0]>:
+                - narrate "<gold>Deleted the following squads: <n><[deletedSquads].parse_tag[<white>- <[parse_value]>].separated_by[<n>]>" if:<[deletedSquads].is_empty.not>
+
+        - run SubUpkeep def.kingdom:<player.flag[kingdom]> def.amount:<[SMLocation].flag[squadManager.upkeep]>
+
+        # TODO: Find a way to determine the value of an SM and return a suitable fraction of that
+        # TODO/ value to the kingdom balance as a refund.
+        - run AddBalance def.kingdom:<player.flag[kingdom]> def.amount:1000
+
+        - flag <[SMLocation]> squadManager:!
+        - modifyblock <[SMLocation]> air source:<player>
+        - drop SquadManager_Item location:<[SMLocation]> quantity:1
 
 
 RecalculateSquadManagerAOE:
