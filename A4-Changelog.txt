@@ -66,3 +66,4 @@ Large Additions:
 Known bugs (Should be patched soon:tm:):
     - Under some circumstances squad orders can just stop working randomly. This can be temporarily remedied by exiting squad orders and re-entering;
         - Likely caused by a misreferenced variable somewhere-- so should be an easy fix when I find it.
+    - Squad manager items can sometimes not drop when players delete them. This is also caused by a trivial bug and will likely be fixed in the first hotpatch
