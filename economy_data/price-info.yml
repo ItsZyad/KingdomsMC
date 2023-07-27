@@ -3,11 +3,19 @@ price_info:
   global_supply_mod: '1'
   items:
     ores:
+      glowstone_dust:
+        base: '650'
+        gov_cap: '1750'
+        supply_prob: '0.25'
+        amount_mod: '2'
+      amethyst_shard:
+        base: '550'
+        gov_cap: '2000'
+        supply_prob: '0.35'
+        amount_mod: '1.5'
       diamond:
         base: '260'
         gov_cap: '510'
-        substitutes:
-        - g:ores
         supply_prob: '0.5'
         amount_mod: '0.9'
       lapis_ore:
@@ -32,7 +40,7 @@ price_info:
       iron_ore:
         base: '75'
         gov_cap: '260'
-        supply_prob: '0.45'
+        supply_prob: '0.43'
       gold_ore:
         base: '140'
         gov_cap: '340'
@@ -40,7 +48,7 @@ price_info:
       redstone_ore:
         base: '75'
         gov_cap: '190'
-        supply_prob: '0.33'
+        supply_prob: '0.3'
       iron_block:
         base: '390'
         gov_cap: '550'
@@ -57,16 +65,21 @@ price_info:
         base: '900'
         gov_cap: '1430'
         supply_prob: '0.34'
+      copper_ingot:
+        base: '35'
+        gov_cap: '200'
+        supply_prob: '0.7'
+        amount_mod: '1.45'
       iron_ingot:
-        base: '22'
-        gov_cap: '45'
+        base: '50'
+        gov_cap: '135'
         supply_prob: '0.65'
         amount_mod: '1.1'
       gold_ingot:
-        base: '105'
-        gov_cap: '175'
+        base: '100'
+        gov_cap: '190'
         supply_prob: '0.45'
-      redstone:
+      redstone_dust:
         base: '30'
         gov_cap: '42'
         supply_prob: '0.56'
@@ -86,39 +99,145 @@ price_info:
         gov_cap: '4'
         supply_prob: '0.8'
         amount_mod: '2'
+    redstone:
+      redstone_dust:
+        base: '30'
+        gov_cap: '60'
+        supply_prob: '0.56'
+        amount_mod: '1.5'
+      redstone_torch:
+        base: '50'
+        gov_cap: '75'
+        supply_prob: '0.5'
+      redstone_block:
+        base: '300'
+        gov_cap: '750'
+        supply_prob: '0.39'
+      repeater:
+        base: '80'
+        gov_cap: '130'
+        supply_prob: '0.51'
+      comparator:
+        base: '105'
+        gov_cap: '150'
+        supply_prob: '0.49'
+      lever:
+        base: '10'
+        gov_cap: '35'
+        supply_prob: '0.79'
+      oak_button:
+        base: '5'
+        gov_cap: '8'
+        supply_prob: '0.9'
+        amount_mod: '1.35'
+      stone_button:
+        base: '6'
+        gov_cap: '12'
+        supply_prob: '0.89'
+        amount_mod: '1.35'
+      oak_pressure_plate:
+        base: '6'
+        gov_cap: '15'
+        supply_prob: '0.92'
+      stone_pressure_plate:
+        base: '8'
+        gov_cap: '14'
+        supply_prob: '0.91'
+      light_weighted_pressure_plate:
+        base: '50'
+        gov_cap: '160'
+        supply_prob: '0.65'
+        amount_mod: '0.75'
+      heavy_weighted_pressure_plate:
+        base: '250'
+        gov_cap: '410'
+        supply_prob: '0.6'
+        amount_mod: '0.75'
+      tripwire_hook:
+        base: '25'
+        gov_cap: '60'
+        supply_prob: '0.74'
+      daylight_detector:
+        base: '150'
+        gov_cap: '360'
+        supply_prob: '0.66'
+      lightning_rod:
+        base: '100'
+        gov_cap: '275'
+        supply_prob: '0.58'
+      piston:
+        base: '135'
+        gov_cap: '370'
+        supply_prob: '0.65'
+      sticky_piston:
+        base: '190'
+        gov_cap: '400'
+        supply_prob: '0.62'
+      dispenser:
+        base: '155'
+        gov_cap: '310'
+        supply_prob: '0.59'
+      dropper:
+        base: '165'
+        gov_cap: '330'
+        supply_prob: '0.59'
+      hopper:
+        base: '95'
+        gov_cap: '225'
+        supply_prob: '0.66'
+      observer:
+        base: '400'
+        gov_cap: '950'
+        supply_prob: '0.49'
+      slime_block:
+        base: '3000'
+        gov_cap: '6500'
+        supply_prob: '0.45'
+        amount_mod: '0.5'
+      iron_door:
+        base: '45'
+        gov_cap: '120'
+        supply_prob: '0.59'
     tools:
-      stone_sword:
-        base: '2.5'
-        gov_cap: '3.5'
-        supply_prob: '0.47'
-      stone_pickaxe:
+      torch:
         base: '4'
         gov_cap: '5.6'
+        supply_prob: '0.96'
+        amount_mod: '1.35'
+      stone_sword:
+        base: '47'
+        gov_cap: '75'
+        supply_prob: '0.47'
+      stone_pickaxe:
+        base: '40'
+        gov_cap: '70'
         supply_prob: '0.49'
       stone_axe:
-        base: '3'
-        gov_cap: '4.2'
+        base: '30'
+        gov_cap: '65'
         supply_prob: '0.5'
       stone_hoe:
-        base: '2.5'
-        gov_cap: '3.5'
+        base: '25'
+        gov_cap: '55'
         supply_prob: '0.53'
       iron_sword:
-        base: '22'
-        gov_cap: '30.8'
-        supply_prob: '0.33'
-      iron_pickaxe:
-        base: '22'
-        gov_cap: '30.8'
+        base: '155'
+        gov_cap: '220'
         supply_prob: '0.35'
+      iron_pickaxe:
+        base: '140'
+        gov_cap: '210'
+        supply_prob: '0.34'
+        amount_mod: '1'
       iron_axe:
-        base: '22'
-        gov_cap: '30.8'
-        supply_prob: '0.36'
+        base: '125'
+        gov_cap: '200'
+        supply_prob: '0.38'
+        amount_mod: '1'
       iron_hoe:
-        base: '22'
-        gov_cap: '30.8'
-        supply_prob: '0.39'
+        base: '100'
+        gov_cap: '155'
+        supply_prob: '0.41'
       diamond_sword:
         base: '420'
         gov_cap: '588'
@@ -215,6 +334,55 @@ price_info:
         base: '10'
         gov_cap: '14'
         supply_prob: '0.73'
+      gold_axe:
+        base: '330'
+        gov_cap: '530'
+        supply_prob: '0.29'
+        amount_mod: '1'
+      gold_pickaxe:
+        base: '370'
+        gov_cap: '590'
+        supply_prob: '0.28'
+      gold_hoe:
+        base: '310'
+        gov_cap: '500'
+        supply_prob: '0.32'
+      gold_sword:
+        base: '410'
+        gov_cap: '630'
+        supply_prob: '0.27'
+      gold_chestplate:
+        base: '500'
+        gov_cap: '750'
+        supply_prob: '0.22'
+      gold_leggings:
+        base: '480'
+        gov_cap: '725'
+        supply_prob: '0.23'
+      gold_boots:
+        base: '420'
+        gov_cap: '690'
+        supply_prob: '0.25'
+      gold_helmet:
+        base: '450'
+        gov_cap: '740'
+        supply_prob: '0.26'
+      bow:
+        base: '60'
+        gov_cap: '110'
+        supply_prob: '0.85'
+      arrow:
+        base: '4'
+        gov_cap: '16'
+        supply_prob: '0.96'
+      water_bucket:
+        base: '80'
+        gov_cap: '180'
+        supply_prob: '0.68'
+      lava_bucket:
+        base: '90'
+        gov_cap: '190'
+        supply_prob: '0.6'
     building_blocks:
       sponge:
         base: '80'
@@ -368,7 +536,7 @@ price_info:
         base: '1'
         gov_cap: '1.4'
         supply_prob: '0.89'
-        supply_mod: '1.4'
+        amount_mod: '1.4'
       sugar:
         base: '10'
         gov_cap: '14'
@@ -430,11 +598,153 @@ price_info:
         gov_cap: '90'
         supply_prob: '0.78'
         amount_mod: '0.98'
-    general:
-      torch:
-        base: '4'
-        gov_cap: '5.6'
+      pufferfish:
+        base: '150'
+        gov_cap: '440'
+        supply_prob: '0.65'
+        amount_mod: '0.85'
+      cod:
+        base: '40'
+        gov_cap: '110'
+        supply_prob: '0.98'
+      cooked_cod:
+        base: '50'
+        gov_cap: '120'
         supply_prob: '0.96'
+      salmon:
+        base: '40'
+        gov_cap: '110'
+        supply_prob: '0.98'
+      cooked_salmon:
+        base: '50'
+        gov_cap: '120'
+        supply_prob: '0.96'
+      tropical_fish:
+        base: '65'
+        gov_cap: '175'
+        supply_prob: '0.81'
+        amount_mod: '0.8'
+      pumpkin_pie:
+        base: '55'
+        gov_cap: '165'
+        supply_prob: '0.9'
+      potato:
+        base: '5'
+        gov_cap: '20'
+        supply_prob: '0.99'
+        amount_mod: '2'
+      baked_potato:
+        base: '10'
+        gov_cap: '35'
+        supply_prob: '0.91'
+      beetroot:
+        base: '3'
+        gov_cap: '17'
+        supply_prob: '0.99'
+        amount_mod: '2'
+      melon_slice:
+        base: '9'
+        gov_cap: '25'
+        supply_prob: '0.97'
+        amount_mod: '1.75'
+      cookie:
+        base: '15'
+        gov_cap: '55'
+        supply_prob: '0.87'
+    organics:
+      glow_ink_sac:
+        base: '200'
+        gov_cap: '450'
+        supply_prob: '0.52'
+      bone:
+        base: '5'
+        gov_cap: '28'
+        supply_prob: '0.79'
+      bone_meal:
+        base: '6'
+        gov_cap: '30'
+        supply_prob: '0.77'
+      oak_sappling:
+        base: '4'
+        gov_cap: '19'
+        supply_prob: '0.89'
+      birch_sappling:
+        base: '4'
+        gov_cap: '19'
+        supply_prob: '0.89'
+      spruce_sappling:
+        base: '4'
+        gov_cap: '19'
+        supply_prob: '0.89'
+      dark_oak_sappling:
+        base: '4'
+        gov_cap: '19'
+        supply_prob: '0.89'
+      acacia_sappling:
+        base: '4'
+        gov_cap: '19'
+        supply_prob: '0.89'
+      jungle_sappling:
+        base: '4'
+        gov_cap: '19'
+        supply_prob: '0.89'
+      kelp:
+        base: '2'
+        gov_cap: '12'
+        supply_prob: '0.98'
+      lily_pad:
+        base: '15'
+        gov_cap: '56'
+        supply_prob: '0.83'
+      wheat_seeds:
+        base: '5'
+        gov_cap: '27'
+        supply_prob: '0.95'
+      beetroot_seeds:
+        base: '5'
+        gov_cap: '27'
+        supply_prob: '0.95'
+      pumpkin_seeds:
+        base: '5'
+        gov_cap: '27'
+        supply_prob: '0.95'
+      melon_seeds:
+        base: '5'
+        gov_cap: '27'
+        supply_prob: '0.95'
+      cocoa_beans:
+        base: '35'
+        gov_cap: '150'
+        supply_prob: '0.88'
+      bamboo:
+        base: '1'
+        gov_cap: '8'
+        supply_prob: '0.99'
+      sugar_cane:
+        base: '3'
+        gov_cap: '20'
+        supply_prob: '0.97'
+      cactus:
+        base: '40'
+        gov_cap: '210'
+        supply_prob: '0.78'
+      sea_pickle:
+        base: '10'
+        gov_cap: '25'
+        supply_prob: '0.81'
+      glow_berries:
+        base: '60'
+        gov_cap: '300'
+        supply_prob: '0.76'
+      rotten_flesh:
+        base: '1.5'
+        gov_cap: '6'
+        supply_prob: '0.99'
+      spider_eye:
+        base: '35'
+        gov_cap: '115'
+        supply_prob: '0.88'
+    general:
       chest:
         base: '4'
         gov_cap: '5.6'
@@ -475,10 +785,6 @@ price_info:
         base: '6'
         gov_cap: '8.4'
         supply_prob: '0.89'
-      iron_door:
-        base: '22'
-        gov_cap: '30.8'
-        supply_prob: '0.29'
       saddle:
         base: '100'
         gov_cap: '140'
@@ -487,14 +793,6 @@ price_info:
         base: '23'
         gov_cap: '32.2'
         supply_prob: '0.32'
-      bow:
-        base: '15'
-        gov_cap: '21'
-        supply_prob: '0.4'
-      arrow:
-        base: '3.5'
-        gov_cap: '4.9'
-        supply_prob: '0.46'
       stick:
         base: '0.25'
         gov_cap: '0.35'
@@ -515,14 +813,6 @@ price_info:
         base: '25'
         gov_cap: '35'
         supply_prob: '0.31'
-      water_bucket:
-        base: '40'
-        gov_cap: '56'
-        supply_prob: '0.48'
-      lava_bucket:
-        base: '40'
-        gov_cap: '56'
-        supply_prob: '0.4'
       snowball:
         base: '1'
         gov_cap: '1.4'
@@ -555,7 +845,3 @@ price_info:
         base: '10'
         gov_cap: '14'
         supply_prob: '0.19'
-      bone:
-        base: '2'
-        gov_cap: '2.8'
-        supply_prob: '0.76'
