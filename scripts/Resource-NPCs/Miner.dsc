@@ -115,20 +115,21 @@ MineExperienceGain:
 
 TrueItemRef:
     type: data
-    stone: cobblestone
-    granite: granite
-    andesite: andesite
-    diorite: diorite
-    gold_ore: gold_ingot
-    iron_ore: iron_ingot
-    diamond_ore: diamond
-    coal_ore: coal
-    redstone_ore: redstone
-    obsidian: obsidian
-    emerald_ore: emerald
-    gravel: gravel
-    lapis_ore: lapis_lazuli
-    clay_block: clay
+    items:
+        stone: cobblestone
+        granite: granite
+        andesite: andesite
+        diorite: diorite
+        gold_ore: gold_ingot
+        iron_ore: iron_ingot
+        diamond_ore: diamond
+        coal_ore: coal
+        redstone_ore: redstone
+        obsidian: obsidian
+        emerald_ore: emerald
+        gravel: gravel
+        lapis_ore: lapis_lazuli
+        clay_block: clay
 
 
 ## NOTE: This is a stopgap. Rewrite all RNPCs code for A5!!
@@ -139,18 +140,22 @@ MinerItemGenerator:
     - define allMiners <list[]>
 
     - foreach <[kingdomList]> as:kingdom:
-        - if !<server.has_flag[kingdoms.<[kingdom]>.RNPCs.miners]>:
+        - if !<server.has_flag[kingdoms.<[kingdom]>.RNPCs.Miners]>:
             - foreach next
 
-        - define minerData <server.flag[kingdoms.<[kingdom]>.RNPCs.miners].parse_value_tag[<[parse_value].include[kingdom=<[kingdom]>]>]>
-        - define allMiners:->:<[minerData]>
+        - define minerData <server.flag[kingdoms.<[kingdom]>.RNPCs.Miners].parse_value_tag[<[parse_value].include[kingdom=<[kingdom]>]>]>
+        - define allMiners <[allMiners].include[<[minerData].values>]>
 
     - run flagvisualizer def.flag:<[allMiners]>
-    - determine cancelled
+    # - determine cancelled
 
     - foreach <[allMiners]>:
-        - define npcID <[value].split[_].get[4]>
-        - define npc <npc[<[npcID]>]>
+        - define npc <[value].get[NPC].as[npc]>
+        - define kingdom <[value].get[kingdom]>
+        - define npcChunk <[npc].location.chunk>
+
+        - chunkload add <[npcChunk]>|<[npcChunk].add[1,0]>|<[npcChunk].add[0,1]>|<[npcChunk].sub[1,0]>|<[npcChunk].sub[0,1]> duration:10s
+        - waituntil <[npcChunk].is_loaded>
 
         - if !<[kingdom].exists>:
             - foreach next
@@ -161,13 +166,14 @@ MinerItemGenerator:
         - if <proc[IsKingdomBankrupt].context[<[kingdom]>]>:
             - foreach next
 
-        - define surroundingMiners <[npc].find_npcs_within[10].parse_tag[<[parse_value].flag[type].equals[miners]>]>
-        - define overcrowdingPenalty <[surroundingMiners].sub[1].mul[25]>
+        - define surroundingMiners <[npc].location.find_npcs_within[10].filter_tag[<[filter_value].flag[RNPC].equals[miners]>].if_null[<list[]>].exclude[<[npc]>]>
+        - define overcrowdingPenalty <[surroundingMiners].size.sub[1].mul[25]>
+        - define overcrowdingPenalty 0 if:<[overcrowdingPenalty].is[LESS].than[0]>
         - define overcrowdingPenalty 100 if:<[overcrowdingPenalty].is[MORE].than[100]>
 
-        - if <[surroundingMiners].is[MORE].than[1]>:
-            - adjust <[npc]> hologram_lines:<list[Overcrowding Penalty:<[overcrowdingPenalty]><&pc>]>
-            - adjust <[npc]> hologram_line_height:0.25
+        - if <[surroundingMiners].size.is[MORE].than[1]>:
+            - adjust <[npc]> hologram_lines:<list[]>
+            - adjust <[npc]> hologram_lines:<list[Overcrowding Penalty:<&sp><[overcrowdingPenalty]><&pc>]>
             - flag <[npc]> overcrowdingPen:<[overcrowdingPenalty]>
 
             - if <[overcrowdingPenalty]> == 100:
@@ -175,7 +181,7 @@ MinerItemGenerator:
                 - foreach next
 
         # Note: future configurable
-        - flag <[npc]> nextGen:<util.time_now.add[35s]>
+        # - flag <[npc]> nextGen:<util.time_now.add[35s]>
         - define minerBlocks <script[TrueItemRef].data_key[].keys>
         - define volume <[mine].volume>
         - define generationProfile <[npc].flag[blockBuildup].exclude[totalBlocks].get_subset[<[minerBlocks]>]>
@@ -187,13 +193,44 @@ MinerItemGenerator:
             - if <[spawnChance].is[LESS].than[37]>:
                 - foreach next
 
-            - define trueItem <script[TrueItemRef].data_key[<[key]>]>
-            - define dropAmount <util.random.int[0].to[<util.random.int[<[val]>].to[99]>]>
-            - define outpostMod <[npc].flag[outpostMod]>
-            - define outputMod <[npc].flag[outputMod]>
-            - define itemModifier <element[1.01].sub[<script[MineExperienceGain].data_key[<[key]>]>].mul[<[spawnChance]>].div[8].mul[<[outpostMod].get[1]>].mul[<[outputMod].add[1]>].round_down>
+            - define trueItem <script[TrueItemRef].data_key[items.<[block]>]>
+            - define outpostMod <[npc].flag[outpostMod].as[list].if_null[<list[0|0]>]>
+            - define outputMod <[npc].flag[outputMod].if_null[0]>
+            - define overcrowdingMultiplier <element[100].sub[<[overcrowdingPenalty]>]>
+            - define itemAmount <element[1.01].sub[<script[MineExperienceGain].data_key[<[block]>]>].mul[<[spawnChance]>].div[8].mul[<[outpostMod].get[1].add[1]>].mul[<[outputMod].add[1]>].mul[<[overcrowdingMultiplier]>].round_down>
 
-            - inject Debugger
+            - if !<[npc].inventory.can_fit[<[trueItem]>].quantity[<[itemModifier]>]>:
+                - foreach next
+
+            - give <[trueItem]> to:<[npc].inventory> quantity:<[itemModifier]>
+
+            - flag <[npc]> Level:+:<script[MineExperienceGain].data_key[<[key]>].mul[<[itemModifier].div[350].round_to_precision[0.1]>]>
+
+            # Find a random item not already in the generation
+            # profile and weigh out the chance that it appears
+            # in the Miner's inventory
+
+            - define randomItemList <[minerBlocks].exclude[<[generationProfile].keys>]>
+            - define randomItem <[randomItemList].get[<util.random.int[1].to[<[randomItemList].size>]>]>
+            - define randomItemChance <script[MineExperienceGain].data_key[<[randomItem]>]>
+            - define threshold <util.random.decimal[0].to[1]>
+            - define randomItemList:!
+
+            # If the lucky item appears than give the Miner only
+            # one of it and add on the relevant experience
+
+            - if <[threshold].is[LESS].than[<[randomItemChance]>]>:
+                - foreach next
+
+            - give <script[TrueItemRef].data_key[<[randomItem]>]> to:<[npc].inventory> quantity:<[outpostMod].get[2]>
+
+            - define prevBaseLevel <[npc].flag[Level].round_down>
+
+            - if <[npc].flag[Level].round_down> != <[prevBaseLevel]>:
+                - define inventoryData <[npc].inventory.list_contents>
+                - adjust <[npc]> name:<[npc].nickname.split[<&sp>].get[1].to[-2].space_separated><&sp><[npc].flag[Level].round_down>
+                - adjust <[npc]> inventory_contents:<[inventoryData]>
+                - flag <[npc]> outputMod:+:<util.random.decimal[0].to[0.005]>
 
 
 MinerGeneration:
