@@ -188,9 +188,26 @@ Formatting conventions for all type contracts are listed below:
 | Maps    | `[MapTag]` `[MapTag<*Type:*Type>]` | ^Same as above
 | All other tags | `[*Tagname+'Tag']` | Example: Locations --> `[LocationTag]` 
 
-## World Scripts
+## Data Scripts
 
-TODO
+Usage of data scripts is encouraged throughout the Kingdoms codebase, especially when it comes to the representation of large datasets as not to clutter regular scripts. However, Denizen data scripts have no required keys other than `type: data`, meaning that it becomes easy to format and structure them inconsistently leading to confusion.
+
+Data scripts in Kingdoms are not allowed to utilize non-nested keys. All data must be contained within a parent key. For example:
+
+```DenizenScript
+SomeItemsAndNumbers:
+    type: data
+    items:
+        wood:
+            oak_planks: 100
+            spruce_planks: 100
+        stone:
+            cobblestone: 50
+            andesite: 30
+```
+
+
+Additionally, all naming schemes outlined for definitions and flags apply to data script keys, unless the data refers to items, player names, or any other non-Kingdoms-related datapoint.
 
 ## Command Scripts
 
