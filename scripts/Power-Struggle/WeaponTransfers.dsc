@@ -169,11 +169,16 @@ WeaponTransferOption_Handler:
             - inventory close
             - narrate format:callout "Your kingdom has exhausted its influence actions for today <&co><&bs>"
 
+        on player quits:
+        - flag <player> transferData:!
+
+
 RemoveTransferAfterDue:
     type: task
     definitions: transferID|kingdom
     script:
     - flag server kingdoms.<[kingdom]>.powerstruggle.activeTransfers.<[transferID]>:!
+
 
 InitiateWeaponTransferWindow:
     type: world
