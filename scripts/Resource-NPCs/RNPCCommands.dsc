@@ -307,7 +307,7 @@ RNPCInfo_Window:
     title: "Select NPC Specialization"
     slots:
     - [] [UpgardeProgress_Item] [] [] [RNPCInventory_Item] [] [] [CurrentLevel_Item] []
-    - [] [] [] [] [ShowRNPCAOE_Item] [] [] [] []
+    - [] [] [] [ShowRNPCAOE_Item] [] [RelocateRNPC_Item] [] [] []
     - [] [] [] [] [DeleteRNPC_Item] [] [] [] []
 
 
@@ -318,6 +318,12 @@ DeleteConfirm_Window:
     title: "Are you sure?"
     slots:
     - [] [] [ConfirmDeleteRNPC_Item] [] [] [] [CancelDeleteRNPC_Item] [] []
+
+
+RelocateRNPC_Item:
+    type: item
+    material: lead
+    display name: <aqua><bold>Relocate RNPC
 
 
 ConfirmDeleteRNPC_Item:
@@ -396,6 +402,44 @@ RNPCInfo_Handler:
 
         on player clicks DeleteRNPC_Item in RNPCInfo_Window:
         - inventory open d:DeleteConfirm_Window
+
+        on player clicks RelocateRNPC_Item in RNPCInfo_Window:
+        - inventory close
+        - flag <player> datahold.RNPCs.relocatingRNPC:<player.flag[currNPC]>
+        - run TempSaveInventory def.player:<player>
+
+        - narrate format:callout "Click on the block you would like to relocate this RNPC to."
+
+        on player left clicks block flagged:datahold.RNPCs.relocatingRNPC:
+        - if <player.cursor_on_solid[30].exists>:
+            - run LoadTempInventory def.player:<player>
+            - flag <player> datahold.RNPCs.relocatingRNPC:!
+
+            - teleport <player.flag[currNPC].as[npc]> <context.location>
+
+            - define prestige <server.flag[kingdoms.<player.flag[kingdom]>.prestige]>
+
+            - choose <player.flag[currNPC].as[npc].flag[RNPC]>:
+                - case miners:
+                    - define radius <[prestige].sqrt.mul[3.9].round>
+                    - define radius 10 if:<[prestige].round.is[LESS].than[10]>
+
+                    - ~run MinerRangeFinder def.radius:<[radius]> def.npc:<player.flag[currNPC].as[npc]>
+
+                - case farmers:
+                    - define radius <[prestige].div[2].round>
+                    - define radius 5 if:<[prestige].round.is[LESS].than[10]>
+
+                    - ~run FarmerRangeFinder def.radius:<[radius]> def.npc:<player.flag[currNPC].as[npc]>
+
+        - else:
+            - narrate format:callout "That is not a valid location! Please click a valid location or right click to exit."
+
+        on player right clicks block flagged:datahold.RNPCs.relocatingRNPC:
+            - run LoadTempInventory def.player:<player>
+            - flag <player> datahold.RNPCs.relocatingRNPC:!
+
+            - narrate format:callout "Cancelled RNPC relocation."
 
         on player clicks ConfirmDeleteRNPC_Item in DeleteConfirm_Window:
 
