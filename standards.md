@@ -52,6 +52,16 @@ SomeWorldScript:
 
 Definition and flag names may not start with numbers or symbols. These names may only start with a character matching: `[A-z]`. The only exception to this rule is the utilization of the underscore character to modify queue-level 'fake' definitions like `__player` and `__npc`.
 
+### Comments
+Comment lines must never exceed 100 characters. If you wish to write a comment longer than 100 characters you must separate it between multiple lines.
+
+Comments starting with `Todo` will be highlighted yellow by the Denizen VSCode plugin. Should you wish to write a Todo comment longer than 100 characters or a comment spanning several lines, you must start each subsequent line of the comment with `Todo/` to maintain the highlighting;
+
+```DenizenScript
+# TODO: This is a multi-line todo comment.
+# TODO/ This is the second line of the comment!
+```
+
 ### Spacing
 There must be exactly two lines of whitespace between scripts and one line **after** subpaths, events, tab completes, descriptions, and any other multi-line script section;
 
