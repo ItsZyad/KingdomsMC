@@ -16,6 +16,7 @@ DynmapFlagBuilderV2:
   script:
     ## Original script by: @mrm/Maxime#9999
     ## *also no, I'm not going to change the varibale scheme to match...*
+    ## *ok I might...*
     ##
     ## Generates the corners for the provided territoryType and the provided kingdom and caches the
     ## output in the world-specific dynmap flag
@@ -28,13 +29,13 @@ DynmapFlagBuilderV2:
     - define territoryType <[territoryType].to_lowercase.if_null[core]>
     - define kingdomData <server.flag[kingdoms.<[kingdom]>]>
     - define world <server.worlds.filter_tag[<[filter_value].name.to_lowercase.equals[<[worldName].to_lowercase>]>]>
-    - define chunks <[kingdomData].deep_get[claims.core].if_null[<list[]>].include[<[kingdomData].deep_get[claims.castle].if_null[<list[]>]>]>
+    - define chunks <[kingdomData].deep_get[claims.castle].if_null[<list[]>].include[<[kingdomData].deep_get[claims.core].if_null[<list[]>]>]>
 
     - if !<[world].exists>:
         - narrate format:admincallout "<red>[Internal Error INTD01] <&gt><&gt><&r>Could not determine world name. Please contact a dev or server owner."
         - determine cancelled
 
-    - determine <list> if:<[chunks].is_empty>
+    - determine <list> if:<[chunks].is_empty.or[<[chunks].is_truthy.not>]>
 
     - define min_x <[chunks].sort_by_value[x].get[1].x>
     - define min_z <[chunks].filter[x.equals[<[min_x]>]].sort_by_value[z].get[1].z>
@@ -107,7 +108,7 @@ DynmapFlagBuilderV2:
                     - define tar_x:--
                     - define tar_z:--
 
-    - flag <[world]> dynmap.cache.<[kingdom]>.cornerList:<[corners]>
+    - flag <[world]> dynmap.cache.<[kingdom]>.main.cornerList:<[corners]>
     - determine <[corners]>
 
 
@@ -234,17 +235,32 @@ DynmapTask:
     description: Admin Command - Updates all Kingdoms markers on Dynmap
     script:
     - define world <player.location.world>
-    - define kingdomList <list[centran|cambrian|viridian|raptoran]>
+    - define kingdomList <proc[GetKingdomList]>
     - definemap KingdomTextColors:
         raptoran: f14|812
         centran: 34c|16a
         viridian: 181|571
         cambrian: c27100|faaa39
 
+    # Main territory loop #
     - foreach <[kingdomList]> as:kingdom:
+        - if <[world].has_flag[dynamp.cache.<[kingdom]>.main.cornerList]>:
+            - foreach <[world].flag[dynmap.cache.<[kingdom]>.cornerList]> as:corner:
+                - define formattedCorner <[corner].simple.replace_text[,].with[<&sp>]>
+                - execute as_op "dmarker addcorner <[formattedCorner]>" silent
+
+            - execute as_op "dmarker deletearea id:<[kingdom]>_main_territory set:kingdoms" silent
+            - execute as_op "dmarker addarea id:<[kingdom]>_main_territory set:kingdoms label:<&dq>[Kingdom] <script[KingdomRealNames].data_key[<[kingdom]>]><&dq>"
+            - execute as_op "dmarker updatearea id:<[ID]> set:outposts color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2"
+            - execute as_op "dmarker clearcorners" silent
+
+        - foreach next
 
         # Main outpost loop #
-        - foreach <[world].flag[dynmap].deep_get[kingdoms.<[kingdom]>.outposts]> as:entry:
+        - foreach <[world].flag[dynmap.cache.<[kingdom]>.outposts]> as:entry:
+
+            # TODO: REWRITE + INTEGRATE
+
             - define areaName <[entry].as[list].get[1]>
             - define area <[entry].as[list].get[2]>
             - define ID <[areaName].replace[<&sp>].with[-]>
@@ -259,19 +275,6 @@ DynmapTask:
             - execute as_op "dmarker addarea id:<[ID]> set:outposts label:"[Outpost] <script[KingdomRealNames].data_key[<[kingdom]>]>"" silent
             - execute as_op "dmarker updatearea id:<[ID]> set:outposts color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2" silent
             - execute as_op "dmarker clearcorners" silent
-
-        - define ID main_region_<[kingdom]>
-        - define regionEntry <[world].flag[dynmap].deep_get[kingdoms.<[kingdom]>.region]>
-        - define region <[regionEntry].get[2].as[cuboid]>
-
-        - narrate format:debug REG:<[region]>
-
-        - execute as_op "dmarker addcorner <[region].min.simple.replace_text[,].with[ ]>" silent
-        - execute as_op "dmarker addcorner <[region].max.simple.replace_text[,].with[ ]>" silent
-        - execute as_op "dmarker deletearea id:<[ID]> set:regions"
-        - execute as_op "dmarker addarea id:<[ID]> set:regions label:"[Kingdom] <script[KingdomRealNames].data_key[<[kingdom]>]>""
-        - execute as_op "dmarker updatearea id:<[ID]> set:regions color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2"
-        - execute as_op "dmarker clearcorners"
 
     - narrate format:admincallout "Successfully refreshed Dynmap for world: <[world]>"
 
