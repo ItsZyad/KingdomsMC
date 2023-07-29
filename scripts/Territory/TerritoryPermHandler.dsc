@@ -7,8 +7,8 @@ DoorInteractCode:
 
         - if <server.flag[kingdoms.claimInfo.allClaims].contains[<context.location.chunk>]>:
             - if <server.flag[kingdoms.<[kingdom]>.warStatus]> != true:
-                - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
-                - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
+                - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].as[list]>
+                - define core <server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>].as[list]>
                 - define castleCore <[core].include[<[castle]>].exclude[0]>
                 - define isInOwnTerritory false
 
@@ -39,6 +39,17 @@ TerritoryHandler:
 
         on player right clicks *trapdoor:
         - inject DoorInteractCode
+
+        # on player opens inventory:
+        # - define kingdom <player.flag[kingdom]>
+        # - define core <server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>
+        # - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>]>
+        # - define castleCore <[core].include[<[castle]>].parse_tag[<[parse_value].cuboid>]>
+
+        # - if <context.inventory.script.exists>:
+        #     - stop
+
+        # - if <player.cursor_on>
 
         on player damaged by entity:
         # If player has taken damage within their own core/castle
@@ -103,11 +114,10 @@ TerritoryHandler:
             - determine cancelled
 
         on player places block:
-        - define kingdom <player.flag[kingdom]>
-
         - if !<player.has_flag[kingdom]>:
             - determine cancelled
 
+        - define kingdom <player.flag[kingdom]>
         - define isInAnyClaim false
 
         - foreach <server.flag[kingdoms.claimInfo.allClaims]>:
@@ -120,39 +130,34 @@ TerritoryHandler:
 
         - if <[isInAnyClaim]>:
             - if !<server.flag[kingdoms.<[kingdom]>.warStatus]>:
-                - if !<player.has_permission[kingdoms.admin.bypassrc]>:
-                    - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
-                    - define inOwnTerritory false
+                - if !<player.has_permission[kingdoms.admin.bypassrc]> || !<player.is_op>:
+                    - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
 
                     # Note to self: this may not be very efficient. Try consolidating
                     # all the chunks of core/castle territory into a cuboid object to
                     # access and reference easier
 
-                    - foreach <[castleCore]>:
-                        - if <[value].cuboid.contains[<context.location>]>:
-                            - define inOwnTerritory true
-                            - foreach stop
-
-                    - if !<[inOwnTerritory]>:
-                        - determine cancelled
-
-                    - else:
-                        - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size> != 0:
+                    - if <context.location.chunk.is_in[<[castleCore]>]>:
+                        - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size.if_null[0]> != 0:
                             - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
                                 - if <cuboid[<[value]>].players.contains[<player>]>:
                                     - determine cancelled
 
+                    - else:
+                        - determine cancelled
+
         - else:
+            # Block players from placing stuff in the wilderness only if restricted creative is
+            # engaged.
             - if <server.has_flag[RestrictedCreative]>:
                 - if !<player.has_permission[kingdoms.admin.bypassrc]>:
                     - determine cancelled
 
         on player breaks block:
-        - define kingdom <player.flag[kingdom]>
-
         - if !<player.has_flag[kingdom]>:
             - determine cancelled
 
+        - define kingdom <player.flag[kingdom]>
         - define isInAnyClaim false
 
         - foreach <server.flag[kingdoms.claimInfo.allClaims]>:
@@ -165,31 +170,29 @@ TerritoryHandler:
 
         - if <[isInAnyClaim]>:
             - if !<server.flag[kingdoms.<[kingdom]>.warStatus]>:
-                - if !<player.has_permission[kingdoms.admin.bypassrc]>:
-                    - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
-                    - define inOwnTerritory false
+                - if !<player.has_permission[kingdoms.admin.bypassrc]> || !<player.is_op>:
+                    - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
 
                     # Note to self: this may not be very efficient. Try consolidating
                     # all the chunks of core/castle territory into a cuboid object to
                     # access and reference easier
 
-                    - foreach <[castleCore]>:
-                        - if <[value].cuboid.contains[<context.location>]>:
-                            - define inOwnTerritory true
-
-                    - if !<[inOwnTerritory]>:
-                        - determine cancelled
-
-                    - else:
-                        - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size> != 0:
+                    - if <context.location.chunk.is_in[<[castleCore]>]>:
+                        - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size.if_null[0]> != 0:
                             - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
                                 - if <cuboid[<[value]>].players.contains[<player>]>:
                                     - determine cancelled
 
+                    - else:
+                        - determine cancelled
+
         - else:
+            # Block players from placing stuff in the wilderness only if restricted creative is
+            # engaged.
             - if <server.has_flag[RestrictedCreative]>:
                 - if !<player.has_permission[kingdoms.admin.bypassrc]>:
                     - determine cancelled
+
 
 EntityTerritoryHandler:
     type: world
