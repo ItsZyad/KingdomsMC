@@ -348,7 +348,6 @@ MinerGenerationNoticeUpdater:
 MinerGeneration_Handler:
     type: world
     debug: false
-    enabled: false
     events:
         on system time secondly every:150:
         - run MinerItemGenerator
