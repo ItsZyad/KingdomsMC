@@ -103,7 +103,7 @@ IngestMaterialTransfer:
                     # The influence equation for weapon transfers is:
                     # infl = ln(75grad / (amount - 75grad))
 
-                    - define influenceGradient <script[ItemGradientData].data_key[<[transferItem]>]>
+                    - define influenceGradient <script[ItemGradientData].data_key[items.<[transferItem]>]>
                     #- narrate format:debug INFG:<[influenceGradient]>
 
                     - define grad <[influenceGradient].mul[75]>

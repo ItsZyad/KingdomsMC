@@ -130,7 +130,7 @@ ChestTransferInfluenceCalc:
     # The influence equation for weapon transfers is:
     # infl = ln(5grad / (amount - 5grad))
 
-    - define influenceGradient <script[ItemGradientData].data_key[<[orderItem]>]>
+    - define influenceGradient <script[ItemGradientData].data_key[items.<[orderItem]>]>
     - define fiveGrad <element[5].mul[<[influenceGradient]>]>
 
     #- narrate format:debug <[fiveGrad]>
