@@ -15,6 +15,7 @@ DailySimulationUpdate:
             - flag <[merc]> merchantData.balance:<[wealth].add[<[balance]>]> if:<[balance].exists>
 
             - run MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
+            - run MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
 
 
 # Runs for every merchant in a market and calculates what items it should prioritize buying
