@@ -88,6 +88,7 @@ WeaponTransferOption_Handler:
                         material: <context.item.material.name>
 
                     - flag <player> transferData:<[tData]>
+                    - flag <player> noChat.powerstruggle.transfer
                     - inventory close
 
                 - else:
@@ -96,7 +97,7 @@ WeaponTransferOption_Handler:
             - else:
                 - narrate format:callout "You are already making a weapon transfer transaction"
 
-        on player chats flagged:transferData.transferType:
+        on player chats flagged:noChat.powerstruggle.transfer:
         - if <context.message.to_lowercase> == cancel:
             - flag <player> transferData:!
             - narrate format:callout "Transfer cancelled!"
@@ -151,7 +152,7 @@ WeaponTransferOption_Handler:
             - else:
                 - narrate format:callout "There is not enough demand for you to fullfill that many orders!"
 
-        - flag <player> enteringTransferData:!
+        - flag <player> noChat.powerstruggle.transfer:!
         - determine cancelled
 
         on player clicks WeaponTransfer_MercInfluence in MercenaryInfluence_Window:

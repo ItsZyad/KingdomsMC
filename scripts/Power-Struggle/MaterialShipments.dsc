@@ -57,27 +57,29 @@ MaterialTransferOption_Handler:
                 - narrate format:callout "You are already making an item transfer transaction"
 
         on player places *_sign:
-        - if <player.has_flag[transferData]>:
-            - if <player.flag[transferData].get[transferType]> == masons:
+        - if !<player.has_flag[transferData]>:
+            - stop
 
-                - define playerLoc <player.location>
-                - define chestLoc <context.location.with_x[<context.location.z.sub[1]>]>
-                - define signDirection <context.location.material.direction>
+        - if <player.flag[transferData].get[transferType]> == masons:
+            - define playerLoc <player.location>
+            - define chestLoc <context.location.with_x[<context.location.z.sub[1]>]>
+            - define signDirection <context.location.material.direction>
 
-                - choose <[signDirection]>:
-                    - case NORTH:
-                        - define chestLoc <context.location.with_z[<context.location.z.add[1]>]>
+            - choose <[signDirection]>:
+                - case NORTH:
+                    - define chestLoc <context.location.with_z[<context.location.z.add[1]>]>
 
-                    - case EAST:
-                        - define chestLoc <context.location.with_x[<context.location.x.add[1]>]>
+                - case WEST:
+                    - define chestLoc <context.location.with_x[<context.location.x.add[1]>]>
 
-                    - case WEST:
-                        - define chestLoc <context.location.with_x[<context.location.x.sub[1]>]>
+                - case EAST:
+                    - define chestLoc <context.location.with_x[<context.location.x.sub[1]>]>
 
-                - if <[chestLoc].has_inventory>:
-                    - flag player transferVaultLoc:<[chestLoc]>
-                    - waituntil !<player.location> != <[playerLoc]> || <context.location.sign_contents> != "Material transfer|chest|DO NOT USE"
-                    - sign "<red>Material transfer|chest|<bold>DO NOT USE" <context.location>
+            - if <[chestLoc].has_inventory>:
+                - flag player transferVaultLoc:<[chestLoc]>
+                - waituntil <player.location> != <[playerLoc]> || <context.location.sign_contents> != "Material transfer|chest|DO NOT USE" rate:10t
+
+                - sign "<red>Material transfer|chest|<bold>DO NOT USE" <context.location>
 
 ##############################################################################
 
