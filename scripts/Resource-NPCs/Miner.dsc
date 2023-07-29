@@ -146,9 +146,6 @@ MinerItemGenerator:
         - define minerData <server.flag[kingdoms.<[kingdom]>.RNPCs.Miners].parse_value_tag[<[parse_value].include[kingdom=<[kingdom]>]>]>
         - define allMiners <[allMiners].include[<[minerData].values>]>
 
-    - run flagvisualizer def.flag:<[allMiners]>
-    # - determine cancelled
-
     - foreach <[allMiners]>:
         - define npc <[value].get[NPC].as[npc]>
         - define kingdom <[value].get[kingdom]>
@@ -182,10 +179,13 @@ MinerItemGenerator:
 
         # Note: future configurable
         # - flag <[npc]> nextGen:<util.time_now.add[35s]>
-        - define minerBlocks <script[TrueItemRef].data_key[].keys>
+        - define minerBlocks <script[TrueItemRef].data_key[items].keys>
         - define volume <[mine].volume>
         - define generationProfile <[npc].flag[blockBuildup].exclude[totalBlocks].get_subset[<[minerBlocks]>]>
         - define npcLevel <[npc].flag[Level]>
+        - define npcLevel 100 if:<[npcLevel].is[MORE].than[100]>
+
+        - narrate format:debug GEN:<[generationProfile]>
 
         - foreach <[generationProfile]> key:block as:amount:
             - define spawnChance <util.random.int[<util.random.int[0].to[<[npcLevel].round>]>].to[100]>
@@ -199,12 +199,12 @@ MinerItemGenerator:
             - define overcrowdingMultiplier <element[100].sub[<[overcrowdingPenalty]>]>
             - define itemAmount <element[1.01].sub[<script[MineExperienceGain].data_key[<[block]>]>].mul[<[spawnChance]>].div[8].mul[<[outpostMod].get[1].add[1]>].mul[<[outputMod].add[1]>].mul[<[overcrowdingMultiplier]>].round_down>
 
-            - if !<[npc].inventory.can_fit[<[trueItem]>].quantity[<[itemModifier]>]>:
+            - if !<[npc].inventory.can_fit[<[trueItem]>].quantity[<[itemAmount]>]>:
                 - foreach next
 
-            - give <[trueItem]> to:<[npc].inventory> quantity:<[itemModifier]>
+            - give <[trueItem]> to:<[npc].inventory> quantity:<[itemAmount]>
 
-            - flag <[npc]> Level:+:<script[MineExperienceGain].data_key[<[key]>].mul[<[itemModifier].div[350].round_to_precision[0.1]>]>
+            - flag <[npc]> Level:+:<script[MineExperienceGain].data_key[<[key]>].mul[<[itemAmount].div[350].round_to_precision[0.1]>]>
 
             # Find a random item not already in the generation
             # profile and weigh out the chance that it appears
@@ -350,9 +350,8 @@ MinerGeneration_Handler:
     debug: false
     enabled: false
     events:
-        on system time secondly every:35:
-        - inject MinerGeneration
-        #- run MinerGenerationNoticeUpdater
+        on system time secondly every:150:
+        - run MinerItemGenerator
 
         #on player places block in:mine*:
         #- determine cancelled
