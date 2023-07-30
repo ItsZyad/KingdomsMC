@@ -163,7 +163,7 @@ MinerItemGenerator:
         - if <proc[IsKingdomBankrupt].context[<[kingdom]>]>:
             - foreach next
 
-        - define surroundingMiners <[npc].location.find_npcs_within[10].filter_tag[<[filter_value].flag[RNPC].equals[miners]>].if_null[<list[]>].exclude[<[npc]>]>
+        - define surroundingMiners <[npc].location.find_npcs_within[9].filter_tag[<[filter_value].flag[RNPC].equals[miners]>].if_null[<list[]>].exclude[<[npc]>]>
         - define overcrowdingPenalty <[surroundingMiners].size.sub[1].mul[25]>
         - define overcrowdingPenalty 0 if:<[overcrowdingPenalty].is[LESS].than[0]>
         - define overcrowdingPenalty 100 if:<[overcrowdingPenalty].is[MORE].than[100]>
