@@ -278,12 +278,12 @@ DynmapTask:
 
     - narrate format:admincallout "Successfully refreshed Dynmap for world: <[world]>"
 
-#DynmapWorldTick_Handler:
-#    type: world
-#    debug: false
-#    events:
-#        on system time minutely every:15:
-#        - run dynmap_task
+DynmapWorldTick_Handler:
+   type: world
+   debug: false
+   events:
+       on system time minutely every:15:
+       - execute refreshdynmap as_server
 
 dynmap_task:
     type: task
