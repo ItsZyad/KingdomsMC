@@ -6,14 +6,13 @@ FastTravel:
 
     - else:
         - define kingdom <player.flag[kingdom]>
-        - define allKingdoms <list[centran|cambrian|raptoran|viridian]>
+        - define allKingdoms <proc[GetKingdomList]>
         - define allOtherClaims <list[]>
 
         - foreach <[allKingdoms].exclude[<[kingdom]>]> as:currkingdom:
-            - foreach <server.flag[kingdoms.<[currKingdom]>.claims.castle].include[<server.flag[kingdoms.<[currKingdom]>.claims.core]>]>:
-                - define allOtherClaims:->:<[value]>
+            - define territory <server.flag[kingdoms.<[currKingdom]>.claims.castle].include[<server.flag[kingdoms.<[currKingdom]>.claims.core]>]>
 
-        - define isPlayerInOtherClaims <[allOtherClaims].cuboid.contains[<player.location>]>
+        - define isPlayerInOtherClaims <[territory].contains[<player.location.chunk>]>
 
         - if !<player.has_flag[CombatMode]>:
             - if <[isPlayerInOtherClaims]>:

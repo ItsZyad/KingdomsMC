@@ -27,15 +27,17 @@ Kingdoms_Command:
 
         - determine cancelled
 
-    - if <context.args.size> > 1 && <context.args.get[1]> == travel && <context.args.size.is[LESS].than[2]>:
+    - if <context.args.get[1]> == travel && <context.args.size.is[LESS].than[2]>:
         - define allStory <list[]>
+
+        # Note: Not a general case
         - define areaList <player.flag[foundAreas].include[<polygon[INTERNAL_STORY_Fyndalin_Castle]>]>
 
         - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
             - define areaList <util.notes>
 
-        - foreach <[areaList]>:
-            - if <[value].has_flag[name]> && <[value].as_element.split[@].get[2].starts_with[INTERNAL_STORY]>:
+        - foreach <[areaList].filter_tag[<[filter_value].to_uppercase.split[@].get[2].starts_with[INTERNAL_STORY]>]>:
+            - if <[value].has_flag[name]>:
                 - define allStory:->:<[value].flag[name].replace[_].with[<&sp>]>
 
         - determine <[allStory]>
