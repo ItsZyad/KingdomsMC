@@ -177,6 +177,10 @@ MinerItemGenerator:
                 - adjust <[npc]> hologram_lines:<list[Overcrowding Penalty:<red><[overcrowdingPenalty]><&pc>|This miner is disabled]>
                 - foreach next
 
+        - else:
+            - adjust <[npc]> hologram_lines:<list[]>
+            - flag <[npc]> overcrowdingPen:0
+
         # Note: future configurable
         # - flag <[npc]> nextGen:<util.time_now.add[35s]>
         - define minerBlocks <script[TrueItemRef].data_key[items].keys>
