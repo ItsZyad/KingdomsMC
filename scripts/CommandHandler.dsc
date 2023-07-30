@@ -86,7 +86,7 @@ Kingdoms_Command:
 
     - else if <context.args.get[1]> == map:
         - narrate "<blue><bold>Kingdoms Live Map:"
-        - narrate format:information <underline>http://185.56.138.178:61311/?worldname=KingdomsCurrent&mapname=flat&zoom=3&x=-1830&y=64&z=492
+        - narrate format:information <underline>http://5.62.127.51:27204/#close
 
     - else if <context.args.get[1]> == ping:
         - define ping <player.ping>
