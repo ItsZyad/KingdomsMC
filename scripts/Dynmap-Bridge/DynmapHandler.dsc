@@ -244,14 +244,14 @@ DynmapTask:
 
     # Main territory loop #
     - foreach <[kingdomList]> as:kingdom:
-        - if <[world].has_flag[dynamp.cache.<[kingdom]>.main.cornerList]>:
-            - foreach <[world].flag[dynmap.cache.<[kingdom]>.cornerList]> as:corner:
-                - define formattedCorner <[corner].simple.replace_text[,].with[<&sp>]>
-                - execute as_op "dmarker addcorner <[formattedCorner]>" silent
+        - if <[world].has_flag[dynmap.cache.<[kingdom]>.main.cornerList]>:
+            - foreach <[world].flag[dynmap.cache.<[kingdom]>.main.cornerList]> as:corner:
+                - define formattedCorner <[corner].simple.split[,].remove[last].space_separated>
+                - execute as_op "dmarker addcorner <[formattedCorner]> <[world].name>"
 
-            - execute as_op "dmarker deletearea id:<[kingdom]>_main_territory set:kingdoms" silent
-            - execute as_op "dmarker addarea id:<[kingdom]>_main_territory set:kingdoms label:<&dq>[Kingdom] <script[KingdomRealNames].data_key[<[kingdom]>]><&dq>"
-            - execute as_op "dmarker updatearea id:<[ID]> set:outposts color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2"
+            - execute as_op "dmarker deletearea id:<[kingdom]>_main_territory set:regions"
+            - execute as_op "dmarker addarea id:<[kingdom]>_main_territory set:regions label:<&dq>[Kingdom] <script[KingdomRealNames].data_key[<[kingdom]>]><&dq>"
+            - execute as_op "dmarker updatearea id:<[kingdom]>_main_territory set:outposts color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2"
             - execute as_op "dmarker clearcorners" silent
 
         - foreach next
