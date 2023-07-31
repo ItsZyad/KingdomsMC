@@ -542,6 +542,8 @@ Kingdom_Command:
                 - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
                 - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
                 - define castleCore <[core].include[<[castle]>].exclude[0]>
+                - define outpostAreas <proc[GetAllOutposts].context[<[kingdom]>].values.parse_tag[<[parse_value].get[area]>]>
+                - define inWhichOutpostAreas <[outpostAreas].filter_tag[<[parse_value].contains[<player.location>]>]>
 
                 - if <[warpName]> == main:
                     - if <[castle].contains[<player.location.chunk>]>:
@@ -561,11 +563,11 @@ Kingdom_Command:
                         - narrate format:callout "You must place your kingdom's main warp location inside your castle territory!"
 
                 - else:
-                    - if <[castleCore].contains[<player.location.chunk>]>:
+                    - if <[castleCore].contains[<player.location.chunk>]> || <[inWhichOutpostAreas].size> > 0:
                         - flag server kingdoms.<[kingdom]>.warps.<[warpName]>:<player.location.center>
 
                     - else:
-                        - narrate format:callout "Regular kingdom warps must be within castle or core territory"
+                        - narrate format:callout "Regular kingdom warps must be within castle, core, or outpost territory"
 
                 #- else:
                 #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
