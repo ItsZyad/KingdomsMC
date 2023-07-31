@@ -14,8 +14,8 @@ Old_OutpostManager_Command:
     type: command
     usage: /old_outposts
     name: old_outposts
-    permission: kingdoms.admin
     description: "Displays all the outposts currently maintained by your kingdom [CURRENTLY BROKEN]"
+    permission: kingdoms.admin
     script:
         - define kingdom <player.flag[kingdom]>
 
@@ -40,7 +40,6 @@ OutpostList_GUI:
     inventory: chest
     title: "Outpost List"
     procedural items:
-    - narrate <player.flag[outpostList]>
     - determine <player.flag[outpostList]>
     slots:
     - [] [] [] [] [] [] [] [] []
@@ -96,18 +95,18 @@ OutpostList_Command:
         - define kingdom <player.flag[kingdom]>
         - define rawOutpostList <list[]>
 
-        - foreach <server.flag[kingdoms.<[kingdom]>.outpost.outpostList].keys>:
-            - define currentOutpost <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[value]>]>
+        - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList]> as:currentOutpost:
+            - narrate format:debug <[currentOutpost]>
+
             - define cornerOne <[currentOutpost].get[cornerone].xyz>
             - define cornerTwo <[currentOutpost].get[cornertwo].xyz>
             - define name <[currentOutpost].get[name]>
             - define size <[currentOutpost].get[size]>
             - define upkeep <[currentOutpost].get[upkeep]>
             - define spec <[currentOutpost].get[specType]>
-
             - define outpostBlock <item[Unspec_Item]>
 
-            - flag <[outpostBlock]> name:<[value]>
+            - flag <[outpostBlock]> name:<[name]>
 
             # No specialization is represented by the tag being non-existant
             - if <[currentOutpost].get[specType].exists>:
