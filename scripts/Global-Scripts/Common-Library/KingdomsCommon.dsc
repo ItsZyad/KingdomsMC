@@ -315,7 +315,7 @@ GetClaims:
             - determine <server.flag[kingdoms.<[kingdom]>.claims.core]>
 
 
-GetAllOutposts:
+ALT_GetAllOutposts:
     type: procedure
     definitions: kingdom
     script:
@@ -345,8 +345,7 @@ GetAllOutposts:
     - determine <[outpostMap]>
 
 
-# TODO: Check which one of these is more performant
-ALT_GetAllOutposts:
+GetAllOutposts:
     type: procedure
     definitions: kingdom
     script:
@@ -364,7 +363,7 @@ ALT_GetAllOutposts:
     - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].if_null[<list>].is_empty>:
         - determine <map[]>
 
-    - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].parse_value_tag[<[parse_value].exclude[cornerone|cornertwo]>].include[<cuboid[<player.location.world.name>,<[parse_value].get[cornerone].simple.split[,].remove[last].separated_by[,]>,<[parse_value].get[cornertwo].simple.split[,].remove[last].separated_by[,]>]>]>
+    - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].parse_value_tag[<[parse_value].include[area=<cuboid[<[parse_value].get[cornerone].world.name>,<[parse_value].get[cornerone].simple.split[,].remove[last].separated_by[,]>,<[parse_value].get[cornertwo].simple.split[,].remove[last].separated_by[,]>]>].exclude[cornerone|cornertwo]>]>
 
 
 GetClaimsPolygon:
