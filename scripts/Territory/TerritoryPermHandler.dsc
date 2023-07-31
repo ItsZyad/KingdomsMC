@@ -120,31 +120,32 @@ TerritoryHandler:
         - define kingdom <player.flag[kingdom]>
         - define isInAnyClaim false
 
-        - foreach <server.flag[kingdoms.claimInfo.allClaims]>:
-            - if <[value]> == <context.location.chunk>:
-                - define isInAnyClaim true
-                - foreach stop
+        - if <context.location.chunk.is_in[<server.flag[kingdoms.claimInfo.allClaims].parse_tag[<[parse_value].as[chunk]>]>]>:
+            - define isInAnyClaim true
 
         # If the player places a block not within their own core/castle/
         # outpost territory then undo the block place
 
         - if <[isInAnyClaim]>:
-            - if !<server.flag[kingdoms.<[kingdom]>.warStatus]>:
+            - if <server.flag[kingdoms.<[kingdom]>.warStatus].as_boolean.not>:
                 - if !<player.has_permission[kingdoms.admin.bypassrc]> || !<player.is_op>:
-                    - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
+                    - stop
 
-                    # Note to self: this may not be very efficient. Try consolidating
-                    # all the chunks of core/castle territory into a cuboid object to
-                    # access and reference easier
+                - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
 
-                    - if <context.location.chunk.is_in[<[castleCore]>]>:
-                        - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size.if_null[0]> != 0:
-                            - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
-                                - if <cuboid[<[value]>].players.contains[<player>]>:
-                                    - determine cancelled
+                # Note to self: this may not be very efficient. Try consolidating
+                # all the chunks of core/castle territory into a cuboid object to
+                # access and reference easier
 
-                    - else:
-                        - determine cancelled
+                - if <context.location.chunk.is_in[<[castleCore]>]>:
+                    - stop
+
+                - else if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size.if_null[0]> != 0:
+                    - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
+                        - if <cuboid[<[value]>].players.contains[<player>]>:
+                            - stop
+
+                - determine cancelled
 
         - else:
             # Block players from placing stuff in the wilderness only if restricted creative is
@@ -160,31 +161,32 @@ TerritoryHandler:
         - define kingdom <player.flag[kingdom]>
         - define isInAnyClaim false
 
-        - foreach <server.flag[kingdoms.claimInfo.allClaims]>:
-            - if <[value]> == <context.location.chunk>:
-                - define isInAnyClaim true
-                - foreach stop
+        - if <context.location.chunk.is_in[<server.flag[kingdoms.claimInfo.allClaims].parse_tag[<[parse_value].as[chunk]>]>]>:
+            - define isInAnyClaim true
 
         # If the player places a block not within their own core/castle/
         # outpost territory then undo the block place
 
         - if <[isInAnyClaim]>:
-            - if !<server.flag[kingdoms.<[kingdom]>.warStatus]>:
+            - if <server.flag[kingdoms.<[kingdom]>.warStatus].as_boolean.not>:
                 - if !<player.has_permission[kingdoms.admin.bypassrc]> || !<player.is_op>:
-                    - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
+                    - stop
 
-                    # Note to self: this may not be very efficient. Try consolidating
-                    # all the chunks of core/castle territory into a cuboid object to
-                    # access and reference easier
+                - define castleCore <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
 
-                    - if <context.location.chunk.is_in[<[castleCore]>]>:
-                        - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size.if_null[0]> != 0:
-                            - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
-                                - if <cuboid[<[value]>].players.contains[<player>]>:
-                                    - determine cancelled
+                # Note to self: this may not be very efficient. Try consolidating
+                # all the chunks of core/castle territory into a cuboid object to
+                # access and reference easier
 
-                    - else:
-                        - determine cancelled
+                - if <context.location.chunk.is_in[<[castleCore]>]>:
+                    - stop
+
+                - else if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size.if_null[0]> != 0:
+                    - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
+                        - if <cuboid[<[value]>].players.contains[<player>]>:
+                            - stop
+
+                - determine cancelled
 
         - else:
             # Block players from placing stuff in the wilderness only if restricted creative is
