@@ -102,6 +102,10 @@ KMerchantWindow_Handler:
                 - flag <[item]> price:<[price]>
 
                 - adjust def:item "lore:<element[Going Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>"
+
+                - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
+                    - adjust def:item lore:<[item].lore.include[<&sp>|<italic><element[Alloc: ].color[white]><[value].get[alloc].color[aqua]>|<element[Spent: ].color[white]><[value].get[spent].color[aqua]>]>
+
                 # - inventory adjust d:<[target].open_inventory> slot:<context.slot> "lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>" player:<[target]>
 
                 - define itemList:->:<[item]>
@@ -223,7 +227,7 @@ KMerchantWindow_Handler:
             - else:
                 - define sellAmount 1
 
-            - if <[merchant].flag[merchantData.budget].sub[<[price].mul[<[sellAmount]>]>]> > <[minimumBudget]>:
+            - if <[merchant].flag[merchantData.balance].sub[<[price].mul[<[sellAmount]>]>]> > <[minimumBudget]>:
                 - ratelimit <player> 10t
                 - narrate format:callout "The merchant does not have enough money to buy this from you!"
                 - determine cancelled
@@ -240,7 +244,7 @@ KMerchantWindow_Handler:
 
             - take from:<player.inventory> item:<[itemName]> quantity:<[sellAmount]>
             - money give players:<player> quantity:<[price].mul[<[sellAmount]>]>
-            - flag <[merchant]> merchantData.budget:-:<[price].mul[<[sellAmount]>]>
+            - flag <[merchant]> merchantData.balance:-:<[price].mul[<[sellAmount]>]>
             - flag <[merchant]> merchantData.sellData.items.<[itemName]>.spent:+:<[price].mul[<[sellAmount]>]>
             - flag <[merchant]> merchantData.supply.<[itemName]>.quantity:+:<[sellAmount]>
             - narrate format:callout "Sold <[itemName].color[white].italicize> for: <red>$<[price].mul[<[sellAmount]>].format_number[#,##0.0]>"
