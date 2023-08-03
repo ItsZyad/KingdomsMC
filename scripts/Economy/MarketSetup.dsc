@@ -221,7 +221,12 @@ MerchantPlacement_Handler:
         - flag <player> noChat.economy.spawningMerchant
 
         CreateMerchant:
-        - create player "&7Unspecialized Merchant" <[merchantPos]> save:newMerchant
+        - if <player.has_flag[datahold.merchantSpec]>:
+            - define spec <player.flag[datahold.merchantSpec].replace[_].with[<&sp>].to_titlecase>
+            - create player "<&6><[spec]> Merchant" <[merchantPos]> save:newMerchant
+
+        - else:
+            - create player "&7Unspecialized Merchant" <[merchantPos]> save:newMerchant
 
         - define newMerc <entry[newMerchant].created_npc>
         - adjust <[newMerc]> lookclose:true
