@@ -392,7 +392,7 @@ Kingdom_Command:
             - run SubUpkeep def.kingdom:<[kingdom]> def.amount:5
 
         - else:
-            - run AddUpkeep def.kingdom:<[kingdom]> def.amount:30
+            - run SubUpkeep def.kingdom:<[kingdom]> def.amount:30
 
         - narrate format:callout "Unclaimed chunk: <element[<player.location.chunk.x>, <player.location.chunk.z>].color[red]>"
 
