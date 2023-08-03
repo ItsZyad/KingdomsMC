@@ -389,10 +389,10 @@ Kingdom_Command:
         - flag server kingdoms.claimInfo.allClaims:<-:<player.location.chunk>
 
         - if <server.flag[kingdoms.<[kingdom]>.claims.core].size> <= 20:
-            - flag server kingdoms.<[kingdom]>.upkeep:-:5
+            - run SubUpkeep def.kingdom:<[kingdom]> def.amount:5
 
         - else:
-            - flag server kingdoms.<[kingdom]>.upkeep:-:30
+            - run AddUpkeep def.kingdom:<[kingdom]> def.amount:30
 
         - narrate format:callout "Unclaimed chunk: <element[<player.location.chunk.x>, <player.location.chunk.z>].color[red]>"
 
