@@ -143,7 +143,7 @@ CalculateRNPCPrice:
     - flag server kingdoms.<[kingdom]>.balance:-:<[truePrice]>
     - flag server kingdoms.<[kingdom]>.npcTotal:++
 
-    - run SidebarLoader def.target:<server.flag[<[player].flag[kingdom]>.members].include[<server.online_ops>]>
+    - run SidebarLoader def.target:<server.flag[kingdoms.<[player].flag[kingdom]>.members].include[<server.online_ops>]>
 
 
 RNPCWindow_Handler:
