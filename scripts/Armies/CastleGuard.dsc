@@ -576,7 +576,12 @@ GuardTargetSelection:
     script:
     - ratelimit <queue> 1s
     - define guard <[context]>
-    - define nearestPlayer <[guard].location.find_players_within[<[guard].sentinel.guard_distance_minimum>].get[1]>
+    - define nearestPlayers <[guard].location.find_players_within[<[guard].sentinel.guard_distance_minimum>]>
+    - define nearestPlayer <[nearestPlayers].get[1].if_null[null]>
+
+    - if <[nearestPlayer]> == null:
+        - determine passively false
+        - execute as_server "sentinel forgive --id <[guard].id>" silent
 
     - if !<[nearestPlayer].has_flag[kingdom]>:
         - determine passively false
