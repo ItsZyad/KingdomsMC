@@ -216,6 +216,7 @@ Help_Strings:
     type: data
     coreclaim: Claims <element[core territory].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]> for your kingdom. You need to the King or Vizier to do this action!
     castleclaim: Claims <element[castle territory].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]> for your kingdom. You need to the King to do this action!
+    unclaim: Unclaims the chunk you are standing in if it is a part of your claims. You are refunded for its full upkeep value but not its upfront value.
     balance: Shows the joint kingdom bank account.
     deposit: Adds the specified amount of money to your kingdom's balance.
     withdraw: Transfers the specified amount of money from the kingdom's balance to your personal account.
@@ -244,7 +245,7 @@ Kingdom_Command:
     aliases:
         - k
     tab completions:
-        1: help|coreclaim|castleclaim|balance|guards|deposit|withdraw|trade|rename|npc|warp|ideas|outline|influence
+        1: help|coreclaim|castleclaim|unclaim|balance|guards|deposit|withdraw|trade|rename|npc|warp|ideas|outline|influence
         2: help
 
     tab complete:
@@ -359,32 +360,41 @@ Kingdom_Command:
     - else if <context.args.get[1]> == castleclaim:
         - define param <context.args.get[2]>
 
-        - if <[param]> == unclaim:
-            #- if <player.has_permission[kingdoms.admin.unclaim]> || <player.is_op>:
-
-            - if <server.flag[kingdoms.<player.flag[kingdom]>.claims.castle].contains[<player.location.chunk>]>:
-                - flag server kingdoms.<player.flag[kingdom]>.claims.castle:<-:<player.location.chunk>
-                - flag server kingdoms.allClaims:<-:<player.location.chunk>
-
-            - else:
-                - narrate format:admin "This area is not a castle claim"
-
-            #- else:
-            #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
+        #- if <player.has_permission[kingdom.cancastleclaim]>:
+        - if <player.has_flag[ClaimingMode]> && <player.flag[ClaimingMode]> == CastleClaiming:
+            - flag <player> ClaimingMode:!
+            - narrate format:callout "You have exited castle claiming mode"
 
         - else:
-            #- if <player.has_permission[kingdom.cancastleclaim]>:
-            - if <player.has_flag[ClaimingMode]> && <player.flag[ClaimingMode]> == CastleClaiming:
-                - flag <player> ClaimingMode:!
-                - narrate format:callout "You have exited castle claiming mode"
+            - flag <player> ClaimingMode:CastleClaiming
+            - narrate format:callout "You are now in castle claiming mode"
+            - narrate format:callout "Use /claim to claim a chunk for your castle!"
 
-            - else:
-                - flag <player> ClaimingMode:CastleClaiming
-                - narrate format:callout "You are now in castle claiming mode"
-                - narrate format:callout "Use /claim to claim a chunk for your castle!"
+        #- else:
+        #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
 
-            #- else:
-            #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+
+    #------------------------------------------------------------------------------------------------------------------------
+
+    - else if <context.args.get[1]> == unclaim:
+        - define coreCastle <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
+
+        - if !<player.location.chunk.is_in[<[coreCastle]>]>:
+            - narrate format:callout "This chunk is not in your claims."
+            - determine cancelled
+
+        - flag server kingdoms.<[kingdom]>.claims.core:<-:<player.location.chunk>
+        - flag server kingdoms.<[kingdom]>.claims.castle:<-:<player.location.chunk>
+        - flag server kingdoms.claimInfo.allClaims:<-:<player.location.chunk>
+
+        - if <server.flag[kingdoms.<[kingdom]>.claims.core].size> <= 20:
+            - flag server kingdoms.<[kingdom]>.upkeep:-:5
+
+        - else:
+            - flag server kingdoms.<[kingdom]>.upkeep:-:30
+
+        - narrate format:callout "Unclaimed chunk: <element[<player.location.chunk.x>, <player.location.chunk.z>].color[red]>"
 
         - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
