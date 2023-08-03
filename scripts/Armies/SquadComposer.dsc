@@ -80,7 +80,7 @@ SquadComposition_Interface:
     title: Compose a Squad
     slots:
     - [SquadCompositionOneSoldier_Item] [SquadCompositionFiveSoldiers_Item] [SquadInfoSeparator_Item] [] [] [] [] [] []
-    - [SquadCompositionOneArcher_Item] [SquadCompositionFiveArchers_Item] [SquadInfoSeparator_Item] [] [] [] [] [] []
+    - [] [] [SquadInfoSeparator_Item] [] [] [] [] [] []
     - [] [] [SquadInfoSeparator_Item] [] [] [] [] [] []
     - [] [] [SquadInfoSeparator_Item] [] [] [] [] [] []
     - [] [] [SquadInfoSeparator_Item] [] [] [] [] [] []
