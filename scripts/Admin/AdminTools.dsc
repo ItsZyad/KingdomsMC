@@ -106,7 +106,7 @@ AdminTools_Command:
                             - define keys <server.flag[<[currentKey]>].keys>
 
                         - else:
-                            - define keys <element[<&lt><[object]><&gt>].parsed.flag[<[currentKey]>].keys>
+                            - define keys <element[<[object]>].parsed.flag[<[currentKey]>].keys>
 
                         - if <[keys].exists>:
                             - determine <[keys].parse_tag[<[keyList].separated_by[.]>.<[parse_value]>]>
