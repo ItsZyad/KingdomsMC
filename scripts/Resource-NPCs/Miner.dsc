@@ -403,12 +403,12 @@ MinerGenerationNoticeUpdater:
         - wait <element[1000].sub[<util.current_time_millis.sub[<[timeStart]>]>].div[1000].mul[20].round>t
 
 
-# MinerGeneration_Handler:
-#     type: world
-#     debug: false
-#     events:
-#         on system time secondly every:150:
-#         - run MinerItemGenerator
+MinerGeneration_Handler:
+    type: world
+    debug: false
+    events:
+        on system time secondly every:150:
+        - run MinerItemGenerator
 
         #on player places block in:mine*:
         #- determine cancelled
