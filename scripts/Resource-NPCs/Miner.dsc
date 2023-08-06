@@ -95,7 +95,7 @@ MinerRangeFinder:
 ##ignorewarning raw_object_notation
 ##ignorewarning def_of_nothing
 
-MineExperienceGain:
+MineExperienceGain_OLD:
     type: data
     stone: 0.005
     granite: 0.015
@@ -111,6 +111,25 @@ MineExperienceGain:
     gravel: 0.004
     lapis_ore: 0.07
     clay_block: 0.01
+
+
+MineExperienceGain:
+    type: data
+    XP:
+        clay_block: 0.02
+        gravel: 0.03
+        granite: 0.03
+        andesite: 0.04
+        diorite: 0.04
+        stone: 0.05
+        coal_ore: 0.06
+        lapis_ore: 0.08
+        redstone_ore: 0.09
+        iron_ore: 0.1
+        gold_ore: 0.25
+        diamond_ore: 0.35
+        emerald_ore: 0.37
+        obsidian: 0.5
 
 
 TrueItemRef:
@@ -150,6 +169,7 @@ MinerItemGenerator:
         - define npc <[value].get[NPC].as[npc]>
         - define kingdom <[value].get[kingdom]>
         - define npcChunk <[npc].location.chunk>
+        - define mine <[value].get[area]>
 
         - chunkload add <[npcChunk]>|<[npcChunk].add[1,0]>|<[npcChunk].add[0,1]>|<[npcChunk].sub[1,0]>|<[npcChunk].sub[0,1]> duration:10s
         - waituntil <[npcChunk].is_loaded>
@@ -174,7 +194,7 @@ MinerItemGenerator:
             - flag <[npc]> overcrowdingPen:<[overcrowdingPenalty]>
 
             - if <[overcrowdingPenalty]> == 100:
-                - adjust <[npc]> hologram_lines:<list[Overcrowding Penalty:<red><[overcrowdingPenalty]><&pc>|This miner is disabled]>
+                - adjust <[npc]> hologram_lines:<list[Overcrowding Penalty:<&sp><red><[overcrowdingPenalty]><&pc>|This miner is disabled]>
                 - foreach next
 
         - else:
@@ -186,10 +206,11 @@ MinerItemGenerator:
         - define minerBlocks <script[TrueItemRef].data_key[items].keys>
         - define volume <[mine].volume>
         - define generationProfile <[npc].flag[blockBuildup].exclude[totalBlocks].get_subset[<[minerBlocks]>]>
+        - define totalAmount <[generationProfile].values.sum>
         - define npcLevel <[npc].flag[Level]>
         - define npcLevel 100 if:<[npcLevel].is[MORE].than[100]>
 
-        - narrate format:debug GEN:<[generationProfile]>
+        - run flagvisualizer def.flag:<[generationProfile].include[total=<[totalAmount]>]> def.flagName:genProf
 
         - foreach <[generationProfile]> key:block as:amount:
             - define spawnChance <util.random.int[<util.random.int[0].to[<[npcLevel].round>]>].to[100]>
@@ -200,15 +221,38 @@ MinerItemGenerator:
             - define trueItem <script[TrueItemRef].data_key[items.<[block]>]>
             - define outpostMod <[npc].flag[outpostMod].as[list].if_null[<list[0|0]>]>
             - define outputMod <[npc].flag[outputMod].if_null[0]>
-            - define overcrowdingMultiplier <element[100].sub[<[overcrowdingPenalty]>]>
-            - define itemAmount <element[1.01].sub[<script[MineExperienceGain].data_key[<[block]>]>].mul[<[spawnChance]>].div[8].mul[<[outpostMod].get[1].add[1]>].mul[<[outputMod].add[1]>].mul[<[overcrowdingMultiplier]>].round_down>
+            - define outputMod 2 if:<[npc].flag[outputMod].is[OR_MORE].than[2]>
+            - define overcrowdingMultiplier <element[100].sub[<[overcrowdingPenalty]>].div[100]>
+            - define baseEXP <element[1.01].sub[<script[MineExperienceGain].data_key[XP.<[block]>]>]>
+            - define maximumGeneratableItems <[volume].div[20.8125].round.mul[<[outputMod]>].add[<util.random.int[-10].to[20]>].round>
+
+            - if <[amount]> >= <[totalAmount].div[2]>:
+
+                # Item proportion scalar equation:
+                # s = (t / 10) * log2(a - (t / 2)) - (t / 2)
+                # Where: t = totalAmount
+                #        a = amount
+                # https://www.desmos.com/calculator/qi3c4cfcsb
+                - define amount <[totalAmount].div[10].mul[<element[<[amount].sub[<[totalAmount].div[2]>]>].log[2]>].sub[<[totalAmount].div[2]>]>
+
+            - define itemProportion <[amount].div[<[totalAmount]>]>
+            - define itemAmount <[maximumGeneratableItems].mul[<[itemProportion]>].round_up>
+
+            # - narrate format:debug <red>ITM:<[trueItem]>
+            # - narrate format:debug <gold>AMT:<[amount]>
+            # - narrate format:debug MAX:<[maximumGeneratableItems].round_to_precision[0.001]>
+            # - narrate format:debug PRP:<[itemProportion]>
+            # - narrate format:debug APR:<[itemProportion].mul[<element[<[itemProportion].power[1.90279728]>].div[2]>]>
+            # - narrate format:debug VOL:<[volume]>
+            # - narrate format:debug <bold>ITA:<[itemAmount]>
+            # - narrate format:debug -----------------------------
 
             - if !<[npc].inventory.can_fit[<[trueItem]>].quantity[<[itemAmount]>]>:
                 - foreach next
 
             - give <[trueItem]> to:<[npc].inventory> quantity:<[itemAmount]>
 
-            - flag <[npc]> Level:+:<script[MineExperienceGain].data_key[<[key]>].mul[<[itemAmount].div[350].round_to_precision[0.1]>]>
+            - flag <[npc]> Level:+:<script[MineExperienceGain].data_key[<[block]>].mul[<[itemAmount].div[500].round_to_precision[0.1]>]>
 
             # Find a random item not already in the generation
             # profile and weigh out the chance that it appears
@@ -228,13 +272,23 @@ MinerItemGenerator:
 
             - give <script[TrueItemRef].data_key[<[randomItem]>]> to:<[npc].inventory> quantity:<[outpostMod].get[2]>
 
-            - define prevBaseLevel <[npc].flag[Level].round_down>
+            - if <[npc].flag[Level].round> >= 100:
+                - foreach next
 
-            - if <[npc].flag[Level].round_down> != <[prevBaseLevel]>:
-                - define inventoryData <[npc].inventory.list_contents>
-                - adjust <[npc]> name:<[npc].nickname.split[<&sp>].get[1].to[-2].space_separated><&sp><[npc].flag[Level].round_down>
-                - adjust <[npc]> inventory_contents:<[inventoryData]>
-                - flag <[npc]> outputMod:+:<util.random.decimal[0].to[0.005]>
+            - define prevBaseLevel <[npc].flag[Level].round_down>
+            - flag <[npc]> Level:+:<util.random.decimal[0.01].to[0.02]>
+
+            - if <[npc].flag[Level].round_down> == <[prevBaseLevel]>:
+                - foreach next
+
+            - define inventoryData <[npc].inventory.list_contents>
+            - adjust <[npc]> name:<[npc].nickname.split[<&sp>].get[1].to[-2].space_separated><&sp><[npc].flag[Level].round_down>
+            - adjust <[npc]> inventory_contents:<[inventoryData]>
+
+            - if <[npc].flag[outputMod]> >= 2:
+                - foreach next
+
+            - flag <[npc]> outputMod:+:<util.random.decimal[0].to[0.005]>
 
 
 MinerGeneration:
@@ -349,12 +403,12 @@ MinerGenerationNoticeUpdater:
         - wait <element[1000].sub[<util.current_time_millis.sub[<[timeStart]>]>].div[1000].mul[20].round>t
 
 
-MinerGeneration_Handler:
-    type: world
-    debug: false
-    events:
-        on system time secondly every:150:
-        - run MinerItemGenerator
+# MinerGeneration_Handler:
+#     type: world
+#     debug: false
+#     events:
+#         on system time secondly every:150:
+#         - run MinerItemGenerator
 
         #on player places block in:mine*:
         #- determine cancelled
