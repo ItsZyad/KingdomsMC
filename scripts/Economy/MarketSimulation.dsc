@@ -480,47 +480,6 @@ MarketAnalysisGenerator:
     - define stDev <[sum].div[<[n]>].sqrt>
 
 
-TransactionRecorder:
-    type: task
-    definitions: price|item|amount|merchant|market|mode
-    script:
-    - define mode <[mode].if_null[buy]>
-
-    - if <[mode]> == buy:
-        - define transactions <server.flag[economy.markets.<[market]>.marketDemand.<[item]>.transactions.<[mode]>]>
-        - define transactionIndex <[transactions].parse_tag[<[parse_value].exclude[amount]>].find[<map[price=<[price]>;merchant=<[merchant]>]>]>
-
-        - if <[transactionIndex]> != -1:
-            - define transaction <[transactions].get[<[transactionIndex]>]>
-            - define transaction.amount:+:<[amount]>
-            - flag server economy.markets.<[market]>.marketDemand.<[item]>.transactions.buy:<[transactions].overwrite[<[transaction]>].at[<[transactionIndex]>]>
-
-        - else:
-            - flag server economy.markets.<[market]>.marketDemand.<[item]>.transactions.buy:->:<map[price=<[price]>;amount=<[amount]>;merchant=<[merchant].as[entity]>]>
-
-        - flag server economy.markets.<[market]>.marketDemand.totalAmount:+:<[amount]>
-        - flag server economy.markets.<[market]>.marketDemand.totalValue:+:<[price]>
-        - flag server economy.markets.<[market]>.marketDemand.<[item]>.totalAmount:+:<[amount]>
-        - flag server economy.markets.<[market]>.marketDemand.<[item]>.totalValue:+:<[price]>
-
-    - else:
-        - define transactions <server.flag[economy.markets.<[market]>.sellData.<[item]>.transactions.<[mode]>]>
-        - define transactionIndex <[transactions].parse_tag[<[parse_value].exclude[amount]>].find[<map[price=<[price]>;merchant=<[merchant]>]>]>
-
-        - if <[transactionIndex]> != -1:
-            - define transaction <[transactions].get[<[transactionIndex]>]>
-            - define transaction.amount:+:<[amount]>
-            - flag server economy.markets.<[market]>.sellData.<[item]>.transactions.sell:<[transactions].overwrite[<[transaction]>].at[<[transactionIndex]>]>
-
-        - else:
-            - flag server economy.markets.<[market]>.sellData.<[item]>.transactions.sell:->:<map[price=<[price]>;amount=<[amount]>;merchant=<[merchant].as[entity]>]>
-
-        - flag server economy.markets.<[market]>.sellData.totalAmount:+:<[amount]>
-        - flag server economy.markets.<[market]>.sellData.totalValue:+:<[price]>
-        - flag server economy.markets.<[market]>.sellData.<[item]>.totalAmount:+:<[amount]>
-        - flag server economy.markets.<[market]>.sellData.<[item]>.totalValue:+:<[price]>
-
-
 OldMarketDataRecorder:
     type: task
     AppendQueue:
