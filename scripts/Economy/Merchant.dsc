@@ -185,7 +185,7 @@ KMerchantWindow_Handler:
                     - foreach <[interactingPlayers]> as:target:
                         - inventory adjust d:<[target].open_inventory> slot:<context.slot> "lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>" player:<[target]>
 
-                    - run MarketDemandScript def.price:<[price]> def.item:<context.item.material.name> def.amount:<[purchaseAmount]> def.merchant:<[merchant]> def.player:<player> def.market:<[market]>
+                    - run TransactionRecorder def.price:<[price]> def.item:<context.item.material.name> def.amount:<[purchaseAmount]> def.merchant:<[merchant]> def.player:<player> def.market:<[market]>
 
                 - else:
                     # Clicking outside the window returns -998 for some reason
