@@ -15,16 +15,38 @@ MarketCreation_Command:
     usage: /market create|remove|init [name] [Attractiveness]|...|[Spawn Chance] [Max Size]|...
     permission: kingdoms.admin.markets
     description: Designates a market with a given name and area
-    tab completions:
-        1: create|remove|init
-        2: (Name)
-        3: (Attractiveness)|...|(Spawn Chance)
-        4: (?MaxSize)|...|...
+    tab complete:
+    - define args <context.raw_args.split_args>
+
+    - if <[args].size> == 0:
+        - determine <list[create|complete|remove|init]> if:<player.has_flag[datahold.economy.definingArea]>
+        - determine <list[create|remove|init]>
+
+    - choose <[args].get[1].to_lowercase>:
+        - case create:
+            - determine <list[[Name]]> if:<[args].size.equals[1].and[<context.raw_args.ends_with[<&sp>]>]>
+            - determine <list[[Atttractiveness]]> if:<[args].size.equals[2].and[<context.raw_args.ends_with[<&sp>]>]>
+            - determine <list[[?MaxSize]]> if:<[args].size.equals[3].and[<context.raw_args.ends_with[<&sp>]>]>
+
+        - case remove:
+            - determine <list[[Name]]> if:<[args].size.equals[1].and[<context.raw_args.ends_with[<&sp>]>]>
+
+        - case init:
+            - determine <list[[Name]]> if:<[args].size.equals[1].and[<context.raw_args.ends_with[<&sp>]>]>
+            - determine <list[[Spawn Chance]]> if:<[args].size.equals[2].and[<context.raw_args.ends_with[<&sp>]>]>
+
+        - case complete:
+            - if <[args].size.equals[1]> && !<player.has_flag[datahold.economy.definingArea]>:
+                - determine <list[[Name]]>
+
     script:
     - define args <context.raw_args.split_args>
     - define action <[args].get[1]>
     - define name <[args].get[2]>
     - define maxSize <[args].get[4].if_null[n/a]>
+
+    - if <player.has_flag[datahold.economy.definingArea]>:
+        - define name <player.flag[datahold.economy.definingArea]>
 
     - if <[action]> == name:
         - if <[args].size> < 3:
@@ -42,68 +64,16 @@ MarketCreation_Command:
     - if <[action].exists> && <[name].exists>:
         - choose <[action].to_lowercase>:
             - case init:
-                - define spawnChance <util.random.decimal[0].to[1]>
-
-                - if <[args].get[3].is_decimal>:
-                    - define spawnChance <[args].get[3]>
-
-                - define merchantAmount <server.flag[economy.markets.<[name]>.merchants].size>
-
-                - run SupplyAmountCalculator def.marketSize:<[merchantAmount]> def.spawnChance:<[spawnChance]> save:supplyAmount
-
-                - define supply <entry[supplyAmount].created_queue.determination.get[1]>
-                - flag server economy.markets.<[name]>.supplyMap.original:<[supply]>
-                - flag server economy.markets.<[name]>.supplyMap.current:<[supply]>
+                - inject <script.name> path:MarketInit
 
             - case create:
-                - define attractiveness <[args].get[3]>
+                - define merchantAmount 1
 
-                - flag server economy.markets.<[name]>.ID:<server.flag[economy.markets].size.if_null[0].add[1]>
-                - flag server economy.markets.<[name]>.merchants:<list[]>
-                - flag server economy.markets.<[name]>.attractiveness:<[attractiveness]>
-                - flag server economy.markets.<[name]>.maxSize:<[maxSize]> if:<[maxSize].equals[n/a].not>
-                - flag server economy.markets.<[name]>.supplierPriceMod:0.6
-
-                - clickable save:make_area until:10m usages:1 for:<player>:
-                    - give to:<player.inventory> MarketCreation_Item
-                    - narrate format:admincallout "Click the blocks you would like to constitute the borders of the market area. Drop the market wand to cancel the process.<n>Type <element[/market complete].color[green]> to finish the process."
-                    - narrate format:admincallout "<gray><italic>Note: This does not need to be an exact area. You will still be able to determine where individual merchants can go."
-
-                - clickable save:no_make_area until:10m usages:1 for:<player>:
-                    - narrate "<green>Created market area: '<[name].bold.underline>'"
-
-                - narrate format:admincallout "You may optionally define an area that a market operates in. This will restrict the places where merchants can spawn."
-                - narrate "<blue>Would you like to do that?"
-                - narrate "<n><element[Yes].color[green].on_click[<entry[make_area].command>]> / <element[No].color[red].on_click[<entry[no_make_area].command>]>"
+                - inject <script.name> path:MarketCreate
+                - inject <script.name> path:MarketInit
 
             - case complete:
-                - define minY 999
-                - define maxY -999
-                - define world <player.location.world>
-                - define coordList <list[]>
-
-                - foreach <player.flag[marketPoints]> as:point:
-                    - define coordList:->:<[point].x>
-                    - define coordList:->:<[point].z>
-
-                    - if <[point].y> > <[maxY]>:
-                        - define maxY <[point].y>
-
-                    - if <[point].y> < <[minY]>:
-                        - define minY <[point].y>
-
-                - define marketArea <polygon[<[world].name>,<[minY]>,<[maxY]>,<[coordList].comma_separated.replace_text[<&sp>].with[]>]>
-
-                - take from:<player.inventory> item:MarketCreation_Item
-
-                - foreach <player.flag[marketPoints]> as:point:
-                    - showfake cancel <[point]>
-
-                - flag <player> marketPoints:!
-                - flag server economy.markets.<[name]>.marketArea:<[marketArea]>
-                - note <[marketArea]> as:<[name]>
-                - showfake red_stained_glass <[marketArea].outline_2d[<player.location.y.add[10]>]>
-                - narrate format:admincallout "Created market area: '<[name]>'!"
+                - inject <script.name> path:MarketComplete
 
             - case remove:
                 - if <server.has_flag[economy.markets.<[name]>]>:
@@ -118,6 +88,77 @@ MarketCreation_Command:
 
     - else:
         - narrate format:admincallout "You must provide a create/remove action and an ID to create a market."
+
+    ## SUBPATHS
+    MarketInit:
+    - define spawnChance <util.random.decimal[0].to[1]>
+
+    - if <[args].get[3].is_decimal>:
+        - define spawnChance <[args].get[3]>
+
+    - define merchantAmount <[merchantAmount].if_null[<server.flag[economy.markets.<[name]>.merchants].size>]>
+
+    - run SupplyAmountCalculator def.marketSize:<[merchantAmount]> def.spawnChance:<[spawnChance]> save:supplyAmount
+    - define supply <entry[supplyAmount].created_queue.determination.get[1]>
+
+    - flag server economy.markets.<[name]>.supplyMap.original:<[supply]>
+    - flag server economy.markets.<[name]>.supplyMap.current:<[supply]>
+
+    MarketCreate:
+    - define attractiveness <[args].get[3]>
+
+    - flag server economy.markets.<[name]>.ID:<server.flag[economy.markets].size.if_null[0].add[1]>
+    - flag server economy.markets.<[name]>.merchants:<list[]>
+    - flag server economy.markets.<[name]>.attractiveness:<[attractiveness]>
+    - flag server economy.markets.<[name]>.maxSize:<[maxSize]> if:<[maxSize].equals[n/a].not>
+    - flag server economy.markets.<[name]>.supplierPriceMod:0.6
+
+    - clickable save:make_area until:10m usages:1 for:<player>:
+        - give to:<player.inventory> MarketCreation_Item
+
+        - narrate format:admincallout "Click the blocks you would like to constitute the borders of the market area. Drop the market wand to cancel the process.<n>Type <element[/market complete].color[green]> to finish the process."
+        - narrate format:admincallout "<gray><italic>Note: This does not need to be an exact area. You will still be able to determine where individual merchants can go."
+
+        - flag <player> datahold.economy.definingArea:<[name]>
+
+    - clickable save:no_make_area until:10m usages:1 for:<player>:
+        - narrate "<green>Created market area: '<[name].bold.underline>'"
+
+    - narrate format:admincallout "You may optionally define an area that a market operates in. This will restrict the places where merchants can spawn."
+    - narrate "<blue>Would you like to do that?"
+    - narrate "<n><element[Yes].color[green].on_click[<entry[make_area].command>]> / <element[No].color[red].on_click[<entry[no_make_area].command>]>"
+
+    MarketComplete:
+    - define minY 999
+    - define maxY -999
+    - define world <player.location.world>
+    - define coordList <list[]>
+
+    - foreach <player.flag[marketPoints]> as:point:
+        - define coordList:->:<[point].x>
+        - define coordList:->:<[point].z>
+
+        - if <[point].y> > <[maxY]>:
+            - define maxY <[point].y>
+
+        - if <[point].y> < <[minY]>:
+            - define minY <[point].y>
+
+    - define marketArea <polygon[<[world].name>,<[minY]>,<[maxY]>,<[coordList].comma_separated.replace_text[<&sp>].with[]>]>
+
+    - take from:<player.inventory> item:MarketCreation_Item
+
+    - foreach <player.flag[marketPoints]> as:point:
+        - showfake cancel <[point]>
+
+    - flag <player> marketPoints:!
+    - flag <player> datahold.economy.definingArea:!
+    - flag server economy.markets.<[name]>.marketArea:<[marketArea]>
+
+    - note <[marketArea]> as:<[name]>
+    - showfake red_stained_glass <[marketArea].outline_2d[<player.location.y.add[10]>]>
+
+    - narrate format:admincallout "Created market area: '<[name]>'!"
 
 
 MarketCreation_Item:
@@ -170,10 +211,14 @@ MerchantCreation_Command:
 
     - choose <[action]>:
         - case create:
+            - if !<[args].get[2].exists>:
+                - narrate format:admincallout "Cannot create a merchant with no specialization!"
+                - determine cancelled
+
             - run TempSaveInventory def.player:<player>
             - give to:<player.inventory> MerchantPlacement_Item
             - flag <player> PlacingMerchant
-            - flag <player> dataHold.merchantSpec:<[args].get[2].if_null[null]>
+            - flag <player> dataHold.merchantSpec:<[args].get[2]>
 
         - case remove:
             - define mercID <[args].get[2]>
