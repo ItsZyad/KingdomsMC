@@ -18,6 +18,14 @@ DailySimulationUpdate:
             - run MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
 
 
+UpdateMerchant:
+    type: task
+    definitions: merchant|marketName
+    script:
+    - run MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
+    - run MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
+
+
 # Runs for every merchant in a market and calculates what items it should prioritize buying
 MerchantPurchaseDecider:
     type: task
