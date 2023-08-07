@@ -257,7 +257,7 @@ MerchantPurchaseDecider:
 
     - flag <[merchant]> cachedInterface:!
 
-    - run MarketDemandScript path:MarketAnalysisGenerator def.market:<[marketName]> save:demandInfo
+    - run MarketAnalysisGenerator def.market:<[marketName]> save:demandInfo
     - define demandInfo <entry[demandInfo].created_queue.determination.get[1]>
     - define sortedItemDemand <[demandInfo].get[items].to_pair_lists.sort_by_value[get[2].get[saleToAmountRatio]]>
 
@@ -427,19 +427,24 @@ MerchantSellDecider:
         - flag <[merchant]> merchantData.sellData.items.<[key]>.price:<[sellPrice]>
 
 
-MarketDemandScript:
+MarketAnalysisGenerator:
     type: task
-    definitions: price|item|amount|merchant|player|market|mode
-    StandardDevCalculator:
-    - define n <[marketDemand].get[<[item]>].size>
-    - define sum 0
+    definitions: market
+    script:
+    - define marketDemand <server.flag[economy.markets.<[market]>.marketDemand]>
+    - define marketAnalysis <map[]>
+    - yaml load:economy_data/price-info.yml id:prices
 
-    - foreach <[allPrices]> as:price:
-        - define sum:+:<[price].sub[<[averageSellPrice]>].power[2]>
+    - foreach <[marketDemand].exclude[totalAmount|totalValue]> as:itemData key:itemName:
+        - run MarketAnalysisGenerator path:ItemAnalysisGenerator def.market:<[market]> def.item:<[itemName]> save:ItemAnalysis
+        - define itemAnalysis <entry[ItemAnalysis].created_queue.determination.get[1]>
+        - define marketAnalysis.items.<[itemName]>:<[itemAnalysis]>
+        - define marketAnalysis.totalAmount:<[marketDemand].get[totalAmount]>
+        - define marketAnalysis.totalValue:<[marketDemand].get[totalValue]>
 
-    - define stDev <[sum].div[<[n]>].sqrt>
+    - determine <[marketAnalysis]>
 
-    ## DEFS REQUIRED: ITEM, MARKET
+    ## SUBPATHS
     ItemAnalysisGenerator:
     - define supplyAmounts <server.flag[economy.markets.<[market]>.supplyMap.original]>
     - define marketDemand <server.flag[economy.markets.<[market]>.marketDemand]>
@@ -451,7 +456,7 @@ MarketDemandScript:
     #- define allPrices <[marketDemand].deep_get[<[item]>.transactions].parse_tag[<[parse_value].deep_get[buy.price]>].if_null[null]>
     - define allPrices <[marketDemand].deep_get[<[item]>.transactions].parse_tag[<[parse_value].get[price]>]>
     - define averageSellPrice <[allPrices].average>
-    - inject MarketDemandScript path:StandardDevCalculator
+    - inject MarketAnalysisGenerator path:StandardDevCalculator
 
     - definemap itemAnalysis:
         saleToAmountRatio: <[saleToAmountRatio].round_to_precision[0.0001]>
@@ -465,21 +470,19 @@ MarketDemandScript:
 
     - determine <[itemAnalysis]>
 
-    ## DEFS REQUIRED: MARKET
-    MarketAnalysisGenerator:
-    - define marketDemand <server.flag[economy.markets.<[market]>.marketDemand]>
-    - define marketAnalysis <map[]>
-    - yaml load:economy_data/price-info.yml id:prices
+    StandardDevCalculator:
+    - define n <[marketDemand].get[<[item]>].size>
+    - define sum 0
 
-    - foreach <[marketDemand].exclude[totalAmount|totalValue]> as:itemData key:itemName:
-        - run MarketDemandScript path:ItemAnalysisGenerator def.market:<[market]> def.item:<[itemName]> save:ItemAnalysis
-        - define itemAnalysis <entry[ItemAnalysis].created_queue.determination.get[1]>
-        - define marketAnalysis.items.<[itemName]>:<[itemAnalysis]>
-        - define marketAnalysis.totalAmount:<[marketDemand].get[totalAmount]>
-        - define marketAnalysis.totalValue:<[marketDemand].get[totalValue]>
+    - foreach <[allPrices]> as:price:
+        - define sum:+:<[price].sub[<[averageSellPrice]>].power[2]>
 
-    - determine <[marketAnalysis]>
+    - define stDev <[sum].div[<[n]>].sqrt>
 
+
+TransactionRecorder:
+    type: task
+    definitions: price|item|amount|merchant|market|mode
     script:
     - define mode <[mode].if_null[buy]>
 
@@ -561,7 +564,7 @@ OldMarketDataRecorder:
     - define maxQueueSize 31
 
     - foreach <server.flag[economy.markets].keys> as:market:
-        - run MarketDemandScript path:MarketAnalysisGenerator def.market:<[market]> save:analysis
+        - run MarketAnalysisGenerator def.market:<[market]> save:analysis
         - define marketAnalysis <entry[analysis].created_queue.determination.get[1]>
         - define marketTotals <[marketAnalysis].get_subset[totalValue|totalAmount]>
         - define marketAnalysis <[marketAnalysis].get[items].parse_value_tag[<[parse_value].deep_exclude[sellPriceInfo.max|sellPriceInfo.min]>]>
