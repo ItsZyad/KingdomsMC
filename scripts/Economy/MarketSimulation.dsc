@@ -431,7 +431,7 @@ MarketAnalysisGenerator:
     type: task
     definitions: market
     script:
-    - define marketDemand <server.flag[economy.markets.<[market]>.marketDemand]>
+    - define marketDemand <server.flag[economy.markets.<[market]>.buyData]>
     - define marketAnalysis <map[]>
     - yaml load:economy_data/price-info.yml id:prices
 
@@ -447,7 +447,7 @@ MarketAnalysisGenerator:
     ## SUBPATHS
     ItemAnalysisGenerator:
     - define supplyAmounts <server.flag[economy.markets.<[market]>.supplyMap.original]>
-    - define marketDemand <server.flag[economy.markets.<[market]>.marketDemand]>
+    - define marketDemand <server.flag[economy.markets.<[market]>.buyData]>
 
     # This value is a ratio between the amount of an item that was sold in the past week
     # and the average amount of that item that gets spawned in merchant inventories weekly
@@ -575,4 +575,4 @@ MarketDemandHandler:
         - run OldMarketDataRecorder
 
         - foreach <server.flag[economy.markets].keys> as:market:
-            - flag server economy.markets.<[market]>.marketDemand:!
+            - flag server economy.markets.<[market]>.buyData:!
