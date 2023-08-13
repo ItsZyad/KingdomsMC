@@ -7,9 +7,11 @@
 ##
 ## ----------------END HEADER-----------------
 
+# Note: Future configurable
 Bribe_Config:
     type: data
     minBribe: 6000
+
 
 Bribe_Handler:
     type: world
