@@ -64,6 +64,7 @@ ReconstructionPermit_Command:
 
     - yaml id:recon unload
 
+
 ReconstructionPermit_Handler:
     type: world
     debug: false
@@ -89,7 +90,7 @@ ReconstructionPermit_Handler:
 
                 - flag server kingdoms.<[kingdom]>.powerstruggle.influencePoints:-:1
 
-                - run SidebarLoader def.target:<server.flag[<[kingdom]>.members].include[<server.online_ops>]>
+                - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
                 - narrate format:callout "Your reconstruction permit request has been recieved and should be reviewed by the mandate council in 24 hours"
                 - narrate <&sp>
@@ -104,6 +105,7 @@ ReconstructionPermit_Handler:
             - flag <player> PlotSizeReq:!
             - flag <player> RequestedPayout:!
             - determine cancelled
+
 
 ReconstructionPermitSave:
     type: task
@@ -126,6 +128,7 @@ ReconstructionPermitSave:
     - yaml id:recon savefile:reconstruction-permits.yml
     - yaml id:recon unload
 
+
 ReconstructionPermitAdmin_Window:
     type: inventory
     inventory: chest
@@ -138,6 +141,7 @@ ReconstructionPermitAdmin_Window:
     - [] [] [] [] [] [] [] [] []
     - [] [] [] [] [] [] [] [] []
 
+
 ReconstructionPermitApproval_Window:
     type: inventory
     inventory: chest
@@ -145,20 +149,24 @@ ReconstructionPermitApproval_Window:
     slots:
     - [] [] [PermitApprove] [] [] [] [PermitDecline] [] []
 
+
 PermitApprove:
     type: item
     material: green_wool
     display name: "Approve Permit"
+
 
 PermitDecline:
     type: item
     material: red_wool
     display name: "Decline Permit"
 
+
 PlotRegionWand:
     type: item
     material: blaze_rod
     display name: "<light_purple><bold>Plot Wand"
+
 
 ReconstructionPermitAdmin_Function:
     type: task
@@ -197,6 +205,7 @@ ReconstructionPermitAdmin_Function:
     - flag player ReconWindow:<[permitList]>
     - inventory open d:ReconstructionPermitAdmin_Window
     - flag player ReconWindow:!
+
 
 ReconstructionPermitAdmin_Handler:
     type: world
@@ -285,7 +294,7 @@ ReconstructionPermitAdmin_Handler:
             - execute as_player "rg addowner -w <player.location.world.name> INTERNAL_RECONPERMIT_<[kingdom]>_<[plotId]> <player>"
             - execute as_player "rg setpriority -w <player.location.world.name> INTERNAL_RECONPERMIT_<[kingdom]>_<[plotId]> 1"
 
-            - foreach <server.flag[<[kingdom]>.members]> as:player:
+            - foreach <server.flag[kingdoms.<[kingdom]>.members]> as:player:
                 - execute as_player "rg addmember -w <player.location.world.name> INTERNAL_RECONPERMIT_<[kingdom]>_<[plotId]> <[player]>"
 
             - wait 1s
@@ -306,6 +315,7 @@ ReconstructionPermitAdmin_Handler:
         - else if <player.has_flag[declinedPermit]>:
             - narrate format:callout "Your request for a reconstruction permit <gray>(#<player.flag[declinedPermit]>) <&6>has been rejected"
             - flag player declinedPermit:!
+
 
 # PlayerBuildPlot_Handler:
 #     type: world
