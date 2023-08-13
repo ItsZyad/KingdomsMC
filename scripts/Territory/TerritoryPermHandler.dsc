@@ -2,26 +2,25 @@ DoorInteractCode:
     type: task
     debug: false
     script:
-    - if !<player.has_permission[kingdoms.admin.bypassclickcheck]>:
-        - define kingdom <player.flag[kingdom]>
+    - if <player.has_permission[kingdoms.admin.bypassclickcheck]>:
+        - stop
 
-        - if <server.flag[kingdoms.claimInfo.allClaims].contains[<context.location.chunk>]>:
-            - if <server.flag[kingdoms.<[kingdom]>.warStatus]> != true:
-                - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].as[list]>
-                - define core <server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>].as[list]>
-                - define castleCore <[core].include[<[castle]>].exclude[0]>
-                - define isInOwnTerritory false
+    - if !<server.flag[kingdoms.claimInfo.allClaims].contains[<context.location.chunk>]>:
+        - stop
 
-                - foreach <[castleCore]>:
-                    - if <[value].cuboid.contains[<context.location>]>:
-                        - define isInOwnTerritory true
+    - define kingdom <player.flag[kingdom]>
 
-                - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
-                    - if <cuboid[<[value]>].players.contains[<player>]>:
-                        - define isInOwnTerritory true
+    - if !<server.flag[kingdoms.<[kingdom]>.warStatus]>:
+        - define castleCore <proc[GetClaims].context[<[kingdom]>]>
 
-                - if !<[isInOwnTerritory]>:
-                    - determine cancelled
+        - if <[castleCore].filter_tag[<[filter_value].equals[<player.location.chunk>]>].size> != 0:
+            - stop
+
+        - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.if_null[<list[]>]>:
+            - if <cuboid[<[value]>].players.contains[<player>]>:
+                - stop
+
+    - determine cancelled
 
 
 TerritoryHandler:
