@@ -5,6 +5,7 @@ KChat_Config:
     type: data
     chatProximityThreshold: 30
 
+
 ChatCallStack:
     type: task
     definitions: fullText|text|player
@@ -44,24 +45,24 @@ LocalChat_Command:
     tab completions:
         1: kingdom|proximity|global|help
         2: Optional[Message]
+
     script:
-    - if "<script[LocalChat_Command].data_key[tab completions].exclude[help].get[1].contains_any[<context.args.get[1]>].not>":
+    - if "<script.data_key[tab completions].exclude[help].get[1].contains_any[<context.args.get[1]>].not>":
         - narrate format:callout "This is not a valid chat mode"
         - determine cancelled
 
     - if <context.args.size> == 1:
-        - flag player ChatMode:<context.args.get[1]>
+        - flag <player> ChatMode:<context.args.get[1]>
         - narrate format:callout "Set <player.name>'s chat mode to: <aqua><context.args.get[1]>"
 
     - else:
         - define prevChatMode <player.flag[ChatMode]>
-        - flag player ChatMode:<context.args.get[1]>
+        - flag <player> ChatMode:<context.args.get[1]>
 
         - define message <context.raw_args.split[<&sp>].remove[1].space_separated>
-        - run KingdomsChat_Handler def:<player>|<[message]>
         - run ChatCallStack def.text:<[message]> def.player:<player>
 
-        - flag player ChatMode:<[prevChatMode]>
+        - flag <player> ChatMode:<[prevChatMode]>
 
 
 KingdomsChat_Handler:
@@ -86,10 +87,11 @@ KingdomsChat_Handler:
             - define kingdom <[player].flag[kingdom]>
             - define kingdomRealName <script[KingdomRealShortNames].data_key[<[kingdom]>]>
             - define kingdomMembers <server.flag[kingdoms.<[player].flag[kingdom]>.members]>
-            - define onlineOps <server.online_ops>
+            - define kingdomOps <server.online_ops.filter_tag[<[filter_value].flag[kingdom].equals[<[kingdom]>]>]>
+            - define applicableOps <server.online_ops.exclude[<[kingdomOps]>]>
 
-            - narrate targets:<[onlineOps]> "<[opPrefix]><red>[SocSpy]<aqua>[<[kingdomRealName]> Kingdom] <gray><[player].name> <white><&gt><&gt> <&r><[message]>"
-            - narrate targets:<[kingdomMembers]> "<[opPrefix]><aqua>[Kingdom] <gray><[player].name> <white><&gt><&gt> <[message]>"
+            - narrate targets:<[applicableOps]> "<[opPrefix]><red>[SocSpy]<aqua>[<[kingdomRealName]> Kingdom] <gray><[player].name> <white><&gt><&gt> <&r><[message]>"
+            - narrate targets:<[kingdomMembers].include[<[kingdomOps]>]> "<[opPrefix]><aqua>[Kingdom] <gray><[player].name> <white><&gt><&gt> <[message]>"
 
         - else if <[player].flag[ChatMode]> == proximity:
             - define nearThreshold <script[KChat_Config].data_key[chatProximityThreshold]>
@@ -98,6 +100,7 @@ KingdomsChat_Handler:
             - narrate targets:<[nearPlayers]> "<[opPrefix]><light_purple>[Proximity] <gray><[player].name> <white><&gt><&gt> <[message]>"
 
         # - narrate format:debug "Queue: <queue.id.color[aqua]> ran in: <queue.time_ran.in_milliseconds.color[aqua]>ms"
+
 
 FakeChat_Command:
     type: command
@@ -108,6 +111,7 @@ FakeChat_Command:
     tab completions:
         1: <server.online_players>
         2: [chat]
+
     script:
     - define target <context.raw_args.split_args.get[1]>
     - define message <context.raw_args.split_args.get[2].to[last].space_separated>
