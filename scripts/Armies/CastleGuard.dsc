@@ -241,7 +241,7 @@ GuardInterface_Handler:
 
         - if <context.message> != cancel:
             - flag <[guard]> guardPos:<player.location>
-            - ~run StaggeredPathfind def.npc:<[guard]> def.endLocation:<player.location.center> def.recursionDepth:0 def.speed:1.1
+            - run StaggeredPathfind def.npc:<[guard]> def.endLocation:<player.location.center> def.recursionDepth:0 def.speed:1.1
 
         - else:
             - narrate format:callout "Cancelled guard repositioning!"
@@ -553,6 +553,7 @@ GuardSetup:
     - execute as_server "sentinel targettime 20 --id <[npc].id>" silent
     - execute as_server "sentinel speed 1.25 --id <[npc].id>" silent
 
+    - execute as_server "sentinel addignore denizen_proc:GuardIgnoreFriendlies:<[npc]> --id <[npc].id>" silent
     - execute as_server "sentinel addtarget denizen_proc:GuardTargetSelection:<[npc]> --id <[npc].id>" silent
 
     - equip <[npc]> hand:stone_sword head:leather_cap chest:leather_chestplate legs:leather_leggings boots:leather_boots
@@ -567,6 +568,26 @@ GuardSetup:
     - flag <[npc]> GuardPos:<[player].location>
     - flag server kingdoms.<[kingdom]>.castleGuards:->:<[npc]>
     - flag server kingdoms.<[kingdom]>.castleGuards:<server.flag[kingdoms.<[kingdom]>.castleGuards].deduplicate>
+
+
+GuardIgnoreFriendlies:
+    type: procedure
+    debug: false
+    definitions: entity|context
+    script:
+    - ratelimit <queue> 1s
+
+    - if <[entity].is_player>:
+        - if <[entity].flag[kingdom].equals[<[context].flag[kingdom]>].if_null[false]>:
+            - determine passively true
+            - execute as_server "sentinel forgive --id <[context].id>" silent
+            - stop
+
+    - if <[entity].has_trait[sentinel]>:
+        - if <[entity].flag[kingdom].equals[<[context].flag[kingdom]>].if_null[false]>:
+            - determine passively true
+            - execute as_server "sentinel forgive --id <[context].id>" silent
+            - stop
 
 
 GuardTargetSelection:
