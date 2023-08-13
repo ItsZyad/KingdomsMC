@@ -74,6 +74,16 @@ ValidateKingdomCode:
     - determine <[kingdomCode].is_in[<proc[GetKingdomList]>]>
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+## ATOMIC VALUES
+##_________________________________________________________________________________________________
+##
+## Get/Set/Add/Sub
+## - Balance
+## - Upkeep
+## - Prestige
+##
+
 GetBalance:
     type: procedure
     definitions: kingdom
@@ -246,23 +256,106 @@ SubUpkeep:
     - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
-IsKingdomBankrupt:
+GetPrestige:
     type: procedure
     definitions: kingdom
     script:
-    ## Checks if the provided kingdom is bankrupt
+    ## Gets the given kingdom's prestige.
     ##
     ## kingdom : [ElementTag<String>]
     ##
-    ## >>> [ElementTag<Boolean>]
+    ## >>> [ElementTag<Float>]
 
-    - define balance <proc[GetBalance].context[<[kingdom]>]>
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot get kingdom prestige. Invalid kingdom code provided: <[kingdom]>]> def.id:003
+        - determine cancelled
 
-    - if <[balance].is[LESS].than[0]>:
-        - if <server.flag[indebtedKingdoms].get[<[kingdom]>].is[OR_MORE].than[4]>:
-            - determine true
+    - determine <server.flag[kingdoms.<[kingdom]>.prestige]>
 
-    - determine false
+
+SetPrestige:
+    type: task
+    definitions: kingdom|amount
+    script:
+    ## Sets the prestige of a kingdom to a given amount.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## amount  : [ElementTag<Float>]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot set kingdom prestige. Invalid kingdom code provided: <[kingdom]>]> def.id:003
+        - determine cancelled
+
+    - if !<[amount].is_decimal>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot set prestige to a non-number value.]> def.id:005
+        - determine cancelled
+
+    - if <[amount]> > 100 || <[amount]> < 0:
+        - run GenerateInternalError def.category:generic message:<element[Cannot set prestige to amount higher than 100 or lower than 0.]> def.id:004
+        - determine cancelled
+
+    - flag server kingdoms.<[kingdom]>.prestige:<[amount]>
+    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+
+
+AddPrestige:
+    type: task
+    definitions: kingdom|amount
+    script:
+    ## Adds a given amount of prestige to a kingdom.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## amount  : [ElementTag<Float>]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot set kingdom prestige. Invalid kingdom code provided: <[kingdom]>]> def.id:003
+        - determine cancelled
+
+    - if !<[amount].is_decimal>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot set prestige to a non-number value.]> def.id:005
+        - determine cancelled
+
+    - define prestige <proc[GetPrestige].context[<[kingdom]>]>
+
+    - if <[amount].add[<[prestige]>]> > 100:
+        - run GenerateInternalError def.category:generic message:<element[Cannot set prestige to amount higher than 100.]> def.id:004
+        - determine cancelled
+
+    - flag server kingdoms.<[kingdom]>.prestige:+:<[amount]>
+    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+
+
+SubPrestige:
+    type: task
+    definitions: kingdom|amount
+    script:
+    ## Subtracts a given amount of prestige from a kingdom.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## amount  : [ElementTag<Float>]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot set kingdom prestige. Invalid kingdom code provided: <[kingdom]>]> def.id:003
+        - determine cancelled
+
+    - if !<[amount].is_decimal>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot set prestige to a non-number value.]> def.id:005
+        - determine cancelled
+
+    - define prestige <proc[GetPrestige].context[<[kingdom]>]>
+
+    - if <[amount].sub[<[prestige]>]> < 0:
+        - run GenerateInternalError def.category:generic message:<element[Cannot set prestige to amount lower than 0.]> def.id:004
+        - determine cancelled
+
+    - flag server kingdoms.<[kingdom]>.prestige:-:<[amount]>
+    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 GetMembers:
@@ -275,7 +368,58 @@ GetMembers:
     ##
     ## >>> [ListTag<PlayerTag>]
 
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]> def.id:003
+        - determine null
+
     - determine <server.flag[kingdoms.<[kingdom]>.members]>
+
+
+AddMember:
+    type: task
+    definitions: kingdom|player
+    script:
+    ## Adds a player to a given kingdom
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## player  : [PlayerTag]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]> def.id:003
+        - determine cancelled
+
+    - if !<[player].as[entity].is_player>:
+        # TODO: Add new error system
+        - determine cancelled
+
+    - flag server kingdoms.<[kingdom]>.members:->:<[player]>
+    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+
+
+RemoveMember:
+    type: task
+    definitions: kingdom|player
+    script:
+    ## Removes the given player from a kingdom if they are a member.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## player  : [PlayerTag]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]> def.id:003
+        - determine cancelled
+
+    - if !<[player].as[entity].is_player>:
+        # TODO: Add new error system
+        - determine cancelled
+
+    - if <proc[GetMembers].context[<[kingdom]>].contains[<[player]>]>:
+        - flag server kingdoms.<[kingdom]>.members:<-:<[player]>
+        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 GetAllMembers:
@@ -285,8 +429,30 @@ GetAllMembers:
     ##
     ## >>> [ListTag<PlayerTag>]
 
-    - define allKingdoms <proc[GetKingdomList]>
-    - determine <[allKingdoms].parse_tag[<server.flag[kingdoms.<[parse_value]>.members]>].combine.deduplicate>
+    - determine <proc[GetKingdomList].parse_tag[<server.flag[kingdoms.<[parse_value]>.members]>].combine.deduplicate>
+
+
+IsKingdomBankrupt:
+    type: procedure
+    definitions: kingdom
+    script:
+    ## Checks if the provided kingdom is bankrupt
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:generic message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]> def.id:003
+        - determine cancelled
+
+    - define balance <proc[GetBalance].context[<[kingdom]>]>
+
+    - if <[balance].is[LESS].than[0]>:
+        - if <server.flag[indebtedKingdoms].get[<[kingdom]>].is[OR_MORE].than[4]>:
+            - determine true
+
+    - determine false
 
 
 GetClaims:
@@ -297,7 +463,6 @@ GetClaims:
     ##
     ## kingdom : [ElementTag<String>]
     ## type    : ?[ElementTag<String>]
-    ##         | Default Val: core
     ##
     ## >>> [ListTag<ChunkTag>]
 
@@ -305,65 +470,54 @@ GetClaims:
         - run GenerateInternalError def.category:generic message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]> def.id:003
         - determine cancelled
 
-    - define type <[type].if_null[core]>
-
     - choose <[type]>:
         - case castle:
             - determine <server.flag[kingdoms.<[kingdom]>.claims.castle]>
 
-        - default:
+        - case core:
             - determine <server.flag[kingdoms.<[kingdom]>.claims.core]>
 
+        - default:
+            - determine <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
 
-ALT_GetAllOutposts:
+
+GetClaimsCuboid:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom|type
     script:
-    ## Generates a MapTag of all the kingdom's outposts with an additional key added for the
-    ## outpost's area represented as a cuboid.
+    ## Returns a nested cuboid of the given kingdom's claims. Should a claim type not be specified
+    ## the procedure will assume 'core/castle'.
     ##
     ## kingdom : [ElementTag<String>]
+    ## type    : ?[ElementTag<String>]
+    ##         | Valid values:   core, castle, castlecore
+    ##         | Default values: castlecore
     ##
-    ## >>> [MapTag<CuboidTag;ElementTag(...);>]
+    ## >>> [CuboidTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:generic message:<element[Invalid kingdom code provided: <[kingdom]>]> def.id:003
         - determine cancelled
 
-    - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].if_null[<list>].is_empty>:
-        - determine <map[]>
+    - choose <[type]>:
+        - case castle:
+            - define claims <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>]>
 
-    - define outpostMap <map[]>
+        - case core:
+            - define claims <server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>
 
-    - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList]> key:outpostName as:outpost:
-        - define cornerOne <[outpost].get[cornerone].simple.split[,].remove[last].separated_by[,]>
-        - define cornerTwo <[outpost].get[cornertwo].simple.split[,].remove[last].separated_by[,]>
-        - define outpostCuboid <cuboid[<player.location.world.name>,<[cornerOne]>,<[cornerTwo]>]>
-        - define outpostData <[outpost].exclude[cornerone|cornertwo].include[area=<[outpostCuboid]>]>
-        - define outpostMap.<[outpostName]>:<[outpostData]>
+        - default:
+            - define claims <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
 
-    - determine <[outpostMap]>
-
-
-GetAllOutposts:
-    type: procedure
-    definitions: kingdom
-    script:
-    ## Generates a MapTag of all the kingdom's outposts with an additional key added for the
-    ## outpost's area represented as a cuboid.
-    ##
-    ## kingdom : [ElementTag<String>]
-    ##
-    ## >>> [MapTag<CuboidTag;ElementTag;>]
-
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:generic message:<element[Invalid kingdom code provided: <[kingdom]>]> def.id:003
+    - if <[claims].is_empty>:
         - determine cancelled
 
-    - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].if_null[<list>].is_empty>:
-        - determine <map[]>
+    - define claimCuboid <[claims].get[1].cuboid>
 
-    - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].parse_value_tag[<[parse_value].include[area=<cuboid[<[parse_value].get[cornerone].world.name>,<[parse_value].get[cornerone].simple.split[,].remove[last].separated_by[,]>,<[parse_value].get[cornertwo].simple.split[,].remove[last].separated_by[,]>]>].exclude[cornerone|cornertwo]>]>
+    - foreach <[claims].remove[1]>:
+        - define claimCuboid <[claimCuboid].add_member[<[value].cuboid>]>
+
+    - determine <[claimCuboid]>
 
 
 GetClaimsPolygon:
@@ -388,3 +542,24 @@ GetClaimsPolygon:
     # TODO: make it fire the dynmap polygon generator when a permanent name is decided upon
 
     - determine cancelled
+
+
+GetAllOutposts:
+    type: procedure
+    definitions: kingdom
+    script:
+    ## Generates a MapTag of all the kingdom's outposts with an additional key added for the
+    ## outpost's area represented as a cuboid.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [MapTag<CuboidTag;ElementTag;>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:generic message:<element[Invalid kingdom code provided: <[kingdom]>]> def.id:003
+        - determine cancelled
+
+    - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].if_null[<list>].is_empty>:
+        - determine <map[]>
+
+    - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].parse_value_tag[<[parse_value].include[area=<cuboid[<[parse_value].get[cornerone].world.name>,<[parse_value].get[cornerone].simple.split[,].remove[last].separated_by[,]>,<[parse_value].get[cornertwo].simple.split[,].remove[last].separated_by[,]>]>].exclude[cornerone|cornertwo]>]>
