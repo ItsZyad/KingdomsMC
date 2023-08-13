@@ -150,3 +150,29 @@ Actionbar_Handler:
     events:
         on player receives actionbar:
         - flag <player> datahold.actionbar:<context.message> expire:2s
+
+
+Enum:
+    type: procedure
+    definitions: enumKey
+    script:
+    ## Gets the data from the specified enum key. enum keys are dot-operated, meaning that the key:
+    ## 'TerritoryType.Core' will get the Core constant inside the TerritoryType enum.
+    ##
+    ## enumKey : [ElementTag<String>]
+    ##
+    ## >>> ?[ElementTag<String>]
+
+    - define splitKey <[enumKey].split[.]>
+    - define enum <[splitKey].get[1]>
+
+    - if !<script[<[enum]>].exists>:
+        - determine null
+
+    - define key <[splitKey].get[2]>
+    - define keyIndex <script[<[enum]>].data_key[enum].find[<[key]>]>
+
+    - if !<[keyIndex].exists>:
+        - determine null
+
+    - determine <script[<[enum]>].data_key[enum].get[<[keyIndex]>]>
