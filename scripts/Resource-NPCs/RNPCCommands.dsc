@@ -239,7 +239,7 @@ RNPCWindow_Handler:
                     # If the NPC is spawned into an outpost of its corresponding specialization type,
                     # assign it a modifier
                     - flag <entry[latestNPC].created_npc> outpostMod:<[NPCOutpostMod]>
-                    - ~run MinerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
+                    - run MinerRangeFinder def.npc:<entry[latestNPC].created_npc> def.radius:<[radius]>
 
                     # Write relevant RNPC data
                     - run WriteRNPCData def:<entry[latestNPC].created_npc>|<context.item.flag[spawnType]>
