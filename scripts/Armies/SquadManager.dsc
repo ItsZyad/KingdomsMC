@@ -207,7 +207,7 @@ SquadManager_Handler:
             - narrate format:callout "Your kingdom does not have sufficient funds to activate this squad manager.<n>You require at least $2000 in your kingdom's bank."
             - determine cancelled
 
-        - define existingBarracks <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
+        - define existingBarracks <server.flag[kingdoms.<[kingdom]>.armies.barracks].if_null[<list[]>]>
         - define barrackLocations <[existingBarracks].parse_value_tag[<[parse_value].get[location]>]>
         - define numberOfExistingBarracks <[existingBarracks].size.if_null[0]>
         - define defaultName Barracks-<[numberOfExistingBarracks].add[1]>
@@ -233,11 +233,7 @@ SquadManager_Handler:
             upkeep: 500
 
         # Generate cuboid consisting of all the kingdom's core claims
-        - define coreClaims <server.flag[kingdoms.<[kingdom]>.claims.core]>
-        - define coreClaimsCuboid <[coreClaims].get[1].cuboid>
-
-        - foreach <[coreClaimsCuboid].remove[1]>:
-            - define coreClaimsCuboid <[coreClaimsCuboid].include[<[value]>]>
+        - define coreClaimsCuboid <proc[GetClaimsCuboid].context[<[kingdom]>|core]>
 
         # Running path:AreaCalculation returns a cuboid of the barracks' area
         - run RecalculateSquadManagerAOE path:AreaCalculation def.AOESize:<[squadManagerData].get[AOESize]> def.SMLocation:<context.location> save:area
@@ -246,7 +242,7 @@ SquadManager_Handler:
         - define withinOutpost false
 
         # Check if barracks are contained within outpost cuboids
-        - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList]> key:outpostName as:outpost:
+        - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].if_null[<list[]>]> key:outpostName as:outpost:
             - define cornerOne <[outpost].get[cornerone].simple.split[,].remove[last].separated_by[,]>
             - define cornerTwo <[outpost].get[cornertwo].simple.split[,].remove[last].separated_by[,]>
             - define outpostCuboid <cuboid[<player.location.world.name>,<[cornerOne]>,<[cornerTwo]>]>
@@ -257,14 +253,13 @@ SquadManager_Handler:
 
         - if <[barracksArea].is_within[<[coreClaimsCuboid]>]> || <[withinOutpost]> || <player.is_op>:
             - flag <context.location> squadManager:<[squadManagerData]>
-            - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
-            - define bedCount <proc[CountBedsInSquadManagerArea].context[<[squadManagerLocation]>]>
+            - define bedCount <proc[CountBedsInSquadManagerArea].context[<context.location>]>
 
             # Station count equation:
             # s = round(sqrt(b) * b ^ 0.7)
             - define stationCapacity <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
 
-            - flag <[squadManagerLocation]> squadManager.levels.stationCapacity:<[stationCapacity]>
+            - flag <context.location> squadManager.levels.stationCapacity:<[stationCapacity]>
 
             # Running Recalc. task without path generates the barracks area and adds to the main
             # kingdoms flag the corresponding cuboid
@@ -652,7 +647,9 @@ SquadManager_Handler:
         - define SMID <entry[smid].created_queue.determination.get[1]>
         - define squadList <[SMInfo].deep_get[squads.squadList].keys>
         - define barrackList <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
+
         - flag <player> datahold.armies.showAOE:!
+        - flag <player> datahold.armies.squadManagerLocation:<context.location>
 
         - if <[barrackList].size> == 1:
             - flag <player> datahold.armies.SMDelete.squadList:<[squadList]> if:<[squadList].is_empty.not>
@@ -778,7 +775,6 @@ SquadManagerDeletion_Handler:
                     - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
 
                     - flag <[newSMLocation]> squadManager.squads.squadList.<[squad]>:<[squadInfo]>
-                    - flag server kingdoms.<player.flag[kingdom]>.armies.barracks.<[SMLocation].flag[squadManager.id]>:!
 
                     - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[newSMLocation]>
 
@@ -795,6 +791,7 @@ SquadManagerDeletion_Handler:
         # TODO/ value to the kingdom balance as a refund.
         - run AddBalance def.kingdom:<player.flag[kingdom]> def.amount:1000
 
+        - flag server kingdoms.<player.flag[kingdom]>.armies.barracks.<[SMLocation].flag[squadManager.id]>:!
         - flag <[SMLocation]> squadManager:!
         - modifyblock <[SMLocation]> air source:<player>
         - drop SquadManager_Item location:<[SMLocation]> quantity:1
