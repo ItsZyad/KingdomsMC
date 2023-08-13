@@ -89,24 +89,22 @@ SquadAttackAll_Procedure:
     definitions: entity|context
     script:
     - ratelimit <queue> 25t
-    - define soldier <[context].as[npc]>
 
-    - if <[soldier].is_navigating>:
+    - if <[context].as[npc].is_navigating>:
         - stop
 
-    - define friendlyKingdom <[soldier].flag[soldier.kingdom]>
-    - define enemyKingdoms <proc[GetKingdomList].exclude[<[friendlyKingdom]>]>
+    - define enemyKingdoms <proc[GetKingdomList].exclude[<[context].as[npc].flag[soldier.kingdom]>]>
 
     - if !<[entity].has_flag[soldier]>:
         - determine passively false
-        - execute as_server "sentinel forgive --id <[soldier].id>" silent
+        - execute as_server "sentinel forgive --id <[context].as[npc].id>" silent
 
     - else if <[entity].flag[soldier.kingdom].is_in[<[enemyKingdoms]>]>:
         - determine true
 
     - else:
         - determine passively false
-        - execute as_server "sentinel forgive --id <[soldier].id>" silent
+        - execute as_server "sentinel forgive --id <[context].as[npc].id>" silent
 
 ## Death Handlers
 #################################################
