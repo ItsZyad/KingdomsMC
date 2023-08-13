@@ -62,6 +62,11 @@ Comments starting with `Todo` will be highlighted yellow by the Denizen VSCode p
 # TODO/ This is the second line of the comment!
 ```
 
+### Indentation
+Standard indentation size for both Denizen, YAML, and JSON files is to be 4 space characters.
+
+**Indenting with tabs is not allowed.**
+
 ### Spacing
 There must be exactly two lines of whitespace between scripts and one line **after** subpaths, events, tab completes, descriptions, and any other multi-line script section;
 
