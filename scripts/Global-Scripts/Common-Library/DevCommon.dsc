@@ -51,25 +51,25 @@ DEBUG_DEBUG:
     - debug type:<[type]> <[formattedMessage]>
 
 
-InternalErrorCategories_Data:
+InternalErrorTypes:
     type: data
-    errorCats:
-        generic: GEN
-        internal: INT
-        squads: SQA
-        armies: SQA
-        quests: QUE
-        npcs: NPC
-        rnpcs: NPC
-        territory: TER
-        economy: ECO
-        blackmarket: BMA
-        powerstrugle: PWR
+    enum:
+    - GenericError
+    - TypeError
+    - ValueError
+
+
+DefaultInternalErrorMessages:
+    type: data
+    errors:
+        GenericError: An internal error has occurred.
+        TypeError: A value is of an invalid type.
+        ValueError: A value provided cannot is invalid.
 
 
 GenerateInternalError:
     type: task
-    definitions: message|silent|category|id|codeOverride
+    definitions: category|message|silent
     script:
     #TODO: Update this docstring
     ## Writes a given message to the debug console with the 'ERROR' type and the provided internal
@@ -77,37 +77,22 @@ GenerateInternalError:
     ## kingdoms.admin permission or are ops when silent is provided as 'true'. It is set to 'false'
     ## by default
     ##
-    ## id           : [ElementTag<Integer>]
     ## category     : [ElementTag<String>]
     ## message      : ?[ElementTag<String>]
     ## silent       : ?[ElementTag<Boolean>]
-    ## codeOverride : ?[ElementTag<Boolean>]
     ##
     ## >>> [Void]
 
     - define silent <[silent].if_null[false]>
-    - define categoryCode <script[InternalErrorCategories_Data].data_key[errorCats.<[category]>]>
-    - define codeOverride <[codeOverride].if_null[false]>
+    - define errorType <proc[Enum].context[InternalErrorTypes.<[category]>|true]>
+    - define message <[message].if_null[<script[DefaultInternalErrorMessages].data_key[errors.<[errorType]>]>]>
 
-    - if !<[categoryCode].exists>:
-        - run GenerateInternalError def.message:<element[Cannot generate internal error: CatCode not provided]> def.id:001B def.category:internal def.silent:false
-        - determine cancelled
+    - define messagePrefix <element[[Internal <[errorType].color[gold]>] <&gt><&gt> ].color[red]>
+    - define formattedMessage <[messagePrefix]><[message].color[white]>
 
-    - if !<[id].exists>:
-        - run GenerateInternalError def.message:<element[Cannot generate internal error: ID not provided]> def.id:001A def.category:internal def.silent:false
-        - determine cancelled
-
-    - define messagePrefix <element[[Internal Error <[categoryCode]><[id]>] <&gt><&gt>].color[red]>
-
-    - if <server.has_flag[kingdomsCache.errorCodes.<[categoryCode]><[id]>]> && !<[codeOverride]>:
-        - define formattedMessage <[messagePrefix]><server.flag[kingdomsCache.errorCodes.<[categoryCode]><[id]>]>
-
-    - else:
-        - define formattedMessage <[messagePrefix]><[message].color[white]>
-        - flag server kingdomsCache.errorCodes.<[categoryCode]><[id]>:<[formattedMessage]>
-
-    - debug DEBUG --------------------------
-    - debug ERROR <[formattedMessage]>
+    - debug DEBUG <element[KINGDOMS ERROR                                    ].color[red].bold>
+    - debug DEBUG <[formattedMessage]>
+    - debug DEBUG <element[                                                  ].strikethrough>
 
     - if !<[silent]>:
         - narrate <[formattedMessage]>
@@ -154,17 +139,24 @@ Actionbar_Handler:
 
 Enum:
     type: procedure
-    definitions: enumKey
+    definitions: enumKey|useDefault
     script:
     ## Gets the data from the specified enum key. enum keys are dot-operated, meaning that the key:
-    ## 'TerritoryType.Core' will get the Core constant inside the TerritoryType enum.
+    ## 'TerritoryType.Core' will get the Core constant inside the TerritoryType enum. If useDefault
+    ## is set to true, the procedure will use the first key in the enum as a default value.
+    ## useDeafult is set to false by default.
     ##
-    ## enumKey : [ElementTag<String>]
+    ## Example usage:
+    ## - define enumKey <proc[Enum].context[InternalErrorTypes.Generic]>
+    ##
+    ## enumKey    : [ElementTag<String>]
+    ## useDefault : ?[ElementTag<Boolean>]
     ##
     ## >>> ?[ElementTag<String>]
 
     - define splitKey <[enumKey].split[.]>
     - define enum <[splitKey].get[1]>
+    - define useDefault <[useDefault].if_null[false]>
 
     - if !<script[<[enum]>].exists>:
         - determine null
@@ -172,7 +164,10 @@ Enum:
     - define key <[splitKey].get[2]>
     - define keyIndex <script[<[enum]>].data_key[enum].find[<[key]>]>
 
-    - if !<[keyIndex].exists>:
+    - if <[keyIndex].exists>:
+        - determine <script[<[enum]>].data_key[enum].get[<[keyIndex]>]>
+
+    - if !<[useDefault]>:
         - determine null
 
-    - determine <script[<[enum]>].data_key[enum].get[<[keyIndex]>]>
+    - determine <script[<[enum]>].data_key[enum].get[1]>
