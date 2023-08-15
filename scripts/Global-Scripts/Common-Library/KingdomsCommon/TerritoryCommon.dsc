@@ -133,7 +133,7 @@ GetClaimsPolygon:
     - determine null
 
 
-GetAllOutposts:
+GetOutposts:
     type: procedure
     definitions: kingdom
     script:
@@ -152,3 +152,96 @@ GetAllOutposts:
         - determine <map[]>
 
     - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].parse_value_tag[<[parse_value].include[area=<cuboid[<[parse_value].get[cornerone].world.name>,<[parse_value].get[cornerone].simple.split[,].remove[last].separated_by[,]>,<[parse_value].get[cornertwo].simple.split[,].remove[last].separated_by[,]>]>].exclude[cornerone|cornertwo]>]>
+
+
+GetAllOutposts:
+    type: procedure
+    script:
+    ## Generates a MapTag representing the outpost information of every kingdom.
+    ##
+    ## >>> [MapTag<CuboidTag;
+    ##             ElementTag<Integer>;
+    ##             ElementTag<Float>;
+    ##             ElementTag<String>>]
+
+    - define kingdomList <proc[GetKingdomList]>
+    - define outpostMap <map[]>
+
+    - foreach <[kingdomList]> as:kingdom:
+        - define outpostMap.<[kingdom]>:<proc[GetOutposts].context[<[kingdom]>]>
+
+    - determine <[outpostMap]>
+
+
+IsPlayerInCore:
+    type: procedure
+    definitions: player
+    script:
+    ## Checks if a player is in their own kingdom's core claims
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - if !<[player].has_flag[kingdom]>:
+        - determine false
+
+    - define kingdom <[player].flag[kingdom]>
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - determine false
+
+    - determine <[player].location.chunk.is_in[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
+
+
+IsPlayerInCastle:
+    type: procedure
+    definitions: player
+    script:
+    ## Checks if a player is in their own castle claims
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - if !<[player].has_flag[kingdom]>:
+        - determine false
+
+    - define kingdom <[player].flag[kingdom]>
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - determine false
+
+    - determine <[player].location.chunk.is_in[<server.flag[kingdoms.<[kingdom]>.claims.castle]>]>
+
+
+PlayerInWhichOutpost:
+    type: procedure
+    definitions: player
+    script:
+    ## Checks if a player is in one of their own kingdom's outposts
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<[player].has_flag[kingdom]>:
+        - determine null
+
+    - define kingdom <[player].flag[kingdom]>
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - define areas <proc[GetOutposts].context[<[kingdom]>].parse_value_tag[<[parse_value].get[area]>]>
+
+    - foreach <[areas]> key:name as:area:
+        - debug DEBUG <[area]>
+
+        - if <[area].contains[<[player].location>]>:
+            - determine <[name]>
+
+    - determine null

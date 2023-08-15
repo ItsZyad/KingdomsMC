@@ -552,7 +552,7 @@ Kingdom_Command:
                 - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
                 - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
                 - define castleCore <[core].include[<[castle]>].exclude[0]>
-                - define outpostAreas <proc[GetAllOutposts].context[<[kingdom]>].values.parse_tag[<[parse_value].get[area]>]>
+                - define outpostAreas <proc[GetOutposts].context[<[kingdom]>].values.parse_tag[<[parse_value].get[area]>]>
                 - define inWhichOutpostAreas <[outpostAreas].filter_tag[<[parse_value].contains[<player.location>]>]>
 
                 - if <[warpName]> == main:
