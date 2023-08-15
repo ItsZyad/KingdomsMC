@@ -367,8 +367,8 @@ OutpostWand_Handler:
                 #- narrate format:debug "ESCAPED: <[escapedName]>"
 
                 - flag server kingdoms.outpostInfo.allOutposts.<[escapedName]>:<[kingdom]>
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornerone:<[PosOne].as[location]>
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornertwo:<[PosTwo].as[location]>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornerone:<[PosOne].as[location].with_y[0]>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornertwo:<[PosTwo].as[location].with_y[255]>
                 - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size:<player.flag[size].round>
                 - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.upkeep:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size].mul[<server.flag[kingdoms.<[kingdom]>.outposts.upkeepMultiplier]>].round>
                 - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.name:<context.message>
@@ -387,8 +387,8 @@ OutpostWand_Handler:
                 - define outpostName <player.flag[redefiningOutpost]>
                 - note <cuboid[<player.world.name>,<[PosOne].as[location].x>,0,<[PosOne].as[location].z>,<[PosTwo].as[location].x>,255,<[PosTwo].as[location].z>]> as:<context.message>
 
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornerone:<[PosOne].as[location]>
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornertwo:<[PosTwo].as[location]>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornerone:<[PosOne].as[location].with_y[0]>
+                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornertwo:<[PosTwo].as[location].with_y[255]>
                 - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size:<player.flag[size].round>
 
                 - define newUpkeep <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpostName]>.size].mul[<server.flag[kingdoms.<[kingdom]>.outposts.upkeepMultiplier]>].round>
