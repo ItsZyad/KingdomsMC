@@ -1,4 +1,5 @@
 ##
+## [KAPI]
 ## Common scripts that allow the dev to get and set internal game states and interact with the
 ## server and worlds directly as opposed to the Kingdoms API.
 ##
@@ -171,3 +172,47 @@ Enum:
         - determine null
 
     - determine <script[<[enum]>].data_key[enum].get[1]>
+
+
+EnforceType:
+    type: procedure
+    definitions: def|type|subtype
+    script:
+    ## Returns the definition passed into it if its type matches the type passed in. Additionally,
+    ## a Kingdoms-standard subtype can be provided (only applicable for ElementTags) to further
+    ## isolate a type. If the definition provided does not match the type provided, the procedure
+    ## will return null.
+    ##
+    ## def     : [ObjectTag]
+    ## type    : [ElementTag<String>]
+    ## subtype : ?[ElementTag<String>]
+    ##
+    ## >>> [ObjectTag]
+
+    - define type <[type].to_lowercase>
+    - define actualType <[def].object_type.to_lowercase>
+    - define subtype <[subtype].to_lowercase> if:<[subtype].exists>
+
+    - if <[actualType]> != <[type]>:
+        - determine null
+
+    - if <[actualType]> != element || !<[subtype].exists>:
+        - determine <[def]>
+
+    - choose <[subtype]>:
+        - case string:
+            - determine <[def]>
+
+        - case integer:
+            - if <[def].is_integer>:
+                - determine <[def]>
+
+        - case float:
+            - if <[def].is_decimal>:
+                - determine <[def]>
+
+        - case boolean:
+            - if <[def].is_boolean>:
+                - determine <[def]>
+
+    - determine null
