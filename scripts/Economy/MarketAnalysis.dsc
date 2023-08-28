@@ -184,8 +184,8 @@ OldMarketDataRecorder:
         - define sellAnalysis <entry[sellAnalysis].created_queue.determination.get[1]>
 
         - definemap marketAnalysis:
-            buyAnalysis: <[buyAnalysis].get[items].parse_value_tag[<[parse_value].deep_exclude[sellPriceInfo.max|sellPriceInfo.min]>]>
-            sellAnalysis: <[sellAnalysis].get[items].parse_value_tag[<[parse_value].deep_exclude[sellPriceInfo.max|sellPriceInfo.min]>]>
+            buyAnalysis: <[buyAnalysis]>
+            sellAnalysis: <[sellAnalysis]>
 
         - define allMarketsMap.<[market]>.items:<[marketAnalysis]>
         - define allMarketsMap.<[market]>:<[allMarketsMap].get[<[market]>].include[<[marketAnalysis].get_subset[totalValue|totalAmount]>]>
@@ -213,8 +213,8 @@ OldMarketDataRecorder:
 
     # I just spent the better part of an hour trying to work this segment of code a certain way
     # and in the end got so angry that I decided to re-write the whole thing using the method
-    # below that I previously thought would be less efficient and made it run faster and easier
-    # than the original in one shot... oh and it ran on the first time.
+    # below that I previously thought would be less efficient and made it run faster and in less
+    # space than the original in one shot... oh and it ran on the first time.
     # roid rage works.
     - define staticPastData <yaml[past].read[past_data]>
 
@@ -263,24 +263,50 @@ OldMarketDataRecorder:
 
     # - run flagvisualizer def.flag:<[newQueue]> def.flagName:newQueue
 
-    # TODO: Write RefreshQueue/CheckQueueIntegrity which makes sure the past data queue remains in
-    # TODO/ the correct format.
 
-    GenerateOldData:
-        - define SARMap <[marketDemand].get[items].parse_value_tag[<[parse_value].get[saleToAmountRatio]>]>
-        - define SARList <[SARMap].values>
-        - define oSAR <[SARList].average>
-        - define itemsSold <[marketDemand].keys>
-        - define totalValue <[marketDemand].get[totalValue]>
-        - define totalAmount <[marketDemand].get[totalAmount]>
-        - define averagePrice <[totalValue].div[<[totalAmount]>]>
+GenerateCompressedOldData:
+    type: task
+    definitions: marketName|day
+    script:
+    ## Compresses the old data of a given market for a given amount of days ago for ease of use.
+    ##
+    ## marketName : [ElementTag<String>]
+    ## day        : [ElementTag<Integer>]
+    ##
+    ## >>> [MapTag<
+    ##         <ElementTag<Integer>>
+    ##         <ElementTag<Float>>
+    ##         <ElementTag<Float>>
+    ##         <ElementTag<Float>>
+    ##         <ElementTag<Integer>>
+    ##     >]
 
-        - definemap marketMap:
-            total_amount: <[totalAmount]>
-            total_value: <[totalValue]>
-            avg_price: <[averagePrice]>
-            o_sar: <[oSAR]>
-            items_sold: <[itemsSold]>
+    - yaml load:economy_data/past-economy-data.yml id:past
+
+    # TODO: Throw internal errors for these when branch is merged back!
+    - if !<[day].is_integer>:
+        - determine null
+
+    - if !<server.has_flag[economy.markets.<[marketName]>]>:
+        - determine null
+
+    - define marketPastData <yaml[past].read[past_data.<[day]>.<[marketName]>]>
+    - define SARMap <[marketPastData].get[items].parse_value_tag[<[parse_value].get[saleToAmountRatio]>]>
+    - define SARList <[SARMap].values>
+    - define oSAR <[SARList].average>
+    - define itemsSold <[marketPastData].keys>
+    - define totalValue <[marketPastData].get[totalValue]>
+    - define totalAmount <[marketPastData].get[totalAmount]>
+    - define averagePrice <[totalValue].div[<[totalAmount]>]>
+
+    - definemap marketMap:
+        total_amount: <[totalAmount]>
+        total_value: <[totalValue]>
+        avg_price: <[averagePrice]>
+        o_sar: <[oSAR]>
+        items_sold: <[itemsSold]>
+
+    - determine <[marketMap]>
 
 
 ## Save previous market tendancies to YAML perhaps also save along with it global market demand
