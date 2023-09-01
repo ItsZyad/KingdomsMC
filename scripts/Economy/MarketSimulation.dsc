@@ -14,7 +14,7 @@ DailySimulationUpdate:
             - flag <[merc]> merchantData.balance:<[wealth]> if:<[balance].exists.not>
             - flag <[merc]> merchantData.balance:<[wealth].add[<[balance]>]> if:<[balance].exists>
 
-            - run MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
+            - run OLD_MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
             - run MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
 
 
@@ -22,12 +22,12 @@ UpdateMerchant:
     type: task
     definitions: merchant|marketName
     script:
-    - run MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
+    - run OLD_MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
     - run MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
 
 
 # Runs for every merchant in a market and calculates what items it should prioritize buying
-MerchantPurchaseDecider:
+OLD_MerchantPurchaseDecider:
     type: task
     definitions: marketName|merchant
     CalculateCloseness:
@@ -340,6 +340,39 @@ MerchantPurchaseDecider:
     # - narrate format:debug SPEN:<[spendableBalance]>
 
     - yaml id:prices unload
+
+
+NewMerchantSellDecider:
+    type: task
+    definitions: merchant|marketName
+    script:
+    - yaml load:economy_data/past-economy-data.yml id:past
+    - define pastData <yaml[past].read[past_data]>
+    - yaml id:past unload
+
+    - if !<[pastData].contains[1]>:
+        - stop
+
+    - define items <[pastData].deep_get[1.<[marketName]>.items.buyAnalysis].keys>
+
+    - inject <script.name> path:FindItemPurchaseTrend
+
+    FindItemPurchaseTrend:
+    - define buyAnalyses <[pastData].parse_value_tag[<[parse_value].deep_get[<[marketName]>.items.buyAnalysis]>]>
+    - define itemTrends <map[]>
+
+    # - run flagvisualizer def.flag:<[buyAnalyses]> def.flagName:BA
+
+    - foreach <[buyAnalyses]> key:day as:data:
+        - foreach <[data]> key:item as:itemData:
+            - define itemTrends.<[item]>.SARs:->:<[itemData].get[saleToAmountRatio]>
+            - define itemTrends.<[item]>.totalAmountItem:+:<[itemData].get[totalAmountItem]>
+            - define itemTrends.<[item]>.totalValueItem:+:<[itemData].get[totalValueItem]>
+
+    - foreach <[itemTrends]>:
+        - define itemTrends.<[key]>.SARRange:<[value].get[SARs].last.sub[<[value].get[SARs].first>]>
+
+    - run flagvisualizer def.flag:<[itemTrends]> def.flagName:trends
 
 
 MerchantSellDecider:
