@@ -13,7 +13,7 @@ OpenWarpsToKingdom:
     type: task
     definitions: kingdom|targetKingdom
     script:
-    ## Opens a kingdoms' warps to another target kingdom if not already
+    ## Opens a kingdom's warps to another target kingdom if not already
     ##
     ## kingdom       : [ElementTag<String>]
     ## targetKingdom : [ElementTag<String>]
@@ -26,6 +26,25 @@ OpenWarpsToKingdom:
 
     - if <server.flag[kingdoms.<[kingdom]>.openWarps].contains[<[targetKingdom]>]>:
         - flag server kingdoms.<[kingdom]>.openWarps:->:<[targetKingdom]>
+
+
+CloseWarpsToKingdom:
+    type: task
+    definitions: kingdom|targetKingdom
+    script:
+    ## Closes a given kingdom's warps to another target kingdom if not already
+    ##
+    ## kingdom       : [ElementTag<String>]
+    ## targetKingdom : [ElementTag<String>]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot modify kingdom warps. Invalid kingdom code(s) provided: <[kingdom]>/<[targetKingdom]>]>
+        - determine cancelled
+
+    - if <server.flag[kingdoms.<[kingdom]>.openWarps].contains[<[targetKingdom]>]>:
+        - flag server kingdoms.<[kingdom]>.openWarps:<-:<[targetKingdom]>
 
 
 AddWarp:
