@@ -1,6 +1,7 @@
 ##
 ## [KAPI]
-## Generic items and inventories that may be useful in multiple places around the codebase
+## Generic items and inventories that may be useful in multiple places around the codebase as to
+## avoid unnecessary duplication of item scripts.
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Aug 2023
