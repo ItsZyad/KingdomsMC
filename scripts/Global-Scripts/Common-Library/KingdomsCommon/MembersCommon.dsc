@@ -10,7 +10,7 @@
 
 GetMembers:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
     script:
     ## Returns a list of all the members currently in the kingdom
     ##
@@ -27,7 +27,7 @@ GetMembers:
 
 AddMember:
     type: task
-    definitions: kingdom|player
+    definitions: kingdom[ElementTag(String)]|player[PlayerTag]
     script:
     ## Adds a player to a given kingdom
     ##
@@ -50,7 +50,7 @@ AddMember:
 
 RemoveMember:
     type: task
-    definitions: kingdom|player
+    definitions: kingdom[ElementTag(String)]|player[PlayerTag]
     script:
     ## Removes the given player from a kingdom if they are a member.
     ##
@@ -84,7 +84,7 @@ GetAllMembers:
 
 IsPlayerInKingdom:
     type: procedure
-    definitions: kingdom|player
+    definitions: kingdom[ElementTag(String)]|player[PlayerTag]
     script:
     ## Returns true if the provided player is in the provided kingdom.
     ##

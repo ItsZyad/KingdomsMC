@@ -11,7 +11,7 @@
 
 OpenWarpsToKingdom:
     type: task
-    definitions: kingdom|targetKingdom
+    definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]
     script:
     ## Opens a kingdom's warps to another target kingdom if not already
     ##
@@ -30,7 +30,7 @@ OpenWarpsToKingdom:
 
 CloseWarpsToKingdom:
     type: task
-    definitions: kingdom|targetKingdom
+    definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]
     script:
     ## Closes a given kingdom's warps to another target kingdom if not already
     ##
@@ -49,7 +49,7 @@ CloseWarpsToKingdom:
 
 AddWarp:
     type: task
-    definitions: kingdom|location|warpName
+    definitions: kingdom[ElementTag(String)]|location[LocationTag]|warpName[ElementTag(String)]
     description:
     - WARNING: Will overwrite any existing warps should the warpName provided already be in use!
 
@@ -80,7 +80,7 @@ AddWarp:
 
 RemoveWarp:
     type: task
-    definitions: kingdom|warpName
+    definitions: kingdom[ElementTag(String)]|warpName[ElementTag(String)]
     script:
     ## Removes a kingdom's warp by the given name if it exists
     ##

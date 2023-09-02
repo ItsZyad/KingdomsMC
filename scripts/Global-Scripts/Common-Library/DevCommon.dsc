@@ -12,7 +12,7 @@
 GenerateKingdomsDebug:
     type: task
     debug: false
-    definitions: type|message|silent
+    definitions: type[ElementTag(String)]|message[?ElementTag(String)]|silent[?ElementTag(Boolean)]
     script:
     ## Writes a given message to the debug console, with 'type' being the debug message type.
     ## See the debug command meta for more info: http://meta.denizenscript.com/Docs/Commands/debug
@@ -70,7 +70,7 @@ DefaultInternalErrorMessages:
 
 GenerateInternalError:
     type: task
-    definitions: category|message|silent
+    definitions: category[ElementTag(String)]|message[?ElementTag(String)]|silent[?ElementTag(Boolean)]
     script:
     #TODO: Update this docstring
     ## Writes a given message to the debug console with the 'ERROR' type and the provided internal
@@ -102,7 +102,7 @@ GenerateInternalError:
 ActionBarToggler:
     type: task
     debug: false
-    definitions: player|message|toggleType
+    definitions: player[PlayerTag]|message[ElementTag]|toggleType[?ElementTag(String)]
     script:
     ## Toggles a consistent message to be displayed to the player's actionbar based on the
     ## toggleType provided. If no toggleType is provided then the script will disable any enabled
@@ -140,7 +140,7 @@ Actionbar_Handler:
 
 Enum:
     type: procedure
-    definitions: enumKey|useDefault
+    definitions: enumKey[ElementTag(String)]|useDefault[?ElementTag(Boolean)]
     script:
     ## Gets the data from the specified enum key. enum keys are dot-operated, meaning that the key:
     ## 'TerritoryType.Core' will get the Core constant inside the TerritoryType enum. If useDefault
@@ -176,7 +176,7 @@ Enum:
 
 EnforceType:
     type: procedure
-    definitions: def|type|subtype
+    definitions: def[ObjectTag]|type[ElementTag(String)]|subtype[?ElementTag(String)]
     script:
     ## Returns the definition passed into it if its type matches the type passed in. Additionally,
     ## a Kingdoms-standard subtype can be provided (only applicable for ElementTags) to further

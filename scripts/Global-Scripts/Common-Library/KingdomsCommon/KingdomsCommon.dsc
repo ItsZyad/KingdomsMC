@@ -52,7 +52,7 @@ KingdomTextColors:
 GetKingdomList:
     type: procedure
     debug: false
-    definitions: isCodeNames
+    definitions: isCodeNames[ElementTag(Boolean)]
     script:
     ## Generates a list of all the valid kingdom code names. When isCodeNames is set to false
     ## the procedure generates a list of the full/real kingdom names. isCodeNames is true by default
@@ -74,7 +74,7 @@ GetKingdomList:
 # TODO: Change name to 'IsValidKingdomCode'
 ValidateKingdomCode:
     type: procedure
-    definitions: kingdomCode
+    definitions: kingdomCode[ElementTag(String)]
     script:
     ## Checks id the kingdom code provided is a valid one.
     ##
@@ -87,7 +87,7 @@ ValidateKingdomCode:
 
 IsKingdomBankrupt:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
     script:
     ## Checks if the provided kingdom is bankrupt
     ##
@@ -124,7 +124,7 @@ IsKingdomBankrupt:
 
 GetBalance:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
     script:
     ## Returns the balance of a given kingdom.
     ##
@@ -141,7 +141,7 @@ GetBalance:
 
 SetBalance:
     type: task
-    definitions: kingdom|amount
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     script:
     ## Sets the balance of a given kingdom to a given amount.
     ##
@@ -164,7 +164,7 @@ SetBalance:
 
 AddBalance:
     type: task
-    definitions: kingdom|amount
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     script:
     ## Adds a given amount to the provided kingdom's balance
     ##
@@ -187,7 +187,7 @@ AddBalance:
 
 SubBalance:
     type: task
-    definitions: kingdom|amount
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     script:
     ## Subtracts a given amount to the provided kingdom's balance
     ##
@@ -210,7 +210,7 @@ SubBalance:
 
 GetUpkeep:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
     script:
     ## Gets a given kingdom's total daily upkeep
     ##
@@ -227,7 +227,7 @@ GetUpkeep:
 
 SetUpkeep:
     type: task
-    definitions: kingdom|amount
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     script:
     ## Sets the upkeep of a given kingdom to a given amount.
     ##
@@ -250,7 +250,7 @@ SetUpkeep:
 
 AddUpkeep:
     type: task
-    definitions: kingdom|amount
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     script:
     ## Adds a given amount to the provided kingdom's upkeep
     ##
@@ -273,7 +273,7 @@ AddUpkeep:
 
 SubUpkeep:
     type: task
-    definitions: kingdom|amount
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     script:
     ## Subtracts a given amount from the kingdom's upkeep
     ##
@@ -296,7 +296,7 @@ SubUpkeep:
 
 GetPrestige:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
     script:
     ## Gets the given kingdom's prestige.
     ##
@@ -313,7 +313,7 @@ GetPrestige:
 
 SetPrestige:
     type: task
-    definitions: kingdom|amount
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     script:
     ## Sets the prestige of a kingdom to a given amount.
     ##
@@ -340,7 +340,7 @@ SetPrestige:
 
 AddPrestige:
     type: task
-    definitions: kingdom|amount
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     script:
     ## Adds a given amount of prestige to a kingdom.
     ##
@@ -369,7 +369,7 @@ AddPrestige:
 
 SubPrestige:
     type: task
-    definitions: kingdom|amount
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     script:
     ## Subtracts a given amount of prestige from a kingdom.
     ##
@@ -398,7 +398,7 @@ SubPrestige:
 
 GetDescription:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
     script:
     ## Gets the description of a kingdom. Returns null if there is none.
     ##
@@ -418,7 +418,7 @@ GetDescription:
 
 SetDescription:
     type: task
-    definitions: kingdom|description
+    definitions: kingdom[ElementTag(String)]|description[ElementTag(String)]
     script:
     ## Sets the description of a kingdom.
     ##

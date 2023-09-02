@@ -10,7 +10,7 @@
 
 GetClaims:
     type: procedure
-    definitions: kingdom|type
+    definitions: kingdom[ElementTag(String)]|type[?ElementTag(String)]
     script:
     ## Gets a list of the provided claim type pertaining to the provided kingdom.
     ##
@@ -36,7 +36,7 @@ GetClaims:
 
 AddClaim:
     type: task
-    definitions: kingdom|type|chunk
+    definitions: kingdom[ElementTag(String)]|type[ChunkTag]|chunk[?ElementTag(String)]
     script:
     ## Adds the provided chunk to the claims of the provided kingdom. Claim types can be core or
     ## castle. If no claim type is provided, the script will assume 'castle'.
@@ -72,7 +72,7 @@ AddClaim:
 
 GetClaimsCuboid:
     type: procedure
-    definitions: kingdom|type
+    definitions: kingdom[ElementTag(String)]|type[?ElementTag(String)]
     script:
     ## Returns a nested cuboid of the given kingdom's claims. Should a claim type not be specified
     ## the procedure will assume 'core/castle'.
@@ -111,7 +111,7 @@ GetClaimsCuboid:
 
 GetClaimsPolygon:
     type: procedure
-    definitions: kingdom|world
+    definitions: kingdom[ElementTag(String)]|world[WorldTag]
     script:
     ## Returns a polygon created of all the chunks consisting a kingdom's core/castle claims
     ##
@@ -135,7 +135,7 @@ GetClaimsPolygon:
 
 GetOutposts:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
     script:
     ## Generates a MapTag of all the kingdom's outposts with an additional key added for the
     ## outpost's area represented as a cuboid.
@@ -162,7 +162,8 @@ GetAllOutposts:
     ## >>> [MapTag<CuboidTag;
     ##             ElementTag<Integer>;
     ##             ElementTag<Float>;
-    ##             ElementTag<String>>]
+    ##             ElementTag<String>
+    ##      >]
 
     - define kingdomList <proc[GetKingdomList]>
     - define outpostMap <map[]>
@@ -175,7 +176,7 @@ GetAllOutposts:
 
 IsPlayerInCore:
     type: procedure
-    definitions: player
+    definitions: player[PlayerTag]
     script:
     ## Checks if a player is in their own kingdom's core claims
     ##
@@ -197,7 +198,7 @@ IsPlayerInCore:
 
 IsPlayerInCastle:
     type: procedure
-    definitions: player
+    definitions: player[PlayerTag]
     script:
     ## Checks if a player is in their own castle claims
     ##
@@ -219,7 +220,7 @@ IsPlayerInCastle:
 
 PlayerInWhichOutpost:
     type: procedure
-    definitions: player
+    definitions: player[PlayerTag]
     script:
     ## Checks if a player is in one of their own kingdom's outposts
     ##
