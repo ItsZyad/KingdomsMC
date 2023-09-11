@@ -15,7 +15,7 @@ DailySimulationUpdate:
             - flag <[merc]> merchantData.balance:<[wealth].add[<[balance]>]> if:<[balance].exists>
 
             - run OLD_MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
-            - run MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
+            - run OLD_MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
 
 
 UpdateMerchant:
@@ -23,7 +23,7 @@ UpdateMerchant:
     definitions: merchant|marketName
     script:
     - run OLD_MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
-    - run MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
+    - run OLD_MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
 
 
 # Runs for every merchant in a market and calculates what items it should prioritize buying
@@ -342,10 +342,19 @@ OLD_MerchantPurchaseDecider:
     - yaml id:prices unload
 
 
-NewMerchantSellDecider:
+MerchantSellDecider:
     type: task
-    definitions: merchant|marketName
+    definitions: marketName[ElementTag(String)]|merchant[NPCTag]
     script:
+    ## Will utilize market demand and sale data to determine how much each merchant in a given
+    ## market should allocate to the sale of each item in their inventory. If the 'merchant' param
+    ## is provided, it will only do this for the specified merchant.
+    ##
+    ## marketName : [ElementTag<String>]
+    ## merchant   : [NPCTag]
+    ##
+    ## >>> [Void]
+
     - yaml load:economy_data/past-economy-data.yml id:past
     - define pastData <yaml[past].read[past_data]>
     - yaml id:past unload
@@ -353,29 +362,74 @@ NewMerchantSellDecider:
     - if !<[pastData].contains[1]>:
         - stop
 
-    - define items <[pastData].deep_get[1.<[marketName]>.items.buyAnalysis].keys>
+    - inject <script.name> path:FindItemTrend
 
-    - inject <script.name> path:FindItemPurchaseTrend
+    - if !<[merchant].exists>:
+        - foreach <server.flag[economy.markets.<[marketName]>.merchants]> as:merchant:
+            - inject <script.name> path:AnalyzeTrends
 
-    FindItemPurchaseTrend:
-    - define buyAnalyses <[pastData].parse_value_tag[<[parse_value].deep_get[<[marketName]>.items.buyAnalysis]>]>
+    - else:
+        - inject <script.name> path:AnalyzeTrends
+
+    AnalyzeTrends:
+    - define sBias <[merchant].flag[merchantData.spendBias]>
+    - define qBias <[merchant].flag[merchantData.quantityBias]>
+    - define wealth <[merchant].flag[merchantData.wealth]>
+    - define spendableBalance <[merchant].flag[merchantData.balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
+    - define sellEffectors <map[]>
+    - define allocations <map[]>
+
+    - foreach <[itemTrends]> key:item:
+        - if !<[merchant].has_flag[merchantData.supply.<[item]>]>:
+            - foreach next
+
+        - define realAvgValue <[value].get[averageValue].mul[<[sBias]>]>
+        - define positiveEffector <[value].get[averageSAR].mul[<[realAvgValue]>].add[<[value].get[SARRange]>]>
+        - define realFluctuationValue <[value].get[totalFluctuation].mul[<element[1].add[<[sBias]>]>]>
+        - define negativeEffector <[realFluctuationValue].sub[<[value].get[SARRange]>]>
+
+        - define sellEffectors.<[item]>:<[positiveEffector].sub[<[negativeEffector]>].round_to_precision[0.00001]>
+        - define sellEffectors.total:+:<[positiveEffector].sub[<[negativeEffector]>].round_to_precision[0.00001]>
+
+    - foreach <[sellEffectors].exclude[total]> key:item as:effector:
+        - define proportion <[effector].div[<[sellEffectors].get[total]>]>
+        - define itemAllocatedBalance <[spendableBalance].mul[<[proportion]>]>
+        - define buyPrice <[merchant].flag[merchantData.supply.<[item]>.price]>
+        - define sellPrice <[buyPrice].mul[<element[1].sub[<[sBias].div[2]>]>].round_up_to_precision[0.05]>
+        - define alloc <[itemAllocatedBalance].div[<[sellPrice]>].round_down>
+
+        - define allocations.<[item]>:<[alloc]>
+
+        - flag <[merchant]> merchantData.sellData.items.<[key]>.alloc:<[alloc]>
+        - flag <[merchant]> merchantData.sellData.items.<[key]>.spent:0
+        - flag <[merchant]> merchantData.sellData.items.<[key]>.price:<[sellPrice]>
+
+    - run flagvisualizer def.flag:<[allocations]> def.flagName:allocations
+
+    FindItemTrend:
+    - define sellAnalyses <[pastData].parse_value_tag[<[parse_value].deep_get[<[marketName]>.items.sellAnalysis]>]>
     - define itemTrends <map[]>
 
-    # - run flagvisualizer def.flag:<[buyAnalyses]> def.flagName:BA
-
-    - foreach <[buyAnalyses]> key:day as:data:
+    - foreach <[sellAnalyses]> key:day as:data:
         - foreach <[data]> key:item as:itemData:
-            - define itemTrends.<[item]>.SARs:->:<[itemData].get[saleToAmountRatio]>
+            - define itemTrends.<[item]>.SARList:->:<[itemData].get[saleToAmountRatio]>
             - define itemTrends.<[item]>.totalAmountItem:+:<[itemData].get[totalAmountItem]>
             - define itemTrends.<[item]>.totalValueItem:+:<[itemData].get[totalValueItem]>
 
     - foreach <[itemTrends]>:
-        - define itemTrends.<[key]>.SARRange:<[value].get[SARs].last.sub[<[value].get[SARs].first>]>
+        - define itemTrends.<[key]>.SARRange:<[value].get[SARList].last.sub[<[value].get[SARList].first>]>
+        - define itemTrends.<[key]>.averageValue:<[value].get[totalValueItem].div[<[value].get[totalAmountItem]>]>
+        - define itemTrends.<[key]>.totalFluctuation:0
+
+        - foreach <[value].get[SARList]> as:currSAR:
+            - define itemTrends.<[key]>.totalFluctuation:+:<[value].get[SARList].get[<[loop_index].sub[1]>].if_null[<[currSAR]>].sub[<[currSAR]>].abs>
+
+        - define itemTrends.<[key]>.averageSAR:<[value].get[SARList].average>
 
     - run flagvisualizer def.flag:<[itemTrends]> def.flagName:trends
 
 
-MerchantSellDecider:
+OLD_MerchantSellDecider:
     type: task
     definitions: merchant|marketName
     AnalyzeOneDay:
