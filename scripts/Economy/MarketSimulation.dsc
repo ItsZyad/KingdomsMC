@@ -1,7 +1,23 @@
+##
+## Contains all scripts relating to the daily simulation of the Kingdoms markets system.
+##
+## @Author: Zyad (ITSZYAD#9280)
+## @Date: Sep 2023
+## @Script Ver: v2.0
+##
+## ----------------END HEADER-----------------
+
 AssignPurchaseStrategy:
     type: task
-    definitions: merchant
+    definitions: merchant[NPCTag]
     script:
+    ## Assigns the given merchant an appropriate item purchase strategy based on its biases, wealth
+    ## and balance by modifying its merchantData flag with an assignedStrategy sub-flag.
+    ##
+    ## merchant : [NPCTag]
+    ##
+    ## >>> [Void]
+
     - define strategyQuals <script[MerchantStrategy_Qualifiers].data_key[strategy_list]>
     - define merchantData <[merchant].flag[merchantData]>
     - define closenessMap <map[]>
@@ -80,8 +96,15 @@ AssignPurchaseStrategy:
 
 MerchantPurchaseDecider:
     type: task
-    definitions: marketName|merchant
+    definitions: marketName[ElementTag(String)]|merchant[NPCTag]
     script:
+    ## Uses the given merchant's chosen strategy, past market demand, and sale data if they exist.
+    ## If no past market data exists, it will simply assign the merchant items and prices based on
+    ## how they show up in price-info.yml
+    ##
+    ## marketName : [ElementTag<String>]
+    ## merchant   : [NPCTag]
+
     - yaml load:economy_data/price-info.yml id:prices
 
     - narrate format:admincallout "Generating Market Items..."
@@ -379,7 +402,7 @@ MerchantSellDecider:
 
 MarketSubTickPriceAdjuster:
     type: task
-    definitions: marketName|merchant
+    definitions: marketName[ElementTag(String)]|merchant[NPCTag]
     script:
     ## Generates a map containing the degree to which a market's item prices must be adjusted in
     ## line with supply & demand. This data is used at the sub-tick level (by default, every in-
