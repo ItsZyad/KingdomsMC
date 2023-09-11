@@ -1,36 +1,8 @@
-DailySimulationUpdate:
+AssignPurchaseStrategy:
     type: task
+    definitions: merchant
     script:
-    - define markets <server.flag[economy.markets]>
-
-    - foreach <[markets]> as:market:
-        - define marketName <[key]>
-        - define merchants <[market].get[merchants]>
-        - define attrac <[market].get[attractiveness]>
-
-        - foreach <[merchants]> as:merc:
-            - define balance <[merc].flag[merchantData.balance]>
-            - define wealth <[merc].flag[merchantData.wealth]>
-            - flag <[merc]> merchantData.balance:<[wealth]> if:<[balance].exists.not>
-            - flag <[merc]> merchantData.balance:<[wealth].add[<[balance]>]> if:<[balance].exists>
-
-            - run OLD_MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
-            - run OLD_MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
-
-
-UpdateMerchant:
-    type: task
-    definitions: merchant|marketName
-    script:
-    - run OLD_MerchantPurchaseDecider def.merchant:<[merc]> def.marketName:<[marketName]>
-    - run OLD_MerchantSellDecider def.merchant:<[merc]> def.marketName:<[marketName]>
-
-
-# Runs for every merchant in a market and calculates what items it should prioritize buying
-OLD_MerchantPurchaseDecider:
-    type: task
-    definitions: marketName|merchant
-    CalculateCloseness:
+    - define strategyQuals <script[MerchantStrategy_Qualifiers].data_key[strategy_list]>
     - define merchantData <[merchant].flag[merchantData]>
     - define closenessMap <map[]>
 
@@ -92,16 +64,34 @@ OLD_MerchantPurchaseDecider:
         - define stratCloseness <[stratCloseness].div[<[stratInfo].size>]>
         - define closenessMap.<[strat]>.totalCloseness:<[stratCloseness].round_to_precision[0.0001]>
 
+    - definemap closestStrat:
+        name: null
+        closeness: 0
+
+    - foreach <[closenessMap]> key:strat as:info:
+        - define stratCloseness <[info].get[totalCloseness]>
+
+        - if <[stratCloseness]> > <[closestStrat].get[closeness]>:
+            - define closestStrat.closeness:<[stratCloseness]>
+            - define closestStrat.name:<[strat]>
+
+    - flag <[merchant]> merchantData.assignedStrategy:<[closestStrat]>
+
+
+MerchantPurchaseDecider:
+    type: task
+    definitions: marketName|merchant
     script:
     - yaml load:economy_data/price-info.yml id:prices
+
+    - narrate format:admincallout "Generating Market Items..."
 
     - define allItems <list[]>
     - define market <server.flag[economy.markets.<[marketName]>]>
     - define spec <[merchant].flag[merchantData.spec]>
     - define balance <[merchant].flag[merchantData.balance]>
-    - define wealth <[merchant].flag[merchantData.wealth]>
     - define sBias <[merchant].flag[merchantData.spendBias]>
-    - define supplyPriceMod <[market].get[supplierPriceMod]>
+    - define supplyPriceMod <[market].get[supplierPriceMod].if_null[1]>
     - define qBias <[merchant].flag[merchantData.quantityBias].round_to_precision[0.05]>
     - define qBias:+:0.05 if:<[qBias].equals[0]>
 
@@ -120,24 +110,9 @@ OLD_MerchantPurchaseDecider:
         - foreach <[allItemsRaw]> as:item key:itemName:
             - define allItems:->:<[item].include[<map[name=<[itemName]>]>]>
 
-    # - narrate format:debug <[group]>
+    - yaml id:prices unload
 
-    - define strategyQuals <script[MerchantStrategy_Qualifiers].data_key[strategy_list]>
-    - inject <script.name> path:CalculateCloseness
-
-    ##- run FlagVisualizer def.flag:<[closenessMap]> def.flagName:closenessMap
-
-    - definemap closestStrat:
-        name: null
-        closeness: 0
-
-    - foreach <[closenessMap]> key:strat as:info:
-        - define stratCloseness <[info].get[totalCloseness]>
-
-        - if <[stratCloseness]> > <[closestStrat].get[closeness]>:
-            - define closestStrat.closeness:<[stratCloseness]>
-            - define closestStrat.name:<[strat]>
-
+    - define closestStrat <[merchant].flag[merchantData.assignedStrategy]>
     - define strategyBehaviour <script[MerchantStrategy_Behaviour].data_key[strategy_list.<[closestStrat].get[name]>]>
     - define strategyLoopIter <[strategyBehaviour].get[loop_iterations].if_null[2]>
     - define strategyLoopIter 7 if:<[strategyLoopIter].is[MORE].than[7]>
@@ -146,12 +121,6 @@ OLD_MerchantPurchaseDecider:
     - define priceFilterLow <[strategyBehaviour].deep_get[price_filter.low].if_null[0]>
     - define priceFilterHigh <[strategyBehaviour].deep_get[price_filter.high].if_null[1000]>
     - define priceControlledItems <[allItems].filter_tag[<[filter_value].get[base].is[OR_LESS].than[<[priceFilterHigh]>].and[<[filter_value].get[base].is[OR_MORE].than[<[priceFilterLow]>]>]>].sort_by_value[get[base]]>
-
-    # - narrate format:debug ALL:<[allItems]>
-    # - narrate format:debug PCI_OLD:<[priceControlledItems]>
-
-    ##- run flagvisualizer def.flag:<[priceControlledItems]> def.flagName:PCI
-    ##- determine cancelled
 
     - if <[priceControlledItems].size> < 2:
         - define allItemsSorted <[allItems].sort_by_value[get[base]]>
@@ -169,177 +138,156 @@ OLD_MerchantPurchaseDecider:
         # Regenerate PCI
         - define priceControlledItems <[allItems].filter_tag[<[filter_value].get[base].is[OR_LESS].than[<[priceFilterHigh]>].and[<[filter_value].get[base].is[OR_MORE].than[<[priceFilterLow]>]>]>].sort_by_value[get[base]]>
 
-    # - narrate format:debug PFL:<[priceFilterLow]>
-    # - narrate format:debug PFH:<[priceFilterHigh]>
-
     - define priceBiasThreshold <[priceControlledItems].size.mul[<[strategyPriceBias]>].round>
     - define afterThresholdItems <[priceControlledItems].get[<[priceBiasThreshold]>].to[last]>
     - define newFirstItemIndex <[priceBiasThreshold].sub[<[afterThresholdItems].size>]>
     - define newFirstItemIndex 1 if:<[newFirstItemIndex].is[OR_LESS].than[0]>
     - define beforeThresholdItems <[priceControlledItems].get[<[newFirstItemIndex]>].to[<[priceBiasThreshold]>]>
 
-    # - narrate format:debug PBT:<[priceBiasThreshold]>
-    # - narrate format:debug ATI:<[afterThresholdItems]>
-    # - narrate format:debug BTI:<[beforeThresholdItems]>
-
     - define biasControlledItems <[beforeThresholdItems].include[<[afterThresholdItems]>]>
-    - define itemAmount <[biasControlledItems].size>
     - define originalBalance <[merchant].flag[merchantData.balance]>
     - define originalSpendableBalance <[balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
-    - define iterations 0
 
-    # - run FlagVisualizer def.flagName:BCI_NEW def.flag:<[biasControlledItems].random[<[biasControlledItems].size>]>
-    # - run FlagVisualizer def.flag:<[strategyBehaviour]> def.flagName:strat
-    # - determine cancelled
+    # Duplicate items as per the chosen strategy's iterations value
+    - repeat <[strategyLoopIter].sub[1]>:
+        - define biasControlledItems <[biasControlledItems].include[<[biasControlledItems]>]>
 
-    # - narrate format:debug BAL:<[balance]>
-    # - narrate format:debug COR_BAL:<[merchant].flag[merchantData.balance].sub[<[originalBalance].div[50]>]>
-    # - narrate format:debug STR:<[strategyLoopIter]>
+    # Get market demand info if it exists
+    - if <server.has_flag[economy.markets.<[marketName]>.buyData]>:
+        - run PurchaseAnalysisGenerator def.market:<[marketName]> save:demandInfo
+        - define sortedItemDemand <entry[demandInfo].created_queue.determination.get[1].get[items].to_pair_lists.sort_by_value[get[2].get[saleToAmountRatio]]>
 
-    - while <[iterations]> < <[strategyLoopIter]> && <[merchant].flag[merchantData.balance].sub[<[originalBalance].div[50]>]> > <[originalBalance].sub[<[originalSpendableBalance]>]>:
-        - foreach <[biasControlledItems].random[<[biasControlledItems].size>]> as:item:
+    - else:
+        - define sortedItemDemand <list[]>
 
-            # If the market does not contain the current item then skip
-            - if !<server.flag[economy.markets.<[marketName]>.supplyMap.current].keys.contains[<[item].get[name]>]>:
+    - foreach <[biasControlledItems].random[<[biasControlledItems].size>]> as:item:
+        - define availableSupply <server.flag[economy.markets.<[marketName]>.supplyMap.current.<[item].get[name]>]>
+
+        - if <[availableSupply]> <= 0:
+            - foreach next
+
+        # If the item has a demand history then skip; relegate to the demand price handler
+        - if <[item].get[name].is_in[<[sortedItemDemand].parse_tag[<[parse_value].get[1]>]>]>:
+            - define itemAnalysis <[sortedItemDemand].get[<[sortedItemDemand].parse_tag[<[parse_value].get[1]>].find[<[item].get[name]>]>].get[2]>
+            - define SAR <[itemAnalysis].get[saleToAmountRatio]>
+            - define totalSold <[itemAnalysis].get[totalAmountItem]>
+            - define lowest <[itemAnalysis].deep_get[sellPriceInfo.min]>
+            - define highest <[itemAnalysis].deep_get[sellPriceInfo.max]>
+            - define mean <[itemAnalysis].deep_get[sellPriceInfo.average]>
+
+            - inject <script.name> path:CalculateItemPurchaseAmount
+
+            - if <[reasonablePurchaseAmount]> <= 0:
                 - foreach next
 
-            - define base <[item].get[base]>
-            - define balance <[merchant].flag[merchantData.balance]>
-            - define availableSupply <server.flag[economy.markets.<[marketName]>.supplyMap.current.<[item].get[name]>]>
-            - define spendableBalance <[balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
+            - inject <script.name> path:CalculatePurchasedItemsPrice
 
-            # Buy Multiplier Equation:
-            # y = (xs / 2i) + (s / i) + 0.45
-            # where: x = current item index
-            #        s = sBias
-            #        i = total items in BCI
-            - define purchaseAmountMultiplier <element[<[loop_index].mul[<[sBias]>]>].div[<[biasControlledItems].size.mul[2]>].add[<[sBias].div[<[biasControlledItems].size.mul[2]>]>].add[0.45]>
+            - narrate format:admincallout "<red>Adujsted Price Data For: <[item].get[name].color[red]>"
+            - flag <[merchant]> merchantData.balance:-:<[supplyPrice]>
+            - flag <[merchant]> merchantData.supply.<[item].get[name]>.quantity:+:<[reasonablePurchaseAmount].round>
+            - flag <[merchant]> merchantData.supply.<[item].get[name]>.price:<[newSellPrice]>
+            - flag server economy.markets.<[marketName]>.supplyMap.current.<[item].get[name]>:-:<[reasonablePurchaseAmount].round>
 
-            - define reasonablePurchaseAmount <[spendableBalance].div[<[base].div[<[itemAmount]>]>].power[0.37].round>
-            - define reasonablePurchaseAmount <[reasonablePurchaseAmount].mul[<[purchaseAmountMultiplier]>].round>
-            - define supplyPrice <[reasonablePurchaseAmount].mul[<[base].mul[<[supplyPriceMod]>]>]>
+            - foreach next
 
-            - if <[spendableBalance].is[LESS].than[<[supplyPrice]>]>:
-                - foreach next
+        # If the balance drops below the point where the merchant's spend bias no longer allows
+        # purchases, then skip
+        - if <[merchant].flag[merchantData.balance].sub[<[originalBalance].div[50]>]> <= <[originalBalance].sub[<[originalSpendableBalance]>]>:
+            - narrate format:debug "Merchant balance too low!"
+            - foreach stop
 
-            # Only tries to buy anything if there is supply in the supply matrix
-            - if <[availableSupply]> > 0:
-                # - narrate format:debug RPA_OLD:<[reasonablePurchaseAmount]>
+        # If the market does not contain the current item then skip
+        - if !<server.flag[economy.markets.<[marketName]>.supplyMap.current].keys.contains[<[item].get[name]>]>:
+            - narrate format:debug "Market does not contain current item: <[item].get[name].color[white]>!"
+            - foreach next
 
-                # Rescales the amount that the merchant wants to purchase if the amount in the supply
-                # matrix is less than the original purchase amount
-                - if <[reasonablePurchaseAmount]> > <[availableSupply]>:
-                    # Purchase multiplier equation:
-                    # y = round(x / (r / 20))
-                    # where: r = reasonablePurchaseAmount
-                    #        x = availableSupply
-                    - define reasonablePurchaseAmount <[availableSupply].div[<element[<[reasonablePurchaseAmount].div[20]>]>].round>
+        # Initialize this loop's balance/sBias-affected balance values
+        - define balance <[merchant].flag[merchantData.balance]>
+        - define spendableBalance <[balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
 
-                # If there is market demand off which to base future purchases on then run the market
-                # demand script (which only works with non-zero values, so that's why I'm doing my
-                # checks over here).
-                - if <[market].keys.contains[marketDemand]> && <[market].get[marketDemand].keys.contains[<[item]>]>:
-                    - foreach next
+        # Buy Multiplier Equation:
+        # y = (xs / 2i) + (s / i) + 0.45
+        # where: x = current item index
+        #        s = sBias
+        #        i = total items in BCI
+        - define purchaseAmountMultiplier <element[<[loop_index].mul[<[sBias]>]>].div[<[biasControlledItems].size.mul[2]>].add[<[sBias].div[<[biasControlledItems].size.mul[2]>]>].add[0.45]>
 
-                - else if <[reasonablePurchaseAmount]> > 0:
-                    - flag <[merchant]> merchantData.balance:-:<[supplyPrice]>
-                    - flag <[merchant]> merchantData.supply.<[item].get[name]>.quantity:+:<[reasonablePurchaseAmount].round>
-                    - flag <[merchant]> merchantData.supply.<[item].get[name]>.price:<[base]>
-                    - flag server economy.markets.<[marketName]>.supplyMap.current.<[item].get[name]>:-:<[reasonablePurchaseAmount].round>
-                    # - narrate format:debug "ADDED <[reasonablePurchaseAmount].round> OF <[item].get[name]> FOR $<[supplyPrice].round_to_precision[0.001]>"
+        - define reasonablePurchaseAmount <[spendableBalance].div[<[item].get[base].div[<[biasControlledItems].size>]>].power[0.37].mul[<[purchaseAmountMultiplier]>].round>
+        - define supplyPrice <[reasonablePurchaseAmount].mul[<[item].get[base].mul[<[supplyPriceMod]>]>]>
 
-            - else:
-                - foreach next
+        # Rescales the amount that the merchant wants to purchase if the amount in the supply
+        # matrix is less than the original purchase amount
+        - if <[reasonablePurchaseAmount]> > <[availableSupply]>:
 
-            # - narrate format:debug -------------------------------
+            # Purchase multiplier equation:
+            # y = round(x / (r / 20))
+            # where: r = reasonablePurchaseAmount
+            #        x = availableSupply
+            - define reasonablePurchaseAmount <[availableSupply].div[<element[<[reasonablePurchaseAmount].div[20]>]>].round>
 
-        - define iterations:++
+        # If there is market demand off which to base future purchases on then run the market
+        # demand script (which only works with non-zero values, so that's why I'm doing my checks
+        # over here).
+        - if <[market].keys.contains[marketDemand]> && <[market].get[marketDemand].keys.contains[<[item]>]>:
+            - foreach next
+
+        - else if <[reasonablePurchaseAmount]> > 0:
+            - narrate format:admincallout "<gold>Adujsted Price Data For: <[item].get[name].color[red]>"
+            - flag <[merchant]> merchantData.balance:-:<[supplyPrice]>
+            - flag <[merchant]> merchantData.supply.<[item].get[name]>.quantity:+:<[reasonablePurchaseAmount].round>
+            - flag <[merchant]> merchantData.supply.<[item].get[name]>.price:<[item].get[base]>
+            - flag server economy.markets.<[marketName]>.supplyMap.current.<[item].get[name]>:-:<[reasonablePurchaseAmount].round>
 
     - flag <[merchant]> cachedInterface:!
 
-    - run PurchaseAnalysisGenerator def.market:<[marketName]> save:demandInfo
-    - define demandInfo <entry[demandInfo].created_queue.determination.get[1]>
-    - define sortedItemDemand <[demandInfo].get[items].to_pair_lists.sort_by_value[get[2].get[saleToAmountRatio]]>
+    CalculateItemPurchaseAmount:
+    # Demand amount response equation:
+    # y.1 = 6 * sqrt(x + 49.57255xs ^ 2)
+    - define amountReg <element[6].mul[<[totalSold].add[<element[49.57255].mul[<[totalSold].mul[<[SAR].power[2]>]>]>].sqrt>]>
 
-    - foreach <[sortedItemDemand]>:
-        - define itemName <[value].get[1]>
-        - define itemAnalysis <[value].get[2]>
-        - define trueBase <[allItems].get[<[itemName]>]>
-        - define SAR <[itemAnalysis].get[saleToAmountRatio]>
-        - define totalSold <[itemAnalysis].get[totalAmountItem]>
-        - define lowest <[itemAnalysis].deep_get[sellPriceInfo.min]>
-        - define stDev <[itemAnalysis].deep_get[sellPriceInfo.stDev]>
-        - define highest <[itemAnalysis].deep_get[sellPriceInfo.max]>
-        - define mean <[itemAnalysis].deep_get[sellPriceInfo.average]>
-        - define availableSupply <server.flag[economy.markets.<[marketName]>.supplyMap.current.<[itemName]>]>
+    # Demand amount response randomization maximum:
+    # y.2 = (0.8 + s) * 1.6 * y.1 + y.1^s
+    - define amountMax <element[0.8].add[<[SAR]>].mul[1.6].mul[<[amountReg]>].add[<[amountReg].power[<[SAR]>]>]>
 
-        # Demand amount response equation:
-        # y.1 = 6 * sqrt(x + 49.57255xs ^ 2)
-        - define amountReg <element[6].mul[<[totalSold].add[<element[49.57255].mul[<[totalSold].mul[<[SAR].power[2]>]>]>].sqrt>]>
+    # Demand amount response randomization minimum:
+    # y.3 = abs(y.1 - y.2 / 3)
+    - define amountMin <element[<[amountReg].sub[<[amountMax]>]>].div[3].abs>
 
-        # Demand amount response randomization maximum:
-        # y.2 = (0.8 + s) * 1.6 * y.1 + y.1^s
-        - define amountMax <element[0.8].add[<[SAR]>].mul[1.6].mul[<[amountReg]>].add[<[amountReg].power[<[SAR]>]>]>
+    - define qAdjustedMin <[amountMin].mul[<[qBias].add[1]>].round>
+    - define reasonablePurchaseAmount <util.random.int[<[qAdjustedMin]>].to[<util.random.int[<[amountReg].round>].to[<[amountMax].round>]>]>
 
-        # Demand amount response randomization minimum:
-        # y.3 = abs(y.1 - y.2 / 3)
-        - define amountMin <element[<[amountReg].sub[<[amountMax]>]>].div[3].abs>
+    - if <[reasonablePurchaseAmount]> > <[availableSupply]>:
+        # Purchase multiplier equation:
+        # m = (3a / sqrt(r/a) * 4r) ^ 2
+        # where: a: availableBalance
+        #        r: reasonablePurchaseAmount
+        - define purchaseMultiplier <element[<[availableSupply].mul[3]>].div[<element[<[reasonablePurchaseAmount].div[<[availableSupply]>]>].sqrt.mul[4].mul[<[reasonablePurchaseAmount]>]>].power[2].add[0.2].if_null[0]>
+        - define reasonablePurchaseAmount <[purchaseMultiplier].mul[<[availableSupply]>].round>
 
-        # Adjusting the minimum value by multiplying it by the merchant's qBias to narrow the
+    CalculatePurchasedItemsPrice:
+    # The combined price of all the purchased item as sold by the static supplier price
+    - define supplyPrice <[allItems].filter_tag[<[filter_value].get[name]>].get[1].get[base].mul[<[reasonablePurchaseAmount]>]>
+
+    # Demand price response equation:
+    # y.1 = x * (0.66 + s)^2 * h / 1.15l
+    - define priceReg <[mean].mul[<element[0.66].add[<[SAR]>].power[2]>].mul[<element[<[highest].div[<element[1.15].mul[<[lowest]>]>]>]>]>
+
+    # Demand price response randomization maximum:
+    # y.2 = (0.2 + s) * x + y.1
+    - define priceMax <element[0.2].add[<[SAR]>].mul[<[mean]>].add[<[priceReg]>]>
+
+    - if <[SAR].is[OR_LESS].than[0.34]>:
+        # Demand price response randomization minimum:
+        # y.3 = (0.5s - 0.19) * x + y.1
+        - define priceMin <[SAR].mul[0.5].sub[0.19].mul[<[mean]>].add[<[priceReg]>]>
+
+        # Adjusting the minimum value by multiplying it by the merchant's sBias to narrow the
         # randomization space.
-        - define qAdjustedMin <[amountMin].mul[<[qBias].add[1]>].round>
-        - define reasonablePurchaseAmount <util.random.int[<[qAdjustedMin]>].to[<util.random.int[<[amountReg].round>].to[<[amountMax].round>]>]>
+        - define sAdjustedMin <[priceMin].mul[<[sBias].add[1]>]>
+        - define newSellPrice <util.random.decimal[<util.random.decimal[<[sAdjustedMin]>].to[<[priceReg]>]>].to[<[priceMax]>].round_to_precision[0.025]>
 
-        # - narrate format:debug ITM_DEM:<[itemName]>
-        # - narrate format:debug PUR_ORI:<[reasonablePurchaseAmount]>
-
-        - if <[reasonablePurchaseAmount]> > <[availableSupply]>:
-            # Purchase multiplier equation:
-            # m = (3a / sqrt(r/a) * 4r) ^ 2
-            # where: a: availableBalance
-            #        r: reasonablePurchaseAmount
-            - define purchaseMultiplier <element[<[availableSupply].mul[3]>].div[<element[<[reasonablePurchaseAmount].div[<[availableSupply]>]>].sqrt.mul[4].mul[<[reasonablePurchaseAmount]>]>].power[2].add[0.2]>
-            - define reasonablePurchaseAmount <[purchaseMultiplier].mul[<[availableSupply]>].round>
-
-        # The combined price of all the purchased item as sold by the static supplier price
-        - define supplyPrice <[allItems].deep_get[<[itemName]>.base].mul[<[reasonablePurchaseAmount]>]>
-
-        # Demand price response equation:
-        # y.1 = x * (0.66 + s)^2 * h / 1.15l
-        - define priceReg <[mean].mul[<element[0.66].add[<[SAR]>].power[2]>].mul[<element[<[highest].div[<element[1.15].mul[<[lowest]>]>]>]>]>
-
-        # Demand price response randomization maximum:
-        # y.2 = (0.2 + s) * x + y.1
-        - define priceMax <element[0.2].add[<[SAR]>].mul[<[mean]>].add[<[priceReg]>]>
-
-        - if <[SAR].is[OR_LESS].than[0.34]>:
-            # Demand price response randomization minimum:
-            # y.3 = (0.5s - 0.19) * x + y.1
-            - define priceMin <[SAR].mul[0.5].sub[0.19].mul[<[mean]>].add[<[priceReg]>]>
-
-            # Adjusting the minimum value by multiplying it by the merchant's sBias to narrow the
-            # randomization space.
-            - define sAdjustedMin <[priceMin].mul[<[sBias].add[1]>]>
-            - define newSellPrice <util.random.decimal[<util.random.decimal[<[sAdjustedMin]>].to[<[priceReg]>]>].to[<[priceMax]>].round_to_precision[0.025]>
-
-        - else:
-            - define newSellPrice <util.random.decimal[<[priceReg]>].to[<[priceMax]>]>
-
-        # - narrate format:debug PUR_NEW:<[reasonablePurchaseAmount]>
-        # - narrate format:debug SEL_ORI:<[mean]>
-        # - narrate format:debug SEL_NEW:<[newSellPrice]>
-        # - narrate format:debug ----------------------------------
-
-        - flag <[merchant]> merchantData.balance:-:<[supplyPrice]>
-        - flag <[merchant]> merchantData.supply.<[itemName]>.quantity:+:<[reasonablePurchaseAmount]>
-        - flag <[merchant]> merchantData.supply.<[itemName]>.price:<[newSellPrice]>
-        - flag <[merchant]> merchantData.supply.<[itemName]>.lastWeekAvg:<[mean]>
-        - flag server economy.markets.<[marketName]>.supplyMap.current.<[item].get[name]>:-:<[reasonablePurchaseAmount]>
-
-    # - narrate format:debug SPM:<[supplyPriceMod]>
-    # - narrate format:debug SPEN:<[spendableBalance]>
-
-    - yaml id:prices unload
+    - else:
+        - define newSellPrice <util.random.decimal[<[priceReg]>].to[<[priceMax]>]>
 
 
 MerchantSellDecider:
@@ -429,86 +377,150 @@ MerchantSellDecider:
     - run flagvisualizer def.flag:<[itemTrends]> def.flagName:trends
 
 
-OLD_MerchantSellDecider:
+MarketSubTickPriceAdjuster:
     type: task
-    definitions: merchant|marketName
-    AnalyzeOneDay:
-    - define sellAttractivenessIndex <map[]>
-    - define marketTotalValue <[data].get[totalValue]>
-
-    - foreach <[data].get[items]> as:item key:itemName:
-        - if !<[itemName].is_in[<[merchant].flag[merchantData.supply].keys>]>:
-            - foreach next
-
-        - define SAR <[item].get[saleToAmountRatio]>
-        - define totalValue <[item].get[totalValueItem]>
-        - define totalAmount <[item].get[totalAmountItem]>
-        - define adjustedStDev <[totalAmount].div[<[item].deep_get[sellPriceInfo.stDev]>]>
-        - define adjustedStDev 0 if:<[adjustedStDev].equals[infinity]>
-
-        # Sell attractiveness equation:
-        # x = (20yv) / t * (d + 1)
-        # where: y: SAR
-        #        v: totalValue
-        #        t: marketTotalValue
-        #        d: adjustedStDev
-        - define sellAttractiveness <element[<[SAR].mul[<[totalValue]>].mul[20]>].div[<element[<[adjustedStDev].add[1]>].mul[<[marketTotalValue]>]>]>
-        - define sellAttractivenessIndex.<[itemName]>:<[sellAttractiveness].round_to_precision[0.0001]>
-
-    - define SAR:!
-    - define totalValue:!
-    - define totalAmount:!
-    - define adjustedStDev:!
-
-    AnalyzeOldData:
-    # Note: You could do something liek checking which items have been sold that day and then
-    #       just doing a general calculation using the overall SAR and then add a certain flat
-    #       value to to the attractiveness of every item that was sold that day
-    - narrate WIP
-
+    definitions: marketName|merchant
     script:
-    - yaml load:economy_data/past-economy-data.yml id:p
-    - define marketFilteredRecentData <yaml[p].read[past_data.recent].as[map].parse_value_tag[<[parse_value].get[<[marketName]>]>]>
-    - define marketFilteredOldData <yaml[p].read[past_data.old].as[map].parse_value_tag[<[parse_value].get[<[marketName]>]>].if_null[null]>
-    - define grandTotalValue 0
-    - define grandTotalAmount 0
+    ## Generates a map containing the degree to which a market's item prices must be adjusted in
+    ## line with supply & demand. This data is used at the sub-tick level (by default, every in-
+    ## game day) to inform on-the-fly merchant price adjustments.
+    ##
+    ## Note: sub-tick adjustments in the merchants' going prices for goods may or may not carry
+    ## over into the next week. Main tick adjustments should take into account the final changed
+    ## price each item was at in the end of the last sub-tick adjustment however, they may be lower
+    ## than the (yet-to-be-implemented) minimum reasonable price for every item.
+    ##
+    ## marketName : [ElementTag<String>]
+    ## merchant   : [NPCTag]
+    ##
+    ## >>> [ListTag<ElementTag>]
 
-    - if <[marketFilteredRecentData].is_empty>:
-        - determine cancelled
+    # Note: replace with KAPI calls
+    - if <server.has_flag[economy.markets.<[marketName]>.sellData]>:
+        - run SellAnalysisGenerator def.market:<[marketName]> save:sellAnalysis
+        - define sellAnalysis <entry[sellAnalysis].created_queue.determination.get[1]>
 
-    - if <yaml[p].contains[past_data.old]> || <[marketFilteredOldData]> != null:
-        - inject <script.name> path:AnalyzeOldData
+        - run flagvisualizer def.flag:<[sellAnalysis]> def.flagName:sellAnalysis
 
-    - define overallSAI <map[]>
+    - if <server.has_flag[economy.markets.<[marketName]>.buyData]>:
+        - run PurchaseAnalysisGenerator def.market:<[marketName]> save:buyAnalysis
+        - define buyAnalysis <entry[buyAnalysis].created_queue.determination.get[1]>
 
-    - foreach <[marketFilteredRecentData]> as:data:
-        - define grandTotalValue:+:<[data].get[totalValue]>
-        - define grandTotalAmount:+:<[data].get[totalAmount]>
+        - run flagvisualizer def.flag:<[buyAnalysis]> def.flagName:buyAnalysis
 
-        - inject <script.name> path:AnalyzeOneDay
+    - if !<[buyAnalysis].exists>:
+        - define validMerchants <server.flag[economy.markets.<[marketName]>.merchants].filter_tag[<[filter_value].flag[merchantData.supply].keys.contains[<[sellAnalysis].get[items].keys>]>].parse_tag[<[parse_value].as[npc]>]>
+        - inject <script.name> path:AnalyzeSellDataOnly
 
-        - define overallSAI <[overallSAI].parse_value_tag[<[parse_value].add[<[sellAttractivenessIndex].get[<[parse_key]>]>]>]>
-        - define overallSAI <[sellAttractivenessIndex]> if:<[overallSAI].is_empty>
+        - determine <[sellAnalysis].get[items].keys>
 
-    - yaml id:p unload
+    - else if !<[sellAnalysis].exists>:
+        - define validMerchants <server.flag[economy.markets.<[marketName]>.merchants].filter_tag[<[filter_value].flag[merchantData.supply].keys.contains[<[buyAnalysis].get[items].keys>]>].parse_tag[<[parse_value].as[npc]>]>
+        - inject <script.name> path:AnalyzeBuyDataOnly
 
-    - define overallSAI <[overallSAI].parse_value_tag[<[parse_value].div[<[marketFilteredRecentData].size>]>]>
+        - determine <[buyAnalysis].get[items].keys>
 
-    # TODO: Do some analysis on the old data that would generated from path:AnalyzeOldData
+    - else:
+        - foreach <[sellAnalysis].get[items]> key:item as:data:
+            - if !<[merchant].flag[merchantData.supply].keys.contains[<[item]>]>:
+                - foreach next
 
-    - run flagvisualizer def.flag:<[overallSAI]> def.flagName:overall
+            - if <[buyAnalysis].deep_get[items.<[item]>].exists>:
+                - define newSAR <[data].get[saleToAmountRatio].sub[<[buyAnalysis].deep_get[items.<[item]>.saleToAmountRatio]>]>
+                # - define overallSold <[data].get[totalAmountItem].sub[<[buyAnalysis].deep_get[items.<[item]>.totalAmountItem]>]>
+                # - define overallValue <[data].get[totalValueItem].sub[<[buyAnalysis].deep_get[items.<[item]>.totalValueItem]>]>
 
+                - if <[newSAR]> > 0:
+                    - define priceIncrease <[merchant].flag[merchantData.supply.<[item]>.price].mul[<[newSAR].add[1]>].round_to_precision[0.01]>
+                    - narrate format:debug "Price increase for: <[item].color[red]>; <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> -<&gt> <[priceIncrease].color[red]>"
+
+                - else:
+                    - define priceDecrease <[merchant].flag[merchantData.supply.<[item]>.price].sub[<[merchant].flag[merchantData.supply.<[item]>.price].mul[<[newSAR].abs>]>].round_to_precision[0.01]>
+                    - narrate format:debug "Price decrease for: <[item].color[aqua]>; <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> -<&gt> <[priceDecrease].color[aqua]>"
+
+        - determine <[buyAnalysis].get[items].keys.include[<[sellAnalysis].get[items].keys>].deduplicate>
+
+    AnalyzeSellDataOnly:
     - define sBias <[merchant].flag[merchantData.spendBias]>
 
-    - foreach <[overallSAI]> as:index:
-        ##
-        ## BIG NOTE: If ever you need to add large world economic events like financial crashes etc.
-        ##           and you need it to impact the way that merchants price their goods this is
-        ##           where you would modify that. VVV
-        ##
-        - define buyPrice <[merchant].flag[merchantData.supply.<[key]>.price]>
-        - define sellPrice <[buyPrice].mul[<element[1].sub[<[sBias].div[2]>]>].round_up_to_precision[0.05]>
+    # If the SAR for a given item is below this threshold then the price won't be changed
+    - define priceIncreaseThreshold <[sBias].power[1.941629877]>
 
-        - flag <[merchant]> merchantData.sellData.items.<[key]>.alloc:<[merchant].flag[merchantData.balance].mul[<[index]>]>
-        - flag <[merchant]> merchantData.sellData.items.<[key]>.spent:0
-        - flag <[merchant]> merchantData.sellData.items.<[key]>.price:<[sellPrice]>
+    - foreach <[sellAnalysis].get[items]> key:item as:data:
+        - define SAR <[data].get[saleToAmountRatio]>
+
+        - if <[SAR]> > <[priceIncreaseThreshold]>:
+            - foreach next
+
+        - define priceIncrease <[merchant].flag[merchantData.supply.<[item]>.price].mul[<[SAR].add[1]>].round_to_precision[0.01]>
+
+        - flag <[merchant]> merchantData.supply.<[item]>.lastWeekAvg:<[merchant].flag[merchantData.supply.<[item]>.price]>
+        - flag <[merchant]> merchantData.supply.<[item]>.price:<[priceIncrease]>
+
+        - narrate format:debug "Price increased for: <[item].color[red]> from: <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> to: <[priceIncrease].color[red]>"
+
+    AnalyzeBuyDataOnly:
+    - define sBias <[merchant].flag[merchantData.spendBias]>
+
+    # If the SAR for a given item is below this threshold then the price won't be changed
+    - define priceDecreaseThreshold <[sBias].power[1.941629877]>
+
+    - foreach <[buyAnalysis].get[items]> key:item as:data:
+        - define SAR <[data].get[saleToAmountRatio]>
+
+        - if <[SAR]> > <[priceIncreaseThreshold]>:
+            - foreach next
+
+        - define priceDecrease <[merchant].flag[merchantData.supply.<[item]>.price].sub[<[merchant].flag[merchantData.supply.<[item]>.price].mul[<[SAR]>]>].round_to_precision[0.01]>
+
+        - flag <[merchant]> merchantData.supply.<[item]>.lastWeekAvg:<[merchant].flag[merchantData.supply.<[item]>.price]>
+        - flag <[merchant]> merchantData.supply.<[item]>.price:<[priceDecrease]>
+
+        - narrate format:debug "Price decreased for: <[item].color[aqua]> from: <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> to: <[priceDecrease].color[aqua]>"
+
+
+MarketSubTick_Handler:
+    type: world
+    enabled: false
+    events:
+        on system time minutely every:140:
+        - ~run OldMarketDataRecorder
+
+        - foreach <server.flag[economy.markets]> as:market:
+            - foreach <[merchants]> as:merchant:
+                - run MarketSubTickPriceAdjuster def.marketName:<[market]> def.merchant:<[merchant]>
+
+
+MarketTick_Handler:
+    type: world
+    enabled: false
+    events:
+        on system time minutely every:560:
+        - foreach <server.flag[economy.markets]> as:market:
+            - define merchantAmount <server.flag[economy.markets.<[market]>.merchants].size.mul[1.5].round_up>
+
+            - run SupplyAmountCalculator def.marketSize:<[merchantAmount]> def.spawnChance:1 save:supplyAmount
+            - define supply <entry[supplyAmount].created_queue.determination.get[1]>
+
+            - flag server economy.markets.<[market]>.supplyMap.original:<[supply]>
+            - flag server economy.markets.<[market]>.supplyMap.current:<[supply]>
+
+            - foreach <[merchants]> as:merchant:
+                - define balance <[merc].flag[merchantData.balance]>
+                - define wealth <[merc].flag[merchantData.wealth]>
+
+                # Note: future configurable(?)
+                # How much of the merchant's wealth should be earned back by them each week? As of
+                # now I'm settled on 1/4 of wealth returned weekly to simulate a monthly paycheck.
+                - flag <[merc]> merchantData.balance:<[wealth].div[4]> if:<[balance].exists.not>
+                - flag <[merc]> merchantData.balance:<[wealth].div[4].add[<[balance]>]> if:<[balance].exists>
+
+                - run AssignPurchaseStrategy def.merchant:<[merchant]>
+                - run MerchantPurchaseDecider def.marketName:<[market]> def.merchant:<[merchant]>
+                - run MerchantSellDecider def.marketName:<[market]> def.merchant:<[merchant]>
+
+        # The main tick should handle:
+        #x 1. Merchant re-purchasing new resources (See old demand response code + NewMerchantPriceDecider)
+        #* 2. Proper re-adjustments of prices (based on old data as well as recent)
+        #x 3. Merchant refreshing balance (see if a yearly or monthly salary makes more sense)
+        #x 4. Market supply refresh (this one should probably be first)
