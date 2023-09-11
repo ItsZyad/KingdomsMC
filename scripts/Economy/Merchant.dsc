@@ -75,7 +75,7 @@ RunMerchantInterface:
         - flag <[item]> quantity:<[quantity]>
         - flag <[item]> price:<[price]>
 
-        - adjust def:item lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>
+        - adjust def:item lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00].if_null[null]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>
 
         - if <[lastWeekAvg].is_decimal>:
             - define percentageDiff <element[<[price].sub[<[lastWeekAvg]>]>].div[<[lastWeekAvg]>].round_to_precision[0.01].mul[100]>
@@ -104,20 +104,21 @@ KMerchantWindow_Handler:
         - if <player.flag[dataHold.merchantMode]> == buy:
             - define itemList <list[]>
 
-            - foreach <[merchant].flag[merchantData.sellData.items]>:
-                - define name <[key]>
-                - define item <[name].as[item]>
-                - define price <[value].get[price]>
-                - flag <[item]> price:<[price]>
+            - if <[merchant].has_flag[merchantData.sellData.items]>:
+                - foreach <[merchant].flag[merchantData.sellData.items]>:
+                    - define name <[key]>
+                    - define item <[name].as[item]>
+                    - define price <[value].get[price]>
+                    - flag <[item]> price:<[price]>
 
-                - adjust def:item lore:<element[Going Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>
+                    - adjust def:item lore:<element[Going Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>
 
-                - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
-                    - adjust def:item lore:<[item].lore.include[<&sp>|<italic><element[Alloc: ].color[white]><[value].get[alloc].color[aqua]>|<element[Spent: ].color[white]><[value].get[spent].color[aqua]>]>
+                    - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
+                        - adjust def:item lore:<[item].lore.include[<&sp>|<italic><element[Alloc: ].color[white]><[value].get[alloc].color[aqua]>|<element[Spent: ].color[white]><[value].get[spent].color[aqua]>]>
 
-                # - inventory adjust d:<[target].open_inventory> slot:<context.slot> "lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>" player:<[target]>
+                    # - inventory adjust d:<[target].open_inventory> slot:<context.slot> "lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>" player:<[target]>
 
-                - define itemList:->:<[item]>
+                    - define itemList:->:<[item]>
 
             - define newChangeModeItem <inventory[MerchantInterfaceNewFooter_Window].slot[9]>
             - define footer <inventory[MerchantInterfaceNewFooter_Window]>
@@ -158,9 +159,7 @@ KMerchantWindow_Handler:
             - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
             - define market <[merchant].flag[merchantData.linkedMarket]>
 
-            # If player shift clicks, buy 10 of the item instead of
-            # just 1
-
+            # If player shift clicks, buy 10 of the item instead of just 1
             - if <context.click> == SHIFT_LEFT:
                 - define purchaseAmount 10
 
@@ -177,11 +176,9 @@ KMerchantWindow_Handler:
 
                     # take the appropriate amount of money and give
                     # the player the items;
-
                     - take money quantity:<[price].mul[<[purchaseAmount]>]>
 
                     # Create item without any of the BM Item's flags or lore
-
                     - define selectedItem <context.item>
                     - adjust def:selectedItem lore:<list[]>
                     - adjust def:selectedItem flag_map:<map[]>
@@ -225,9 +222,7 @@ KMerchantWindow_Handler:
             #        s: sBias
             - define minimumBudget <[wealth].mul[4.588].mul[<element[<[sbias].add[0.85]>]>]>
 
-            # If player shift clicks, sell 10 of the item instead of
-            # just 1
-
+            # If player shift clicks, sell 10 of the item instead of just 1
             - if <context.click> == SHIFT_LEFT:
                 - define sellAmount 10
 
