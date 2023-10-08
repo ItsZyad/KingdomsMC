@@ -1,9 +1,11 @@
 ##
-## All general-purpose, reusable functions related to the squads mechanics can be found here.
+## [KAPI]
+## All scripts that read and modify data at the squad-level of the army mechanic.
 ##
 ## @Author: Zyad (ITSZYAD#9280)
-## @Date: Jun 2023
-## @Script Ver: v1.0
+## @Original Scripts: Jun 2023
+## @Date: Oct 2023
+## @Script Ver: v0.1
 ##
 ## ----------------END HEADER-----------------
 
@@ -98,32 +100,6 @@ CreateSquadReference:
         - narrate format:callout "Created squad with name: <[displayName]>"
 
 
-WriteArmyDataToKingdom:
-    type: task
-    definitions: SMLocation|kingdom
-    script:
-    ## Ensures that the kingdom.armies flag contains the same information as the squad manager
-    ## flag of the provided SMLocation
-    ##
-    ## SMLocation : [LocationTag]
-    ## kingdom    : [ElementTag<String>]
-    ##
-    ## >>> [Void]
-
-    - define squadManagerID <[SMLocation].simple.split[,].remove[last].unseparated>
-    - define SMData <[SMLocation].flag[squadManager]>
-    - define stationedSquads <[SMData].deep_get[squads.squadList].keys> if:<[SMData].deep_get[squads.squadList].exists>
-    - define SMData <[SMData].exclude[kingdom].exclude[id].deep_exclude[squads]>
-
-    - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>:<[SMData]>
-    - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.location:<[SMLocation]>
-    - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.stationedSquads:<[stationedSquads]> if:<[stationedSquads].exists>
-    - flag server kingdoms.<[kingdom]>.armies.squads.squadList:!
-
-    - foreach <[SMLocation].flag[squadManager.squads.squadList].if_null[<list[]>]>:
-        - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[key]>:<[value]>
-
-
 GiveSquadTools:
     type: task
     definitions: player|saveInv
@@ -202,109 +178,3 @@ GetSquadInfo:
 
     # - run flagvisualizer def.flag:<[globalRef]> def.flagName:globalRef
     - determine <[globalRef]>
-
-
-GetSquadSMLocation:
-    type: task
-    definitions: kingdom|squadName
-    script:
-    ## Gets the SM associated with the squad provided
-    ##
-    ## kingdom   : [ElementTag<String>]
-    ## squadName : [ElementTag<String>]
-    ##
-    ## >>> [LocationTag]
-
-    - define barracks <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
-    - define stationingInfo <[barracks].parse_value_tag[<[parse_value].get[stationedSquads]>]>
-
-    - foreach <[stationingInfo]>:
-        - if <[value].contains[<[squadName]>]>:
-            - define SMID <[key]>
-            - define location <[barracks].get[<[SMID]>].get[location]>
-            - determine <[location]>
-
-
-GiveSoldierItemFromArmory:
-    type: task
-    definitions: soldier|squadName|kingdom|armories|item
-    script:
-    ## Gives the provided soldier an item from their squad's armory if it exists
-    ##
-    ## kingdom   : [ElementTag<String>]
-    ## squadName : [ElementTag<String>]
-    ## soldier   : [NPCTag]
-    ## item      : [ItemTag]
-    ## armories  : ?[ListTag<LocationTag>]
-    ##
-    ## >>> [Void]
-
-    - if !<[armories].exists>:
-        - run GetSquadSMLocation def.squadName:<[squadName]> def.kingdom:<[kingdom]> save:SMLocation
-        - define SMLocation <entry[SMLocation].created_queue.determination.get[1]>
-        - define filledArmories <[SMLocation].flag[squadManager.armories].filter_tag[<[filter_value].inventory.is_empty.not>]>
-
-    - else:
-        - define filledArmories <[armories].filter_tag[<[filter_value].inventory.is_empty.not>]>
-
-    - define anyInvHasItem <[filledArmories].parse_tag[<[parse_value].inventory.list_contents.find_all_matches[<[item]>]>]>
-
-    # TODO(Medium): next-best-item search.
-    # - if !<[anyInvHasItem]>:
-    #     - define expandedSearch <[filledArmories].parse_tag[<[parse_value].inventory.list_contents.parse_tag[<[parse_value].material.name>]>]>
-    #     - define anyInvHasItem <[expandedSearch]>
-
-    - determine cancelled if:<[anyInvHasItem].is_empty>
-
-    - foreach <[filledArmories]> as:loc:
-        - if <[loc].inventory.list_contents.contains[<[item]>]>:
-            - if <[item].advanced_matches[*_boots|*_chestplate|*_leggings|*_helmet]>:
-                - define oldArmor <[soldier].equipment>
-
-                - equip <[soldier]> boots:<[item]> if:<[item].advanced_matches[*_boots]>
-                - equip <[soldier]> head:<[item]> if:<[item].advanced_matches[*_helmet]>
-                - equip <[soldier]> legs:<[item]> if:<[item].advanced_matches[*_leggings]>
-                - equip <[soldier]> chest:<[item]> if:<[item].advanced_matches[*_chestplate]>
-
-                - define replacedItem <[soldier].equipment.exclude[<[oldArmor]>]>
-                - give to:<[loc].inventory> <[soldier].slot[<[replacedItem]>]>
-
-            - else:
-                - define nextHotbarItemSlot <[soldier].inventory.find_item[*]>
-                - give to:<[loc].inventory> <[soldier].slot[<[nextHotbarItemSlot]>]>
-                - give to:<[soldier].inventory> <[item]>
-                - adjust <[soldier]> item_slot:1
-
-            - take from:<[loc].inventory> item:<[item]>
-
-
-GenerateSMID:
-    type: task
-    definitions: location
-    script:
-    ## Generates the ID used to refer to SMs in the kingdom flag using the location of the SM
-    ##
-    ## location : [LocationTag]
-    ##
-    ## >>> [ElementTag<Integer>]
-
-    - determine <[location].simple.split[,].remove[last].unseparated>
-
-
-GetMaxSMAOESize:
-    type: procedure
-    definitions: SMLocation
-    script:
-    ## Gets the maximum size that a squad manager's AOE can be at its current level.
-    ##
-    ## SMLocation : [LocationTag]
-    ##
-    ## >>> [ElementTag<Integer>]
-
-    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
-
-    - run GetSquadInfo def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]> save:squadInfo
-    - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
-    - define AOELevel <[squadInfo].deep_get[levels.AOELevel]>
-
-    - determine <script[SquadManagerUpgrade_Data].data_key[levels.AOE.<[AOELevel]>.value]>
