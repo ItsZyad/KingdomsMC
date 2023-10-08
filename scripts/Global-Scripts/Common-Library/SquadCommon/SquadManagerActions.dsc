@@ -22,6 +22,38 @@ GenerateSMID:
     - determine <[location].simple.split[,].remove[last].unseparated>
 
 
+GetSMName:
+    type: procedure
+    definitions: SMLocation
+    script:
+    ## Gets the internal name of the squad manager.
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - determine null
+
+    - determine <[SMLocation].flag[squadManager.name]>
+
+
+GetSMKingdom:
+    type: procedure
+    definitions: SMLocation
+    script:
+    ## Gets the squad manager's kingdom affiliation.
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - determine null
+
+    - determine <[SMLocation].flag[squadManager.kingdom]>
+
+
 GetMaxSMAOESize:
     type: procedure
     definitions: SMLocation
@@ -32,13 +64,123 @@ GetMaxSMAOESize:
     ##
     ## >>> [ElementTag<Integer>]
 
-    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - determine null
 
-    - run GetSquadInfo def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]> save:squadInfo
-    - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
-    - define AOELevel <[squadInfo].deep_get[levels.AOELevel]>
+    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
+    - define AOELevel <entry[squadInfo].created_queue.determination.get[1].deep_get[levels.AOELevel]>
 
     - determine <script[SquadManagerUpgrade_Data].data_key[levels.AOE.<[AOELevel]>.value]>
+
+
+GetSquadLimit:
+    type: procedure
+    definitions: SMLocation
+    script:
+    ## Gets the maximum amount of squads that can be stationed under this squad manager
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [ElementTag<Integer>]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - determine null
+
+    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
+    - define squadLimit <entry[squadInfo].created_queue.determination.get[1].deep_get[levels.squadLimit]>
+
+    - determine <[squadLimit]>
+
+
+GetMaxSquadSize:
+    type: procedure
+    definitions: SMLocation
+    script:
+    ## Gets the maximum size squad that can be created using this squad manager's composer.
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [ElementTag<Integer>]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - determine null
+
+    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
+    - define maxSquadSize <entry[squadInfo].created_queue.determination.get[1].deep_get[levels.squadSizeLimit]>
+
+    - determine <[maxSquadSize]>
+
+
+GetStationingCapacity:
+    type: procedure
+    definitions: SMLocation
+    script:
+    ## Gets the maximum size of squads that can be stationed under this squad manager.
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [ElementTag<Integer>]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - determine null
+
+    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
+    - define stationCapacity <entry[squadInfo].created_queue.determination.get[1].deep_get[levels.stationCapacity]>
+
+    - determine <[stationCapacity]>
+
+
+GetSMAOESize:
+    type: procedure
+    definitions: SMLocation
+    script:
+    ## Gets the current size of a squad manager's AOE.
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [ElementTag<Integer>]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - determine null
+
+    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
+    - determine <entry[squadInfo].created_queue.determination.get[1].get[AOESize]>
+
+
+GetSMArea:
+    type: procedure
+    definitions: SMLocation
+    script:
+    ## Gets the CuboidTag representing a squad manager's AOE.
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [CuboidTag]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - determine null
+
+    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
+
+    - determine <entry[squadInfo].created_queue.determination.get[1].get[AOESize]>
+
+
+GetSMArmoryLocations:
+    type: procedure
+    definitions: SMLocation
+    script:
+    ## Gets a list of all the locations assigned as armories in this squad manager.
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [ListTag<LocationTag>]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - determine null
+
+    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
+
+    - determine <entry[squadInfo].created_queue.determination.get[1].get[armories]>
 
 
 GetSquadSMLocation:
