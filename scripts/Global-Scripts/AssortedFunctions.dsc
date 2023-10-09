@@ -1,21 +1,5 @@
 ##ignorewarning invalid_data_line_quotes
 
-NPCLevelProgress:
-    type: procedure
-    definitions: level
-    script:
-    - define justDecimal <[Level].round_down.sub[<[Level]>].abs.mul[100]>
-    - define levelGraphic <list>
-
-    - repeat <[justDecimal].div[5].round_to_precision[5]>:
-        - define levelGraphic:->:█
-
-    - repeat <element[20].sub[<[justDecimal].div[5].round_to_precision[5]>]>:
-        - define levelGraphic:->:░
-
-    - determine "<[levelGraphic].unseparated> - <[justDecimal].round_to_precision[0.01]><&pc>"
-
-
 KingdomNameReplacer:
     type: procedure
     definitions: playerKingdom
@@ -27,12 +11,6 @@ YamlSpaceAdder:
     definitions: yamlVal
     script:
     - determine <definition[yamlVal].replace[/sp/].with[<&sp>]>
-
-YamlSpaceSerilizer:
-    type: procedure
-    definitions: Val
-    script:
-    - determine <definition[Val].replace[<&sp>].with[/sp/]>
 
 Paginate:
     type: procedure

@@ -385,6 +385,22 @@ RNPCLandTypeRef:
     fisherman: fishery
 
 
+NPCLevelProgress:
+    type: procedure
+    definitions: level
+    script:
+    - define justDecimal <[Level].round_down.sub[<[Level]>].abs.mul[100]>
+    - define levelGraphic <list>
+
+    - repeat <[justDecimal].div[5].round_to_precision[5]>:
+        - define levelGraphic:->:█
+
+    - repeat <element[20].sub[<[justDecimal].div[5].round_to_precision[5]>]>:
+        - define levelGraphic:->:░
+
+    - determine "<[levelGraphic].unseparated> - <[justDecimal].round_to_precision[0.01]><&pc>"
+
+
 RNPCInfo_Handler:
     type: world
     events:
