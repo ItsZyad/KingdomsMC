@@ -125,4 +125,4 @@ IntimidationInfluence_Handler:
 
                 - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
-                - narrate format:callout "The <script[KingdomRealNames].data_key[<[kingdom]>]> has dispatched agents to secure the support of key MPs in the Fyndalin parliament."
+                - narrate format:callout "The <proc[GetKingdomName].context[<[kingdom]>]> has dispatched agents to secure the support of key MPs in the Fyndalin parliament."

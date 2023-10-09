@@ -172,7 +172,7 @@ GuardInterface_Handler:
                 - define dateFormatted "<[report].get[date].to_zone[UTC].format[YYYY-MM-dd @ hh:mm]> UTC"
                 - define playerName <[report].get[player].name>
                 - define IncNum <[report].get[incNumber].if_null[1]>
-                - define kingdomName <script[KingdomRealNames].data_key[<[report].get[kingdom]>]>
+                - define kingdomName <proc[GetKingdomName].context[<[report].get[kingdom]>]>
 
                 - define "bookPageList:->:<element[<[incursionNumber]><n><n><element[Date of Inc: ]><[dateFormatted]>]><n><element[Player: ]><[playerName]><n><element[From Kingdom: ]><[kingdomName]><n><element[Number of Incursions: ]><[incNum]>"
 
@@ -198,7 +198,7 @@ GuardInterface_Handler:
             - define dateFormatted "<[report].get[date].to_zone[UTC].format[YYYY-MM-dd @ hh:mm]> UTC"
             - define playerName <[report].get[player].name>
             - define IncNum <[report].get[incNumber].if_null[1]>
-            - define kingdomName <script[KingdomRealNames].data_key[<[report].get[kingdom]>]>
+            - define kingdomName <proc[GetKingdomName].context[<[report].get[kingdom]>]>
 
             - adjust def:incItem "lore:|<element[Date of Inc: ].bold.color[white]><[dateFormatted].color[aqua]>|<element[Player: ].bold.color[white]><[playerName].color[aqua]>|<element[From Kingdom: ].bold.color[white]><[kingdomName].color[aqua]>|<element[Number of Incursions: ].bold.color[white]><[incNum].color[aqua]>"
             - define incursionItemList:->:<[incItem]>

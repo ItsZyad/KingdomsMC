@@ -14,7 +14,7 @@ KingdomUpkeepHandler:
         on system time hourly every:48:
         - if !<server.has_flag[RestrictedCreative]>:
             - if !<server.has_flag[PauseUpkeep]>:
-                - define kingdomList <script[KingdomRealNames].data_key[].keys>
+                - define kingdomList <proc[GetKingdomList]>
 
                 - foreach <[kingdomList]> as:kingdom:
                     - flag server kingdoms.<[kingdom]>.balance:-:<server.flag[kingdoms.<[kingdom]>.upkeep]>

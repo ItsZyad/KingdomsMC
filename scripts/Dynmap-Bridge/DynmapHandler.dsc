@@ -165,7 +165,7 @@ NEW_DynmapFlagBuilder:
             - define sortedCornerList <[world].flag[dynmap.cache.<[kingdom]>.cornerList]>
 
         - else:
-            - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
+            - define kingdomName <proc[GetKingdomName].context[<[kingdom]>]>
             - define core <server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>
             - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>]>
             - define allCuboids <[core].include[<[castle]>].parse_tag[<[parse_value].cuboid>]>
@@ -250,7 +250,7 @@ DynmapTask:
                 - execute as_op "dmarker addcorner <[formattedCorner]> <[world].name>"
 
             - execute as_op "dmarker deletearea id:<[kingdom]>_main_territory set:regions"
-            - execute as_op "dmarker addarea id:<[kingdom]>_main_territory set:regions label:<&dq>[Kingdom] <script[KingdomRealNames].data_key[<[kingdom]>]><&dq>"
+            - execute as_op "dmarker addarea id:<[kingdom]>_main_territory set:regions label:<&dq>[Kingdom] <proc[GetKingdomName].context[<[kingdom]>]><&dq>"
             - execute as_op "dmarker updatearea id:<[kingdom]>_main_territory set:outposts color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2"
             - execute as_op "dmarker clearcorners" silent
 
@@ -272,7 +272,7 @@ DynmapTask:
             - execute as_op "dmarker addcorner <[area].min.simple.replace_text[,].with[<&sp>]>" silent
             - execute as_op "dmarker addcorner <[area].max.simple.replace_text[,].with[<&sp>]>" silent
             - execute as_op "dmarker deletearea id:<[ID]> set:outposts" silent
-            - execute as_op "dmarker addarea id:<[ID]> set:outposts label:"[Outpost] <script[KingdomRealNames].data_key[<[kingdom]>]>"" silent
+            - execute as_op "dmarker addarea id:<[ID]> set:outposts label:"[Outpost] <proc[GetKingdomName].context[<[kingdom]>]>"" silent
             - execute as_op "dmarker updatearea id:<[ID]> set:outposts color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2" silent
             - execute as_op "dmarker clearcorners" silent
 
@@ -281,6 +281,7 @@ DynmapTask:
 DynmapWorldTick_Handler:
    type: world
    debug: false
+   enabled: false
    events:
        on system time minutely every:15:
        - execute refreshdynmap as_server

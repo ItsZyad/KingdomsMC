@@ -171,7 +171,7 @@ Loan_Handler:
         on player clicks Loan_From_Fyndalin_Influence in Loan_GUI:
         - define loanData <context.item.flag[loanData]>
         - define kingdom <player.flag[kingdom]>
-        - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
+        - define kingdomName <proc[GetKingdomName].context[<[kingdom]>]>
 
         - if <server.flag[kingdoms.<[kingdom]>.balance].is[MORE].than[<[loanData].get[amount]>]>:
             # Subtract from kingdom, add to issuer
@@ -218,7 +218,7 @@ Loan_Handler:
 
                 - flag server kingdoms.<[kingdom]>.loans:->:<[loanMap]>
 
-                - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
+                - define kingdomName <proc[GetKingdomName].context[<[kingdom]>]>
                 - inventory close
                 - narrate format:callout "<[kingdomName]> has taken out a loan of $<[amount]> from Fyndalin. Your kingdom will have <[due].from_now.formatted.color[red].bold> to pay back this loan or else you will default!"
                 - narrate "<&sp><gray>To pay back your loans access the loans section of the <element[/influence options].color[red].bold> command again!"

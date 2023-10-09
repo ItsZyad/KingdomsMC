@@ -187,7 +187,7 @@ ReconstructionPermitAdmin_Function:
                 - define currPermit <yaml[recon].read[permits.permit-<[value]>]>
 
                 - define requestingPlayer "<&r>Requesting Player: <blue><[currPermit].get[requestingplayer].get[name]>"
-                - define requestingKingdom "<&r>On behalf of: <blue><script[KingdomRealNames].data_key[<[currPermit].get[requestingkingdom]>]>"
+                - define requestingKingdom "<&r>On behalf of: <blue><proc[GetKingdomName].context[<[currPermit].get[requestingkingdom]>]>"
                 - define requestedPlotSize "<&r>Requested Size: <blue><[currPermit].get[requestedplotsize]>"
                 - define requestDate "<&r>Request Date: <blue><[currPermit].get[requestdate]>"
 

@@ -60,7 +60,7 @@ SidebarLoader:
 
             # Initialize and set Balance line
             - define kingdom <[player].flag[kingdom]>
-            - define kingdomName <script[KingdomRealNames].data_key[<[kingdom]>]>
+            - define kingdomName <proc[GetKingdomName].context[<[kingdom]>]>
             - define kingdomData <server.flag[kingdoms.<[kingdom]>]>
             - define totalOutpostUpkeep <server.flag[<[kingdom]>.outposts.totalUpkeep].if_null[0]>
             - sidebar set "title:<bold> <[kingdomName].color[<script[KingdomTextColors].data_key[<[player].flag[kingdom]>]>]>  " "values:<&r>|<&sp>Balance: <yellow>$<[kingdomData].get[balance].round_down.format_number>" players:<[player]>

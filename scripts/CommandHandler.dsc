@@ -123,7 +123,7 @@ ChunkMap:
     - define playerChunk <player.location.chunk>
     - define chunkList <list[]>
     - define allClaims <server.flag[kingdoms.claimInfo.allClaims]>
-    - define kingdomList <script[KingdomRealNames].data_key[].keys.exclude[type]>
+    - define kingdomList <proc[GetKingdomList]>
 
     - repeat 10 from:-5 as:zChunk:
         - repeat 19 from:-9 as:xChunk:

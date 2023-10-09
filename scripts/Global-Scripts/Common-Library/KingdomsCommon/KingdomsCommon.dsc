@@ -18,11 +18,19 @@
 # Note: future configurable(?)
 KingdomRealNames:
     type: data
-    centran: Dominion of Muspelheim
-    viridian: Commonwealth of Viriditas
-    raptoran: Republic of Altea
-    cambrian: Grovelian Empire
-    fyndalin: Fyndalin Trust Territory
+    Names:
+        centran: Dominion of Muspelheim
+        viridian: Commonwealth of Viriditas
+        raptoran: Republic of Altea
+        cambrian: Grovelian Empire
+        fyndalin: Fyndalin Trust Territory
+
+    ShortNames:
+        centran: Muspelheim
+        viridian: Viridia
+        raptoran: Altea
+        cambrian: Grovelia
+        fyndalin: Fyndalin
 
 
 KingdomRealShortNames:
@@ -32,7 +40,6 @@ KingdomRealShortNames:
     raptoran: Altea
     cambrian: Grovelia
     fyndalin: Fyndalin
-
 
 KingdomTextColors:
     type: data
@@ -61,8 +68,8 @@ GetKingdomList:
     ##
     ## >>> [ListTag<[ElementTag<String>]>]
 
-    - define kingdomRealNames <script[KingdomRealNames].data_key[].values.exclude[data]>
-    - define kingdomCodeNames <script[KingdomRealNames].data_key[].keys.exclude[type]>
+    - define kingdomRealNames <script[KingdomRealNames].data_key[Names].values>
+    - define kingdomCodeNames <script[KingdomRealNames].data_key[Names].keys>
     - define isCodeNames <[isCodeNames].if_null[true]>
 
     - if <[isCodeNames]>:
@@ -119,6 +126,9 @@ IsKingdomBankrupt:
 ##
 ## Get/Set
 ## - Description
+##
+## Get
+## - Name
 ##
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -436,3 +446,38 @@ SetDescription:
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.description:<[description]>
+
+
+GetKingdomName:
+    type: procedure
+    definitions: kingdomCode
+    script:
+    ## Gets the current display name for the kingdom with the provided kingdom code
+    ##
+    ## kingdomCode : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdomCode]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom name. Invalid kingdom code provided: <[kingdomCode]>]>
+        - determine null
+
+    - determine <script[KingdomRealNames].data_key[Names.<[kingdomCode]>]>
+
+
+GetKingdomShortName:
+    type: procedure
+    definitions: kingdomCode
+    script:
+    ## Gets the current shorthand display name for the kingdom with the provided kingdom code.
+    ## For example a kingdom called 'The Duchy of Jalerad' would have a shorthand of 'Jalerad'.
+    ##
+    ## kingdomCode : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdomCode]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom name. Invalid kingdom code provided: <[kingdomCode]>]>
+        - determine null
+
+    - determine <script[KingdomRealNames].data_key[ShortNames.<[kingdomCode]>]>

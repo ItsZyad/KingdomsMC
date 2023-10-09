@@ -225,7 +225,7 @@ KingdomSwitcher_Command:
     tab completions:
         1: centran|viridian|raptoran|cambrian|fyndalin
     script:
-    - define kingdomList <script[KingdomRealNames].data_key[].keys>
+    - define kingdomList <proc[GetKingdomList]>
 
     - if <[kingdomList].contains[<context.args.get[1]>]>:
         - if <context.args.length> == 2:
