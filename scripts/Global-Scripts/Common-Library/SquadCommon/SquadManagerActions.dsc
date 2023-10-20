@@ -67,8 +67,7 @@ GetMaxSMAOESize:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
-    - define AOELevel <entry[squadInfo].created_queue.determination.get[1].deep_get[levels.AOELevel]>
+    - define AOELevel <[SMLocation].flag[squadManager.levels.AOELevel]>
 
     - determine <script[SquadManagerUpgrade_Data].data_key[levels.AOE.<[AOELevel]>.value]>
 
@@ -86,8 +85,8 @@ GetSquadLimit:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
-    - define squadLimit <entry[squadInfo].created_queue.determination.get[1].deep_get[levels.squadLimit]>
+    - define squadLevel <[SMLocation].flag[squadManager.levels.squadLimitLevel].if_null[0]>
+    - define squadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[squadLevel]>.value]>
 
     - determine <[squadLimit]>
 
@@ -105,8 +104,8 @@ GetMaxSquadSize:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
-    - define maxSquadSize <entry[squadInfo].created_queue.determination.get[1].deep_get[levels.squadSizeLimit]>
+    - define squadSizeLevel <[SMLocation].flag[squadManager.levels.squadSizeLevel].if_null[0]>
+    - define maxSquadSize <script[SquadManagerUpgrade_Data].data_key[levels.SquadSize.<[squadSizeLevel]>.value]>
 
     - determine <[maxSquadSize]>
 
@@ -124,8 +123,7 @@ GetStationingCapacity:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
-    - define stationCapacity <entry[squadInfo].created_queue.determination.get[1].deep_get[levels.stationCapacity]>
+    - define stationCapacity <[SMLocation].flag[squadManager.levels.stationCapacity]>
 
     - determine <[stationCapacity]>
 
@@ -143,8 +141,7 @@ GetSMAOESize:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
-    - determine <entry[squadInfo].created_queue.determination.get[1].get[AOESize]>
+    - determine <[SMLocation].flag[squadManager.AOESize]>
 
 
 GetSMArea:
@@ -160,9 +157,7 @@ GetSMArea:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
-
-    - determine <entry[squadInfo].created_queue.determination.get[1].get[AOESize]>
+    - determine <[SMLocation].flag[squadManager.area]>
 
 
 GetSMArmoryLocations:
@@ -178,9 +173,7 @@ GetSMArmoryLocations:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - run GetSquadInfo def.kingdom:<proc[GetSMKingdom].context[<[SMLocation]>]> def.SMLocation:<[SMLocation]> save:squadInfo
-
-    - determine <entry[squadInfo].created_queue.determination.get[1].get[armories]>
+    - determine <[SMLocation].flag[squadManager.armories]>
 
 
 GetSquadSMLocation:

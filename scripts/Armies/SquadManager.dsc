@@ -301,13 +301,14 @@ SquadManager_Handler:
         ## Setup SM Interface
         on player opens SquadManager_Interface:
         - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
+        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
         - define barracksInfoSlot <context.inventory.find_item[SquadManagerInfo_Item]>
         - define squadLimitLevel <[squadManagerData].deep_get[levels.squadLimitLevel]>
         - define squadSizeLevel <[squadManagerData].deep_get[levels.squadSizeLevel]>
-        - define squadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[squadLimitLevel]>.value]>
-        - define squadSize <script[SquadManagerUpgrade_Data].data_key[levels.SquadSize.<[squadSizeLevel]>.value]>
 
-        - inventory adjust slot:<[barracksInfoSlot]> "lore:<gray>Name: <&r><[squadManagerData].get[name]>|<gray>Squad Limit: <&r><[squadLimit]>|<gray>Squad Size Limit: <&r><[squadSize]>|<gray>Stationing Capacity: <&r><[squadManagerData].deep_get[levels.stationCapacity]>|<gray>Max AOE Size: <&r><script[SquadManagerUpgrade_Data].data_key[levels.AOE.<[squadManagerData].deep_get[levels.AOELevel]>.value]>" destination:<context.inventory>
+        - narrate format:debug SMLocation:<[SMLocation]>
+
+        - inventory adjust slot:<[barracksInfoSlot]> "lore:<gray>Name: <&r><proc[GetSMName].context[<[SMLocation]>]>|<gray>Squad Limit: <&r><proc[GetSquadLimit].context[<[SMLocation]>]>|<gray>Squad Size Limit: <&r><proc[GetMaxSquadSize].context[<[SMLocation]>]>|<gray>Stationing Capacity: <&r><proc[GetStationingCapacity].context[<[SMLocation]>]>|<gray>Max AOE Size: <&r><proc[GetMaxSMAOESize].context[<[SMLocation]>]>" destination:<context.inventory>
 
         on player opens SquadManager_Interface flagged:datahold.armies.showAOE:
         - define AOEItemSlot <context.inventory.find_item[SquadManagerShowAOE_Item]>
