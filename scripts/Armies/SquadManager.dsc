@@ -192,8 +192,8 @@ SquadManager_Handler:
         ## Crafts SM
         on SquadManager_Item recipe formed:
         - define kingdom <player.flag[kingdom]>
-        - define maxAllowedSMs <server.flag[kingdoms.<[kingdom]>.armies.maximumAllowedSMs].if_null[4]>
-        - define SMCount <server.flag[kingdoms.<[kingdom]>.armies.barracks].size>
+        - define maxAllowedSMs <proc[GetMaxAllowedSMs].context[<[kingdom]>]>
+        - define SMCount <proc[GetKingdomSquadManagers].context[<[kingdom]>].size>
 
         - if <[SMCount]> >= <[maxAllowedSMs]>:
             - narrate format:callout "You have already created the maximum amount of barracks in your kingdom. Consider upgrading existing squad managers, instead!"
@@ -207,10 +207,9 @@ SquadManager_Handler:
             - narrate format:callout "Your kingdom does not have sufficient funds to activate this squad manager.<n>You require at least $2000 in your kingdom's bank."
             - determine cancelled
 
-        - define existingBarracks <server.flag[kingdoms.<[kingdom]>.armies.barracks].if_null[<list[]>]>
+        - define existingBarracks <proc[GetKingdomSquadManagers].context[<[kingdom]>].if_null[<list[]>]>
         - define barrackLocations <[existingBarracks].parse_value_tag[<[parse_value].get[location]>]>
-        - define numberOfExistingBarracks <[existingBarracks].size.if_null[0]>
-        - define defaultName Barracks-<[numberOfExistingBarracks].add[1]>
+        - define defaultName Barracks-<[existingBarracks].size.if_null[0].add[1]>
 
         # Closeness check to other SMs
         - foreach <[barrackLocations]> as:loc:
@@ -300,13 +299,8 @@ SquadManager_Handler:
 
         ## Setup SM Interface
         on player opens SquadManager_Interface:
-        - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
         - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
         - define barracksInfoSlot <context.inventory.find_item[SquadManagerInfo_Item]>
-        - define squadLimitLevel <[squadManagerData].deep_get[levels.squadLimitLevel]>
-        - define squadSizeLevel <[squadManagerData].deep_get[levels.squadSizeLevel]>
-
-        - narrate format:debug SMLocation:<[SMLocation]>
 
         - inventory adjust slot:<[barracksInfoSlot]> "lore:<gray>Name: <&r><proc[GetSMName].context[<[SMLocation]>]>|<gray>Squad Limit: <&r><proc[GetSquadLimit].context[<[SMLocation]>]>|<gray>Squad Size Limit: <&r><proc[GetMaxSquadSize].context[<[SMLocation]>]>|<gray>Stationing Capacity: <&r><proc[GetStationingCapacity].context[<[SMLocation]>]>|<gray>Max AOE Size: <&r><proc[GetMaxSMAOESize].context[<[SMLocation]>]>" destination:<context.inventory>
 
@@ -329,7 +323,6 @@ SquadManager_Handler:
         - define SMLocation <proc[BedSMLocation].context[<player>|<context.location>]>
 
         - if <[SMLocation].exists> && <[SMLocation].world> == <player.location.world>:
-            - define SMData <[SMLocation].flag[squadManager]>
             - define bedCount <proc[CountBedsInSquadManagerArea].context[<[SMLocation]>]>
             - define stationCapacity <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
 
@@ -341,7 +334,6 @@ SquadManager_Handler:
         - define SMLocation <proc[BedSMLocation].context[<player>|<context.location>]>
 
         - if <[SMLocation].exists> && <[SMLocation].world> == <player.location.world>:
-            - define SMData <[SMLocation].flag[squadManager]>
             - define bedCount <proc[CountBedsInSquadManagerArea].context[<[SMLocation]>]>
             - define stationCapacity <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
 
@@ -355,9 +347,9 @@ SquadManager_Handler:
         # Runs the AOE show task script and replaces the SM interface button with a different
         # colored button that cancels the AOE effect
         - if !<player.has_flag[datahold.armies.showAOE]>:
-            - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
+            - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
             - flag <player> datahold.armies.showAOE expire:1h
-            - run ShowSquadManagerAOE def.area:<[squadManagerData].get[area]> def.player:<player>
+            - run ShowSquadManagerAOE def.area:<proc[GetSMArea].context[<[SMLocation]>]> def.player:<player>
             - inventory set slot:<context.slot> o:SquadManagerShowAOEActive_Item d:<context.inventory>
             - inventory close
 
@@ -376,8 +368,8 @@ SquadManager_Handler:
 
         ## AOE Set
         on player clicks SquadManagerSetAOE_Item in SquadManager_Interface:
-        - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
-        - define maxAOESize <proc[GetMaxSMAOESize].context[<[squadManagerLocation]>]>
+        - define SMLocation <player.flag[datahold.armies.SMLocation]>
+        - define maxAOESize <proc[GetMaxSMAOESize].context[<[SMLocation]>]>
 
         - flag <player> noChat.armies.settingAOE:<[maxAOESize]>
 
@@ -387,22 +379,22 @@ SquadManager_Handler:
         ## AOE Set
         on player chats flagged:noChat.armies.settingAOE:
         - define maxAOESize <player.flag[noChat.armies.settingAOE]>
-        - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
-        - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - define SMLocation <player.flag[datahold.armies.SMLocation]>
 
         - if <context.message.is_integer>:
             - if <context.message.is[MORE].than[<[maxAOESize]>]>:
                 - narrate format:callout "The maximum AOE size that can be set at this level is: <[maxAOESize]>. Try again or type 'cancel'."
                 - determine cancelled
 
-            - flag <[squadManagerLocation]> squadManager.AOESize:<context.message>
+            # Note: Future setter
+            - flag <[SMLocation]> squadManager.AOESize:<context.message>
             - flag <player> noChat.armies:!
             - narrate format:callout "Set squad manager AOE to: <white><context.message>"
             - inventory open d:SquadManager_Interface
 
             - flag <player> datahold.armies.showAOE:!
 
-            - run RecalculateSquadManagerAOE def.AOESize:<context.message> def.SMLocation:<[squadManagerLocation]> def.player:<player>
+            - run RecalculateSquadManagerAOE def.AOESize:<context.message> def.SMLocation:<[SMLocation]> def.player:<player>
 
         - else if <context.message.to_lowercase> == cancel:
             - flag <player> noChat.armies:!
@@ -422,9 +414,8 @@ SquadManager_Handler:
 
         ## Barrack Rename
         on player chats flagged:noChat.armies.renamingBarracks:
-        - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
-        - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
-        - define existingName <[squadManagerData].get[name]>
+        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - define existingName <proc[GetSMName].context[<[SMLocation]>]>
 
         - if <context.message> == <[existingName]>:
             - narrate format:callout "These barracks already have this name. Try again or type 'cancel'."
@@ -436,8 +427,8 @@ SquadManager_Handler:
             - narrate format:callout "Cancelled operation."
             - determine cancelled
 
-        - flag <[squadManagerLocation]> squadManager.name:<context.message>
-        - run WriteArmyDataToKingdom def.SMLocation:<[squadManagerLocation]> def.kingdom:<player.flag[kingdom]>
+        - flag <[SMLocation]> squadManager.name:<context.message>
+        - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<player.flag[kingdom]>
         - flag <player> noChat.armies:!
 
         - narrate format:callout "Renamed barracks to: <context.message.color[red]>"
@@ -465,10 +456,10 @@ SquadManager_Handler:
         on player places SquadManager_Item flagged:datahold.armies.movingSM:
         - define kingdom <player.flag[kingdom]>
         - define squadManagerData <player.flag[datahold.armies.movingSM.data]>
-        - define oldSquadManagerLocation <player.flag[datahold.armies.movingSM.location]>
-        - define newSquadManagerLocation <context.location>
-        - define existingBarrackID <[oldSquadManagerLocation].simple.split[,].remove[last].unseparated>
-        - define existingBarracks <server.flag[kingdoms.<[kingdom]>.armies.barracks].exclude[<[existingBarrackID]>]>
+        - define oldSMLocation <player.flag[datahold.armies.movingSM.location]>
+        - define newSMLocation <context.location>
+        - define existingBarrackID <[oldSMLocation].simple.split[,].remove[last].unseparated>
+        - define existingBarracks <proc[GetKingdomSquadManagers].context[<[kingdom]>].exclude[<[existingBarrackID]>]>
         - define barrackLocations <[existingBarracks].parse_value_tag[<[parse_value].get[location]>]>
 
         - foreach <[barrackLocations]> as:loc:
@@ -477,20 +468,16 @@ SquadManager_Handler:
                 - narrate format:callout "Invalid location! This location is too close to another squad manager belonging to your kingdom. Try another spot..."
                 - determine cancelled
 
-        # Generate cuboid consisting of all the kingdom's core claims
-        - define coreClaims <server.flag[kingdoms.<[kingdom]>.claims.core]>
-        - define coreClaimsCuboid <[coreClaims].get[1].cuboid>
-
-        - foreach <[coreClaimsCuboid].remove[1]>:
-            - define coreClaimsCuboid <[coreClaimsCuboid].include[<[value]>]>
+        # Get cuboid consisting of all the kingdom's core claims
+        - define coreClaimsCuboid <proc[GetClaimsCuboid].context[<[kingdom]>|core]>
 
         # Running path:AreaCalculation returns a cuboid of the barracks' area
-        - run RecalculateSquadManagerAOE path:AreaCalculation def.AOESize:<[squadManagerData].get[AOESize]> def.SMLocation:<context.location> save:area
+        - run RecalculateSquadManagerAOE path:AreaCalculation def.AOESize:<proc[GetSMAOESize].context[<[oldSMLocation]>]> def.SMLocation:<[newSMLocation]> save:area
         - define barracksArea <entry[area].created_queue.determination.get[1]>
 
         - if <[barracksArea].is_within[<[coreClaimsCuboid]>]> || <player.is_op>:
             - flag <context.location> squadManager:<[squadManagerData]>
-            - define bedCount <proc[CountBedsInSquadManagerArea].context[<[newSquadManagerLocation]>]>
+            - define bedCount <proc[CountBedsInSquadManagerArea].context[<[newSMLocation]>]>
 
             # Station count equation:
             # s = round(sqrt(b) * b ^ 0.7)
@@ -501,13 +488,13 @@ SquadManager_Handler:
             # Flag new squad manager location with corrected data + remove old data
             - define squadManagerData.area:<[barracksArea]>
             - define squadManagerData.id:<[newBarrackID]>
-            - flag <[newSquadManagerLocation]> squadManager:<[squadManagerData]>
-            - flag <[oldSquadManagerLocation]> squadManager:!
+            - flag <[newSMLocation]> squadManager:<[squadManagerData]>
+            - flag <[oldSMLocation]> squadManager:!
 
             # Remove old server-level reference to barrack and copy adjusted version over to new key
             - define kingdomsFlagBarrackData <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[existingBarrackID]>]>
             - define kingdomsFlagBarrackData.area:<[barracksArea]>
-            - define kingdomsFlagBarrackData.location:<[newSquadManagerLocation]>
+            - define kingdomsFlagBarrackData.location:<[newSMLocation]>
             - flag server kingdoms.<[kingdom]>.armies.barracks.<[newBarrackID]>:<[kingdomsFlagBarrackData]>
             - flag server kingdoms.<[kingdom]>.armies.barracks.<[existingBarrackID]>:!
 
@@ -515,12 +502,12 @@ SquadManager_Handler:
             # it, the references aren't all wrong
             - flag <player> datahold.armies.movingSM.data:!
             - flag <player> datahold.armies.movingSM.location:!
-            - flag <player> datahold.armies.squadManagerLocation:<[newSquadManagerLocation]>
+            - flag <player> datahold.armies.squadManagerLocation:<[newSMLocation]>
             - flag <player> datahold.armies.squadManagerData:<[squadManagerData]>
 
             # Running Recalc. task without path generates the barracks area and adds to the main
             # kingdoms flag the corresponding cuboid
-            - run RecalculateSquadManagerAOE def.barracksArea:<[barracksArea]> def.SMLocation:<[newSquadManagerLocation]> def.player:<player>
+            - run RecalculateSquadManagerAOE def.barracksArea:<[barracksArea]> def.SMLocation:<[newSMLocation]> def.player:<player>
 
             - run LoadTempInventory def.player:<player>
 
@@ -533,11 +520,11 @@ SquadManager_Handler:
         on player drops SquadManager_Item flagged:datahold.armies.movingSM:
         - determine passively cancelled
 
-        - define squadManagerLocation <player.flag[datahold.armies.movingSM.location]>
+        - define SMLocation <player.flag[datahold.armies.movingSM.location]>
 
         - take from:<player.inventory>
         - run LoadTempInventory def.player:<player>
-        - modifyblock <[squadManagerLocation]> Lodestone
+        - modifyblock <[SMLocation]> Lodestone
 
         ## Player Clicks Armory Set
         on player clicks SetArmoryLocations_Item in SquadManager_Interface:
@@ -640,14 +627,15 @@ SquadManager_Handler:
         on player breaks lodestone location_flagged:squadManager:
         - define kingdom <player.flag[kingdom]>
         - define SMInfo <context.location.flag[squadManager]>
+        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
 
-        - if <[kingdom]> != <[SMInfo].get[kingdom]>:
+        - if <[kingdom]> != <proc[GetSMKingdom].context[<[SMLocation]>]>:
             - determine cancelled
 
         - run GenerateSMID def.location:<context.location> save:smid
         - define SMID <entry[smid].created_queue.determination.get[1]>
-        - define squadList <[SMInfo].deep_get[squads.squadList].keys>
-        - define barrackList <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
+        - define squadList <proc[GetSMSquads].context[<[SMLocation]>].keys>
+        - define barrackList <proc[GetKingdomSquadManagers].context[<[kingdom]>]>
 
         - flag <player> datahold.armies.showAOE:!
         - flag <player> datahold.armies.squadManagerLocation:<context.location>
@@ -671,14 +659,13 @@ SquadManager_Handler:
         - define movableSquads <list[]>
 
         - foreach <[barrackList].filter_tag[<[filter_value].get[name].equals[<[SMInfo].get[name]>].not>]> as:barrack:
-            - define barrack <[barrack].get[location].flag[squadManager]>
-            - define barrackSquadLimitLevel <[barrack].deep_get[levels.squadLimitLevel]>
-            - define barrackSquadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[barrackSquadLimitLevel]>.value]>
-            - define barrackStationingCap <[barrack].deep_get[levels.stationCapacity]>
+            - define barrackLocation <[barrack].get[location]>
+            - define barrackSquadLimit <proc[GetSquadLimit].context[<[barrackLocation]>]>
+            - define barrackStationingCap <proc[GetStationingCapacity].context[<[barrackLocation]>]>
 
             - foreach <[squadList].exclude[<[movableSquads].parse_value_tag[<[parse_key]>]>]> as:squadName:
                 - define passedConditions 0
-                - define squad <[SMInfo].deep_get[squads.squadList.<[squadName]>]>
+                - define squad <proc[GetSMSquads].context[<[SMLocation]>].get[<[squadName]>]>
 
                 - if <[squad].get[npcList].size> <= <[barrackStationingCap]>:
                     - define passedConditions:++
@@ -770,7 +757,7 @@ SquadManagerDeletion_Handler:
                 - foreach <[movableSquads]> key:squad:
                     - define kingdom <[value].get[kingdom]>
                     - define barrackID <[value].get[barrackID]>
-                    - define newSMLocation <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.location]>
+                    - define newSMLocation <proc[GetSMLocation].context[<[barrackID]>|<[kingdom]>]>
 
                     - run GetSquadInfo def.kingdom:<player.flag[kingdom]> def.squadName:<[squad]> save:squadInfo
                     - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
@@ -850,7 +837,7 @@ CalculateSMCost:
 
     # TODO: Temp calculation-- make sure you come back to this later and factor in prestige!
     - define maxAllowedSMs <server.flag[kingdoms.<[kingdom]>.armies.maximumAllowedSMs].if_null[4]>
-    - define SMCount <server.flag[kingdoms.<[kingdom]>.armies.barracks].size>
+    - define SMCount <proc[GetKingdomSquadManagers].context[<[kingdom]>].size>
     - determine <element[2000].mul[<[maxAllowedSMs].mul[<[SMCount].sqrt>]>]>
 
 
@@ -866,14 +853,16 @@ BedSMLocation:
     ## >>> [LocationTag<?>]
 
     - define kingdom <[player].flag[kingdom]>
-    - define barracks <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
+    - define barracks <proc[GetKingdomSquadManagers].context[<[kingdom]>]>
 
     - if !<[barracks].exists>:
         - determine cancelled
 
-    - foreach <[barracks].values>:
-        - if <[value].get[area].contains[<[bedLocation]>]>:
-            - determine <[value].get[location]>
+    - foreach <[barracks].keys>:
+        - define barrackLocation <proc[GetSMLocation].context[<[value]>|<[kingdom]>]>
+
+        - if <proc[GetSMArea].context[<[barrackLocation]>].contains[<[bedLocation]>]>:
+            - determine <[barrackLocation]>
 
 
 CountBedsInSquadManagerArea:
@@ -888,8 +877,7 @@ CountBedsInSquadManagerArea:
     ##
     ## >>> [ElementTag<Integer>]
 
-    - define squadManagerData <[location].flag[squadManager]>
-    - define SMArea <[squadManagerData].get[area]>
+    - define SMArea <proc[GetSMArea].context[<[location]>]>
     - define bedCount <[SMArea].blocks[*_bed].size.div[2]>
     - determine <[bedCount]>
 

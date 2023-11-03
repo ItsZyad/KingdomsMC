@@ -33,8 +33,13 @@ SquadEditConfirm_Window:
     - [] [] [] [] [] [] [] [] []
 
 
+# @Deprecated
 SquadSelectionGUI_OLD:
     type: task
+    description:
+    - @Deprecated [Phase-out]
+    - *I'm really just using this for "spare parts" rn*
+
     script:
     - define kingdom <player.flag[kingdom]>
     - define squadList <server.flag[armies.<[kingdom]>.squads].keys>
@@ -118,7 +123,7 @@ SquadSelectionGUI:
     script:
     - define __player <[player]>
     - define kingdom <player.flag[kingdom]>
-    - define squadList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].keys>
+    - define squadList <proc[GetKingdomSquads].context[<[kingdom]>].keys>
     - define itemList <list[]>
 
     - if <[squadList].size.if_null[0]> == 0:
@@ -128,16 +133,17 @@ SquadSelectionGUI:
     - foreach <[squadList]> as:squadName:
         - define squadItem <item[SquadInterface_Item]>
         - define squad <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
-        - define displayName <[squad].get[displayName]>
+        - define displayName <proc[GetSquadDisplayName].context[<[kingdom]>|<[squadName]>]>
 
         - adjust def:squadItem display:<gold><bold><[displayName]>
 
-        - if <[squad].get[hasSpawned]>:
-            - define npcListShort <[squad].get[npcList].get[1].to[4].if_null[<list[]>]>
-            - define npcListShort <[npcListShort].include[<[squad].get[squadLeader]>]>
+        - if <proc[HasSquadSpawned].context[<[kingdom]>|<[squadName]>]>:
+            - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
+            - define npcListShort <[npcList].get[1].to[4].if_null[<list[]>]>
+            - define npcListShort <[npcListShort].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]>
 
-            - if <[npcListShort].size> < <[squad].get[npcList]>:
-                - define remainingNpcNumber <[squad].get[npcList].size.sub[<[npcListShort].size>]>
+            - if <[npcListShort].size> < <[npcList]>:
+                - define remainingNpcNumber <[npcList].size.sub[<[npcListShort].size>]>
                 - define npcListShort:->:<element[And <[remainingNpcNumber]> Others...].color[gray]>
 
             - adjust def:squadItem lore:<[npcListShort].separated_by[<n>]>
@@ -148,7 +154,7 @@ SquadSelectionGUI:
         - definemap squadInfo:
             internalName: <[squadName]>
             displayName: <[displayName]>
-            npcList: <[squad].get[npcList].if_null[<list[]>]>
+            npcList: <[npcList].if_null[<list[]>]>
 
         - flag <[squadItem]> squadInfo:<[squadInfo]>
         - define itemList:->:<[squadItem]>
@@ -256,7 +262,7 @@ SquadSelection_Handler:
         on player clicks SquadOrders_Item in SquadOptions_Window:
         - define kingdom <player.flag[kingdom]>
         - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
-        - define hasSpawned <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.hasSpawned]>
+        - define hasSpawned <proc[HasSquadSpawned].context[<[kingdom]>|<[squadName]>]>
 
         - if <[hasSpawned]>:
             - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList]>
@@ -275,6 +281,8 @@ SquadSelection_Handler:
 
                 - if <[spawnLocation]> != 0:
                     - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
+
+                    # TODO: Unfuck this.
                     - run GiveSquadTools def.player:<player>
 
                     - spawn <[npcList].include[<[squadLeader]>]> <[spawnLocation]>
@@ -307,14 +315,15 @@ SquadSelection_Handler:
             - define kingdom <player.flag[kingdom]>
             - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
             - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
-            - define newInternalName <context.message.replace_text[ ].with[-]>
-            - define squadInfo <[SMLocation].flag[squadManager.squads.squadList.<[squadName]>]>
-            - define squadInfo <[squadInfo].with[name].as[<[newInternalName]>].with[displayName].as[<context.message>]>
 
-            - flag <[SMLocation]> squadManager.squads.squadList.<[newInternalName]>:<[squadInfo]>
-            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>:!
+            - run RenameSquad def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.newName:<context.message> def.SMLocation:<[SMLocation]>
+            # - define squadInfo <[SMLocation].flag[squadManager.squads.squadList.<[squadName]>]>
+            # - define squadInfo <[squadInfo].with[name].as[<[newInternalName]>].with[displayName].as[<context.message>]>
 
-            - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
+            # - flag <[SMLocation]> squadManager.squads.squadList.<[newInternalName]>:<[squadInfo]>
+            # - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>:!
+
+            # - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
 
             - narrate format:callout "Renamed <[squadName].replace[-].with[ ].color[gray]> to: <context.message.color[red]>."
 
@@ -340,7 +349,8 @@ SquadSelection_Handler:
         - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
         - define hotbarSlots <context.inventory.list_contents.parse_tag[<[parse_value].material.name>].find_all[air]>
         - define armorSlots <context.inventory.list_contents.parse_tag[<[parse_value].material.name>].find_all_matches[*_boots|*_leggings|*_chestplate|*_helmet]>
-        - define hotbarItems <[squadManagerData].deep_get[squads.squadList.<[squadName]>.standardEquipment.hotbar].if_null[<list[]>]>
+        # - define hotbarItems <[squadManagerData].deep_get[squads.squadList.<[squadName]>.standardEquipment.hotbar].if_null[<list[]>]>
+        - define hotbarItems <proc[GetSquadEquipment].context[<[kingdom]>|<[squadName]>].get[hotbar]>
         - flag <player> datahold.hotbarSlots:<[hotbarSlots]>
         - flag <player> datahold.armorSlots:<[armorSlots]>
 
@@ -360,7 +370,8 @@ SquadSelection_Handler:
             - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
 
             - inventory set d:<context.inventory> origin:<context.cursor_item> slot:<context.slot>
-            - define hotbarItems <[SMLocation].flag[squadManager.standardEquipment.hotbar].if_null[<list[]>]>
+            # - define hotbarItems <[SMLocation].flag[squadManager.standardEquipment.hotbar].if_null[<list[]>]>
+            - define hotbarItems <proc[GetSquadEquipment].context[<[kingdom]>|<[squadName]>].get[hotbar]>
             - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.standardEquipment.hotbar:<[hotbarItems].remove[<[hotbarSlots].find[<context.slot>]>].include[<context.cursor_item>]>
             - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]>
 
@@ -452,7 +463,6 @@ SquadDeletion_Handler:
         - narrate format:callout "Deleted squad with name: <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadInfo].get[internalName]>.displayName].color[red]>"
 
         - run DeleteSquad def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.squadName:<[squadInfo].get[internalName]>
-
         - run SquadSelectionGUI def.player:<player>
 
         on player clicks SquadReject_Item in SquadDeleteConfirmation_Window:
@@ -471,16 +481,15 @@ SpawnSquadNPCs:
             - foreach stop
 
     SpawnSoldiers:
-    - define SMData <[SMLocation].flag[squadManager]>
-    - define hasSpawned <[SMData].deep_get[squads.squadList.<[squadName]>.hasSpawned]>
-    - define soldiers <[SMData].deep_get[squads.squadList.<[squadName]>.totalManpower]>
-    - define equipment <[SMData].deep_get[squads.squadList.<[squadName]>.standardEquipment]>
+    - define hasSpawned <proc[HasSquadSpawned].context[<[kingdom]>|<[squadName]>]>
+    - define soldiers <proc[GetSquadManpower].context[<[kingdom]>|<[squadName]>]>
+    - define equipment <proc[GetSquadEquipment].context[<[kingdom]>|<[squadName]>]>
     - define soldierList <list[]>
 
     - inject <script.name> path:SpawnSquadLeader
 
     - if !<[hasSpawned]>:
-        - foreach <[SMData].deep_get[squads.squadList.<[squadName]>.squadComp]> key:type as:amount:
+        - foreach <proc[GetSquadComposition].context[<[kingdom]>|<[squadName]>]> key:type as:amount:
             - run SpawnNewSoldiers def.type:<[type]> def.location:<[spawnLocation]> def.amount:<[amount]> def.squadName:<[squadName]> def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> save:soldiers
             - define soldier <entry[soldiers].created_queue.determination.get[1]>
             - flag <[soldier]> soldier.isSquadLeader:false
@@ -533,6 +542,7 @@ SpawnSquadNPCs:
 
         - if <[spawnLocation].exists>:
             - inject <script.name> path:SpawnSoldiers
+            - flag <player> datahold.squadInfo.name:<[squadName]>
 
         - else:
             - narrate format:debug "Invalid Location."

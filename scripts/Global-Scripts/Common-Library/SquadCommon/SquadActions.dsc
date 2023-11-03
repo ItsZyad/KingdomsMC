@@ -2,12 +2,249 @@
 ## [KAPI]
 ## All scripts that read and modify data at the squad-level of the army mechanic.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad/ITSZYAD#9280)
 ## @Original Scripts: Jun 2023
 ## @Date: Oct 2023
 ## @Script Ver: v0.1
 ##
 ## ----------------END HEADER-----------------
+
+# TODO -- New KAPI Scripts to Add:
+# TODO/ CreateSquad/SpawnSquad @ location
+# TODO/
+
+HasSquadSpawned:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    script:
+    ## Returns true if the squad has been spawned at least once before.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.hasSpawned].if_null[false]>
+
+
+GetSquadNPCs:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    script:
+    ## Gets a list of the NPCs constituting this squad.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [ListTag<NPCTag>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad list. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList].if_null[<list[]>]>
+
+
+GetSquadComposition:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    script:
+    ## Gets the composition map of the squad provided
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [MapTag<ElementTag<String>;<ElementTag<Integer>>>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad comp. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadComp].if_null[<map[]>]>
+
+
+GetSquadManpower:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    script:
+    ## Gets the total manpower of the squad provided
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Integer>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad manpower. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.totalManpower].if_null[0]>
+
+
+GetSquadLeader:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    script:
+    ## Gets the npc currently acting as the leader of the squad provided
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [NPCTag]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad leader. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader]>
+
+
+GetSquadID:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    script:
+    ## Gets the given squad's numerical ID
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Integer>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad leader. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.ID]>
+
+
+GetSquadName:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|ID[ElementTag(Integer)]
+    script:
+    ## Gets the given squad's internal name
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## ID        : [ElementTag<Integer>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad leader. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].filter_tag[<[filter_value].get[ID].equals[<[ID]>]>].get[1].get[name]>
+
+
+GetSquadDisplayName:
+    type: procedure
+    definitions: kingdom|squadName
+    script:
+    ## Gets the given squad's display name
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad leader. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.displayName]>
+
+
+GetSquadEquipment:
+    type: procedure
+    definitions: kingdom|squadName
+    script:
+    ## Returns a map of the given squad's standard equipment in the following format:
+    ## helmet:     <ItemTag>
+    ## chestplate: <ItemTag>
+    ## leggings:   <ItemTag>
+    ## boots:      <ItemTag>
+    ## hotbar:     <ListTag<ItemTag>>
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [MapTag<
+    ##         <ItemTag>;
+    ##         <ItemTag>;
+    ##         <ItemTag>;
+    ##         <ItemTag>;
+    ##         <ListTag<
+    ##             <ItemTag>
+    ##         >>
+    ##     >]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad equipment. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
+        - determine null
+
+    - define equipment <server.flag[kigndoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.standardEquipment]>
+    - define equipment.hotbar <list[]> if:<[equipment].get[hotbar].exists.not>
+
+    - determine <[equipment]>
+
+
+RenameSquad:
+    type: task
+    definitions: kingdom|squadName|newName|SMLocation
+    script:
+    ## Renames the squad with the provided name to a new name
+    ##
+    ## kingdom    : [ElementTag<String>]
+    ## squadName  : [ElementTag<String>]
+    ## newName    : [ElementTag<String>]
+    ## SMLocation : ?[LocationTag]
+    ##
+    ## >>> [Void]
+
+    - define newInternalName <[newName].replace_text[ ].with[-]>
+
+    - if !<[SMLocation].exists>:
+        - define SMLocation <server.flag[kingdoms.<[kingdom]>.armies.barracks].filter_tag[<[filter_value].get[stationedSquads].contains[<[squadName]>]>].get[1]>
+
+    - if <server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[newInternalName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot rename squad: <[squadName]> to: <[newInternalName]>. Squad with that name already exists]>
+        - determine cancelled
+
+    - define squadInfo <[SMLocation].flag[squadManager.squads.squadList.<[squadName]>]>
+    - define squadInfo <[squadInfo].with[name].as[<[newInternalName]>].with[displayName].as[<[newName]>]>
+
+    - flag <[SMLocation]> squadManager.squads.squadList.<[newInternalName]>:<[squadInfo]>
+    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>:!
+
+    - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
+
 
 DeleteSquad:
     type: task
@@ -61,7 +298,7 @@ CreateSquadReference:
     ## SMLocation    : [LocationTag]
     ## kingdom       : [ElementTag<String>]
     ## displayName   : [ElementTag<String>]
-    ## squadComp     : [MapTag<[ElementTag<String>];[ElementTag<Integer>]>]
+    ## squadComp     : [MapTag<ElementTag<String>;ElementTag<Integer>>]
     ## totalManpower : [ElementTag<Integer>]
     ##
     ## >>> [Void]
@@ -145,9 +382,13 @@ ResetSquadTools:
         - flag <player> datahold.armies.previousItemSlot:!
 
 
+# @Deprecated
 GetSquadInfo:
     type: task
-    definitions: kingdom|squadName
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    description:
+    - @Deprecated [Phase-out]
+
     script:
     ## Gets the full squad information of a given squad under the given kingdom
     ##

@@ -103,13 +103,13 @@ SquadOptions_Handler:
         ## RECALL SQUAD
         on player right clicks block with:SquadRecall_Item:
         - define kingdom <player.flag[kingdom]>
-        - define squadInfo <player.flag[datahold.squadInfo]>
-        - define npcList <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]>
+        - define squadName <player.flag[datahold.squadInfo.name]>
+        - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
         - define stationInfo <server.flag[kingdoms.<[kingdom]>.armies.barracks].parse_value_tag[<[parse_value].get[stationedSquads]>]>
         - define barrackID 0
 
         - foreach <[stationInfo]>:
-            - if <[value].contains[<[squadInfo].get[name]>]>:
+            - if <[value].contains[<[squadName]>]>:
                 - define barrackID <[key]>
                 - foreach stop
 
@@ -125,7 +125,7 @@ SquadOptions_Handler:
         - foreach <[npcList]> as:npc:
             - run WalkSoldierToSM_Helper def.npc:<[npc]> def.location:<[spawnLocation]>
 
-        - run SquadEquipmentChecker def.squadName:<[squadInfo].get[name]> def.kingdom:<[kingdom]>
+        - run SquadEquipmentChecker def.squadName:<[squadName]> def.kingdom:<[kingdom]>
         - run ActionBarToggler def.player:<player> def.toggleType:false
 
         - narrate format:callout "Stashing squad at barracks: <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.name].color[red]>..."
@@ -265,19 +265,16 @@ SquadEquipmentChecker:
     ##
     ## >>> [Void]
 
-    # GetSquadInfo and find standard equipment assigned to this squad
-    - run GetSquadInfo def.squadName:<[squadName]> def.kingdom:<[kingdom]> save:squadInfo
-    - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
-    - define standardEquipment <[squadInfo].deep_get[standardEquipment]>
+    - define standardEquipment <proc[GetSquadEquipment].context[<[kingdom]>|<[squadName]>]>
 
     # Get SMLocation and find armory locations
     - run GetSquadSMLocation def.squadName:<[squadName]> def.kingdom:<[kingdom]> save:SMLocation
     - define SMLocation <entry[SMLocation].created_queue.determination.get[1]>
-    - define filledArmories <[SMLocation].flag[squadManager.armories].filter_tag[<[filter_value].inventory.is_empty.not>]>
+    - define filledArmories <proc[GetSMArmoryLocations].context[<[SMLocation]>].filter_tag[<[filter_value].inventory.is_empty.not>]>
 
     # Loop through all squad soldiers with squad leader coming first to give them priority for
     # equipment
-    - foreach <[squadInfo].get[npcList].insert[<[squadInfo].get[squadLeader]>].at[1]> as:soldier:
+    - foreach <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].insert[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>].at[1]> as:soldier:
 
         # Compare the armor and equipment that the soldier has against the standard equipment
         - define soldierArmor <[soldier].equipment>
@@ -325,6 +322,7 @@ FindClickedSquad:
 
 DEBUG_ClearSquadEquipment:
     type: task
+    enabled: false
     definitions: squadName|kingdom
     script:
     - run GetSquadInfo def.squadName:<[squadName]> def.kingdom:<[kingdom]> save:squadInfo
@@ -350,6 +348,7 @@ WalkSoldierToSM_Helper:
 
 OLD_SquadAttackAllOrder:
     type: task
+    enabled: false
     definitions: kingdom|squadName
     DEBUG_OldApproach:
     - define squadInfo <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>

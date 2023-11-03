@@ -5,7 +5,7 @@
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Original Scripts: Jun 2023
 ## @Date: Oct 2023
-## @Script Ver: v0.1
+## @Script Ver: v0.2
 ##
 ## ----------------END HEADER-----------------
 
@@ -20,6 +20,24 @@ GenerateSMID:
     ## >>> [ElementTag<Integer>]
 
     - determine <[location].simple.split[,].remove[last].unseparated>
+
+
+GetSMLocation:
+    type: procedure
+    definitions: SMID|kingdom
+    script:
+    ## Gets the location of a specific squad manager, provided the SM's kingdom and ID
+    ##
+    ## SMID    : [ElementTag<Integer>]
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [LocationTag]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get SM Location. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.location]>
 
 
 GetSMName:
@@ -176,6 +194,22 @@ GetSMArmoryLocations:
     - determine <[SMLocation].flag[squadManager.armories]>
 
 
+GetSMSquads:
+    type: procedure
+    definitions: SMLocation
+    script:
+    ## Gets a list of all the squads stationed at a certain SM
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> [ListTag<MapTag>]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - determine null
+
+    - determine <[SMLocation].flag[squadManager.squads.squadList]>
+
+
 GetSquadSMLocation:
     type: task
     definitions: kingdom|squadName
@@ -195,29 +229,3 @@ GetSquadSMLocation:
             - define SMID <[key]>
             - define location <[barracks].get[<[SMID]>].get[location]>
             - determine <[location]>
-
-
-WriteArmyDataToKingdom:
-    type: task
-    definitions: SMLocation|kingdom
-    script:
-    ## Ensures that the kingdom.armies flag contains the same information as the squad manager
-    ## flag of the provided SMLocation
-    ##
-    ## SMLocation : [LocationTag]
-    ## kingdom    : [ElementTag<String>]
-    ##
-    ## >>> [Void]
-
-    - define squadManagerID <[SMLocation].simple.split[,].remove[last].unseparated>
-    - define SMData <[SMLocation].flag[squadManager]>
-    - define stationedSquads <[SMData].deep_get[squads.squadList].keys> if:<[SMData].deep_get[squads.squadList].exists>
-    - define SMData <[SMData].exclude[kingdom].exclude[id].deep_exclude[squads]>
-
-    - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>:<[SMData]>
-    - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.location:<[SMLocation]>
-    - flag server kingdoms.<[kingdom]>.armies.barracks.<[squadManagerID]>.stationedSquads:<[stationedSquads]> if:<[stationedSquads].exists>
-    - flag server kingdoms.<[kingdom]>.armies.squads.squadList:!
-
-    - foreach <[SMLocation].flag[squadManager.squads.squadList].if_null[<list[]>]>:
-        - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[key]>:<[value]>

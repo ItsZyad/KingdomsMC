@@ -100,6 +100,7 @@ FormationWalkFix_Handler:
 
 DEBUG_RefreshGarrisonArea:
     type: task
+    enabled: false
     definitions: target
     script:
     - define fakeBlockList <[target].flag[definingGarrison]>
@@ -118,6 +119,7 @@ DEBUG_GarrisonBrush_ITEM:
 
 DEBUG_GarrisonBrush_HANDLER:
     type: world
+    enabled: false
     events:
         on player left clicks block with:DEBUG_GarrisonBrush_ITEM:
         - flag <player> definingGarrison:!

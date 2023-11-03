@@ -131,16 +131,13 @@ SquadComposition_Handler:
             - determine cancelled
 
         on player clicks SquadCompositionAccept_Item in SquadComposition_Interface:
-        - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
-        - define squadManagerLocation <player.flag[datahold.armies.squadManagerLocation]>
-        - define squadList <[squadManagerData].get[squadList].if_null[<list[]>]>
-        - define squadLimitLevel <[squadManagerData].deep_get[levels.squadLimitLevel]>
-        - define squadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[squadLimitLevel]>.value]>
-        - define stationCapacity <[squadManagerData].deep_get[levels.stationCapacity]>
-        - define squadSizeLevel <[squadManagerData].deep_get[levels.squadSizeLevel]>
-        - define squadSizeLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadSize.<[squadSizeLevel]>.value]>
+        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - define kingdom <player.flag[kingdom]>
+        - define squadList <proc[GetKingdomSquads].context[<[kingdom]>]>
+        - define squadLimit <proc[GetSquadLimit].context[<[SMLocation]>]>
+        - define stationCapacity <proc[GetStationingCapacity].context[<[SMLocation]>]>
+        - define squadSizeLimit <proc[GetMaxSquadSize].context[<[SMLocation]>]>
         - define totalManpower <player.flag[datahold.armies.manpower]>
-        - narrate format:debug SMD:<[squadManagerData]>
 
         - if <[squadList].size> >= <[squadLimit]>:
             - narrate format:callout "These barracks already have the maximum amount of squads stationed in them! You must upgrade it first."

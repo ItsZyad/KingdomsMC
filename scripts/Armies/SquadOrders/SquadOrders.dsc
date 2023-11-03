@@ -122,24 +122,24 @@ SoldierCombat_Handler:
             - define SMLocation <entry[SMLocation].created_queue.determination.get[1]>
 
             - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<-:<[soldier]>
-            - define squadInfo <[SMLocation].flag[squadManager.squads.squadList.<[squadName]>]>
+            - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
 
             - if <[soldier].flag[soldier.isSquadLeader].if_null[false]>:
                 - flag <[soldier]> datahold.armies.particles:!
 
                 # Last soldier is killed - delete squad
-                - if <[squadInfo].get[npcList].size> == 0:
+                - if <[npcList].size> == 0:
                     - run DeleteSquad def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.squadName:<[squadName]>
 
                 # Promote a soldier to become squad leader
                 - else:
-                    - define firstSoldier <[squadInfo].get[npcList].first>
+                    - define firstSoldier <[npcList].first>
                     - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.squadLeader:<[firstSoldier]>
                     - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<-:<[firstSoldier]>
                     - flag <[firstSoldier]> soldier.isSquadLeader:true
 
                     - rename "&4Squad Leader" t:<[firstSoldier].as[npc]>
                     - assignment set to:<[firstSoldier]> script:SoldierManager_Assignment
-                    - run SoldierParticleGenerator def.npcList:<[squadInfo].get[npcList]> def.squadLeader:<[firstSoldier]> def.orderType:attackAll
+                    - run SoldierParticleGenerator def.npcList:<[npcList]> def.squadLeader:<[firstSoldier]> def.orderType:attackAll
 
             - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
