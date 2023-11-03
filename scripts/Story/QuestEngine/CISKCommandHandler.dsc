@@ -539,6 +539,31 @@ NPCWalkHelper_CISK:
     - waituntil <[target].is_navigating.not> rate:10t
     - teleport <[target]> <[location]>
 
+# Example Usage:
+# <run SampleTestScript>
+RunCommand_CISK:
+    type: task
+    description:
+    - CISK COMMAND - Runs a Denizen task script inside a CISK container, automatically passing in
+    - the context associated with the current CISK queue.
+    - Example Usage<&co>
+    - <&lt>run SampleTaskScript<&gt>
+
+    PostEvaluationCode:
+    - if <util.scripts.contains[s<&at><[scriptName]>]>:
+        - definemap contextData:
+            player: <player>
+            npc: <npc>
+
+        - run <[scriptName]> defmap:<[contextData]>
+
+    - else:
+        - run GenerateInternalError def.silent:true def.category:GenericError def.message:<element[Unable to run script: <[scriptName]> within quest schema. Maybe a task script by that name does not exist?]>
+
+    script:
+    - define scriptName <[attrVal]>
+    - foreach stop
+
 
 # Example Usage:
 # <add 3 5>
