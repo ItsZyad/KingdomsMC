@@ -13,17 +13,18 @@ ChunkMap:
     script:
     - define playerChunk <player.location.chunk>
     - define chunkList <list[]>
-    - define allClaims <server.flag[kingdoms.claimInfo.allClaims]>
+    # - define allClaims <server.flag[kingdoms.claimInfo.allClaims]>
+    - define allClaims <proc[GetAllClaims]>
     - define kingdomList <proc[GetKingdomList]>
 
     - repeat 10 from:-5 as:zChunk:
         - repeat 19 from:-9 as:xChunk:
             - define currentChunk <[playerChunk].add[<[xChunk]>,<[zChunk]>]>
-            #- narrate format:debug CUR:<[currentChunk]>
 
             - if <[allClaims].contains[<[currentChunk]>]>:
                 - foreach <[kingdomList]> as:kingdom:
-                    - define kingdomTerritory <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
+                    # - define kingdomTerritory <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
+                    - define kingdomTerritory <proc[GetClaims]>
                     - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
 
                     - if <[currentChunk]> == <[playerChunk]> && <[kingdomTerritory].contains[<[currentChunk]>]>:
