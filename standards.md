@@ -202,7 +202,7 @@ Data scripts in Kingdoms are not allowed to utilize non-nested keys. All data mu
 ```DenizenScript
 SomeItemsAndNumbers:
     type: data
-    items:
+    Items:
         wood:
             oak_planks: 100
             spruce_planks: 100
@@ -217,3 +217,45 @@ Additionally, all naming schemes outlined for definitions and flags apply to dat
 ## Command Scripts
 
 TODO
+
+## Subpaths
+
+Subpathing is an essential tool that you can use to avoid code clutter in larger task and procedure scripts. They also have the added performance benefit of reducing the number of scripts processed by Denizen on every reload. However subpathed code may only be called from within the same script. Pull requests featuring scripts that call subpathed code from another script will almost certainly be rejected.
+
+Additionally, always ensure that subpaths are written below the `script:` key on any script that contains them;
+
+```DenizenScript
+SomeTaskScript:
+    type: task
+    script:
+    - narrate "This is a script to demonstrate subpath formatting!"
+    - inject <script.name> path:OtherCode
+
+    OtherCode:
+    - repeat 10:
+        - narrate "Subpaths are cool!"
+```
+
+All naming and spacing conventions mentioned in above sections apply to subpaths. Subpath name must be camel-cased and be preceded by one empty line.
+
+Optionally, in cases where a script has too many subpaths, the submitter may opt to add a deliniator between them in the following format: 
+
+```DenizenScript
+SomeTaskScript:
+    type: task
+    script:
+    - narrate "This is a script to demonstrate subpath formatting!"
+    - inject <script.name> path:OtherCode
+
+    OtherCode:
+    - repeat 10:
+        - narrate "Subpaths are cool!"
+
+    #------------------------------------------------------------------------------------------
+
+    OtherOtherCode:
+    - narrate "More code goes here..."
+```
+*(although this is not required, and the amount of subpaths deemed "too many" can be determined by the submitter)*
+
+Should a deliniator be included, it must be on a comment line starting at an indentation level of 4 spaces, and consist of dash characters which stretch from the start of the comment to column 100 of the line. The deliniator must then be preceded and followed by empty lines.
