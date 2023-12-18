@@ -8,6 +8,34 @@
 ##
 ## ----------------END HEADER-----------------
 
+
+GetAllClaims:
+    type: procedure
+    definitions: type[?ElementTag(String)]
+    description:
+    - Gets all claims of the provided type made by all kingdoms.
+    - If no type is specified, the procedure will return all claims of all types.
+
+    script:
+    ## Gets all claims of the provided type made by all kingdoms. If no type is specified, the
+    ## procedure will return all claims of all types.
+    ##
+    ## type : ?[ElementTag<String>]
+    ##
+    ## >>> [ListTag<ChunkTag>]
+
+    - define allClaims <list[]>
+
+    - if <[type].is_in[core|castle]>:
+        - foreach <proc[GetKingdomList]> as:kingdom:
+            - define allClaims <[allClaims].include[<server.flag[kingdoms.<[kingdom]>.claims.<[type]>]>]>
+
+    - else:
+        - define allClaims <server.flag[kingdoms.claimInfo.allClaims]>
+
+    - determine <[allClaims]>
+
+
 GetClaims:
     type: procedure
     definitions: kingdom[ElementTag(String)]|type[?ElementTag(String)]
