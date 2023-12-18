@@ -1,241 +1,51 @@
 ##
-## * The main command handler for all the
-## * main kingdoms commands
+## * This file contains the command script which handles this /kingdom or /k command. This command
+## * allows players to interact with the kingdom they are currently in. For the /kingdoms or /ks
+## * command look for the KingdomsCommand.dsc file.
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Aug 2020
 ## @Update 1: Mar 2021
 ## @Update 2: Apr-Jun 2022
-## @Script Ver: v2.0
+## @Update 3: Dec 2023
+## **** Note: This update entailed the splitting of the former CommandHandler.dsc file into smaller
+## ****       sub-files containing each of the separate sub-commands (or sub-command groups) of the
+## ****       /k and /ks command handlers. All of the subcommand should be found in their respecti-
+## ****       -ve files under this folder.
 ##
-##ignorewarning invalid_data_line_quotes
-## ----------------END HEADER-----------------
+## @Script Ver: v3.0
+##
+#- Note #1: The coreclaim/castleclaim system is just odd. Perhaps now is time to modernize it and
+#-          implement something like a wand that lets you claim chunks, or some sort of a visual
+#-          system involving a GUI...
+##
+## ------------------------------------------END HEADER-------------------------------------------
 
-Kingdoms_Command:
-    type: command
-    usage: /kingdoms
-    name: kingdoms
-    description: Umbrella command for kingdoms
-    aliases:
-        - ks
-    tab completions:
-        1: about|credits|chunkmap|travel|ping|map|rules|version
-    tab complete:
-    - if <context.args.size> > 1 && <context.args.get[2]> == help:
-        - if <script[Help_Strings].list_keys[].contains[<context.args.get[1]>]>:
-            - narrate format:callout <script[Help_Strings].data_key[<context.args.get[1]>].parsed>
-
-        - determine cancelled
-
-    - if <context.args.get[1]> == travel && <context.args.size.is[LESS].than[2]>:
-        - define allStory <list[]>
-
-        # Note: Not a general case
-        - define areaList <player.flag[foundAreas].include[<polygon[INTERNAL_STORY_Fyndalin_Castle]>]>
-
-        - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
-            - define areaList <util.notes>
-
-        - foreach <[areaList].filter_tag[<[filter_value].to_uppercase.split[@].get[2].starts_with[INTERNAL_STORY]>]>:
-            - if <[value].has_flag[name]>:
-                - define allStory:->:<[value].flag[name].replace[_].with[<&sp>]>
-
-        - determine <[allStory]>
-
-    script:
-    - if <context.args.get[1]> == version:
-        - yaml load:kingdoms.yml id:kingdoms
-        - define hoverTest "<&7>Code Compostion: 99.4<&pc> Denizen // 0<&pc> Java // 0.6<&pc> Python"
-        - narrate format:callout <yaml[kingdoms].read[version].on_hover[<[hoverTest]>]>
-        - yaml load:kingdoms.yml id:kingdoms
-
-    - else if <context.args.get[1]> == about:
-        - narrate format:information "Kingdoms is an expansive Minecraft project which aims to blend the worlds of strategy and roleplay gaming into a medival/fantasy world rich with story and possibilities. The game, upon completion, should allow you to do just about anything you want from commanding an army, conducting diplomacy with other kingdoms, improving the lives of your subjects and much more. Kingdoms aims to be one of the most ambitious projects in Minecraft but is currently still in early development."
-        - narrate format:information "Made with ❤ using Denizen©"
-
-    - else if <context.args.get[1]> == rules:
-        - narrate format:information "Rules and Guidelines Doc: https://docs.google.com/document/d/1U3_uZp75n77k9t58M0aKWwaUE7wIHL4PyioKMFv3vaQ/edit?usp=sharing"
-
-    - else if <context.args.get[1]> == credits:
-        - narrate format:information "<&b>Lead Developer: <aqua>Zyad Osman <&9>(ZyadTheBoss)"
-        - wait 1s
-
-        - narrate <&sp>
-        - narrate format:information "<&b>Builders: <aqua>Ben Tcazuck <&9>(EchosBattalion),"
-        - wait 1s
-
-        - narrate format:information "            <aqua>Claude <&9>(Spaggyboidotcom),"
-        - wait 1s
-
-        - narrate format:information "            <aqua>Cydnee Howard <&9>(Shadow31911)"
-        - wait 1s
-
-        - narrate format:information "            <aqua>Alex Raymont <&9>(lyx3)"
-        - wait 1s
-
-        - narrate format:information "            <aqua>Max Chapman <&9>(Mxchapz)"
-        - wait 1s
-
-        - narrate <&sp>
-        - narrate format:information "<&b>Writing Contributions: <aqua>Claude <&9>(Spaggyboidotcom),"
-        - wait 1s
-
-        - narrate format:information "                           <aqua>Philip Harker <&9>(Philidips),"
-        - wait 1s
-
-        - narrate <&sp>
-        - narrate format:information "<&b>Special Thanks: <&9>Denizen Team/Alex Goodwin"
-
-    - else if <context.args.get[1]> == map:
-        - narrate "<blue><bold>Kingdoms Live Map:"
-        - narrate format:information <underline>http://5.62.127.51:27204/#close
-
-    - else if <context.args.get[1]> == ping:
-        - define ping <player.ping>
-        - define color blue
-
-        - if <[ping].is[OR_MORE].than[900]>:
-            - define color gray
-        - else if <[ping].is[OR_MORE].than[650]>:
-            - define color red
-        - else if <[ping].is[OR_MORE].than[270]>:
-            - define color yellow
-        - else if <[ping].is[OR_MORE].than[50]>:
-            - define color green
-
-        - narrate "<element[Ping: ].color[gold].bold><element[<[ping]>ms].color[<[color]>]>"
-
-    - else if <context.args.get[1]> == travel:
-        - if <context.args.size.is[OR_MORE].than[2]>:
-            - inject FastTravel
-
-        - else:
-            - narrate format:callout "You must specify a location to fast travel to!"
-
-    - else if <context.args.get[1]> == chunkmap:
-        - inject ChunkMap
-
-
-ChunkMap:
-    type: task
-    debug: false
-    script:
-    - define playerChunk <player.location.chunk>
-    - define chunkList <list[]>
-    - define allClaims <server.flag[kingdoms.claimInfo.allClaims]>
-    - define kingdomList <proc[GetKingdomList]>
-
-    - repeat 10 from:-5 as:zChunk:
-        - repeat 19 from:-9 as:xChunk:
-            - define currentChunk <[playerChunk].add[<[xChunk]>,<[zChunk]>]>
-            #- narrate format:debug CUR:<[currentChunk]>
-
-            - if <[allClaims].contains[<[currentChunk]>]>:
-                - foreach <[kingdomList]> as:kingdom:
-                    - define kingdomTerritory <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
-                    - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
-
-                    - if <[currentChunk]> == <[playerChunk]> && <[kingdomTerritory].contains[<[currentChunk]>]>:
-                        - define chunkList:->:<element[P].color[<[kingdomColor]>]>
-                        - foreach stop
-
-                    - else if <[kingdomTerritory].contains[<[currentChunk]>]>:
-                        - define chunkList:->:<element[■].color[<[kingdomColor]>]>
-                        - foreach stop
-
-            - else if <[currentChunk]> != <[playerChunk]>:
-                - define chunkList:->:<element[-].color[gray]>
-
-            - else:
-                - define chunkList:->:<element[P].color[white].on_hover[<[currentChunk]>]>
-
-    - define chunkList <[chunkList].sub_lists[19]>
-    - narrate "<gold>=-=-=-=-=-= <element[Chunk Map].color[#f7c64b]> =-=-=-=-=-=-="
-    - narrate <[chunkList].parse_tag[<[parse_value].space_separated>].separated_by[<n>]>
-    - narrate "- : <gray>Wilderness"
-    - narrate "P : <blue>Player"
-    - narrate "■ : <gold>Kingdom Claim"
-    - narrate "▒ : <green>Kingdom Outpost"
-
-
-##############################################################################
-
-##ignorewarning ancient_defs
-
-Kingdom_Ideas:
-    type: data
-    # altea
-    raptoran:
-        debuff:
-            name: "ANTI-IMPERIALIST"
-            desc: "Claiming core chunks costs 10% more upfront"
-        buff:
-            name: "PROVING OUR WORTH"
-            desc: "Gets a 10% boost to point gain during wars"
-    # muspelheim
-    centran:
-        debuff:
-            name: "AILING POWER"
-            desc: "Gets a -15% debuff to point gain during wars"
-        buff:
-            name: "HISTORICAL ROOTS"
-            desc: "Claiming core chunks costs 15% less upfront"
-    viridian:
-        debuff:
-            name: "UNINTERESTED IN COLONIALISM"
-            desc: "Outposts cost twice as much upfront"
-        buff:
-            name: "MERCHANT CULTURE"
-            desc: "Recieves twice the amount of black market loot for the same price"
-    # grovelia
-    cambrian:
-        debuff:
-            name: "INDECISIVE COMMANDER"
-            desc: "Declaring and Escalating wars takes $8,500 out of the Kingdom bank"
-        buff:
-            name: "RESTORING PRECIPIUM"
-            desc: "Outpost and core claiming cost 10% less each upfront"
-    fyndalin:
-        debuff:
-            name: "DECLAWED WOLF"
-            desc: "Any military or territorial expansion is locked unless the mandate council provides and exception"
-
-        # OK THIS IS BIG IDEA!!
-        # Fyndalin becomes player control but is entirely subordinated at the start
-        # and much like how the kingdoms have the ability to influence fyndalin,
-        # the city state has a mirror mechanic that allows it to counter these tactics
-        # by increasing its own autonomy.
-
-        buff:
-            name: "FESTERING NATIONALISM"
-            desc: "Fyndalin's autonomy will increase exponentially as the game progresses"
-
-##############################################################################
 
 Help_Strings:
     type: data
-    coreclaim: Claims <element[core territory].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]> for your kingdom. You need to the King or Vizier to do this action!
-    castleclaim: Claims <element[castle territory].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]> for your kingdom. You need to the King to do this action!
-    unclaim: Unclaims the chunk you are standing in if it is a part of your claims. You are refunded for its full upkeep value but not its upfront value.
-    balance: Shows the joint kingdom bank account.
-    deposit: Adds the specified amount of money to your kingdom's balance.
-    withdraw: Transfers the specified amount of money from the kingdom's balance to your personal account.
-    trade: Initiates a trade with the specified player.
-    rename: Renames the kingdom. <element[This command is restricted!].color[red].on_hover[Only the king can use this command with the the Game Czar's approval.]>
-    npc: Use /k npc spawn to open the spawn menu for kingdom NPCs.
-    warp: Takes you to your kingdom's private warp location. <red>Note that there is a 30 sec cooldown for this command.
-    ideas: Shows your kingdom's ideas. These are a number of buffs and debuffs that apply to kingdom depending on its character and history.
-    outline: You can specify either 'castle' or 'core' to show you the bounds of both of those territorial units in your kingdom.
-    influence: Opens a menu which shows all the influence actions you can take to bring Fyndalin further under your control, as well as the current status of your kingdom's influence. <red>Can also be accessed using /influence
-    guards: Will open your kingdom's guard window which will show all your guard NPCs, their location, status, and other information.
-    help: That's so meta...
+    CommandHelpStrings:
+        coreclaim: Claims <element[core territory].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]> for your kingdom. You need to the King or Vizier to do this action!
+        castleclaim: Claims <element[castle territory].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]> for your kingdom. You need to the King to do this action!
+        unclaim: Unclaims the chunk you are standing in if it is a part of your claims. You are refunded for its full upkeep value but not its upfront value.
+        balance: Shows the joint kingdom bank account.
+        deposit: Adds the specified amount of money to your kingdom's balance.
+        withdraw: Transfers the specified amount of money from the kingdom's balance to your personal account.
+        trade: Initiates a trade with the specified player.
+        rename: Renames the kingdom. <element[This command is restricted!].color[red].on_hover[Only the king can use this command with the the Game Czar's approval.]>
+        npc: Use /k npc spawn to open the spawn menu for kingdom NPCs.
+        warp: Takes you to your kingdom's private warp location. <red>Note that there is a 30 sec cooldown for this command.
+        ideas: Shows your kingdom's ideas. These are a number of buffs and debuffs that apply to kingdom depending on its character and history.
+        outline: You can specify either 'castle' or 'core' to show you the bounds of both of those territorial units in your kingdom.
+        influence: Opens a menu which shows all the influence actions you can take to bring Fyndalin further under your control, as well as the current status of your kingdom's influence. <red>Can also be accessed using /influence
+        guards: Will open your kingdom's guard window which will show all your guard NPCs, their location, status, and other information.
+        help: That's so meta...
 
-    travel: Upon selecting one of the options from the tab menu you will be teleported to that fast-travel location's designated waypoint. However you must discover an area first, before you travel to it.
-    map: Displays the Kingdoms live map.
-    rules: Displays the Kingdoms rules document.
-    chunkmap: Displays an in-chat map of the surrounding chunks and their claim status.
+        travel: Upon selecting one of the options from the tab menu you will be teleported to that fast-travel location's designated waypoint. However you must discover an area first, before you travel to it.
+        map: Displays the Kingdoms live map.
+        rules: Displays the Kingdoms rules document.
+        chunkmap: Displays an in-chat map of the surrounding chunks and their claim status.
 
-##############################################################################
 
 Kingdom_Command:
     type: command
@@ -263,28 +73,53 @@ Kingdom_Command:
 
     script:
     - define kingdom <player.flag[kingdom]>
+    - define args <context.raw_args.split_args>
 
-    - if <context.args.get[2]> == help:
-        - if <script[Help_Strings].list_keys[].contains[<context.args.get[1]>]>:
-            - narrate format:callout <script[Help_Strings].data_key[<context.args.get[1]>].parsed>
+    - if <[args].get[2]> == help:
+        - if <script[Help_Strings].data_key[CommandHelpStrings].list_keys[].contains[<context.args.get[1]>]>:
+            - narrate format:callout <script[Help_Strings].data_key[CommandHelpStrings.<context.args.get[1]>].parsed>
 
         - determine cancelled
 
-    - else if <context.args.get[1]> == help:
-        - narrate format:callout "The /k command allows you to interact with most aspects of your kingdom such as finances, resources, trade and more."
-        - narrate "<&n>                                       <&n.end_format>"
-        - narrate <&sp>
-        - narrate format:callout "<&r><italic>You can also type 'help' after each of the kingdom commands to learn more about them individually."
+    ## Note: Adding a case statement for a sub-command which already has its own sub-path will over-
+    ##       ride its behavior.
 
-    - else if <context.args.get[1]> == outline:
-        # DEFINE PARAM GLOBALS #
-        - define param <context.args.get[2]>
+    - choose <[args].get[1]>:
+        - case help:
+            - narrate format:callout "The /k command allows you to interact with most aspects of your kingdom such as finances, resources, trade and more."
+            - narrate "<&n>                                       <&n.end_format>"
+            - narrate <&sp>
+            - narrate format:callout "<&r><italic>You can also type 'help' after each of the kingdom commands to learn more about them individually."
+
+        - case castleclaim:
+            - narrate format:debug "Sub-command is being re-implemented. See note #1 in CommandHandler/KingdomCommand.dsc."
+
+        - case coreclaim:
+            - narrate format:debug "Sub-command is being re-implemented. See note #1 in CommandHandler/KingdomCommand.dsc."
+
+        - case trade:
+            - narrate format:debug "Sub-command is being re-implemented."
+
+        - case influence:
+            - execute as_player influence
+
+        - default:
+            - if <[args].get[1].to_lowercase.is_in[<script.data_key[SubCommands].keys.parse_tag[<[parse_value]>]>]>:
+                - inject <script.name> path:SubCommands.<[args].get[1].to_titlecase>
+
+            - else:
+                - narrate format:callout "<[args].get[1].color[red]> is not a recognized sub-command."
+
+    SubCommands:
+        Outline:
+        - define param <[args].get[2]>
         - define jointCuboid 0
         - define persistTime 10
         - define territoryType castle_territory
 
-        - if <context.args.size.is[LESS].than[2]>:
+        - if <[args].size.is[LESS].than[2]>:
             - narrate format:callout "Insufficient or too many parameters. Please specify either castle or core territory to outline"
+            - determine cancelled
 
         - else if <[param].is_in[castle|core]>:
             - define territoryType <[param]>
@@ -301,8 +136,10 @@ Kingdom_Command:
         # If the player specificies a duration tag then check if the duration is more
         # than 0 and set persistTime as it
 
-        - if <context.args.get[3].starts_with[duration:]>:
-            - define duration <context.args.get[3].split[duration:].get[2]>
+        - narrate format:debug <[args]>
+
+        - if <[args].size> >= 3 && <[args].get[3].starts_with[duration:]>:
+            - define duration <[args].get[3].split[duration:].get[2]>
 
             # Ensure that if a duration is specified, it is less than 2min and more than 1s.
             # If player specifies invalid amount the whole command request is discarded
@@ -333,51 +170,9 @@ Kingdom_Command:
         - else:
             - showfake red_stained_glass <[jointCuboid].outline_2d[<player.location.y.add[20]>]> duration:<[persistTime]>
 
-    #------------------------------------------------------------------------------------------------------------------------
+        #------------------------------------------------------------------------------------------
 
-    - else if <context.raw_args> == coreclaim:
-        #- if <player.has_permission[kingdom.cancoreclaim]>:
-        - if <player.has_flag[ClaimingMode]> && <player.flag[ClaimingMode]> == CoreClaiming:
-            - flag <player> ClaimingMode:!
-            - narrate format:callout "You have exited core claiming mode"
-
-        - else:
-            - flag <player> ClaimingMode:CoreClaiming
-            - narrate format:callout "You are now in core claiming mode"
-            - narrate format:callout "Use /claim to claim a chunk for your kingdom!"
-
-            - define realPrestige <element[100].sub[<server.flag[kingdoms.<[kingdom]>.prestige]>]>
-            - define prestigeMultiplier <util.e.power[<element[0.02186].mul[<[realPrestige]>]>].sub[0.9]>
-            - define corePrice <[prestigeMultiplier].mul[100].round_to_precision[100]>
-
-            - narrate format:callout "Current core chunk price is: <red><bold>$<[corePrice]>"
-
-        #- else:
-        #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
-
-    #------------------------------------------------------------------------------------------------------------------------
-
-    - else if <context.args.get[1]> == castleclaim:
-        - define param <context.args.get[2]>
-
-        #- if <player.has_permission[kingdom.cancastleclaim]>:
-        - if <player.has_flag[ClaimingMode]> && <player.flag[ClaimingMode]> == CastleClaiming:
-            - flag <player> ClaimingMode:!
-            - narrate format:callout "You have exited castle claiming mode"
-
-        - else:
-            - flag <player> ClaimingMode:CastleClaiming
-            - narrate format:callout "You are now in castle claiming mode"
-            - narrate format:callout "Use /claim to claim a chunk for your castle!"
-
-        #- else:
-        #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
-
-        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
-
-    #------------------------------------------------------------------------------------------------------------------------
-
-    - else if <context.args.get[1]> == unclaim:
+        Unclaim:
         - define coreCastle <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
 
         - if !<player.location.chunk.is_in[<[coreCastle]>]>:
@@ -398,33 +193,27 @@ Kingdom_Command:
 
         - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
-    #------------------------------------------------------------------------------------------------------------------------
+        #------------------------------------------------------------------------------------------
 
-    # So far this doesn't really do much but when I figure how to integrate
-    # Kingdoms into dynamap, it will help players visualize where the intended
-    # extent of each kingdom is
-
-    - else if <context.args.get[1]> == layclaim:
+        Layclaim:
         - narrate "Making unofficial claim to: <player.location.chunk>"
         - flag server kingdoms.<player.flag[kingdom]>.unofficial_claim:->:<player.location.chunk>
 
-    #------------------------------------------------------------------------------------------------------------------------
+        #------------------------------------------------------------------------------------------
 
-    - else if <context.raw_args> == balance:
-        - narrate format:callout "Balance for <proc[KingdomNameReplacer].context[<player.flag[kingdom]>]>"
-        - narrate $<server.flag[kingdoms.<player.flag[kingdom]>.balance].format_number.color[red]>
+        Balance:
+        - narrate format:callout "Balance for <proc[GetKingdomName].context[<[kingdom]>]> is <red>$<server.flag[kingdoms.<[kingdom]>.balance].format_number>"
 
-    #------------------------------------------------------------------------------------------------------------------------
+        #------------------------------------------------------------------------------------------
 
-    - else if <context.args.get[1]> == deposit:
-        #- if <player.has_permission[kingdom.deposit]>:
+        Deposit:
         - define amount <context.args.get[2]>
 
         - if <player.money.is[OR_MORE].than[<[amount]>]>:
             - flag server kingdoms.<player.flag[kingdom]>.balance:+:<[amount]>
             - money take from:<player> quantity:<[amount]>
 
-            - narrate format:callout "Successfully deposited: $<[amount].as_money>"
+            - narrate format:callout "Successfully deposited: <red>$<[amount].as_money>"
 
         - else:
             - narrate format:callout "You do not have sufficient funds to perform this action."
@@ -439,13 +228,9 @@ Kingdom_Command:
 
         - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
-        #- else:
-        #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
+        #------------------------------------------------------------------------------------------
 
-    #------------------------------------------------------------------------------------------------------------------------
-
-    - else if <context.args.get[1]> == withdraw:
-        #- if <player.has_permission[kingdom.withdraw]>:
+        Withdraw:
         - define offerWorth null
 
         - foreach <server.flag[fyndalin].get[loanOffers]>:
@@ -461,19 +246,16 @@ Kingdom_Command:
             - money give to:<player> quantity:<[amount]>
             - flag server kingdoms.<[kingdom]>.balance:-:<[amount]>
 
-            - narrate format:callout "Successfully withdrawn: $<[amount].as_money>"
+            - narrate format:callout "Successfully withdrawn: <red>$<[amount].as_money>"
 
         - else:
             - narrate format:callout "You do not have sufficient funds in your kingdom to withdraw"
 
         - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>].get[members].include[<server.online_ops>]>
 
-        #- else:
-        #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
+        #------------------------------------------------------------------------------------------
 
-    #------------------------------------------------------------------------------------------------------------------------
-
-    - else if <context.args.get[1]> == rename:
+        Rename:
         - if <player.has_permission[kingdom.canrename]>:
             - define newName <context.raw_args.split[rename].get[2]>
             - flag server kingdoms.<player.flag[kingdom]>.name:<[newName]>
@@ -485,14 +267,13 @@ Kingdom_Command:
         - else:
             - narrate format:callout "This command requires permission from the server owner to perform!"
 
-    #------------------------------------------------------------------------------------------------------------------------
+        #------------------------------------------------------------------------------------------
 
-    - else if <context.args.get[1]> == npc:
+        Npc:
         - if <server.has_flag[PreGameStart]> && !<player.is_op>:
             - narrate format:callout "Sorry! You cannot use this while the server is still in build mode!"
             - determine cancelled
 
-        #- if <player.has_permission[kingdom.npc.spawn]>:
         - define coreLoc <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
         - define castleLoc <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
 
@@ -526,13 +307,9 @@ Kingdom_Command:
         - else:
             - narrate format:callout "You must spawn resource NPCs within core territory of your kingdom or in outposts!"
 
-        #- else:
-        #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
+        #------------------------------------------------------------------------------------------
 
-    #------------------------------------------------------------------------------------------------------------------------
-
-    - else if <context.args.get[1]> == warp:
-        - define kingdom <player.flag[kingdom]>
+        Warp:
 
         # If the player has recently engaged in combat with another player then
         # they will not be allowed to use or set warps
@@ -665,6 +442,7 @@ Kingdom_Command:
                         - wait 3s
 
                         - teleport <player> <server.flag[kingdoms.<[kingdom]>.warps.<[warpArea]>]>
+
                         - clickable cancel:<entry[decline_warp].id>
 
                     - clickable save:decline_warp usages:1 until:1m:
@@ -691,11 +469,10 @@ Kingdom_Command:
         - else:
             - narrate format:callout "You may not use warps, you are in <red>combat mode!"
 
-    #------------------------------------------------------------------------------------------------------------------------
+        #------------------------------------------------------------------------------------------
 
-    - else if <context.args.get[1]> == ideas:
+        Ideas:
         - if <script[Kingdom_Ideas].list_keys[].contains[<player.flag[kingdom]>]>:
-            - define kingdom <player.flag[kingdom]>
 
             # A whole lotta formatting crap here;
             # This command will write out the kingdom's buffs and debuffs like this:
@@ -707,7 +484,7 @@ Kingdom_Command:
 
             - narrate "<&n>                                       <&n.end_format>"
             - narrate <&sp>
-            - narrate "<bold>Kingdom Ideas for: <proc[KingdomNameReplacer].context[<[kingdom]>]>"
+            - narrate "<bold>Kingdom Ideas for: <proc[GetKingdomName].context[<[kingdom]>]>"
             - narrate "<&n>                                       <&n.end_format>"
             - narrate <&sp>
             - narrate <&n><green><bold><script[Kingdom_Ideas].data_key[<[kingdom]>.buff.name]><&n.end_format>
@@ -721,9 +498,9 @@ Kingdom_Command:
         - else:
             - narrate format:callout "<red>Your kingdom doesn't seem to have any national ideas..."
 
-    - else if <context.args.get[1]> == guards:
-        - define kingdom <player.flag[kingdom]>
+        #------------------------------------------------------------------------------------------
 
+        Guards:
         - if <context.args.get[2]> == list || <context.args.size> == 1:
             - define kingdomGuardList <list[]>
 
@@ -734,7 +511,7 @@ Kingdom_Command:
 
                     - adjust def:guardItem skull_skin:<[guard].skull_skin>
                     - adjust def:guardItem display:<element[<[guard].name>].bold.color[<[kingdomColor]>]>
-                    - adjust def:guardItem "lore:|<element[Location: ].bold.color[white]><element[<[guard].location.round.xyz>].color[aqua]>"
+                    - adjust def:guardItem lore:|<element[Location: ].bold.color[white]><element[<[guard].location.round.xyz>].color[aqua]>
                     - flag <[guardItem]> referencedGuard:<[guard]>
 
                     - define kingdomGuardList:->:<[guardItem]>
@@ -745,111 +522,3 @@ Kingdom_Command:
             - flag <player> guardListPage:1
             - flag <player> kingdomGuardItems:<[paginatedGuardList]>
             - inventory open d:KingdomGuardList_Window
-
-    - else:
-        - narrate format:callout "Unrecognized argument: <context.args.get[1].color[red]>"
-
-    #------------------------------------------------------------------------------------------------------------------------
-    #- START FOLDED COMMANDS
-    #------------------------------------------------------------------------------------------------------------------------
-
-    - if <context.args.get[1]> == influence:
-        - execute as_player influence
-
-##############################################################################
-
-KingdomGuardList_Window:
-    type: inventory
-    inventory: chest
-    gui: true
-    title: Kingdom Guards
-    procedural items:
-    - determine <player.flag[kingdomGuardItems]>
-    slots:
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [Page_Back] [] [Page_Forward] [] [] []
-
-KingdomGuardRespawn_Window:
-    type: inventory
-    inventory: chest
-    gui: true
-    title: Respawn Guard?
-    slots:
-    - [] [] [] [] [GuardRespawn_Item] [] [] [] []
-
-GuardList_Item:
-    type: item
-    material: player_head
-    display name: <gray><bold>Unknown Guard
-
-GuardRespawn_Item:
-    type: item
-    material: respawn_anchor
-    display name: Respawn Guard
-    lore:
-    - Cost: <element[$100].color[red].bold>
-    flags:
-        cost: 100
-
-KingdomGuardList_Handler:
-    type: world
-    events:
-        on player clicks Page_Back in KingdomGuardList_Window:
-        - if <player.flag[guardListPage].is[MORE].than[1]>:
-            - flag <player> guardListPage:--
-
-        on player clicks Page_Forward in KingdomGuardList_Window:
-        - flag <player> guardListPage:++
-
-        on player closes KingdomGuardList_Window:
-        - flag <player> guardListPage:!
-        - flag <player> kingdomGuardItems:!
-
-        on player clicks GuardList_Item in KingdomGuardList_Window:
-        - define guard <context.item.flag[referencedGuard]>
-
-        - if <[guard].exists> && <[guard].is_spawned>:
-            - inventory open d:Guard_Window
-
-        - else:
-            - inventory open d:KingdomGuardRespawn_Window
-
-        - flag <player> clickedNPC:<[guard]>
-
-        on player clicks GuardRespawn_Item in KingdomGuardRespawn_Window:
-        - define kingdom <player.flag[kingdom]>
-        - define kingdomBalance <server.flag[kingdoms.<[kingdom]>.balance]>
-        - define respawnCost <context.item.flag[cost]>
-
-        - if <[kingdomBalance]> >= <[respawnCost]>:
-            - flag server kingdoms.<[kingdom]>.balance:-:<[respawnCost]>
-            - run SidebarLoader def:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
-            - narrate format:callout "Respawned castle guard at their previously defined anchor position!"
-
-        - else:
-            - narrate format:callout "Your kingdom does not have enough funds in its treasury to replace this guard!"
-
-        - inventory close
-
-##############################################################################
-
-##ignorewarning enumerated_script_name
-
-debug:
-    type: format
-    format: "<gray>[Kingdoms Debug] <&gt><&gt> <[text]>"
-
-information:
-    type: format
-    format: "<&9><[text]>"
-
-callout:
-    type: format
-    format: "<white>[Kingdoms] <&gt><&gt> <&6><[text]>"
-
-npctalk:
-    type: format
-    format: "<light_purple><bold>[NPC] <&r><red>-<&gt> <light_purple><bold>[YOU]: <white><[text]>"

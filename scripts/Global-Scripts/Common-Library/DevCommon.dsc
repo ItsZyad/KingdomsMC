@@ -216,3 +216,24 @@ EnforceType:
                 - determine <[def]>
 
     - determine null
+
+##ignorewarning enumerated_script_name
+
+debug:
+    type: format
+    format: <gray>[Kingdoms Debug] <&gt><&gt> <[text]>
+
+
+information:
+    type: format
+    format: <&9><[text]>
+
+
+callout:
+    type: format
+    format: <white>[Kingdoms] <&gt><&gt> <&6><[text]>
+
+
+npctalk:
+    type: format
+    format: <light_purple><bold>[NPC] <&r><red>-<&gt> <light_purple><bold>[YOU]: <white><[text]>
