@@ -104,7 +104,7 @@ SquadOptions_Handler:
         on player right clicks block with:SquadRecall_Item:
         - define kingdom <player.flag[kingdom]>
         - define squadName <player.flag[datahold.squadInfo.name]>
-        - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
+        - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]>
         - define stationInfo <server.flag[kingdoms.<[kingdom]>.armies.barracks].parse_value_tag[<[parse_value].get[stationedSquads]>]>
         - define barrackID 0
 
