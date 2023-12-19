@@ -236,7 +236,7 @@ SomeTaskScript:
         - narrate "Subpaths are cool!"
 ```
 
-All naming and spacing conventions mentioned in above sections apply to subpaths. Subpath name must be camel-cased and be preceded by one empty line.
+All naming and spacing conventions mentioned in above sections apply to subpaths. Subpath name must be in Pascal-cased and be preceded by one empty line.
 
 Optionally, in cases where a script has too many subpaths, the submitter may opt to add a deliniator between them in the following format: 
 
