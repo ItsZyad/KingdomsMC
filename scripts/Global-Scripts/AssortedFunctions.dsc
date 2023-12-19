@@ -1,17 +1,5 @@
 ##ignorewarning invalid_data_line_quotes
 
-KingdomNameReplacer:
-    type: procedure
-    definitions: playerKingdom
-    script:
-    - determine passively <proc[YamlSpaceAdder].context[<script[KingdomRealNames].data_key[<[playerKingdom]>]>]>
-
-YamlSpaceAdder:
-    type: procedure
-    definitions: yamlVal
-    script:
-    - determine <definition[yamlVal].replace[/sp/].with[<&sp>]>
-
 Paginate:
     type: procedure
     definitions: itemArrayMap|itemsPerPage|page
@@ -32,6 +20,7 @@ Paginate:
             - repeat stop
 
     - determine <[outArray]>
+
 
 New_Paginate_Task:
     type: task
@@ -55,6 +44,7 @@ New_Paginate_Task:
 
     - determine <[outList]>
 
+
 Paginate_Task:
     ## HOW TO USE:
     # - run Paginate_Task ... save:paginate
@@ -74,6 +64,7 @@ Paginate_Task:
 
     - determine <[outArray]>
 
+
 OutpostNameEscaper:
     type: procedure
     definitions: outpostName
@@ -81,6 +72,7 @@ OutpostNameEscaper:
     - define escaped <[outpostName].replace[<&sp>].with[-]>
 
     - determine <[escaped]>
+
 
 isBetween:
     type: procedure
@@ -96,21 +88,6 @@ isBetween:
 
     - determine false
 
-## CREDIT:
-## Mergu / Mergu#0001
-CuboidIntersect:
-  type: procedure
-  debug: false
-  definitions: c1|c2
-  script:
-    - define max_x <[c1].max.x.min[<[c2].max.x>]>
-    - define max_y <[c1].max.y.min[<[c2].max.y>]>
-    - define max_z <[c1].max.z.min[<[c2].max.z>]>
-    - define min_x <[c1].min.x.max[<[c2].min.x>]>
-    - define min_y <[c1].min.y.max[<[c2].min.y>]>
-    - define min_z <[c1].min.z.max[<[c2].min.z>]>
-
-    - determine <cuboid[<[c1].world.name>,<[min_x]>,<[min_y]>,<[min_z]>,<[max_x]>,<[max_y]>,<[max_z]>]>
 
 SplitKeep:
     type: task
