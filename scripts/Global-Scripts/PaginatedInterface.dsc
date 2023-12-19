@@ -37,31 +37,24 @@ GetTrueInterface_Proc:
 PaginatedInterface:
     type: task
     debug: false
+    definitions: itemList|page|player|footer|title|flag[ElementTag(String)]
     description:
     - Generates a template paginated interface with the itemList given.
-    - Interface name is always: PaginatedInterface_Window
-    - -=-=-=-=-=-=-=-=-=-=-=-=-=-
-    - @itemList [ListTag[ItemTag]] A list of items to be displayed in the interface.
-    - @page: [ElementTag[Integer]] The page number that the interface starts on.
-    - @player: [PlayerTag] Player for which the interface will be displayed.
-    - ?footer: [InventoryTag] Additional buttons to add in the footer of the interface (other than prev/next page).
-    - ?title: [ElementTag[String]] Interface title.
-    - ?flag: [ElementTag[String]] A flag to be applied to the player while they are looking at the interface.
-
-    definitions: itemList|page|player|footer|title|flag
-    ChangeFooter:
-    - if <[footer].exists> && <[footer].size> == 9:
-        - define interfaceBody <proc[GetTrueInterface_Proc].context[<[interface]>].get[1].to[<[itemsPerPage]>]>
-        - define interfaceFooter <proc[GetTrueInterface_Proc].context[<[interface]>].get[<[itemsPerPage].add[1]>].to[last]>
-
-        - foreach <[footer].list_contents> as:item:
-            - if <[item].material.name> != air:
-                - define interfaceFooter <[interfaceFooter].overwrite[<[item]>].at[<[loop_index]>]>
-
-        - define newInterfaceItems <[interfaceBody].include[<[interfaceFooter]>]>
-        - adjust def:interface contents:<[newInterfaceItems]>
+    - Note: Interface name is always: PaginatedInterface_Window.
 
     script:
+    ## Generates a template paginated interface with the itemList given.
+    ## Note: Interface name is always: PaginatedInterface_Window.
+    ##
+    ## itemList : [ListTag<ItemTag>]
+    ## page     : [ElementTag<Integer>]
+    ## player   : [PlayerTag]
+    ## footer   : [InventoryTag]
+    ## title    : [ElementTag<String>]
+    ## flag     : [ElementTag<String>]
+    ##
+    ## >>> [MapTag<ListTag,ElementTag<Integer>>]
+
     # - flag <[player]> dataHold.paginated.itemList:<[itemList]> if:<player.has_flag[dataHold.paginated.itemList].not>
     - define itemList <[itemList].if_null[<player.flag[dataHold.paginated.itemList]>].exclude[<item[air]>]>
 
@@ -105,6 +98,18 @@ PaginatedInterface:
     - inventory open d:<[interface]> player:<[player]>
     - determine <[determination]>
 
+    ChangeFooter:
+    - if <[footer].exists> && <[footer].size> == 9:
+        - define interfaceBody <proc[GetTrueInterface_Proc].context[<[interface]>].get[1].to[<[itemsPerPage]>]>
+        - define interfaceFooter <proc[GetTrueInterface_Proc].context[<[interface]>].get[<[itemsPerPage].add[1]>].to[last]>
+
+        - foreach <[footer].list_contents> as:item:
+            - if <[item].material.name> != air:
+                - define interfaceFooter <[interfaceFooter].overwrite[<[item]>].at[<[loop_index]>]>
+
+        - define newInterfaceItems <[interfaceBody].include[<[interfaceFooter]>]>
+        - adjust def:interface contents:<[newInterfaceItems]>
+
 
 PaginatedInterface_Handler:
     type: world
@@ -121,7 +126,7 @@ PaginatedInterface_Handler:
     events:
         on player clicks Page_Back in PaginatedInterface_Window priority:0:
         - inject <script.name> path:InitializeVariables
-        - narrate format:debug PAGE_BACK
+        # - narrate format:debug PAGE_BACK
 
         - if <[pageNum].sub[1].is[OR_MORE].than[1]>:
             - run PaginatedInterface def.itemList:<[itemList]> def.page:<[pageNum].sub[1]> def.player:<player> def.title:<[title]> def.footer:<[footer]>
@@ -133,7 +138,7 @@ PaginatedInterface_Handler:
 
         on player clicks Page_Forward in PaginatedInterface_Window priority:0:
         - inject <script.name> path:InitializeVariables
-        - narrate format:debug PAGE_FORWARD
+        # - narrate format:debug PAGE_FORWARD
 
         - if <[pageNum].add[1].is[OR_LESS].than[<[maxPages]>]>:
             - run PaginatedInterface def.itemList:<[itemList]> def.page:<[pageNum].add[1]> def.player:<player> def.title:<[title]> def.footer:<[footer]>
