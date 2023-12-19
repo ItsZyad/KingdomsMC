@@ -28,7 +28,8 @@ AmogusMode:
     script:
     - if <[player].has_flag[amogus]>:
         - if <[text].contains[a]>:
-            - determine <[text].replace_text[a].with[ඞ]>
+            # Thank Alex, I guess...
+            - determine <[text].replace_text[a].with[ඞ].replace_text[A].with[ඞ]>
 
     - determine <[text]>
 
