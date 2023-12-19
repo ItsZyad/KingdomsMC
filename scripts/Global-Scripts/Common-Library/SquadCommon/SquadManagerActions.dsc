@@ -12,8 +12,11 @@
 GenerateSMID:
     type: task
     definitions: location
+    description:
+    - Generates the ID used to refer to SMs in the kingdom flag using the location of the SM.
+
     script:
-    ## Generates the ID used to refer to SMs in the kingdom flag using the location of the SM
+    ## Generates the ID used to refer to SMs in the kingdom flag using the location of the SM.
     ##
     ## location : [LocationTag]
     ##
@@ -25,8 +28,11 @@ GenerateSMID:
 GetSMLocation:
     type: procedure
     definitions: SMID|kingdom
+    description:
+    - Gets the location of a specific squad manager, provided the SM's kingdom and ID.
+
     script:
-    ## Gets the location of a specific squad manager, provided the SM's kingdom and ID
+    ## Gets the location of a specific squad manager, provided the SM's kingdom and ID.
     ##
     ## SMID    : [ElementTag<Integer>]
     ## kingdom : [ElementTag<String>]
@@ -43,6 +49,9 @@ GetSMLocation:
 GetSMName:
     type: procedure
     definitions: SMLocation
+    description:
+    - Gets the internal name of the squad manager.
+
     script:
     ## Gets the internal name of the squad manager.
     ##
@@ -59,6 +68,9 @@ GetSMName:
 GetSMKingdom:
     type: procedure
     definitions: SMLocation
+    description:
+    - Gets the squad manager's kingdom affiliation.
+
     script:
     ## Gets the squad manager's kingdom affiliation.
     ##
@@ -75,6 +87,9 @@ GetSMKingdom:
 GetMaxSMAOESize:
     type: procedure
     definitions: SMLocation
+    description:
+    - Gets the maximum size that a squad manager's AOE can be at its current level.
+
     script:
     ## Gets the maximum size that a squad manager's AOE can be at its current level.
     ##
@@ -93,8 +108,11 @@ GetMaxSMAOESize:
 GetSquadLimit:
     type: procedure
     definitions: SMLocation
+    description:
+    - Gets the maximum amount of squads that can be stationed under this squad manager.
+
     script:
-    ## Gets the maximum amount of squads that can be stationed under this squad manager
+    ## Gets the maximum amount of squads that can be stationed under this squad manager.
     ##
     ## SMLocation : [LocationTag]
     ##
@@ -112,6 +130,9 @@ GetSquadLimit:
 GetMaxSquadSize:
     type: procedure
     definitions: SMLocation
+    description:
+    - Gets the maximum size squad that can be created using this squad manager's composer.
+
     script:
     ## Gets the maximum size squad that can be created using this squad manager's composer.
     ##
@@ -131,6 +152,9 @@ GetMaxSquadSize:
 GetStationingCapacity:
     type: procedure
     definitions: SMLocation
+    description:
+    - Gets the maximum size of squads that can be stationed under this squad manager.
+
     script:
     ## Gets the maximum size of squads that can be stationed under this squad manager.
     ##
@@ -149,6 +173,9 @@ GetStationingCapacity:
 GetSMAOESize:
     type: procedure
     definitions: SMLocation
+    description:
+    - Gets the current size of a squad manager's AOE.
+
     script:
     ## Gets the current size of a squad manager's AOE.
     ##
@@ -165,6 +192,9 @@ GetSMAOESize:
 GetSMArea:
     type: procedure
     definitions: SMLocation
+    description:
+    - Gets the CuboidTag representing a squad manager's AOE.
+
     script:
     ## Gets the CuboidTag representing a squad manager's AOE.
     ##
@@ -181,6 +211,9 @@ GetSMArea:
 GetSMArmoryLocations:
     type: procedure
     definitions: SMLocation
+    description:
+    - Gets a list of all the locations assigned as armories in this squad manager.
+
     script:
     ## Gets a list of all the locations assigned as armories in this squad manager.
     ##
@@ -197,8 +230,11 @@ GetSMArmoryLocations:
 GetSMSquads:
     type: procedure
     definitions: SMLocation
+    description:
+    - Gets a list of all the squads stationed at a certain SM.
+
     script:
-    ## Gets a list of all the squads stationed at a certain SM
+    ## Gets a list of all the squads stationed at a certain SM.
     ##
     ## SMLocation : [LocationTag]
     ##
@@ -213,8 +249,11 @@ GetSMSquads:
 GetSquadSMLocation:
     type: task
     definitions: kingdom|squadName
+    description:
+    - Gets the SM associated with the squad provided.
+
     script:
-    ## Gets the SM associated with the squad provided
+    ## Gets the SM associated with the squad provided.
     ##
     ## kingdom   : [ElementTag<String>]
     ## squadName : [ElementTag<String>]

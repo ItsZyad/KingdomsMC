@@ -12,8 +12,11 @@
 GiveSoldierItemFromArmory:
     type: task
     definitions: soldier|squadName|kingdom|armories|item
+    description:
+    - Gives the provided soldier an item from their squad's armory if it exists.
+
     script:
-    ## Gives the provided soldier an item from their squad's armory if it exists
+    ## Gives the provided soldier an item from their squad's armory if it exists.
     ##
     ## kingdom   : [ElementTag<String>]
     ## squadName : [ElementTag<String>]

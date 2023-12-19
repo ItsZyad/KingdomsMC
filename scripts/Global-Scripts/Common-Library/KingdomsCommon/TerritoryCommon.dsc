@@ -39,6 +39,10 @@ GetAllClaims:
 GetClaims:
     type: procedure
     definitions: kingdom[ElementTag(String)]|type[?ElementTag(String)]
+    description:
+    - Gets a list of the provided claim type belonging to the kingdom provided.
+    - If no claim type is specified the procedure will return both core and castle claims.
+
     script:
     ## Gets a list of the provided claim type pertaining to the provided kingdom.
     ##
