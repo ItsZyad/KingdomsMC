@@ -1,0 +1,7 @@
+Important!
+
+This Misc file was only created to hold a bunch of scripts that I felt just didn't fit anywhere else.
+
+Most (if not all) of the files in this folder should probably be their own separate packages once KPM is implemented fully.
+
+--19/Dec/23
