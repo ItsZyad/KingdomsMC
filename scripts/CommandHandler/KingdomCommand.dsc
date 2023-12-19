@@ -113,9 +113,9 @@ Kingdom_Command:
     SubCommands:
         Outline:
         - define param <[args].get[2]>
-        - define jointCuboid 0
+        - define hasTerritoryType false
         - define persistTime 10
-        - define territoryType castle_territory
+        - define territoryType castle
 
         - if <[args].size.is[LESS].than[2]>:
             - narrate format:callout "Insufficient or too many parameters. Please specify either castle or core territory to outline"
@@ -123,20 +123,18 @@ Kingdom_Command:
 
         - else if <[param].is_in[castle|core]>:
             - define territoryType <[param]>
-            - define jointCuboid <server.flag[kingdoms.<[kingdom]>.claims.<[param]>].get[1].cuboid.if_null[0]>
+            - define hasTerritoryType <proc[GetClaims].context[<[kingdom]>|<[param]>].get[1].cuboid.if_null[false]>
 
         - else:
             - narrate format:callout "<[param].to_titlecase> is not a valid territory type!"
             - determine cancelled
 
-        - if <[jointCuboid]> == 0:
+        - if !<[hasTerritoryType]>:
             - narrate format:callout "Your kingdom doesn't seem to have any <[param]> territory yet :/"
             - determine cancelled
 
         # If the player specificies a duration tag then check if the duration is more
         # than 0 and set persistTime as it
-
-        - narrate format:debug <[args]>
 
         - if <[args].size> >= 3 && <[args].get[3].starts_with[duration:]>:
             - define duration <[args].get[3].split[duration:].get[2]>
@@ -151,29 +149,22 @@ Kingdom_Command:
                 - narrate format:callout "Invalid duration! Please ensure that outline durations are between 1s and 120s."
                 - determine cancelled
 
-        # Loop through the suitable type of territory (depending on what the player specified)
-        # excluding the first territory since the joinCuboid is initialized with the first
-        # already added
-
-        - foreach <server.flag[kingdoms.<[kingdom]>.claims.<[territoryType]>].exclude[<server.flag[kingdoms.<[kingdom]>.claims.<[territoryType]>].get[1]>]>:
-            - if <[value].cuboid.world> != <player.location.world>:
-                - foreach next
-
-            - define jointCuboid <[jointCuboid].add_member[<[value].cuboid>]>
+        - define claimsCuboid <proc[GetClaimsCuboid].context[<[kingdom]>|<[territoryType]>]>
 
         # Show the borders at different altitudes depending on if the player is flying or
         # on the ground
 
         - if <player.is_flying>:
-            - showfake green_stained_glass <[jointCuboid].outline_2d[<player.location.y.sub[10]>]> duration:<[persistTime]>
+            - showfake green_stained_glass <[claimsCuboid].outline_2d[<player.location.y.sub[10]>]> duration:<[persistTime]>
 
         - else:
-            - showfake red_stained_glass <[jointCuboid].outline_2d[<player.location.y.add[20]>]> duration:<[persistTime]>
+            - showfake red_stained_glass <[claimsCuboid].outline_2d[<player.location.y.add[20]>]> duration:<[persistTime]>
 
         #------------------------------------------------------------------------------------------
 
         Unclaim:
-        - define coreCastle <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
+        # - define coreCastle <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
+        - define coreCastle <[kingdom].proc[GetClaims].if_null[<list[]>]>
 
         - if !<player.location.chunk.is_in[<[coreCastle]>]>:
             - narrate format:callout "This chunk is not in your claims."
@@ -183,7 +174,7 @@ Kingdom_Command:
         - flag server kingdoms.<[kingdom]>.claims.castle:<-:<player.location.chunk>
         - flag server kingdoms.claimInfo.allClaims:<-:<player.location.chunk>
 
-        - if <server.flag[kingdoms.<[kingdom]>.claims.core].size> <= 20:
+        - if <proc[GetClaims].context[<[kingdom]>|core].size> <= 20:
             - run SubUpkeep def.kingdom:<[kingdom]> def.amount:5
 
         - else:
@@ -191,7 +182,7 @@ Kingdom_Command:
 
         - narrate format:callout "Unclaimed chunk: <element[<player.location.chunk.x>, <player.location.chunk.z>].color[red]>"
 
-        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         #------------------------------------------------------------------------------------------
 
@@ -202,7 +193,7 @@ Kingdom_Command:
         #------------------------------------------------------------------------------------------
 
         Balance:
-        - narrate format:callout "Balance for <proc[GetKingdomName].context[<[kingdom]>]> is <red>$<server.flag[kingdoms.<[kingdom]>.balance].format_number>"
+        - narrate format:callout "Balance for <[kingdom].proc[GetKingdomName]> is <red>$<[kingdom].proc[GetBalance].format_number>"
 
         #------------------------------------------------------------------------------------------
 
@@ -223,10 +214,10 @@ Kingdom_Command:
         # flag on the server
 
         - if <server.flag[indebtedKingdoms].get[<player.flag[kingdom]>].exists>:
-            - if <server.flag[kingdoms.<player.flag[kingdom]>.balance].is[OR_MORE].than[0]>:
+            - if <[kingdom].proc[GetBalance].is[OR_MORE].than[0]>:
                 - flag server indebtedKingdoms.<player.flag[kingdom]>:0
 
-        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<proc[GetMembers].context[<[kingdom]>].include[<server.online_ops>]>
 
         #------------------------------------------------------------------------------------------
 
@@ -239,10 +230,10 @@ Kingdom_Command:
 
         - define amount <context.args.get[2]>
 
-        - if <server.flag[kingdoms.<[kingdom]>.balance].sub[<[amount]>].is[LESS].than[<[offerWorth].if_null[0]>]>:
+        - if <[kingdom].proc[GetBalance].sub[<[amount]>].is[LESS].than[<[offerWorth].if_null[0]>]>:
             - narrate format:callout "Your kingdom has an active loan offer to Fyndalin worth: $<[offerWorth]>. You may not withdraw an amount that would place you below that amount until the offer is resolved."
 
-        - else if <server.flag[kingdoms.<[kingdom]>.balance].is[OR_MORE].than[<[amount]>]>:
+        - else if <[kingdom].proc[GetBalance].is[OR_MORE].than[<[amount]>]>:
             - money give to:<player> quantity:<[amount]>
             - flag server kingdoms.<[kingdom]>.balance:-:<[amount]>
 
@@ -251,7 +242,7 @@ Kingdom_Command:
         - else:
             - narrate format:callout "You do not have sufficient funds in your kingdom to withdraw"
 
-        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>].get[members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<proc[GetMembers].context[<[kingdom]>].include[<server.online_ops>]>
 
         #------------------------------------------------------------------------------------------
 
@@ -262,7 +253,7 @@ Kingdom_Command:
 
             - narrate format:debug <context.raw_args.split[rename].get[2]>
 
-        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>].get[members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<proc[GetMembers].context[<[kingdom]>].include[<server.online_ops>]>
 
         - else:
             - narrate format:callout "This command requires permission from the server owner to perform!"
@@ -274,9 +265,8 @@ Kingdom_Command:
             - narrate format:callout "Sorry! You cannot use this while the server is still in build mode!"
             - determine cancelled
 
-        - define coreLoc <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
-        - define castleLoc <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
-
+        - define coreLoc <proc[GetClaims].context[<[kingdom]>|core].as[list]>
+        - define castleLoc <proc[GetClaims].context[<[kingdom]>|castle].as[list]>
         - define isInClaimedLoc <[coreLoc].include[<[castleLoc]>].contains[<player.location.chunk>].if_null[false]>
 
         # Only allow players to spawn in NPCs if they are in their own
@@ -326,8 +316,8 @@ Kingdom_Command:
                 # If the player does not specify a specific warp name the game will assume
                 # they are trying to reset their main castle spawn.
                 - define warpName <context.raw_args.split_args.get[3].if_null[main]>
-                - define castle <server.flag[kingdoms.<[kingdom]>.claims.castle].as[list]>
-                - define core <server.flag[kingdoms.<[kingdom]>.claims.core].as[list]>
+                - define castle <proc[GetClaims].context[<[kingdom]>|castle].as[list]>
+                - define core <proc[GetClaims].context[<[kingdom]>|core].as[list]>
                 - define castleCore <[core].include[<[castle]>].exclude[0]>
                 - define outpostAreas <proc[GetOutposts].context[<[kingdom]>].values.parse_tag[<[parse_value].get[area]>]>
                 - define inWhichOutpostAreas <[outpostAreas].filter_tag[<[parse_value].contains[<player.location>]>]>
@@ -362,7 +352,8 @@ Kingdom_Command:
             - else if <[param].starts_with[kingdom<&co>]>:
                 - define chosenKingdomRN <[param].split[<&co>].get[2]>
                 - define warpName <context.args.get[3].if_null[main]>
-                - define kingdomRealNames <script[KingdomRealShortNames].data_key[].values.exclude[data]>
+                # - define kingdomRealNames <script[KingdomRealShortNames].data_key[].values.exclude[data]>
+                - define kingdomRealNames <proc[GetKingdomList].context[false]>
                 - define chosenKingdomCN <script[KingdomRealShortNames].data_key[].invert.get[<[chosenKingdomRN]>]>
 
                 - if <[chosenKingdomRN]> == <script[KingdomRealShortNames].data_key[<[kingdom]>]>:
