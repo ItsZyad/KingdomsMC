@@ -1,3 +1,14 @@
+##
+## Scripts in this file relate to the squad composer window of the squad manager. This lets players
+## create new squads to add to a certain SM.
+##
+## @Author: Zyad (ITSZYAD#9280)
+## @Date: Jun 2023
+## @Script Ver: v1.0
+##
+##ignorewarning invalid_data_line_quotes
+## ------------------------------------------END HEADER-------------------------------------------
+
 SquadCompositionOneSoldier_Item:
     type: item
     material: leather_helmet

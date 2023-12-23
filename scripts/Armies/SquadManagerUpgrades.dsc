@@ -5,7 +5,7 @@
 ## @Date: Jun 2023
 ## @Script Ver: v1.0
 ##
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 SquadManagerAOEUpgrade_Item:
     type: item

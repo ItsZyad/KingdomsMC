@@ -1,4 +1,13 @@
+##
+## All scripts which relate to the management, and player interaction with the castle guards tool
+## are stored in this file.
+##
+## @Author: Zyad (ITSZYAD#9280)
+## @Date: Jul 2022
+## @Script Ver: v2.0
+##
 ##ignorewarning invalid_data_line_quotes
+## ------------------------------------------END HEADER-------------------------------------------
 
 CastleGuard:
     type: assignment

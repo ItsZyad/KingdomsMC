@@ -8,7 +8,7 @@
 ## @Script Ver: v2.0
 ##
 ##ignorewarning invalid_data_line_quotes
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 SquadEditConfirm_Item:
     type: item

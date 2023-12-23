@@ -8,7 +8,7 @@
 ##              cleaned in prep for A4.
 ## @Script Ver: v2.0
 ##
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 # TODO: Add if case in caller function which throws an error to the player if the squad isn't assigned a leader yet
 
