@@ -53,6 +53,17 @@ FlagVisualizer:
 
         - determine passively "<[flag].color[aqua]> <element[[range]].color[light_purple].on_hover[<[coordRange]>]>"
 
+    - else if <[flag].object_type> == Binary:
+
+        # 7 more characters included in the substring method to account for 'binary@'
+        # I really don't want to split it out then re-add it...
+        - define truncatedBinary <[flag].as[element].substring[1,107]>
+
+        - if <[flag].as[element].length> > 100:
+            - define truncatedBinary <element[<[truncatedBinary]> <element[[...]].color[light_purple].on_hover[<element[Raw binary truncated at 100 characters].color[light_purple]>]>]>
+
+        - determine passively "<[truncatedBinary]> <element[[length]].color[light_purple].on_hover[<[flag].length.color[light_purple]>]>"
+
     - else if <[flag].object_type> == Map:
         - narrate <proc[MakeTabbed].context[<element[MAP :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
         - define tabWidth:+:4
