@@ -111,5 +111,5 @@ MakeTabbed:
     debug: false
     definitions: element|tabLevel
     script:
-    - define tabbedList <list[<element[ ].repeat[<[tabLevel]>]>|<[element]>]>
+    - define tabbedList <list[<element[︳   ].repeat[<[tabLevel].div_int[4]>]>|<[element]>]>
     - determine <[tabbedList].unseparated>
