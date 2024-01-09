@@ -91,12 +91,19 @@ GenerateInternalError:
     - define messagePrefix <element[[Internal <[errorType].color[gold]>] <&gt><&gt> ].color[red]>
     - define formattedMessage <[messagePrefix]><[message].color[white]>
 
-    - debug DEBUG <element[KINGDOMS ERROR                                    ].color[red].bold>
-    - debug DEBUG <[formattedMessage]>
-    - debug DEBUG <element[                                                  ].strikethrough>
+    - run DEBUG_ERROR def.formattedMessage:<[formattedMessage]>
 
     - if !<[silent]>:
         - narrate <[formattedMessage]>
+
+
+DEBUG_ERROR:
+    type: task
+    definitions: formattedMessage
+    script:
+    - debug DEBUG <element[KINGDOMS ERROR                                    ].color[red].bold>
+    - debug DEBUG <[formattedMessage]>
+    - debug DEBUG <element[                                                  ].strikethrough>
 
 
 ActionBarToggler:
@@ -224,14 +231,29 @@ debug:
     format: <gray>[Kingdoms Debug] <&gt><&gt> <[text]>
 
 
-information:
+admincallout:
     type: format
-    format: <&9><[text]>
+    format: <light_purple>[Kingdoms Admin] <&gt><&gt><white> <[text]>
 
 
 callout:
     type: format
     format: <white>[Kingdoms] <&gt><&gt> <&6><[text]>
+
+
+warning:
+    type: format
+    format: <red>[Kingdoms] <&gt><&gt><white> <[text]>
+
+
+notice:
+    type: format
+    format: <yellow>[Kingdoms] <&gt><&gt><white> <[text]>
+
+
+information:
+    type: format
+    format: <&9><[text]>
 
 
 npctalk:

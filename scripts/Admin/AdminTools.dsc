@@ -305,8 +305,3 @@ ReloadVerbosity_Handler:
             - narrate targets:<server.flag[reloadoverride]> "<yellow>[Kingdoms] <&gt><&gt> <red>WARNING! Error occured while reloading some or all scripts!"
 
         - flag server reloadoverride:!
-
-
-admincallout:
-    type: format
-    format: "<light_purple>Kingdoms <light_purple>Admin:: <[text]>"
