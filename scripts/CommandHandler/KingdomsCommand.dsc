@@ -118,48 +118,48 @@ Kingdoms_Command:
         - yaml load:kingdoms.yml id:kingdoms
 
     - else if <context.args.get[1]> == about:
-        - narrate format:information "Kingdoms is an expansive Minecraft project which aims to blend the worlds of strategy and roleplay gaming into a medival/fantasy world rich with story and possibilities. The game, upon completion, should allow you to do just about anything you want from commanding an army, conducting diplomacy with other kingdoms, improving the lives of your subjects and much more. Kingdoms aims to be one of the most ambitious projects in Minecraft but is currently still in early development."
-        - narrate format:information "Made with ❤ using Denizen©"
+        - narrate format:callout "Kingdoms is an expansive Minecraft project which aims to blend the worlds of strategy and roleplay gaming into a medival/fantasy world rich with story and possibilities. The game, upon completion, should allow you to do just about anything you want from commanding an army, conducting diplomacy with other kingdoms, improving the lives of your subjects and much more. Kingdoms aims to be one of the most ambitious projects in Minecraft but is currently still in early development."
+        - narrate format:callout "Made with ❤ using Denizen©"
 
     # Note: future configurable
     #       or maybe just nix this completely when it goes into prod.
     - else if <context.args.get[1]> == rules:
-        - narrate format:information "Rules and Guidelines Doc: https://docs.google.com/document/d/1U3_uZp75n77k9t58M0aKWwaUE7wIHL4PyioKMFv3vaQ/edit?usp=sharing"
+        - narrate format:callout "Rules and Guidelines Doc: https://docs.google.com/document/d/1U3_uZp75n77k9t58M0aKWwaUE7wIHL4PyioKMFv3vaQ/edit?usp=sharing"
 
     - else if <context.args.get[1]> == credits:
-        - narrate format:information "<&b>Lead Developer: <aqua>Zyad Osman <&9>(ZyadTheBoss)"
+        - narrate "<&b>Lead Developer: <aqua>Zyad Osman <&9>(ZyadTheBoss)"
         - wait 1s
 
         - narrate <&sp>
-        - narrate format:information "<&b>Builders: <aqua>Ben Tcazuck <&9>(EchosBattalion),"
+        - narrate "<&b>Builders: <aqua>Ben Tcazuck <&9>(EchosBattalion),"
         - wait 1s
 
-        - narrate format:information "            <aqua>Claude <&9>(Spaggyboidotcom),"
+        - narrate "            <aqua>Claude <&9>(Spaggyboidotcom),"
         - wait 1s
 
-        - narrate format:information "            <aqua>Cydnee Howard <&9>(Shadow31911)"
+        - narrate "            <aqua>Cydnee Howard <&9>(Shadow31911)"
         - wait 1s
 
-        - narrate format:information "            <aqua>Alex Raymont <&9>(lyx3)"
+        - narrate "            <aqua>Alex Raymont <&9>(lyx3)"
         - wait 1s
 
-        - narrate format:information "            <aqua>Max Chapman <&9>(Mxchapz)"
-        - wait 1s
-
-        - narrate <&sp>
-        - narrate format:information "<&b>Writing Contributions: <aqua>Claude <&9>(Spaggyboidotcom),"
-        - wait 1s
-
-        - narrate format:information "                           <aqua>Philip Harker <&9>(Philidips),"
+        - narrate "            <aqua>Max Chapman <&9>(Mxchapz)"
         - wait 1s
 
         - narrate <&sp>
-        - narrate format:information "<&b>Special Thanks: <&9>Denizen Team/Alex Goodwin"
+        - narrate "<&b>Writing Contributions: <aqua>Claude <&9>(Spaggyboidotcom),"
+        - wait 1s
+
+        - narrate "                           <aqua>Philip Harker <&9>(Philidips),"
+        - wait 1s
+
+        - narrate <&sp>
+        - narrate "<&b>Special Thanks: <&9>Denizen Team/Alex Goodwin"
 
     # Note: future configurable
     - else if <context.args.get[1]> == map:
         - narrate "<blue><bold>Kingdoms Live Map:"
-        - narrate format:information <underline>http://5.62.127.51:27204/#close
+        - narrate format:callout <underline>http://5.62.127.51:27204/#close
 
     - else if <context.args.get[1]> == ping:
         - define ping <player.ping>
