@@ -251,11 +251,6 @@ notice:
     format: <yellow>[Kingdoms] <&gt><&gt><white> <[text]>
 
 
-information:
-    type: format
-    format: <&9><[text]>
-
-
 npctalk:
     type: format
     format: <light_purple><bold>[NPC] <&r><red>-<&gt> <light_purple><bold>[YOU]: <white><[text]>
