@@ -48,7 +48,7 @@ IsPackageDescriptorValid_KPM:
         - determine false
 
     - if <[descriptor].contains[licenses]> && <[descriptor].get[licenses].object_type> != List:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Package.yml file at path: <[path].color[red]> has an invalid format for the <element[<&sq>authors<&sq>].red> key. It must be in list format.]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Package.yml file at path: <[path].color[red]> has an invalid format for the <element[<&sq>licenses<&sq>].red> key. It must be in list format.]> def.silent:false
         - determine false
 
     # The addon obviously can't have dependencies that are also conflicts.
