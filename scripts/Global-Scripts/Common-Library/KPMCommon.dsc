@@ -9,7 +9,7 @@
 ## ----------------END HEADER-----------------
 
 
-IsValidAddonName:
+DoesAddonExist:
     type: procedure
     definitions: name[ElementTag(String)]
     description:
@@ -38,7 +38,7 @@ IsAddonLoaded:
     ##
     ## >>> [ElementTag<Boolean>]
 
-    - if !<[name].proc[IsValidAddonName]>:
+    - if !<[name].proc[DoesAddonExist]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Provided addon name: <[name].color[red]> is invalid]> def.silent:true
         - determine null
 
@@ -58,7 +58,7 @@ GetAddonMissingDependencies:
     ##
     ## >>> [ListTag<ElementTag<String>>]
 
-    - if !<[name].proc[IsValidAddonName]>:
+    - if !<[name].proc[DoesAddonExist]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Provided addon name: <[name].color[red]> is invalid]> def.silent:true
         - determine null
 
@@ -74,7 +74,7 @@ GetAddonNameByHash:
 
     script:
     ## Gets the name of an addon using its SHA256 hash or a shortened version of it.
-    ## Note: Definitions hash and shortHash are mutually exclusive.
+    ## Note: Definitions 'hash' and 'shortHash' are mutually exclusive.
     ##
     ## hash      : *[BinaryTag]
     ## shortHash : *[ElementTag<String>]
@@ -108,7 +108,7 @@ GetAddonVersion:
     ##
     ## >>> [ElementTag<String>]
 
-    - if !<[name].proc[IsValidAddonName]>:
+    - if !<[name].proc[DoesAddonExist]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Provided addon name: <[name].color[red]> is invalid]> def.silent:true
         - determine null
 
@@ -128,7 +128,7 @@ GetAddonHash:
     ##
     ## >>> [BinaryTag]
 
-    - if !<[name].proc[IsValidAddonName]>:
+    - if !<[name].proc[DoesAddonExist]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Provided addon name: <[name].color[red]> is invalid]> def.silent:true
         - determine null
 
@@ -148,7 +148,7 @@ GetAddonAuthors:
     ##
     ## >>> [ListTag<ElementTag<String>>]
 
-    - if !<[name].proc[IsValidAddonName]>:
+    - if !<[name].proc[DoesAddonExist]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Provided addon name: <[name].color[red]> is invalid]> def.silent:true
         - determine null
 
@@ -157,18 +157,15 @@ GetAddonAuthors:
 
 GetShortHash:
     type: procedure
-    definitions: addonName[ElementTag(String)]
+    definitions: name[ElementTag(String)]
     description:
     - Gets the shortened version of the SHA256 hash used to identify addons.
 
     script:
     ## Gets the shortened version of the SHA256 hash used to identify addons.
     ##
-    ## addonName : [ElementTag<String>]
+    ## name : [ElementTag<String>]
     ##
     ## >>> [ElementTag<String>]
 
-    # TODO: Come back to this after addon system rework.
-    - define addonInfo <map[]>
-
-    - determine <[addonInfo].get[hash].as[element].split[@].get[2].substring[1,4]>
+    - determine <proc[GetAddonHash].context[<[name]>].as[element].split[@].get[2].substring[1,4]>
