@@ -1,5 +1,7 @@
 ##ignorewarning invalid_data_line_quotes
 
+## No header will be added :: file slated for deletion or rework.
+
 BlockData:
     type: data
     legal_items:

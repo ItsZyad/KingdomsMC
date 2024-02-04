@@ -1,7 +1,7 @@
 ##
 ## All scripts related to upgrading the Squad manager will be found here.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jun 2023
 ## @Script Ver: v1.0
 ##

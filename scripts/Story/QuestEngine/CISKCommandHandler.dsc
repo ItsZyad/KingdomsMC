@@ -1,3 +1,13 @@
+##
+## Scripts in this file are responsible for handling CISK's inline commands, which are contained
+## with angle brackets, like Denizen's.
+##
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
+## @Date: Apr 2023
+## @Script Ver: v2.0
+##
+## ------------------------------------------END HEADER-------------------------------------------
+
 GenerateRecursiveStructures_CISK:
     type: task
     debug: false

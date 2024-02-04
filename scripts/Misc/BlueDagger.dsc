@@ -1,9 +1,11 @@
 ##
-## * All things related to CJ's clandestine sabotage organization
+## All things related to CJ's clandestine sabotage organization
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Aug 2022
 ## @Script Ver: INDEV
+##
+#- Note: file slated for deletion.
 ##
 ## ----------------END HEADER-----------------
 

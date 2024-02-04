@@ -1,7 +1,7 @@
 ##
-## * Contains all the scripts necessary to generate low-setup paginated menus in any module.
+## Contains all the scripts necessary to generate low-setup paginated menus in any module.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jan 2023
 ## @Script Ver: v1.0
 ## ---------------------------END HEADER----------------------------

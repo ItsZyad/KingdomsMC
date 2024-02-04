@@ -1,3 +1,12 @@
+##
+## Scripts in this file allow all bookshelves to become usable objects, capable of storing books.
+##
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
+## @Date: Oct 2022
+## @Script Ver: v1.0
+##
+## ------------------------------------------END HEADER-------------------------------------------
+
 UsableBookshelf_Item:
     type: item
     material: bookshelf

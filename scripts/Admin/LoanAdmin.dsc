@@ -1,8 +1,7 @@
 ##
-## * Contains all of the code relating to the admin window
-## * for the loans to Fyndalin
+## Contains all of the code relating to the admin window for the loans to Fyndalin.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jul 2022
 ## @Script Ver: INDEV
 ##

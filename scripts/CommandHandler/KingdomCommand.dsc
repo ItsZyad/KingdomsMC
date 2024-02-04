@@ -3,7 +3,7 @@
 ## * allows players to interact with the kingdom they are currently in. For the /kingdoms or /ks
 ## * command look for the KingdomsCommand.dsc file.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Aug 2020
 ## @Update 1: Mar 2021
 ## @Update 2: Apr-Jun 2022

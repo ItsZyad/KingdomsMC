@@ -1,3 +1,14 @@
+##
+## This file contains scripts which handle player interaction permissions within kingdom territory.
+##
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
+## @Date: Jun 2021
+## @Updated: Oct 2023
+## @Script Ver: v2.0
+##
+## ------------------------------------------END HEADER-------------------------------------------
+
+
 DoorInteractCode:
     type: task
     debug: false

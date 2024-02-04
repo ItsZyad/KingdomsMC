@@ -1,8 +1,15 @@
-#ScriptVer 1.3.2
-#Author: Icecapade
-#Date 2021-03-05
-#Edited by: ItsZyad
-#Date: 2023-01-14
+# @ ----------------------------------------------------------
+##
+## This file contains a modified version of Icecapade's simplesit engine, which allows players to
+## sit on stairs and half-slabs.
+##
+## @Author: @icecapade / Icecapade#8825
+## @Editor: Zyad (@itszyad / ITSZYAD#9280)
+## @Date: Mar 2021
+## @Edited: Jan 2023
+## @Script Ver: v1.3.2
+##
+## ------------------------------------------END HEADER-------------------------------------------
 
 simplesit:
     type: world

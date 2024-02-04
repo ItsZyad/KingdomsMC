@@ -1,10 +1,9 @@
 ##
-## * All code related to how loggers/woodcutters operate
-## * in addition to their AOEs.
+## All code related to how loggers/woodcutters operate in addition to their AOEs.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jun 2021
-## @Script Ver: v0.9
+## @Script Ver: v1.0
 ##
 ##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------
@@ -403,12 +402,12 @@ MinerGenerationNoticeUpdater:
         - wait <element[1000].sub[<util.current_time_millis.sub[<[timeStart]>]>].div[1000].mul[20].round>t
 
 
-MinerGeneration_Handler:
-    type: world
-    debug: false
-    events:
-        on system time secondly every:150:
-        - run MinerItemGenerator
+# MinerGeneration_Handler:
+#     type: world
+#     debug: false
+#     events:
+#         on system time secondly every:150:
+#         - run MinerItemGenerator
 
         #on player places block in:mine*:
         #- determine cancelled

@@ -1,11 +1,11 @@
 ##
-## * Anytime a pre or post-join action needs to be done to
-## * adjust the player experience, it will be in this file
+## Anytime a pre or post-join action needs to be done to adjust the player experience, it will be
+## in this file.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jul 2021
 ## @Updated: May 2022
-## @Script Ver: N/A
+## @Script Ver: v1.0
 ##
 ##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------

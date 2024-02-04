@@ -1,10 +1,9 @@
 ##
-## * Implements a warp cooldown of 30 seconds after
-## * the point where a player enters combat.
+## Implements a warp cooldown of 30 seconds after the point where a player enters combat.
 ##
-## * Applies to the /warp and /kingdom warp commands
+## Applies to the /warp and /kingdom warp commands.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Mar 2022
 ## @Script Ver: v1.0
 ##

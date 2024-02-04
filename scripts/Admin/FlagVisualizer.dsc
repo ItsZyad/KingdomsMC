@@ -1,3 +1,15 @@
+##
+## This file contains the task scripts specific to the Kingdoms flag visualizer- a tool which
+## graphically displays Denizen data structures in a highly readable format to reduce confusion
+## when searching through flags.
+##
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
+## @Date: Mar 2023
+## @Script Ver: v1.5
+##
+## ------------------------------------------END HEADER-------------------------------------------
+
+
 FlagVisualizer:
     type: task
     debug: false

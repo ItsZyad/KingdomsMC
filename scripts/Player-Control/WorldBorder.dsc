@@ -1,3 +1,5 @@
+# TODO: Make this an actual tool that admins can use to setup custom world borders + add header.
+
 WorldBorderPoints:
     type: data
     points:

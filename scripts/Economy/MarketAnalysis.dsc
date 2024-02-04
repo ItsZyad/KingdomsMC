@@ -1,7 +1,7 @@
 ##
-## * All scripts related to the generation of statistical analysis for the purposes of the Kingdoms
-## * economic mechanics. Scripts here should be used to inform the decisions made by both regular
-## * and black market merchants on how to adjust prices based on player input.
+## All scripts related to the generation of statistical analysis for the purposes of the Kingdoms
+## economic mechanics. Scripts here should be used to inform the decisions made by both regular
+## and black market merchants on how to adjust prices based on player input.
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Nov 2022 - First created

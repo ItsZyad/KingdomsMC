@@ -1,7 +1,7 @@
 ##
-## * All scripts, inventories, and interaction handlers related to player-merchant interactions.
+## All scripts, inventories, and interaction handlers related to player-merchant interactions.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Aug 2023
 ## @Script Ver: v1.0
 ##

@@ -2,7 +2,7 @@
 ## This file contains all the scripts needed to show the window which displays all the kingdom's
 ## currently active guards.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Dec 2023
 ## @Script Ver: v1.0
 ##

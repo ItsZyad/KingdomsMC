@@ -2,7 +2,7 @@
 ## All items, menus, tasks, and helpers related to creating, managing, and removing squads through
 ## the squad manager (SM) will be found here.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jun 2023
 ## @Script Ver: v1.0
 ##

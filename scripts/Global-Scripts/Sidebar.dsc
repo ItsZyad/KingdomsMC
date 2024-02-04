@@ -1,8 +1,7 @@
 ##
-## * Sidebar function capable of refreshing/setting/
-## * removing the sidebar for targetted players
+## Sidebar function capable of refreshing/setting/removing the sidebar for targetted players.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Dec 2021
 ## @Script Ver: v1.0
 ##

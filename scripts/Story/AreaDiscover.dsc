@@ -1,14 +1,14 @@
 ##
-## * All scripts that record notable locations the
-## * the player has been and alerting them when they
-## * discover a new area.
+## All scripts that record notable locations the the player has been and alerting them when they
+## discover a new area.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Apr 2022
 ## @Script Ver: v1.0
 ##
 ##ignorewarning invalid_data_line_quotes
-## ----------------END HEADER-----------------
+##
+## ------------------------------------------END HEADER-------------------------------------------
 
 AreaAlert_Handler:
     type: world
@@ -31,10 +31,12 @@ AreaAlert_Handler:
                 - if !<server.has_flag[PreGameStart]>:
                     - flag <player> foundAreas:->:<context.area>
 
+
 AreaCreation_Item:
     type: item
     material: blaze_rod
     display name: "<gold><bold>Area Creation Tool"
+
 
 AreaCreation_Command:
     type: command
@@ -167,6 +169,7 @@ AreaCreation_Handler:
         - if <player.flag[areaCreation].get[points].size.is[OR_MORE].than[1]>:
             - showfake <player.flag[areaCreation].get[points].last> cancel
             - flag <player> areaCreation.points:<-:<player.flag[areaCreation].get[points].last>
+
 
 DEBUG_ParticleTest:
     type: task

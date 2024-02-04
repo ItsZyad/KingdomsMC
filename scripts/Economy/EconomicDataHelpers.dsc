@@ -1,8 +1,8 @@
 ##
-## * Helps the admin add more items to the dynamic markets price info
-## * file by extrapolating the data from similar items in the file
+## Helps the admin add more items to the dynamic markets price info file by extrapolating the data
+## from similar items in the file.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Oct 2022
 ## @Script Ver: v1.0
 ##

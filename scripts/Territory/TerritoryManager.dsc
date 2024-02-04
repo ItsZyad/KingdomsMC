@@ -1,3 +1,15 @@
+##
+## This command is used by the player after using either /k coreclaim or /k castleclaim to activate
+## each respective claiming mode. /claim is then used, afterwards, to specify which chunks to claim
+## into the kingdom's territory.
+##
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
+## @Date: Mar 2023
+## @Updated: Jul 2023
+## @Script Ver: v2.0
+##
+## ------------------------------------------END HEADER-------------------------------------------
+
 Claim_Command:
     type: command
     usage: /claim

@@ -1,14 +1,14 @@
 ##
-## * Creates a special type of itemframe which allows the
-## * player to view a book inside it without having to
-## * pick the book up
+## Creates a special type of itemframe which allows the player to view a book inside it without 
+## having to pick the book up.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Apr 2022
 ## @Script Ver: v1.0
 ##
 ##ignorewarning invalid_data_line_quotes
-## ----------------END HEADER-----------------
+##
+## ------------------------------------------END HEADER-------------------------------------------
 
 
 BookTemplate_Item:

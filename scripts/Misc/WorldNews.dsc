@@ -1,5 +1,5 @@
 ##
-## * File containing the scripts related to the world news interface accessible through /news
+## File containing the scripts related to the world news interface accessible through /news
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Jan 2023

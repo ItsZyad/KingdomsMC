@@ -1,8 +1,7 @@
 ##
-## * All code related to how farmers operate. Their AOEs
-## * and their experience gain etc.
+## All code related to how farmers operate. Their AOEs and their experience gain etc.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jun 2021
 ## @Updated: Jul 2022
 ## @Script Ver: v1.0

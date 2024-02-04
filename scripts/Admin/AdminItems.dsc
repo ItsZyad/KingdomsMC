@@ -1,3 +1,13 @@
+##
+## This file contains all items, and their handlers, which admins can use to make their lives a bit
+## easier (or just to cheese the game ;)).
+##
+## Split-off from the admin tools file just to keep things tidy...
+##
+## @Author: Zyad (@itszyad / ITSZYAD@9280)
+## @Date: Sep 2023
+## @Script Ver: v1.0
+
 NPCYeet_Item:
     type: item
     material: blaze_rod

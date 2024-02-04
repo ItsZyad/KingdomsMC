@@ -1,7 +1,7 @@
 ##
 ## This file contains the script which generates the chat-based chunk map.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Dec 2023
 ## @Script Ver: v1.0
 ##

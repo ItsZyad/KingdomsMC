@@ -1,5 +1,7 @@
 ##ignorewarning invalid_data_line_quotes
 
+# TODO: Come back to this!! (and don't forget that header ;))
+
 OutpostSpec_Window:
     type: inventory
     inventory: chest

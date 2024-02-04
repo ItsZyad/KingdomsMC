@@ -1,15 +1,16 @@
 ##
-## * The main file containing the components of the Common Interface
-## * for Storywriting in Kingdoms (CISK) parser.
+## The main file containing the components of the Common Interface for Storywriting in Kingdoms
+## (CISK) parser.
 ##
-## * This parser will allow individuals with no knowledge of Denizen
-## * to write quests and dialogue stubs for Kingdoms.
+## This parser will allow individuals with no knowledge of Denizen to write quests and dialogue
+## stubs for Kingdoms.
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Aug - Nov 2022
-## @Status: INDEV
-## @Version: v0.5
+## @Version: v1.0
+##
 ##ignorewarning bad_quotes
+##
 ## ---------------------------END HEADER----------------------------
 
 WaitTime_CISK:

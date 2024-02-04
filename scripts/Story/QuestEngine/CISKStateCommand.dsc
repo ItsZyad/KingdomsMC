@@ -1,5 +1,16 @@
+##
+## Scripts in this file are responsible for handling the <state> command, specifically.
+## Its scripts are separated into a separate file due to its large size; all server, player, world
+## entity, etc. property checks pass through the <state> command in CISK.
+##
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
+## @Date: Apr 2023
+## @Script Ver: v1.0
+##
 ##ignorewarning def_of_nothing
 ##ignorewarning bad_execute
+##
+## ------------------------------------------END HEADER-------------------------------------------
 
 DenizenCISKMechMirrors:
     type: data

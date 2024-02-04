@@ -1,6 +1,8 @@
 ##ignorewarning invalid_data_line_quotes
 ##ignorewarning raw_object_notation
 
+## No header will be added :: file slated for deletion / rework.
+
 SkinTextureSignatures:
     type: data
     alchemist:

@@ -1,14 +1,12 @@
 ##
-## * Contains all the scripts relating to KDebugger - A VSCODE-style
-## * debugger designed for speeding up the development process of
-## * Kingdoms.
+## Contains all the scripts relating to KDebugger - A VSCODE-style debugger designed for speeding
+## up the development process of Kingdoms.
 ##
-## * Can be used on any Denizen script.
+## Can be used on any Denizen script.
 ##
-## @Author: Zyad (ITSZYAD#9280)
-## @Date: Sep 05 2022
-## @Status: INDEV
-## @Version: v0.1
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
+## @Date: Sep 2022
+## @Script Ver: v0.1
 ## ---------------------------END HEADER----------------------------
 
 ## DEBUGGER MUST BE INJECTED!

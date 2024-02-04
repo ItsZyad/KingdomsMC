@@ -1,8 +1,7 @@
 ##
-## * All code related to how loggers/woodcutters operate
-## * in addition to their AOEs.
+## All code related to how loggers/woodcutters operate in addition to their AOEs.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jun 2021
 ## @Script Ver: v0.1
 ##
@@ -37,6 +36,7 @@ LoggerGenerationHandler_NEW:
     #script:
     type: world
     debug: false
+    enabled: false
     events:
         on system time secondly every:50:
         - foreach <util.notes[cuboids].filter_tag[<[filter_value].starts_with[cu@INTERNAL_ranch]>]> as:ranch:

@@ -1,9 +1,8 @@
 ##
-## * Rewrote the entire outpost manager code in about
-## * 4 and a half hours (refactor + conventions)
-## * Manages initial outpost claiming and redef.
+## Rewrote the entire outpost manager code in about 4 and a half hours (refactor + conventions)
+## Manages initial outpost claiming and redef.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jul 2021
 ## @Script Ver: v1.0
 ##

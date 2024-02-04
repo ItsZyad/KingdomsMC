@@ -1,7 +1,7 @@
 ##
 ## Contains all scripts relating to the daily simulation of the Kingdoms markets system.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Sep 2023
 ## @Script Ver: v2.0
 ##

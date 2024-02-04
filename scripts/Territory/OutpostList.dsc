@@ -1,9 +1,8 @@
 ##
-## * New outpost list command - should show all owned
-## * outposts in a GUI instead of in chat - with all
-## * relevant metadata shown in the lore box
+## New outpost list command - should show all owned outposts in a GUI instead of in chat - with all
+## relevant metadata shown in the lore box.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Nov 2021
 ## @Script Ver: v1.0
 ##

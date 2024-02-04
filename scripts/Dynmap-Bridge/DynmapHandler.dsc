@@ -1,8 +1,7 @@
 ##
-## * A (heavily modified) Denizen-Dynmap hook for Kingdoms
+## A (heavily modified) Denizen-Dynmap hook for Kingdoms.
 ##
-## @Author: (@icecapade/Icecapade#8825)
-## @Supplementary Scripts: Maxime (@mrm/Maxime#9999)
+## @Author: Maxime (@mrm/Maxime#9999)
 ## @Editor: Zyad (@itszyad/ITSZYAD#9280)
 ## @Date: Jan 2022
 ## @Updated: May-Jun 2023

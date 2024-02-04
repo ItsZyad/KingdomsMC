@@ -1,10 +1,9 @@
 ##
-## * All scripts related to managing kingdom
-## * upkeep
+## All scripts related to managing kingdom upkeep.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Sep 2021
-## @Script Ver: v0.2
+## @Script Ver: v1.0
 ##
 ## ----------------END HEADER-----------------
 

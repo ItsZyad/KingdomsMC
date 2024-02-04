@@ -1,8 +1,7 @@
 ##
-## * All files related to the creation of regular market
-## * and regular merchants in Kingdoms
+## All files related to the creation of regular market and regular merchants in Kingdoms.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Nov 2022
 ## @Script Ver: INDEV
 ##

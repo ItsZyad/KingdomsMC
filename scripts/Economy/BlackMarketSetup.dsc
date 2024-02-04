@@ -2,6 +2,8 @@
 ##ignorewarning raw_object_notation
 ##ignorewarning deprecated_tag_part
 
+## No header will be added :: File slated for deletion / rework.
+
 SpecifySpawnLoc_Command:
     type: command
     name: specify

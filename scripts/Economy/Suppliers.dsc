@@ -1,11 +1,10 @@
 ##
-## * All files related to the simulated supplier mechanic which
-## * provides Kingdoms merchants with all the necessary materials
-## * to sell players as well as the market creator code (temp)
+## All files related to the simulated supplier mechanic which provides Kingdoms merchants with all
+## the necessary materials to sell players as well as the market creator code (temp).
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Oct 2022
-## @Script Ver: INDEV
+## @Script Ver: v1.0
 ##
 ## ----------------END HEADER-----------------
 

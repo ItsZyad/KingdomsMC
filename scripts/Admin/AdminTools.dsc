@@ -1,10 +1,9 @@
 ##
-## * Conatins the umbrella command for all things related to
-## * the kingdoms admin command
+## Conatins the umbrella command for all things admin-related.
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Aug 2020
-## @Updated: Jul 2022 - In Progress
+## @Updated: Jul 2022
 ## @Script Ver: v1.0
 ##
 ##ignorewarning invalid_data_line_quotes

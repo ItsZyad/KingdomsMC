@@ -1,10 +1,10 @@
 ##
-## * All the entry point commands and functions for
-## * the rource NPCs pertaining to each specific kingdom
+## All the entry point commands and functions for the rource NPCs pertaining to each specific 
+## kingdom.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jun 2021
-## @Script Ver: v0.6
+## @Script Ver: v1.0
 ##
 ##ignorewarning invalid_data_line_quotes
 ## ----------------END HEADER-----------------
