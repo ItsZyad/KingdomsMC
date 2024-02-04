@@ -1,87 +1,13 @@
 ##
-## Scripts related to the squad list window in the SM are here + some old scripts from 0.3p5 squad
-## tests kept around in case I need "spare parts".
+## Scripts related to the squad list window in the SM are here.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Sep 2022
 ## @Updated: Jul 2023
 ## @Script Ver: v2.0
 ##
 ##ignorewarning invalid_data_line_quotes
 ## ------------------------------------------END HEADER-------------------------------------------
-
-SquadEditConfirm_Item:
-    type: item
-    material: green_wool
-    display name: <green>Edit Squad
-
-
-SquadEditReject_Item:
-    type: item
-    material: red_wool
-    display name: <red>Cancel
-
-
-SquadEditConfirm_Window:
-    type: inventory
-    inventory: chest
-    gui: true
-    title: Confirm Editing Squad
-    slots:
-    - [] [] [] [] [] [] [] [] []
-    - [] [] [] [SquadEditConfirm_Item] [] [SquadEditReject_Item] [] [] []
-    - [] [] [] [] [] [] [] [] []
-
-
-# @Deprecated
-SquadSelectionGUI_OLD:
-    type: task
-    description:
-    - @Deprecated [Phase-out]
-    - *I'm really just using this for "spare parts" rn*
-
-    script:
-    - define kingdom <player.flag[kingdom]>
-    - define squadList <server.flag[armies.<[kingdom]>.squads].keys>
-    - define itemList <list[]>
-
-    - if <server.flag[armies.<[kingdom]>.squads].keys.size.if_null[0]> == 0:
-        - run PaginatedInterface def.itemList:<list[]> def.page:1 def.player:<player> def.title:Squads
-        - determine cancelled
-
-    - foreach <[squadList]> as:squadName:
-        - define squadItem <item[SquadInterface_Item]>
-        - define squad <server.flag[armies.<[kingdom]>.squads.<[squadName]>]>
-        - define name <[squadName]>
-
-        - if <[squad].contains[displayName]>:
-            - define name <[squad].get[displayName]>
-
-        - adjust def:squadItem display:<gold><bold><[name]>
-
-        - define npcListShort <[squad].get[npcList].get[1].to[4]>
-
-        - if <[npcListShort].size> < <[squad].get[npcList]>:
-            - define remainingNpcNumber <[squad].get[npcList].size.sub[<[npcListShort].size>]>
-            - define npcListShort:->:<element[And <[remainingNpcNumber]> Others...].color[gray]>
-
-        - adjust def:squadItem lore:<[npcListShort].separated_by[<n>]>
-
-        - definemap squadInfo:
-            internalName: <[squadName]>
-            displayName: <[name]>
-            npcList: <[squad].get[npcList]>
-
-        - flag <[squadItem]> squadInfo:<[squadInfo]>
-        - define itemList:->:<[squadItem]>
-
-    - run PaginatedInterface def.itemList:<[itemList]> def.page:1 def.player:<player> def.title:Squads def.flag:viewingSquads
-
-
-####################################################################################################
-############################################# NEW SHIT #############################################
-####################################################################################################
-
 
 SquadCommand:
     type: command
