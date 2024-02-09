@@ -154,7 +154,21 @@ Kingdoms_Command:
         - wait 1s
 
         - narrate <&sp>
+        - narrate "<&b>Additional Code<n>Courtesy Of: <aqua>@icecapade <&9>(Icecapade#8825),"
+        - narrate "<gray>For: <blue><element[SimpleSit].click_url[https://github.com/Hydroxycobalamin/Denizen-Script-Collection/blob/main/external/SitScript/SitScript.dsc].underline>"
+        - wait 1s
+
+        - narrate "             <aqua>@0tickpulse <&9>(0TickPulse#0296),"
+        - narrate "<gray>For: <blue><element[Command Manager].click_url[https://github.com/0tickpulse/TickMC/blob/master/plugins/Denizen/scripts/tickutil/tickutil_commands.dsc].underline>"
+        - wait 1s
+
+        - narrate "             <aqua>@mrm <&9>(MrM#9999),"
+        - narrate "<gray>For: <blue><element[Dynmap Polygon Tracer].click_url[https://paste.denizenscript.com/View/111717].underline>"
+        - wait 1s
+
+        - narrate <&sp>
         - narrate "<&b>Special Thanks: <&9>Denizen Team/Alex Goodwin"
+        - narrate "<gray>Learn more at: https://denizenscript.com/"
 
     # Note: future configurable
     - else if <context.args.get[1]> == map:
