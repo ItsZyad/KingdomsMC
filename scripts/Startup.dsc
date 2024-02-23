@@ -48,10 +48,10 @@ Startup_Handler:
             - yaml id:config savefile:../Kingdoms/config.yml
             - yaml id:config unload
 
-        - if !<util.has_file[../Kingdoms/packages]>:
+        - if !<util.has_file[../Kingdoms/addons]>:
             - yaml id:tempPackage create
             - yaml id:tempPackage set package.name:temp-package
-            - yaml id:tempPackage savefile:../Kingdoms/packages/temp-package/package.yml
+            - yaml id:tempPackage savefile:../Kingdoms/addons/temp-package/package.yml
             - yaml id:tempPackage unload
 
-            - adjust system delete_file:../Kingdoms/packages/temp-package
+            - adjust system delete_file:../Kingdoms/addons/temp-package
