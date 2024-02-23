@@ -38,10 +38,12 @@ FlagVisualizer:
             - determine passively "<[name]> <element[[uuid]].color[light_purple].on_hover[<[uuid].color[light_purple]>]>"
 
     - else if <[flag].time_zone_id.exists>:
+
+        # TODO: Make this work with whatever timezone the server is in.
         - define ESTTime <[flag].to_zone[America/New_York]>
         - define formattedTime <[ESTTime].format[YYYY-MM-dd/hh:mm]>
 
-        - determine passively <[flag].color[light_purple].on_hover[<[formattedTime]> UTC]>
+        - determine passively <[flag].color[light_purple].on_hover[<[formattedTime]> EST]>
 
     - else if <[flag].object_type> == Item:
         - define itemPropertiesList <[flag].property_map>
@@ -93,7 +95,7 @@ FlagVisualizer:
             - if <entry[Recur].created_queue.determination.get[1].as[list].size.if_null[0]> == 1:
                 - define line <list[<[key].color[aqua].italicize><&co> ]>
                 - define line:->:<entry[Recur].created_queue.determination.get[1].color[white]>
-                - narrate <proc[MakeTabbed].context[<[line].unseparated>|<[tabWidth]>]>
+                - narrate <proc[MakeTabbed].context[<[line].unseparated>|<[tabWidth]>].as[element]>
 
     - else if <[flag].object_type> == List:
         - narrate <proc[MakeTabbed].context[<element[LIST :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
@@ -123,5 +125,34 @@ MakeTabbed:
     debug: false
     definitions: element|tabLevel
     script:
-    - define tabbedList <list[<element[︳   ].repeat[<[tabLevel].div_int[4]>]>|<[element]>]>
-    - determine <[tabbedList].unseparated>
+    - define tabbedList <list[<element[¦   ].repeat[<[tabLevel].div_int[4]>]>|<[element]>]>
+    - define unseparatedTab <[tabbedList].unseparated>
+    - define chatWidth 320
+
+    - if <[unseparatedTab].text_width> <= <[chatWidth]>:
+        - determine <[unseparatedTab]>
+
+    - define currWidth 0
+    - define formattedTab <list[]>
+    - define sep <[unseparatedTab].split[]>
+    - define skip false
+
+    - foreach <[sep]>:
+        - if <[value]> == §:
+            - define skip true
+
+        - if <[skip]> && <[value]> == ]:
+            - define skip false
+
+        - if <[currWidth].add[<[value].text_width>]> >= <[chatWidth]>:
+            - define currWidth 0
+            - define formattedTab:->:<n>
+            - define formattedTab:->:<element[¦   ].repeat[<[tabLevel].div_int[4]>]>
+            - define currWidth:+:<element[    ].repeat[<[tabLevel].div_int[4]>].text_width>
+
+        - if !<[skip]>:
+            - define currWidth:+:<[value].text_width>
+
+        - define formattedTab:->:<[value]>
+
+    - determine <[formattedTab].unseparated>
