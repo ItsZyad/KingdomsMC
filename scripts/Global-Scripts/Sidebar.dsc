@@ -49,10 +49,13 @@ SidebarLoader:
     - define war-true <red><bold>
     - define war-false <green>
     - define changeSBState <[changeSBState].if_null[true]>
-    - define target <[target].as[list]>
+    - define target <[target].as[list].deduplicate.filter_tag[<[filter_value].is_online>]>
 
     - foreach <[target]> as:player:
         - if !<[player].sidebar_lines.exists> && !<[changeSBState]>:
+            - foreach next
+
+        - if <[player].has_flag[hideSidebar]>:
             - foreach next
 
         - if <[player].is_online> && <[player].has_flag[kingdom]>:
@@ -151,8 +154,10 @@ ToggleSidebar_Command:
         1: hide|show
     script:
     - if <context.raw_args> == hide:
+        - flag <player> hideSidebar
         - sidebar remove
 
     - else if <context.raw_args> == show:
+        - flag <player> hideSidebar:!
         - sidebar remove
         - run SidebarLoader def:<player>|true
