@@ -135,6 +135,26 @@ GetAddonHash:
     - determine <server.flag[addons.addonList.<[name]>.hash]>
 
 
+GetAddonRoot:
+    type: procedure
+    definitions: name[ElementTag(String)]
+    description:
+    - Gets the root directory of the addon with the provided name.
+
+    script:
+    ## Gets the root directory of the addon with the provided name.
+    ##
+    ## name : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<[name].proc[DoesAddonExist]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Provided addon name: <[name].color[red]> is invalid]> def.silent:true
+        - determine null
+
+    - determine <server.flag[addons.addonList.<[name]>.rootDir]>
+
+
 GetAddonAuthors:
     type: procedure
     definitions: name[ElementTag(String)]
