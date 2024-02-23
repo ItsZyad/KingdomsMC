@@ -175,18 +175,18 @@ IsVersionValid_KPM:
     ##
     ## >>> [ElementTag<Boolean>]
 
-    # - foreach <[givenVersions].include[<[currentVersion]>]> as:version:
-    #     - if !<[version].proc[IsVersionFormatValid_KPM]>:
-    #         - determine <list[false|Dependency version is in an invalid format]>
-
     - if <[givenVersions].size> == 1:
         - define minVersionComponents <[givenVersions].get[1].split[regex:<&bs>.|p|rc].parse_tag[<[parse_value].replace_text[regex:\D]>]>
-        - define currVersionComponents <[currentVersion].split[regex:<&bs>.|p|rc].parse_tag[<[parse_value].replace_text[regex:\D]>].pad_right[<[minVersionComponents].size>].with[0]>
+        - define currVersionComponents <[currentVersion].split[regex:<&bs>.|p|rc].parse_tag[<[parse_value].replace_text[regex:\D]>]>
         - define minVersionComponents <[minVersionComponents].pad_right[<[currVersionComponents].size>].with[0]>
+        - define currVersionComponents <[currVersionComponents].pad_right[<[minVersionComponents].size>].with[0]>
 
-        - foreach <[minVersionComponents]> as:comp:
-            - if <[comp]> > <[currVersionComponents].get[<[loop_index]>]>:
-                - determine false
+        - if <[minVersionComponents].get[1]> == any:
+            - define minVersionComponents <list[<[currVersionComponents].get[1].sub[1]>]>
+
+        - foreach <[currVersionComponents]> as:comp:
+            - if <[comp]> >= <[minVersionComponents].get[<[loop_index]>]> && <[comp].add[<[minVersionComponents].get[<[loop_index]>]>]> != 0:
+                - determine true
 
     - else if <[givenVersions].size> == 2:
         - define minVersionComponents <[givenVersions].get[1].split[regex:<&bs>.|p|rc].parse_tag[<[parse_value].replace_text[regex:\D]>]>
@@ -194,15 +194,32 @@ IsVersionValid_KPM:
         - define currVersionComponents <[currentVersion].split[regex:<&bs>.|p|rc].parse_tag[<[parse_value].replace_text[regex:\D]>]>
         - define largestSize <list[<[minVersionComponents].size>|<[maxVersionComponents].size>|<[currVersionComponents].size>].highest[]>
 
+        - if <[minVersionComponents].get[1]> == any:
+            - define minVersionComponents <list[<[currVersionComponents].get[1].sub[1]>]>
+
+        - if <[maxVersionComponents].get[1]> == any:
+            - define minVersionComponents <list[<[currVersionComponents].get[1].add[1]>]>
+
         - define minVersionComponents <[minVersionComponents].pad_right[<[largestSize]>].with[0]>
         - define maxVersionComponents <[maxVersionComponents].pad_right[<[largestSize]>].with[0]>
         - define currVersionComponents <[currVersionComponents].pad_right[<[largestSize]>].with[0]>
 
-        - foreach <[currVersionComponents]> as:comp:
-            - if <[comp]> > <[maxVersionComponents].get[<[loop_index]>]> || <[comp]> < <[minVersionComponents].get[<[loop_index]>]>:
-                - determine false
+        - define stopCheckingMax false
+        - define stopCheckingMin false
 
-    - determine true
+        - foreach <[currVersionComponents]> as:comp:
+            - if <[comp]> <= <[maxVersionComponents].get[<[loop_index]>]> && !<[stopCheckingMax]>:
+                - if <[comp].add[<[maxVersionComponents].get[<[loop_index]>]>]> != 0:
+                    - define stopCheckingMax true
+
+            - if <[comp]> > <[minVersionComponents].get[<[loop_index]>]> && !<[stopCheckingMin]>:
+                - if <[comp].add[<[minVersionComponents].get[<[loop_index]>]>]> != 0:
+                    - define stopCheckingMin true
+
+            - if <[stopCheckingMax]> && <[stopCheckingMin]>:
+                - determine true
+
+    - determine false
 
 
 IsVersionFormatValid_KPM:
@@ -210,6 +227,7 @@ IsVersionFormatValid_KPM:
     definitions: version
     description:
     - Helper function which checks if version numbers are formatted in a Kingdoms-standard manner.
+
     script:
     ## Helper function which checks if version numbers are formatted in a Kingdoms-standard manner.
     ##
