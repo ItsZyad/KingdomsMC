@@ -10,7 +10,7 @@
 
 IsPackageDescriptorValid_KPM:
     type: task
-    definitions: descriptor|path
+    definitions: descriptor[MapTag]|path[ElementTag(String)]
     description:
     - Ensures that the package.yml file (addon descriptor) is formatted correctly and has all
     - the required keys. It also runs a separate task which checks that all dependencies are
@@ -22,6 +22,7 @@ IsPackageDescriptorValid_KPM:
     ## present.
     ##
     ## descriptor : [MapTag]
+    ## path       : [ElementTag<String>]
     ##
     ## >>> [ElementTag<Boolean>]
 
@@ -51,57 +52,92 @@ IsPackageDescriptorValid_KPM:
         - run GenerateInternalError def.category:GenericError def.message:<element[Package.yml file at path: <[path].color[red]> has an invalid format for the <element[<&sq>licenses<&sq>].red> key. It must be in list format.]> def.silent:false
         - determine false
 
-    # The addon obviously can't have dependencies that are also conflicts.
     - if <[descriptor].keys.contains[dependencies|conflicts]>:
+
+        # The addon obviously can't have dependencies that are also conflicts.
         - if <[descriptor].get[dependencies].keys.contains[<[descriptor].get[conflicts].keys>]>:
             - run GenerateInternalError def.category:GenericError def.message:<element[Package.yml file at path: <[path].color[red]> is invalid. Package cannot have a dependency that is also a conflict]> def.silent: false
             - determine false
 
-        - if <[descriptor].get[dependencies].exists>:
-            - foreach <[descriptor].deep_get[dependencies]> key:dependency as:versionInfo:
-
-                # Find the dependency in question. Only edge-case is if it's kingdoms- in which
-                # case just find the current kingdoms version from the YAML file.
-                - if <[dependency]> == kingdoms:
-                    - yaml load:kingdoms.yml id:k
-                    - define currentVersion <yaml[k].read[version].split[ ].get[2]>
-                    - yaml id:k unload
-
-                #- Note to self: I really need to move all the last remaining essential information
-                #- out of the kingdoms.yml and into flag-based storage and do away with this
-                #- outdated convention.
-
-                - else:
-                    - foreach <server.flag[addons.addonList]> as:addon:
-                        - if <[addon].get[name]> == <[dependency]>:
-                            - define currentVersion <[addon].get[version]>
-                            - foreach stop
-
-                # Format checking all version keys in one go.
-                - foreach <[versionInfo].values> as:version:
-                    - if !<[version].proc[IsVersionFormatValid_KPM]>:
-                        - run GenerateInternalError def.category:GenericError def.message:<element[Package.yml file at path: <[path].color[red]> is invalid. Dependency version number: <[version].color[red]> for dependency: <[dependency]> is not formatted correctly. Please see the Kingdoms documentation for information on how to format version numbers correctly.]> def.silent:false
-                        - determine false
-
-                - if <[versionInfo].keys.contains[max-version]> && !<[versionInfo].keys.contains[min-version]>:
-                    - run IsVersionValid_KPM def.givenVersions:<list[<[currentVersion]>]> def.currentVersion:<[versionInfo].get[max-version]> save:validationResult
-
-                - else if !<[versionInfo].keys.contains[max-version]> && <[versionInfo].keys.contains[min-version]>:
-                    - run IsVersionValid_KPM def.givenVersions:<list[<[versionInfo].get[min-version]>]> def.currentVersion:<[currentVersion]> save:validationResult
-
-                - else if <[versionInfo].keys.contains[max-version|min-version]>:
-                    - run IsVersionValid_KPM def.givenVersions:<list[<[versionInfo].get[min-version]>|<[versionInfo].get[max-version]>]> def.currentVersion:<[currentVersion]> save:validationResult
-
-                - else if <[versionInfo].keys.contains[version]>:
-                    - run IsVersionValid_KPM def.givenVersions:<list[<[versionInfo].get[version]>]> def.currentVersion:<[currentVersion]> save:validationResult
-
-                - define validVersion <entry[validationResult].created_queue.determination.get[1].if_null[false]>
-
-                - if !<[validVersion]>:
-                    - narrate "<red>[Kingdoms] <&gt><&gt><white> Required dependency: <[dependency].color[red]> for addon: <[descriptor].get[name].color[gold]> is unsupported or outdated. Indexing, but to activate this addon you must install valid dependencies or use <element[/addon load ~f].color[red]>."
-                    - flag server datahold.KPM.missingDependencies.<[descriptor].get[name]>:->:<[dependency]>
-
     - determine true
+
+
+PackageDependencyChecker_KPM:
+    type: task
+    definitions: descriptor[MapTag]|path[ElementTag(String)]
+    description:
+    - Checks if the addon with the provided descriptor and path has all its dependencies satisfied
+    - and fills the server flag datahold.KPM.missingDependencies with a list of the names of the
+    - missing dependencies.
+
+    script:
+    ## Checks if the addon with the provided descriptor and path has all its dependencies satisfied
+    ## and fills the server flag datahold.KPM.missingDependencies with a list of the names of the
+    ## missing dependencies.
+    ##
+    ## descriptor : [MapTag]
+    ## path       : [ElementTag<String>]
+    ##
+    ## >>> [Void]
+
+    # TODO: (future configurable) Add a config option which lets you prevent the loading of any
+    # TODO/ addon with unsatisfied dependencies.
+
+    - if !<[descriptor].keys.get[1]> == package:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Package.yml file at path: <[path].color[red]> is invalid. Cannot find <&sq>package<&sq> key.]> def.silent:false
+        - stop
+
+    # If the descriptor file has the 'package' key then it will automatically ignore the rest of
+    # the file and treat the contents of 'package' as the file.
+    - define descriptor <[descriptor].get[package]>
+
+    - foreach <[descriptor].get[dependencies]> key:dependency as:versionInfo:
+
+        # Find the dependency in question. Only edge-case is if it's kingdoms- in which
+        # case just find the current kingdoms version from the YAML file.
+        - if <[dependency]> == kingdoms:
+            - yaml load:kingdoms.yml id:k
+            - define currentVersion <yaml[k].read[version].split[ ].get[2]>
+            - yaml id:k unload
+
+        #- Note to self: I really need to move all the last remaining essential information
+        #- out of the kingdoms.yml and into flag-based storage and do away with this
+        #- outdated convention.
+
+        - else:
+            - foreach <server.flag[addons.addonList]> as:addon:
+                - if <[addon].get[name]> == <[dependency]>:
+                    - define currentVersion <[addon].get[version]>
+                    - foreach stop
+
+            - flag server datahold.KPM.missingDependencies.<[descriptor].get[name]>:->:<[dependency]>
+            - foreach next
+
+        # Format checking all version keys in one go.
+        - foreach <[versionInfo]> as:version:
+            - if !<[version].proc[IsVersionFormatValid_KPM]>:
+                - run GenerateInternalError def.category:GenericError def.message:<element[Package.yml file at path: <[path].color[red]> is invalid. Dependency version number: <[version].color[red]> for dependency: <[dependency]> is not formatted correctly. Please see the Kingdoms documentation for information on how to format version numbers correctly.<n>]> def.silent:false
+                - stop
+
+        - if <[versionInfo].keys.contains[max-version]> && !<[versionInfo].keys.contains[min-version]>:
+            - run IsVersionValid_KPM def.givenVersions:<list[<[currentVersion]>]> def.currentVersion:<[versionInfo].get[max-version]> save:validationResult
+
+        - else if !<[versionInfo].keys.contains[max-version]> && <[versionInfo].keys.contains[min-version]>:
+            - run IsVersionValid_KPM def.givenVersions:<list[<[versionInfo].get[min-version]>]> def.currentVersion:<[currentVersion]> save:validationResult
+
+        - else if <[versionInfo].keys.contains[max-version|min-version]>:
+            - run IsVersionValid_KPM def.givenVersions:<list[<[versionInfo].get[min-version]>|<[versionInfo].get[max-version]>]> def.currentVersion:<[currentVersion]> save:validationResult
+
+        - else if <[versionInfo].keys.contains[version]>:
+            - run IsVersionValid_KPM def.givenVersions:<list[<[versionInfo].get[version]>]> def.currentVersion:<[currentVersion]> save:validationResult
+
+        - define validVersion <entry[validationResult].created_queue.determination.get[1].if_null[false]>
+
+        - if !<[validVersion]>:
+            - flag server datahold.KPM.missingDependencies.<[descriptor].get[name]>:->:<[dependency]>
+
+    - if <server.flag[datahold.KPM.missingDependencies.<[descriptor].get[name]>].size> > 0:
+        - narrate format:notice "Required dependenc(ies): <server.flag[datahold.KPM.missingDependencies.<[descriptor].get[name]>].comma_separated.color[red]> for addon: <[descriptor].get[name].color[gold]> are unsupported or outdated. Addon will remain indexed, but to activate it you must install valid dependenc(ies) or use <element[/addon load ~f].color[red]>.<n>"
 
 
 IsVersionValid_KPM:

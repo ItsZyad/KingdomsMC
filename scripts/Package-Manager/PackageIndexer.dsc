@@ -39,12 +39,12 @@ PackageIndexer_KPM:
         - define addonHash <[resultString].utf8_encode.gzip_compress.hash[SHA256]>
 
         # Loading YAML file and check if the name and hash of the addon is recurrent.
-        - yaml load:../Kingdoms/addons/<[subdirectory]>/package.yml id:descriptor
+        - ~yaml load:../Kingdoms/addons/<[subdirectory]>/package.yml id:descriptor
         - define addonName <yaml[descriptor].read[package.name]>
 
         - narrate format:notice "Reading addon: <[addonName].underline>..."
 
-        - if <server.flag[addons.addonList].keys.contains[<[addonName]>]>:
+        - if <server.flag[addons.addonList].keys.if_null[<list[]>].contains[<[addonName]>]>:
             - run GenerateKingdomsDebug def.category:GenericError def.message:<element[Found two addons with the same provided name in their package.yml. Addons will not be indexed if there is an existing addon with an identical name. Skipping...]> def.silent:true
             - narrate format:warning "Found two addons with the same provided name in their package.yml. Addons will not be indexed if there is an existing addon with an identical name. Skipping..."
             - foreach next
@@ -53,13 +53,14 @@ PackageIndexer_KPM:
         - define isDescValid <entry[isDescValid].created_queue.determination.get[1]>
 
         - if !<[isDescValid]>:
+            # IsPackageDescriptorValid_KPM will generate an exact error message detailing which
+            # property of the descriptor is wrong. This message is just some boilerplate.
             - narrate format:warning "Skipping addon: <[addonName].color[red]> until all errors in its package.yml are fixed..."
             - yaml unload id:descriptor
             - foreach next
 
         - narrate format:notice "Indexing addon..."
 
-        - define missingDependencies <server.flag[datahold.KPM.missingDependencies.<[addonName]>].if_null[<list[]>]>
         - define truncatedHash <[addonHash].as[element].substring[8,16]>
         - definemap addonInfo:
             name: <[addonName]>
@@ -69,12 +70,20 @@ PackageIndexer_KPM:
             rootDir: <element[Kingdoms/addons/<[subdirectory]>]>
             allFiles: <[dirList]>
             loaded: false
-            missingDependencies: <[missingDependencies]>
+            __descriptor: <yaml[descriptor].read[]>
 
         - flag server addons.addonList.<[addonName]>:<[addonInfo]>
-        - flag server datahold.KPM.missingDependencies.<[addonName]>:!
+        - ~yaml unload id:descriptor
 
-        - yaml unload id:descriptor
+    - foreach <server.flag[addons.addonList]> as:addonInfo key:addonName:
+        - define rootDir <[addonInfo].get[rootDir]>
+        - define descriptor <[addonInfo].get[__descriptor]>
+
+        - run PackageDependencyChecker_KPM def.descriptor:<[descriptor]> def.path:<[rootDir]>
+
+        - flag server addons.addonList.<[addonName]>.missingDependencies:<server.flag[datahold.KPM.missingDependencies.<[addonName]>].if_null[<list[]>]>
+        - flag server addons.addonList.<[addonName]>.__descriptor:!
+        - flag server datahold.KPM.missingDependencies.<[addonName]>:!
 
 
 SeekFolders_KPM:
