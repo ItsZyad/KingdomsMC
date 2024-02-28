@@ -5,7 +5,7 @@
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Dec 2023
-## @Script Ver: INDEV
+## @Script Ver: v1.0
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 

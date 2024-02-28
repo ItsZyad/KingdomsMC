@@ -5,16 +5,9 @@
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Dec 2023
-## @Script Ver: INDEV
+## @Script Ver: v1.0
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
-
-PackageLoader_KPM:
-    type: task
-    definitions: packageName
-    script:
-    - narrate format:debug WIP
-
 
 Addon_Command:
     type: command
@@ -69,22 +62,35 @@ Addon_Command:
 
                 # And a force load flag...
                 - if <[args].get[AddonFlag]> == ~f:
+                    - narrate format:admincallout "<red>Force Loading <[addonName].color[aqua]>..."
                     - run LoadAddon def.addonName:<[addonName]> def.addonHash:<[addonName].proc[GetAddonHash]>
                     - stop
 
-                - else:
-                    - narrate format:warning "Cannot load an addon which has currently unsatisfied dependencies without the ~f flag."
-                    - stop
+                - narrate format:warning "Cannot load an addon which has currently unsatisfied dependencies without the ~f flag."
+                - stop
 
+            - narrate format:admincallout "Loading <[addonName].color[aqua]>..."
             - run LoadAddon def.addonName:<[addonName]> def.addonHash:<[addonName].proc[GetAddonHash]>
 
-    CheckUnsatisfiedDependencies:
-    - narrate format:debug WIP
+        - case unload:
+            - define addonName <[args].get[AddonName]>
+
+            # Is addon loaded?
+            - if !<util.has_file[scripts/Packages/<[addonName]>]>:
+                - narrate format:admincallout "There is no addon with the name: <[addonName].color[red]> currently loaded.<n>Perhaps it's indexed but not yet loaded?"
+                - stop
+
+            - narrate format:admincallout "Unloading <[addonName].color[aqua]>..."
+            - ~run RecursiveDelete def.directory:scripts/Packages/<[addonName]>
+            - adjust system delete_file:scripts/Packages/<[addonName]>
+
+            - reload
+            - narrate format:admincallout "Addon unloaded!"
 
 
 LoadAddon:
     type: task
-    definitions: addonName[ElementTag(String)]|addonHash[BinaryTag]
+    definitions: addonName[ElementTag(String)]
     description:
     - Loads the addon with the provided name and hash.
     - This task script includes no logic for checking whether the addon name provided belongs to a
@@ -97,12 +103,49 @@ LoadAddon:
     ## valid addon or any other such verification.
     ##
     ## addonName : [ElementTag<String>]
-    ## addonHash : [BinaryTag]
     ##
     ## >>> [Void]
 
-    - narrate format:admincallout "Loading <[addonName].color[aqua]>..."
+    - if !<[addonName].proc[DoesAddonExist]>:
+        - narrate format:admincallout "The provided name: <[addonName].color[red]> does not correspond to any indexed addon."
+        - stop
 
     - ~run flagvisualizer def.flag:<queue.definition_map> def.flagName:defMap
 
-    - narrate format:debug WIP
+    - define addonDir <[addonName].proc[GetAddonRoot]>
+
+    - ~filecopy origin:../<[addonDir]> destination:scripts/Packages/<[addonName]> save:folderCopy
+    - adjust system delete_file:scripts/Packages/<[addonName]>/package.yml
+
+    - narrate format:debug <entry[folderCopy].success>
+
+    - if <entry[folderCopy].success>:
+        - reload
+        - narrate format:admincallout "Copied addon: <[addonName]> to working scripts directory. Addon now loaded!"
+
+    - else:
+        - narrate format:admincallout "An error occurred. File origin or destination may not exist..."
+
+
+RecursiveDelete:
+    type: task
+    definitions: directory[ElementTag(String)]|depth[ElementTag(Integer)]
+    description: Recursively deletes all files and folders inside a given directory.
+    script:
+    ## Recursively deletes all files and folders inside a given directory.
+    ##
+    ## directory : [ElementTag<String>]
+    ##
+    ## >>> [Void]
+
+    - define depth <[depth].if_null[0]>
+
+    - if <[depth]> > 1000:
+        - stop
+
+    - foreach <util.list_files[<[directory]>]> as:subdirectory:
+        - if <util.list_files[<[directory]>/<[subdirectory]>].size.if_null[0]> > 0:
+            - run RecursiveDelete def.directory:<[directory]>/<[subdirectory]> def.depth:<[depth].add[1]>
+
+        - adjust system delete_file:<[directory]>/<[subdirectory]>
+        - narrate format:debug "Deleted: <[subdirectory].color[aqua]>"
