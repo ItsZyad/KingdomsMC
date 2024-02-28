@@ -19,6 +19,7 @@ Debugger:
     script:
     - if <queue.player.exists>:
         - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
+            - define defMap <queue.definition_map>
             - narrate format:debug <queue.script.original_name>
 
             - narrate <element[                                  ].strikethrough>
@@ -30,7 +31,7 @@ Debugger:
                 - narrate format:debug WIP
 
             - narrate "<gold><italic>Breakpoint #<[breakpointCount]>"
-            - run FlagVisualizer def.flag:<queue.definition_map.exclude[breakpointCount]> def.flagName:<queue.script.name.bold><&sp>defs
+            - run FlagVisualizer def.flag:<[defMap]> def.flagName:<queue.script.name.bold><&sp>defs
             - narrate <n>
             - narrate <element[Player Context].color[aqua]>:<element[Click here].underline.on_hover[Player context map].on_click[]>
 
