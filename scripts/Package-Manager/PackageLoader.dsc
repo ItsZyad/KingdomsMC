@@ -12,11 +12,11 @@
 Addon_Command:
     type: command
     name: addon
-    usage: /addon [load|unload|info|help] (AddonName) [~f]
+    usage: /addon [load|unload|list|info|help] (AddonName) [~f]
     description: Blanket command for managing Kingdoms add-ons.
     permission: kingdoms.admin.addons
     data:
-        ValidOperations: <list[load|unload|info|help]>
+        ValidOperations: <list[load|unload|list|info|help]>
         ValidFlags: <list[~f]>
 
         args:
@@ -45,6 +45,9 @@ Addon_Command:
     - inject CommandManager path:TabCompleteEngine
 
     script:
+    - definemap exemptions:
+        list: AddonName
+
     - inject CommandManager path:ArgManager
 
     - define args <[arg]>
@@ -70,7 +73,9 @@ Addon_Command:
                 - stop
 
             - narrate format:admincallout "Loading <[addonName].color[aqua]>..."
-            - run LoadAddon def.addonName:<[addonName]> def.addonHash:<[addonName].proc[GetAddonHash]>
+            - ~run LoadAddon def.addonName:<[addonName]> def.addonHash:<[addonName].proc[GetAddonHash]>
+
+            - customevent id:KingdomsAddonLoaded context:<map[name=<[addonName]>]>
 
         - case unload:
             - define addonName <[args].get[AddonName]>
@@ -86,6 +91,19 @@ Addon_Command:
 
             - reload
             - narrate format:admincallout "Addon unloaded!"
+
+            - customevent id:KingdomsAddonUnloaded context:<map[name=<[addonName]>]>
+
+        - case list:
+            - run AddonGUI def.player:<player>
+
+        - case info:
+            - define addonName <[args].get[AddonName]>
+
+            - narrate format:debug WIP
+
+        - case help:
+            - narrate format:debug "Insert help string here later."
 
 
 LoadAddon:
@@ -130,7 +148,9 @@ LoadAddon:
 RecursiveDelete:
     type: task
     definitions: directory[ElementTag(String)]|depth[ElementTag(Integer)]
-    description: Recursively deletes all files and folders inside a given directory.
+    description:
+    - Recursively deletes all files and folders inside a given directory.
+
     script:
     ## Recursively deletes all files and folders inside a given directory.
     ##
