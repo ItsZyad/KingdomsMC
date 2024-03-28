@@ -27,98 +27,104 @@ FlagVisualizer:
     - if !<[flag].exists>:
         - determine cancelled
 
-    - if <[flag].as[entity].exists>:
-        - define name <[flag].name.color[aqua]>
-        - define uuid <[flag].uuid>
+    - choose <[flag].object_type>:
+        - case Time:
+            - define serverTimeZone <util.time_now.time_zone_name>
+            - define LocalTime <[flag].to_local>
+            - define formattedTime <[LocalTime].format[YYYY-MM-dd/hh:mm]>
 
-        - if <[flag].object_type.to_uppercase.equals[NPC]>:
-            - define id <[flag].id>
-            - determine passively "<[name]> <element[[uuid]].color[light_purple].on_hover[<[uuid].color[light_purple]>]> <element[[id]].color[light_purple].on_hover[<[id].color[light_purple]>]>"
+            - determine passively <[flag].color[light_purple].on_hover[<[formattedTime]> <[serverTimeZone]>]>
 
-        - else:
-            - determine passively "<[name]> <element[[uuid]].color[light_purple].on_hover[<[uuid].color[light_purple]>]>"
+        - case Item:
+            - define itemPropertiesList <[flag].property_map>
 
-    - else if <[flag].time_zone_id.exists>:
+            - if !<[itemPropertiesList].is_empty>:
+                - define formattedItemProperties <list[]>
 
-        # TODO: Make this work with whatever timezone the server is in.
-        - define ESTTime <[flag].to_zone[America/New_York]>
-        - define formattedTime <[ESTTime].format[YYYY-MM-dd/hh:mm]>
+                - foreach <[itemPropertiesList]>:
+                    - define formattedItemProperties:->:<element[<[key]><&co> <[value]>]>
 
-        - determine passively <[flag].color[light_purple].on_hover[<[formattedTime]> EST]>
+                - define formattedItemProperties <[formattedItemProperties].separated_by[<n>]>
 
-    - else if <[flag].object_type> == Item:
-        - define itemPropertiesList <[flag].property_map>
+                - determine passively "<element[i<&at><[flag].material.name>].color[aqua]> <element[[nbt]].color[light_purple].on_hover[<[formattedItemProperties]>]>"
 
-        - if !<[itemPropertiesList].is_empty>:
-            - define formattedItemProperties <list[]>
+            - determine passively <element[i<&at><[flag].material.name>].color[aqua]>
 
-            - foreach <[itemPropertiesList]>:
-                - define formattedItemProperties:->:<element[<[key]><&co> <[value]>]>
+        - case Chunk:
+            - define cornerOne <[flag].cuboid.corners.get[1].simple.split[,].remove[last].remove[2].separated_by[,]>
+            - define cornerTwo <[flag].cuboid.corners.get[2].simple.split[,].remove[last].remove[2].separated_by[,]>
+            - define coordRange "<[cornerOne]> -<&gt> <[cornerTwo]>"
 
-            - define formattedItemProperties <[formattedItemProperties].separated_by[<n>]>
+            - determine passively "<[flag].color[aqua]> <element[[range]].color[light_purple].on_hover[<[coordRange]>]>"
 
-            - determine passively "<element[i<&at><[flag].material.name>].color[aqua]> <element[[nbt]].color[light_purple].on_hover[<[formattedItemProperties]>]>"
+        - case Cuboid:
+            - define cornerOne <[flag].corners.get[1].simple.split[,].remove[last].remove[2].separated_by[,]>
+            - define cornerTwo <[flag].corners.get[2].simple.split[,].remove[last].remove[2].separated_by[,]>
+            - define coordRange "<[cornerOne]> -<&gt> <[cornerTwo]>"
 
-        - determine passively <element[i<&at><[flag].material.name>].color[aqua]>
+            - determine passively "<[flag].color[aqua]> <element[[range]].color[light_purple].on_hover[<[coordRange]>]>"
 
-    - else if <[flag].object_type> == Chunk:
-        - define cornerOne <[flag].cuboid.corners.get[1].simple.split[,].remove[last].remove[2].separated_by[,]>
-        - define cornerTwo <[flag].cuboid.corners.get[2].simple.split[,].remove[last].remove[2].separated_by[,]>
-        - define coordRange "<[cornerOne]> -<&gt> <[cornerTwo]>"
+        - case Binary:
+            # 7 more characters included in the substring method to account for 'binary@'
+            # I really don't want to split it out then re-add it...
+            - define truncatedBinary <[flag].as[element].substring[1,107]>
 
-        - determine passively "<[flag].color[aqua]> <element[[range]].color[light_purple].on_hover[<[coordRange]>]>"
+            - if <[flag].as[element].length> > 100:
+                - define truncatedBinary <element[<[truncatedBinary]> <element[[...]].color[light_purple].on_hover[<element[Raw binary truncated at 100 characters].color[light_purple]>]>]>
 
-    - else if <[flag].object_type> == Binary:
+            - determine passively "<[truncatedBinary]> <element[[length]].color[light_purple].on_hover[<[flag].length.color[light_purple]>]>"
 
-        # 7 more characters included in the substring method to account for 'binary@'
-        # I really don't want to split it out then re-add it...
-        - define truncatedBinary <[flag].as[element].substring[1,107]>
+        - case Map:
+            - narrate <proc[MakeTabbed].context[<element[MAP :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
+            - define tabWidth:+:4
 
-        - if <[flag].as[element].length> > 100:
-            - define truncatedBinary <element[<[truncatedBinary]> <element[[...]].color[light_purple].on_hover[<element[Raw binary truncated at 100 characters].color[light_purple]>]>]>
+            - foreach <[flag]>:
 
-        - determine passively "<[truncatedBinary]> <element[[length]].color[light_purple].on_hover[<[flag].length.color[light_purple]>]>"
+                # # Ensures only 10 items are written from the map
+                # # as to avoid chat spam
+                # - if <[loop_index]> >= 10:
+                #     - narrate "<proc[MakeTabbed].context[And <[flag].size.sub[10]> more...]>"
+                #     - foreach stop
 
-    - else if <[flag].object_type> == Map:
-        - narrate <proc[MakeTabbed].context[<element[MAP :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
-        - define tabWidth:+:4
+                - run FlagVisualizer def.flag:<[value]> def.flagName:<[key]> def.recursionDepth:<[recursionDepth].add[1]> save:Recur
 
-        - foreach <[flag]>:
+                - if <entry[Recur].created_queue.determination.get[1].as[list].size.if_null[0]> == 1:
+                    - define line <list[<[key].color[aqua].italicize><&co> ]>
+                    - define line:->:<entry[Recur].created_queue.determination.get[1].color[white]>
+                    - narrate <proc[MakeTabbed].context[<[line].unseparated>|<[tabWidth]>].as[element]>
 
-            # # Ensures only 10 items are written from the map
-            # # as to avoid chat spam
-            # - if <[loop_index]> >= 10:
-            #     - narrate "<proc[MakeTabbed].context[And <[flag].size.sub[10]> more...]>"
-            #     - foreach stop
+        - case List:
+            - narrate <proc[MakeTabbed].context[<element[LIST :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
+            - define longestNumber <[flag].size>
+            - define tabWidth:+:4
 
-            - run FlagVisualizer def.flag:<[value]> def.flagName:<[key]> def.recursionDepth:<[recursionDepth].add[1]> save:Recur
+            - foreach <[flag]>:
 
-            - if <entry[Recur].created_queue.determination.get[1].as[list].size.if_null[0]> == 1:
-                - define line <list[<[key].color[aqua].italicize><&co> ]>
-                - define line:->:<entry[Recur].created_queue.determination.get[1].color[white]>
-                - narrate <proc[MakeTabbed].context[<[line].unseparated>|<[tabWidth]>].as[element]>
+                # # Ensures only 20 items are written from the list
+                # # as to avoid chat spam
+                # - if <[loop_index]> >= 20:
+                #     - narrate "<proc[MakeTabbed].context[And <[flag].size.sub[20]> more...]>"
+                #     - foreach stop
 
-    - else if <[flag].object_type> == List:
-        - narrate <proc[MakeTabbed].context[<element[LIST :: <[flagName].color[green]> (Size: <[flag].size.color[yellow]>)].italicize.color[gray]>|<[tabWidth]>]>
-        - define longestNumber <[flag].size>
-        - define tabWidth:+:4
+                - run FlagVisualizer def.flag:<[value]> def.flagName:<[loop_index]> def.recursionDepth:<[recursionDepth].add[1]> save:Recur
 
-        - foreach <[flag]>:
+                - if <entry[Recur].created_queue.determination.get[1].as[list].size.if_null[0]> == 1:
+                    - define formattedIndex <[loop_index].pad_left[<[longestNumber].length>].with[0]>
+                    - narrate <proc[MakeTabbed].context[<element[<[formattedIndex].color[gray]>: <entry[Recur].created_queue.determination.get[1].color[white]>]>|<[tabWidth]>]>
 
-            # # Ensures only 20 items are written from the list
-            # # as to avoid chat spam
-            # - if <[loop_index]> >= 20:
-            #     - narrate "<proc[MakeTabbed].context[And <[flag].size.sub[20]> more...]>"
-            #     - foreach stop
+        - default:
+            - if <[flag].as[entity].exists>:
+                - define name <[flag].name.color[aqua]>
+                - define uuid <[flag].uuid>
 
-            - run FlagVisualizer def.flag:<[value]> def.flagName:<[loop_index]> def.recursionDepth:<[recursionDepth].add[1]> save:Recur
+                - if <[flag].object_type.to_uppercase> == NPC:
+                    - define id <[flag].id>
+                    - determine passively "<[name]> <element[[uuid]].color[light_purple].on_hover[<[uuid].color[light_purple]>]> <element[[id]].color[light_purple].on_hover[<[id].color[light_purple]>]>"
 
-            - if <entry[Recur].created_queue.determination.get[1].as[list].size.if_null[0]> == 1:
-                - define formattedIndex <[loop_index].pad_left[<[longestNumber].length>].with[0]>
-                - narrate <proc[MakeTabbed].context[<element[<[formattedIndex].color[gray]>: <entry[Recur].created_queue.determination.get[1].color[white]>]>|<[tabWidth]>]>
+                - else:
+                    - determine passively "<[name]> <element[[uuid]].color[light_purple].on_hover[<[uuid].color[light_purple]>]>"
 
-    - else:
-        - determine passively <[flag]>
+            - determine passively <[flag]>
 
 
 MakeTabbed:
