@@ -21,6 +21,15 @@ PaginatedInterface_Window:
     - [] [] [] [Page_Back] [] [Page_Forward] [] [] []
 
 
+DefaultFooter_Window:
+    type: inventory
+    inventory: chest
+    gui: true
+    title: null
+    slots:
+    - [] [] [] [Page_Back] [] [Page_Forward] [] [] []
+
+
 GetTrueInterface_Proc:
     type: procedure
     definitions: inventory
@@ -57,6 +66,7 @@ PaginatedInterface:
 
     # - flag <[player]> dataHold.paginated.itemList:<[itemList]> if:<player.has_flag[dataHold.paginated.itemList].not>
     - define itemList <[itemList].if_null[<player.flag[dataHold.paginated.itemList]>].exclude[<item[air]>]>
+    - define footer <inventory[DefaultFooter_Window]> if:<[footer].exists.not>
 
     - flag <[player]> dataHold.paginated.itemList:<[itemList]>
     - flag <[player]> dataHold.paginated.footer:<[footer]>
@@ -80,7 +90,10 @@ PaginatedInterface:
 
         - define outList:->:<[itemList].get[<[value]>]>
 
-    - define interface <[interface].include[<[outList]>]>
+    - repeat <[outList].size> from:<[interface].size.sub[<[interface].empty_slots>]>:
+        - inventory set slot:<[value].sub[1]> origin:<[outList].get[<[outList].size.sub[<[value]>]>]> destination:<[interface]>
+
+    # - define interface <[interface].include[<[outList]>]>
 
     - adjust def:interface title:<[title]> if:<[title].exists>
     - adjust def:interface "title:<[interface].title> (page <[page]>/<[maxPages]>)"
