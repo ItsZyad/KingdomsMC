@@ -64,6 +64,7 @@ PackageIndexer_KPM:
         - define truncatedHash <[addonHash].as[element].substring[8,16]>
         - definemap addonInfo:
             name: <[addonName]>
+            displayName: <yaml[descriptor].read[package.display-name]>
             hash: <[addonHash]>
             authors: <yaml[descriptor].read[package.authors]>
             version: <yaml[descriptor].read[package.version]>
