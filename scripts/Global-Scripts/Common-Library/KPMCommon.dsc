@@ -45,6 +45,42 @@ IsAddonLoaded:
     - determine <server.flag[addons.addonList.<[name]>.loaded]>
 
 
+GetAllAddonNames:
+    type: procedure
+    description:
+    - Will return a list of all the names of all currently indexed addons.
+
+    script:
+    ## Will return a list of all the names of all currently indexed addons.
+    ##
+    ## >>> [ListTag<ElementTag<String>>]
+
+    - determine <server.flag[addons.addonList].keys>
+
+
+GetAddonDisplayName:
+    type: procedure
+    definitions: name[ElementTag(String)]
+    description:
+    - Gets the display name of the addon with the provided name.
+
+    script:
+    ## Gets the display name of the addon with the provided name.
+    ##
+    ## name : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<[name].proc[DoesAddonExist]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Provided addon name: <[name].color[red]> is invalid]> def.silent:true
+        - determine null
+
+    - if <server.has_flag[addons.addonList.<[name]>.displayName]>:
+        - determine <server.flag[addons.addonList.<[name]>.displayName]>
+
+    - determine <[name]>
+
+
 GetAddonMissingDependencies:
     type: procedure
     definitions: name[ElementTag(String)]
@@ -91,7 +127,7 @@ GetAddonNameByHash:
     - define shortHash <[shortHash].substring[1,4]>
 
     - foreach <server.flag[addons.addonList].values>:
-        - if <[value].get[hash].proc[GetShortHash]> == <[shortHash]>:
+        - if <[value].get[hash].proc[GetAddonShortHash]> == <[shortHash]>:
             - determine <[value].get[name]>
 
 
@@ -175,7 +211,7 @@ GetAddonAuthors:
     - determine <server.flag[addons.addonList.<[name]>.authors]>
 
 
-GetShortHash:
+GetAddonShortHash:
     type: procedure
     definitions: name[ElementTag(String)]
     description:
