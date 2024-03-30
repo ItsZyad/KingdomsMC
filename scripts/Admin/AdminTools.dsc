@@ -199,7 +199,7 @@ AdminTools_Command:
 
                 - if <[flag]> != null:
                     - narrate <element[                                                     ].strikethrough>
-                    - inject FlagVisualizer
+                    - run FlagVisualizer_Recur def.flag:<[flag]> def.flagName:<[flagName]>
 
                     - if <script.queues.get[1].determination.get[1].exists>:
                         - narrate <element[<[flagName]>: ].color[green].italicize><script.queues.get[1].determination.get[1]>
