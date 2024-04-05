@@ -90,7 +90,7 @@ SidebarLoader:
             - sidebar add "values:<&sp>Outpost Count: <[kingdomData].deep_get[outposts.outpostList].size.if_null[0]>" players:<[player]>
 
             # Set Prestige Line
-            - sidebar add "values:<&sp>Prestige: <[kingdomData].deep_get[prestige]> / 100" players:<[player]>
+            - sidebar add "values:<&sp>Prestige: <[kingdomData].deep_get[prestige].round_to_precision[0.05]> / 100" players:<[player]>
 
             # Set Influences Line
             - sidebar add "values:<&sp>Influence Points: <[kingdomData].deep_get[powerstruggle.influencePoints]>" players:<[player]>
