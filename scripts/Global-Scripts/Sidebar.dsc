@@ -92,6 +92,16 @@ SidebarLoader:
             # Set Prestige Line
             - sidebar add "values:<&sp>Prestige: <[kingdomData].deep_get[prestige].round_to_precision[0.05]> / 100" players:<[player]>
 
+            # Set Prestige Degradation Line
+            - run GetPrestigeDegradation save:prestigeScales
+            - define prestigeScales <entry[prestigeScales].created_queue.determination.get[1]>
+
+            - if <[prestigeScales].get[<[kingdom]>]> >= 0:
+                - sidebar add "values:<&sp>Prestige Gain: <element[+<[prestigeScales].get[<[kingdom]>]>].color[green]>"
+
+            - else:
+                - sidebar add "values:<&sp>Prestige Decay: <element[<[prestigeScales].get[<[kingdom]>]>].color[red]>"
+
             # Set Influences Line
             - sidebar add "values:<&sp>Influence Points: <[kingdomData].deep_get[powerstruggle.influencePoints]>" players:<[player]>
 
