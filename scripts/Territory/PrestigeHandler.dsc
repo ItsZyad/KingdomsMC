@@ -37,7 +37,6 @@ GetPrestigeDegradation:
     ##
     ## >>> [MapTag<<ElementTag<String>>, <ElementTag<Float>>>]
 
-
     - foreach <proc[GetKingdomList]> as:kingdom:
         - define allPrestige.<[kingdom]> <[kingdom].proc[GetPrestige]>
 
