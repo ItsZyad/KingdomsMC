@@ -66,14 +66,14 @@ Addon_Command:
                 # And a force load flag...
                 - if <[args].get[AddonFlag]> == ~f:
                     - narrate format:admincallout "<red>Force Loading <[addonName].color[aqua]>..."
-                    - run LoadAddon def.addonName:<[addonName]> def.addonHash:<[addonName].proc[GetAddonHash]>
+                    - run LoadAddon def.addonName:<[addonName]>
                     - stop
 
                 - narrate format:warning "Cannot load an addon which has currently unsatisfied dependencies without the ~f flag."
                 - stop
 
             - narrate format:admincallout "Loading <[addonName].color[aqua]>..."
-            - ~run LoadAddon def.addonName:<[addonName]> def.addonHash:<[addonName].proc[GetAddonHash]>
+            - ~run LoadAddon def.addonName:<[addonName]>
 
             - customevent id:KingdomsAddonLoaded context:<map[name=<[addonName]>]>
 
@@ -132,6 +132,14 @@ LoadAddon:
 
     - define addonDir <[addonName].proc[GetAddonRoot]>
 
+    - if !<util.has_file[../<[addonDir]>]>:
+        - narrate format:admincallout "Cannot load addon... Source directory does not exist.<n>Was the addon folder deleted after package indexing occurred?"
+        - stop
+
+    - if !<util.has_file[../<[addonDir]>/package.yml]>:
+        - narrate format:admincallout "Cannot load addon... Source directory does not contain a package.yml."
+        - stop
+
     - ~filecopy origin:../<[addonDir]> destination:scripts/Packages/<[addonName]> save:folderCopy
     - adjust system delete_file:scripts/Packages/<[addonName]>/package.yml
 
@@ -142,7 +150,7 @@ LoadAddon:
         - narrate format:admincallout "Copied addon: <[addonName]> to working scripts directory. Addon now loaded!"
 
     - else:
-        - narrate format:admincallout "An error occurred. File origin or destination may not exist..."
+        - narrate format:admincallout "Cannot load addon... Source directory does not exist.<n>Was the addon folder deleted after package indexing occurred?"
 
 
 RecursiveDelete:
