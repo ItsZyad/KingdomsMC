@@ -10,6 +10,7 @@
 
 IsPackageDescriptorValid_KPM:
     type: task
+    debug: false
     definitions: descriptor[MapTag]|path[ElementTag(String)]
     description:
     - Ensures that the package.yml file (addon descriptor) is formatted correctly and has all
@@ -64,6 +65,7 @@ IsPackageDescriptorValid_KPM:
 
 PackageDependencyChecker_KPM:
     type: task
+    debug: false
     definitions: descriptor[MapTag]|path[ElementTag(String)]
     description:
     - Checks if the addon with the provided descriptor and path has all its dependencies satisfied
@@ -142,6 +144,7 @@ PackageDependencyChecker_KPM:
 
 IsVersionValid_KPM:
     type: task
+    debug: false
     definitions: givenVersions|currentVersion
     description:
     - Helper script which makes version checking with recurring keys like min/max-version a bit easier and less repetitive. However, it does assume that versions are formatted in one of the following formats-
@@ -224,6 +227,7 @@ IsVersionValid_KPM:
 
 IsVersionFormatValid_KPM:
     type: procedure
+    debug: false
     definitions: version
     description:
     - Helper function which checks if version numbers are formatted in a Kingdoms-standard manner.
