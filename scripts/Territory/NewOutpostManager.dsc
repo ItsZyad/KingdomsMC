@@ -2,13 +2,14 @@
 ## Rewrote the entire outpost manager code in about 4 and a half hours (refactor + conventions)
 ## Manages initial outpost claiming and redef.
 ##
+## This file exists courtesy of Max Chapman :)
+##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jul 2021
 ## @Script Ver: v1.0
 ##
 ##ignorewarning invalid_data_line_quotes
-## This file exists courtesy of Max Chapman ##
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 #TODO: Comment this!
 
@@ -42,6 +43,7 @@ Outpost_Command:
     name: outpost
     tab completions:
         1: claim|redefine|delete|cancel|showborder|list
+
     tab complete:
         - if <context.args.get[1]> == showborder:
             - if <context.args.size.is[MORE].than[1]>:
