@@ -110,15 +110,10 @@ LoadAddon:
     type: task
     definitions: addonName[ElementTag(String)]
     description:
-    - Loads the addon with the provided name and hash.
-    - This task script includes no logic for checking whether the addon name provided belongs to a
-    - valid addon or any other such verification.
+    - Loads the addon with the provided name.
 
     script:
-    ## Loads the addon with the provided name and hash.
-    ##
-    ## This task script includes no logic for checking whether the addon name provided belongs to a
-    ## valid addon or any other such verification.
+    ## Loads the addon with the provided name.
     ##
     ## addonName : [ElementTag<String>]
     ##
