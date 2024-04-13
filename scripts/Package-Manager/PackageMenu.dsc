@@ -67,6 +67,18 @@ LoadAddon_Item:
     display name: <dark_green><bold>Load Addon
 
 
+AddonLoading_Item:
+    type: item
+    material: yellow_wool
+    display name: <yellow><bold>Loading...
+
+
+AddonUnloading_Item:
+    type: item
+    material: yellow_wool
+    display name: <gold><bold>Unloading...
+
+
 UnloadAddon_Item:
     type: item
     material: red_wool
@@ -102,7 +114,7 @@ AddonGUI_Handler:
 
         - definemap addonInfo:
             1: <element[Addon Name:     ].color[gray]><[addonName].color[gold]>
-            2: <element[Unique Hash:     ].color[gray]><[addonName].proc[GetAddonShortHash].color[gold]>
+            2: <element[Unique Hash:     ].color[gray]><[addonName].proc[GetAddonHash].as[element].substring[8,21].color[gold]>
             3: <element[Addon Version:  ].color[gray]><[addonName].proc[GetAddonVersion].color[gold]>
             4: <element[Addon Authors: ].color[gray]><[addonName].proc[GetAddonAuthors].separated_by[<n>].color[gold]>
 
@@ -112,15 +124,21 @@ AddonGUI_Handler:
         - execute as_player "addon load <player.flag[datahold.addons.addonName]>"
         - flag <player> datahold.addons.addonLoadCooldown
 
+        - inventory set origin:AddonLoading_Item slot:<context.inventory.find_item[LoadAddon_Item]> d:<context.inventory>
+
         on custom event id:KingdomsAddonLoaded:
         - flag <player> datahold.addons.addonLoadCooldown expire:5s
+        - inventory set origin:UnloadAddon_Item slot:<context.inventory.find_item[AddonLoading_Item]> d:<context.inventory>
 
         on player clicks UnloadAddon_Item flagged:!datahold.addons.addonLoadCooldown:
         - execute as_player "addon unload <player.flag[datahold.addons.addonName]>"
         - flag <player> datahold.addons.addonLoadCooldown
 
+        - inventory set origin:AddonUnloading_Item slot:<context.inventory.find_item[UnloadAddon_Item]> d:<context.inventory>
+
         on custom event id:KingdomsAddonUnloaded:
         - flag <player> datahold.addons.addonLoadCooldown expire:5s
+        - inventory set origin:LoadAddon_Item slot:<context.inventory.find_item[AddonUnloading_Item]> d:<context.inventory>
 
         on player closes AddonControls_Window:
         - flag <player> datahold.addons.addonName:!
