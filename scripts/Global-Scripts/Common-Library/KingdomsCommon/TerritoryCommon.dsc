@@ -15,6 +15,8 @@ GetAllClaims:
     description:
     - Gets all claims of the provided type made by all kingdoms.
     - If no type is specified, the procedure will return all claims of all types.
+    - ---
+    - → [ListTag(ChunkTag)]
 
     script:
     ## Gets all claims of the provided type made by all kingdoms. If no type is specified, the
@@ -42,6 +44,8 @@ GetClaims:
     description:
     - Gets a list of the provided claim type belonging to the kingdom provided.
     - If no claim type is specified the procedure will return both core and castle claims.
+    - ---
+    - → [ListTag(ChunkTag)]
 
     script:
     ## Gets a list of the provided claim type pertaining to the provided kingdom.
@@ -69,6 +73,12 @@ GetClaims:
 AddClaim:
     type: task
     definitions: kingdom[ElementTag(String)]|type[ChunkTag]|chunk[?ElementTag(String)]
+    description:
+    - Adds the provided chunk to the claims of the provided kingdom. Claim types can be core or
+    - castle. If no claim type is provided, the script will assume 'castle'.
+    - ---
+    - → [Void]
+
     script:
     ## Adds the provided chunk to the claims of the provided kingdom. Claim types can be core or
     ## castle. If no claim type is provided, the script will assume 'castle'.
@@ -105,6 +115,12 @@ AddClaim:
 GetClaimsCuboid:
     type: procedure
     definitions: kingdom[ElementTag(String)]|type[?ElementTag(String)]
+    description:
+    - Returns a nested cuboid of the given kingdom's claims. Should a claim type not be specified
+    - the procedure will assume 'core/castle'.
+    - ---
+    - → [CuboidTag]
+
     script:
     ## Returns a nested cuboid of the given kingdom's claims. Should a claim type not be specified
     ## the procedure will assume 'core/castle'.
@@ -144,8 +160,13 @@ GetClaimsCuboid:
 GetClaimsPolygon:
     type: procedure
     definitions: kingdom[ElementTag(String)]|world[WorldTag]
+    description:
+    - Returns a polygon created of all the chunks consisting a kingdom's core/castle claims.
+    - ---
+    - → [PolygonTag]
+
     script:
-    ## Returns a polygon created of all the chunks consisting a kingdom's core/castle claims
+    ## Returns a polygon created of all the chunks consisting a kingdom's core/castle claims.
     ##
     ## kingdom : [ElementTag<String>]
     ## world   : [WorldTag]
@@ -168,6 +189,12 @@ GetClaimsPolygon:
 GetOutposts:
     type: procedure
     definitions: kingdom[ElementTag(String)]
+    description:
+    - Generates a MapTag of all the kingdom's outposts with an additional key added for the
+    - outpost's area represented as a cuboid.
+    - ---
+    - → [MapTag(CuboidTag;ElementTag)]
+
     script:
     ## Generates a MapTag of all the kingdom's outposts with an additional key added for the
     ## outpost's area represented as a cuboid.
@@ -188,6 +215,15 @@ GetOutposts:
 
 GetAllOutposts:
     type: procedure
+    description:
+    - Generates a MapTag representing the outpost information of every kingdom.
+    - ---
+    -     → [MapTag(CuboidTag;
+    -               ElementTag(Integer);
+    -               ElementTag(Float);
+    -               ElementTag(String)
+    -       )]
+
     script:
     ## Generates a MapTag representing the outpost information of every kingdom.
     ##
@@ -209,12 +245,19 @@ GetAllOutposts:
 IsPlayerInCore:
     type: procedure
     definitions: player[PlayerTag]
+    description:
+    - Checks if a player is in their own kingdom's core claims.
+    - ---
+    - → [ElementTag(Boolean)]
+
     script:
-    ## Checks if a player is in their own kingdom's core claims
+    ## Checks if a player is in their own kingdom's core claims.
     ##
     ## player : [PlayerTag]
     ##
     ## >>> [ElementTag<Boolean>]
+
+    - narrate <proc[GetAllOutposts]>
 
     - if !<[player].has_flag[kingdom]>:
         - determine false
@@ -231,8 +274,13 @@ IsPlayerInCore:
 IsPlayerInCastle:
     type: procedure
     definitions: player[PlayerTag]
+    description:
+    - Checks if a player is in their own castle claims.
+    - ---
+    - → [ElementTag(Boolean)]
+
     script:
-    ## Checks if a player is in their own castle claims
+    ## Checks if a player is in their own castle claims.
     ##
     ## player : [PlayerTag]
     ##
@@ -253,8 +301,13 @@ IsPlayerInCastle:
 PlayerInWhichOutpost:
     type: procedure
     definitions: player[PlayerTag]
+    description:
+    - Checks if a player is in one of their own kingdom's outposts.
+    - ---
+    - → [ElementTag(String)]
+
     script:
-    ## Checks if a player is in one of their own kingdom's outposts
+    ## Checks if a player is in one of their own kingdom's outposts.
     ##
     ## player : [PlayerTag]
     ##

@@ -13,6 +13,8 @@ GetMembers:
     definitions: kingdom[ElementTag(String)]
     description:
     - Returns a list of all the members currently in the kingdom.
+    - ---
+    - → [ListTag(PlayerTag)]
 
     script:
     ## Returns a list of all the members currently in the kingdom.
@@ -33,6 +35,8 @@ AddMember:
     definitions: kingdom[ElementTag(String)]|player[PlayerTag]
     description:
     - Adds a player to a given kingdom.
+    - ---
+    - → [Void]
 
     script:
     ## Adds a player to a given kingdom.
@@ -59,6 +63,8 @@ RemoveMember:
     definitions: kingdom[ElementTag(String)]|player[PlayerTag]
     description:
     - Removes the given player from a kingdom if they are a member.
+    - ---
+    - → [Void]
 
     script:
     ## Removes the given player from a kingdom if they are a member.
@@ -85,6 +91,8 @@ GetAllMembers:
     type: procedure
     description:
     - Returns a list of all the members in all kingdoms.
+    - ---
+    - → [ListTag(PlayerTag)]
 
     script:
     ## Returns a list of all the members in all kingdoms.
@@ -99,6 +107,8 @@ IsPlayerInKingdom:
     definitions: kingdom[ElementTag(String)]|player[PlayerTag]
     description:
     - Returns true if the provided player is in the provided kingdom.
+    - ---
+    - → [ElementTag(Boolean)]
 
     script:
     ## Returns true if the provided player is in the provided kingdom.

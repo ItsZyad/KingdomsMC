@@ -10,9 +10,11 @@
 
 GetKingdomSquadManagers:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
     description:
     - Gets all of a given kingdom's squad managers.
+    - ---
+    - → [MapTag]
 
     script:
     ## Gets all of a given kingdom's squad managers.
@@ -26,9 +28,11 @@ GetKingdomSquadManagers:
 
 GetKingdomSquads:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
     description:
     - Gets all squads belonging to a kingdom.
+    - ---
+    - → [ListTag(MapTag)]
 
     script:
     ## Gets all squads belonging to a kingdom.
@@ -42,9 +46,11 @@ GetKingdomSquads:
 
 GetMaxAllowedSMs:
     type: procedure
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
     description:
     - Gets the maximum amount of squad managers that a kingdom is allowed to posses.
+    - ---
+    - → [ElementTag(Integer)]
 
     script:
     ## Gets the maximum amount of squad managers that a kingdom is allowed to posses.
@@ -63,10 +69,12 @@ GetMaxAllowedSMs:
 
 WriteArmyDataToKingdom:
     type: task
-    definitions: SMLocation|kingdom
+    definitions: SMLocation[LocationTag]|kingdom[ElementTag(String)]
     description:
     - Ensures that the kingdom.armies flag contains the same information as the squad manager.
     - flag of the provided SMLocation.
+    - ---
+    - → [Void]
 
     script:
     ## Ensures that the kingdom.armies flag contains the same information as the squad manager.

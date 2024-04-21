@@ -8,12 +8,13 @@
 ##
 ## ----------------END HEADER-----------------
 
-
 DoesAddonExist:
     type: procedure
     definitions: name[ElementTag(String)]
     description:
     - Checks if the provided name is the name of a currently indexed addon.
+    - ---
+    - → [ElementTag(Boolean)]
 
     script:
     ## Checks if the provided name is the name of a currently indexed addon.
@@ -30,6 +31,8 @@ IsAddonLoaded:
     definitions: name[ElementTag(String)]
     description:
     - Returns true if the provided addon is currently loaded and running on the server.
+    - ---
+    - → [ElementTag(Boolean)]
 
     script:
     ## Returns true if the provided addon is currently loaded and running on the server.
@@ -49,6 +52,8 @@ GetAllAddonNames:
     type: procedure
     description:
     - Will return a list of all the names of all currently indexed addons.
+    - ---
+    - → [ListTag(ElementTag(String))]
 
     script:
     ## Will return a list of all the names of all currently indexed addons.
@@ -63,6 +68,8 @@ GetAddonDisplayName:
     definitions: name[ElementTag(String)]
     description:
     - Gets the display name of the addon with the provided name.
+    - ---
+    - → [ElementTag(String)]
 
     script:
     ## Gets the display name of the addon with the provided name.
@@ -86,6 +93,8 @@ GetAddonMissingDependencies:
     definitions: name[ElementTag(String)]
     description:
     - Returns a list of the provided addon's currently unsatisfied dependencies.
+    - ---
+    - → [ListTag(ElementTag(String))]
 
     script:
     ## Returns a list of the provided addon's currently unsatisfied dependencies.
@@ -107,6 +116,8 @@ GetAddonNameByHash:
     description:
     - Gets the name of an addon using its SHA256 hash or a shortened version of it.
     - Note: Definitions hash and shortHash are mutually exclusive.
+    - ---
+    - → [MapTag]
 
     script:
     ## Gets the name of an addon using its SHA256 hash or a shortened version of it.
@@ -136,6 +147,8 @@ GetAddonVersion:
     definitions: name[ElementTag(String)]
     description:
     - Gets the current version of the provided addon.
+    - ---
+    - → [ElementTag(String)]
 
     script:
     ## Gets the current version of the provided addon.
@@ -156,6 +169,8 @@ GetAddonHash:
     definitions: name[ElementTag(String)]
     description:
     - Gets the SHA256 hash of the provided addon.
+    - ---
+    - → [BinaryTag]
 
     script:
     ## Gets the SHA256 hash of the provided addon.
@@ -176,6 +191,8 @@ GetAddonRoot:
     definitions: name[ElementTag(String)]
     description:
     - Gets the root directory of the addon with the provided name.
+    - ---
+    - → [ElementTag(String)]
 
     script:
     ## Gets the root directory of the addon with the provided name.
@@ -196,6 +213,8 @@ GetAddonAuthors:
     definitions: name[ElementTag(String)]
     description:
     - Gets a list of authors for the provided addon.
+    - ---
+    - → [ListTag(ElementTag(String))]
 
     script:
     ## Gets a list of authors for the provided addon.
@@ -216,6 +235,8 @@ GetAddonShortHash:
     definitions: name[ElementTag(String)]
     description:
     - Gets the shortened version of the SHA256 hash used to identify addons.
+    - ---
+    - → [ElementTag(String)]
 
     script:
     ## Gets the shortened version of the SHA256 hash used to identify addons.

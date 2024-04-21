@@ -14,6 +14,8 @@ GetAllMarkets:
     type: procedure
     description:
     - Gets all markets in the game by name.
+    - ---
+    - → [ListTag(ElementTag(String))]
 
     script:
     ## Gets all markets in the game by name.
@@ -26,12 +28,14 @@ GetAllMarkets:
 # @Stopgap
 GetMarketMap:
     type: procedure
-    definitions: name
+    definitions: name[ElementTag(String)]
     description:
     - @Stopgap
     - <&sp>
     - Gets all market data by the given internal name of the market.
     - Note: This is a stopgap only to be used until specific getters are made for other attrs.
+    - ---
+    - → [MapTag]
 
     script:
     ## Gets all market data by the given internal name of the market.
@@ -46,9 +50,11 @@ GetMarketMap:
 
 GetMarketByID:
     type: procedure
-    definitions: id
+    definitions: id[ElementTag(Integer)]
     description:
     - Gets a market by its auto-assigned numerical ID.
+    - ---
+    - → [MapTag]
 
     script:
     ## Gets a market by its auto-assigned numerical ID.
@@ -62,9 +68,11 @@ GetMarketByID:
 
 GetMarketName:
     type: procedure
-    definitions: id
+    definitions: id[ElementTag(Integer)]
     description:
     - Gets a market's internal name provided its auto-assigned numerical ID.
+    - ---
+    - → [ElementTag(String)]
 
     script:
     ## Gets a market's internal name provided its auto-assigned numerical ID.
@@ -80,9 +88,11 @@ GetMarketName:
 
 GetMarketAttractiveness:
     type: procedure
-    definitions: name
+    definitions: name[ElementTag(String)]
     description:
     - Gets a market's attractiveness stat.
+    - ---
+    - → [ElementTag(Float)]
 
     script:
     ## Gets a market's attractiveness stat.
@@ -96,10 +106,12 @@ GetMarketAttractiveness:
 
 GetMarketSupplyPriceMod:
     type: procedure
-    definitions: name
+    definitions: name[ElementTag(String)]
     description:
     - Gets the supplierPriceMod value (which multiplies the value of items when they are being
     - mass-purchased from the market's suppliers) for the given market.
+    - ---
+    - → [ElementTag(Float)]
 
     script:
     ## Gets the supplierPriceMod value (which multiplies the value of items when they are being
@@ -114,9 +126,11 @@ GetMarketSupplyPriceMod:
 
 GetMarketArea:
     type: procedure
-    definitions: name
+    definitions: name[ElementTag(String)]
     description:
     - Gets a market's defined area as a PolygonTag.
+    - ---
+    - → [PolygonTag]
 
     script:
     ## Gets a market's defined area as a PolygonTag.
@@ -130,9 +144,11 @@ GetMarketArea:
 
 GetMarketMerchants:
     type: procedure
-    definitions: name
+    definitions: name[ElementTag(String)]
     description:
     - Gets a list of all the merchants currently situated in the provided market.
+    - ---
+    - → [ListTag(NPCTag)]
 
     script:
     ## Gets a list of all the merchants currently situated in the provided market.
@@ -146,9 +162,11 @@ GetMarketMerchants:
 
 GetCurrentMarketSupply:
     type: procedure
-    definitions: marketName
+    definitions: marketName[ElementTag(String)]
     description:
     - Gets a map of all the currently available resources in a given market.
+    - ---
+    - → [MapTag(ElementTag(String); ElementTag(Integer))]
 
     script:
     ## Gets a map of all the currently available resources in a given market.
@@ -162,9 +180,11 @@ GetCurrentMarketSupply:
 
 GetOriginalMarketSupply:
     type: procedure
-    definitions: marketName
+    definitions: marketName[ElementTag(String)]
     description:
     - Gets a map of all the resources available as supply in a given market upon initial generation.
+    - ---
+    - → [MapTag(ElementTag(String); ElementTag(Integer))]
 
     script:
     ## Gets a map of all the resources available as supply in a given market upon initial

@@ -2,7 +2,7 @@
 ## [KAPI]
 ## All scripts that read and modify data at the squad-level of the army mechanic.
 ##
-## @Author: Zyad (@itszyad/ITSZYAD#9280)
+## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Original Scripts: Jun 2023
 ## @Date: Oct 2023
 ## @Script Ver: v0.1
@@ -18,6 +18,8 @@ HasSquadSpawned:
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Returns true if the squad has been spawned at least once before.
+    - ---
+    - → [ElementTag(Boolean)]
 
     script:
     ## Returns true if the squad has been spawned at least once before.
@@ -35,6 +37,8 @@ GetSquadNPCs:
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets a list of the NPCs constituting this squad.
+    - ---
+    - → [ListTag(NPCTag)]
 
     script:
     ## Gets a list of the NPCs constituting this squad.
@@ -60,6 +64,8 @@ GetSquadComposition:
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the composition map of the squad provided.
+    - ---
+    - → [MapTag(ElementTag(String); ElementTag(Integer))]
 
     script:
     ## Gets the composition map of the squad provided.
@@ -85,6 +91,8 @@ GetSquadManpower:
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the total manpower of the squad provided.
+    - ---
+    - → [ElementTag(Integer)]
 
     script:
     ## Gets the total manpower of the squad provided.
@@ -110,6 +118,8 @@ GetSquadLeader:
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the npc currently acting as the leader of the squad provided.
+    - ---
+    - → [NPCTag]
 
     script:
     ## Gets the npc currently acting as the leader of the squad provided.
@@ -135,6 +145,8 @@ GetSquadID:
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the given squad's numerical ID.
+    - ---
+    - [ElementTag(Integer)]
 
     script:
     ## Gets the given squad's numerical ID.
@@ -160,6 +172,8 @@ GetSquadName:
     definitions: kingdom[ElementTag(String)]|ID[ElementTag(Integer)]
     description:
     - Gets the given squad's internal name.
+    - ---
+    - → [ElementTag(String)]
 
     script:
     ## Gets the given squad's internal name.
@@ -178,9 +192,11 @@ GetSquadName:
 
 GetSquadDisplayName:
     type: procedure
-    definitions: kingdom|squadName
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the given squad's display name.
+    - ---
+    - → [ElementTag(String)]
 
     script:
     ## Gets the given squad's display name.
@@ -203,7 +219,7 @@ GetSquadDisplayName:
 
 GetSquadEquipment:
     type: procedure
-    definitions: kingdom|squadName
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Returns a map of the given squad's standard equipment in the following format
     - helmet:     (ItemTag)
@@ -211,6 +227,16 @@ GetSquadEquipment:
     - leggings:   (ItemTag)
     - boots:      (ItemTag)
     - hotbar:     (ListTag(ItemTag))
+    - ---
+    -     → [MapTag(
+    -            (ItemTag);
+    -            (ItemTag);
+    -            (ItemTag);
+    -            (ItemTag);
+    -            (ListTag(
+    -                (ItemTag)
+    -            ))
+    -        )]
 
     script:
     ## Returns a map of the given squad's standard equipment in the following format:
@@ -249,9 +275,11 @@ GetSquadEquipment:
 
 RenameSquad:
     type: task
-    definitions: kingdom|squadName|newName|SMLocation
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|newName[ElementTag(String)]|SMLocation[?LocationTag]
     description:
     - Renames the squad with the provided name to a new name.
+    - ---
+    - → [Void]
 
     script:
     ## Renames the squad with the provided name to a new name.
@@ -283,9 +311,11 @@ RenameSquad:
 
 DeleteSquad:
     type: task
-    definitions: SMLocation|kingdom|squadName
+    definitions: SMLocation[LocationTag]|kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Removes the provided squad from all flag structures that contain it as well as the actual NPCs that comprise it.
+    - ---
+    - → [Void]
 
     script:
     ## Removes the provided squad from all flag structures that contain it as well as the actual
@@ -308,9 +338,11 @@ DeleteSquad:
 
 DeleteSquadReference:
     type: task
-    definitions: SMLocation|kingdom|squadName
+    definitions: SMLocation[Location]|kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Removes the provided squad from all flag structures that contain it.
+    - ---
+    - → [Void]
 
     script:
     ## Removes the provided squad from all flag structures that contain it.
@@ -331,9 +363,11 @@ DeleteSquadReference:
 
 CreateSquadReference:
     type: task
-    definitions: SMLocation|kingdom|displayName|squadComp|totalManpower
+    definitions: SMLocation[LocationTag]|kingdom[ElementTag(String)]|displayName[ElementTag(String)]|squadComp[MapTag]|totalManpower[ElementTag(Integer)]
     description:
     - Creates a new squad reference in the kingdoms.___.armies flag and the squadManager flag attached to the provided SMLocation. But does not create NPCs
+    - ---
+    - → [Void]
 
     script:
     ## Creates a new squad reference in the kingdoms.___.armies flag and the squadManager flag
@@ -383,14 +417,17 @@ CreateSquadReference:
 
 GiveSquadTools:
     type: task
-    definitions: player|saveInv
+    definitions: player[PlayerTag]|saveInv[ElementTag(Boolean)]
     description:
     - Replaces the provided player's hotbar with squad management tools.
+    - ---
+    - → [Void]
 
     script:
     ## Replaces the provided player's hotbar with squad management tools.
     ##
-    ## player : [PlayerTag]
+    ## player  : [PlayerTag]
+    ## saveInv : [ElementTag(Boolean)]
     ##
     ## >>> [Void]
 
@@ -412,9 +449,11 @@ GiveSquadTools:
 
 ResetSquadTools:
     type: task
-    definitions: player
+    definitions: player[PlayerTag]
     description:
     - Gives the player back the inventory they had before selecting the squad tools.
+    - ---
+    - → [Void]
 
     script:
     ## Gives the player back the inventory they had before selecting the squad tools.
@@ -440,6 +479,8 @@ GetSquadInfo:
     - @Deprecated [Phase-out]
     - <&sp>
     - Gets the full squad information of a given squad under the given kingdom.
+    - ---
+    - → [MapTag]
 
     script:
     ## Gets the full squad information of a given squad under the given kingdom.

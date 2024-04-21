@@ -63,6 +63,8 @@ GetKingdomList:
     - Generates a list of all the valid kingdom code names.
     - When isCodeNames is set to false the procedure generates a list of the full/real kingdom names.
     - isCodeNames is true by default.
+    - ---
+    - → [ListTag(ElementTag(String))]
 
     script:
     ## Generates a list of all the valid kingdom code names. When isCodeNames is set to false
@@ -88,6 +90,8 @@ ValidateKingdomCode:
     definitions: kingdomCode[ElementTag(String)]
     description:
     - Checks id the kingdom code provided is a valid one.
+    - ---
+    - → [ElementTag(Boolean)]
 
     script:
     ## Checks id the kingdom code provided is a valid one.
@@ -104,6 +108,8 @@ IsKingdomBankrupt:
     definitions: kingdom[ElementTag(String)]
     description:
     - Checks if the provided kingdom is bankrupt
+    - ---
+    - → [ElementTag(Boolean)]
 
     script:
     ## Checks if the provided kingdom is bankrupt
@@ -147,6 +153,8 @@ GetBalance:
     definitions: kingdom[ElementTag(String)]
     description:
     - Returns the balance of a given kingdom.
+    - ---
+    - → [ElementTag(Float)]
 
     script:
     ## Returns the balance of a given kingdom.
@@ -167,6 +175,8 @@ SetBalance:
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Sets the balance of a given kingdom to a given amount.
+    - ---
+    - → [Void]
 
     script:
     ## Sets the balance of a given kingdom to a given amount.
@@ -193,6 +203,8 @@ AddBalance:
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Adds a given amount to the provided kingdom's balance.
+    - ---
+    - → [Void]
 
     script:
     ## Adds a given amount to the provided kingdom's balance.
@@ -219,6 +231,8 @@ SubBalance:
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Subtracts a given amount to the provided kingdom's balance.
+    - ---
+    - → [Void]
 
     script:
     ## Subtracts a given amount to the provided kingdom's balance.
@@ -245,6 +259,8 @@ GetUpkeep:
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets a given kingdom's total daily upkeep.
+    - ---
+    - → [ElementTag(Float)]
 
     script:
     ## Gets a given kingdom's total daily upkeep.
@@ -265,6 +281,8 @@ SetUpkeep:
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Sets the upkeep of a given kingdom to a given amount.
+    - ---
+    - → [Void]
 
     script:
     ## Sets the upkeep of a given kingdom to a given amount.
@@ -291,6 +309,8 @@ AddUpkeep:
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Adds a given amount to the provided kingdom's upkeep.
+    - ---
+    - → [Void]
 
     script:
     ## Adds a given amount to the provided kingdom's upkeep.
@@ -317,6 +337,8 @@ SubUpkeep:
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Subtracts a given amount from the kingdom's upkeep.
+    - ---
+    - → [Void]
 
     script:
     ## Subtracts a given amount from the kingdom's upkeep.
@@ -343,6 +365,8 @@ GetPrestige:
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets the given kingdom's prestige.
+    - ---
+    - → [ElementTag(Float)]
 
     script:
     ## Gets the given kingdom's prestige.
@@ -363,6 +387,8 @@ SetPrestige:
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Sets the prestige of a kingdom to a given amount.
+    - ---
+    - → [Void]
 
     script:
     ## Sets the prestige of a kingdom to a given amount.
@@ -393,6 +419,8 @@ AddPrestige:
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Adds a given amount of prestige to a kingdom.
+    - ---
+    - → [Void]
 
     script:
     ## Adds a given amount of prestige to a kingdom.
@@ -425,6 +453,8 @@ SubPrestige:
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Subtracts a given amount of prestige from a kingdom.
+    - ---
+    - → [Void]
 
     script:
     ## Subtracts a given amount of prestige from a kingdom.
@@ -457,6 +487,8 @@ GetDescription:
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets the description of a kingdom. Returns null if there is none.
+    - ---
+    - → [ElementTag(String)]
 
     script:
     ## Gets the description of a kingdom. Returns null if there is none.
@@ -480,6 +512,8 @@ SetDescription:
     definitions: kingdom[ElementTag(String)]|description[ElementTag(String)]
     description:
     - Sets the description of a kingdom.
+    - ---
+    - → [Void]
 
     script:
     ## Sets the description of a kingdom.
@@ -502,9 +536,11 @@ SetDescription:
 
 GetKingdomName:
     type: procedure
-    definitions: kingdomCode
+    definitions: kingdomCode[ElementTag(String)]
     description:
     - Gets the current display name for the kingdom with the provided kingdom code.
+    - ---
+    - → [ElementTag(String)]
 
     script:
     ## Gets the current display name for the kingdom with the provided kingdom code.
@@ -526,6 +562,8 @@ GetKingdomShortName:
     description:
     - Gets the current shorthand display name for the kingdom with the provided kingdom code.
     - For example a kingdom called 'The Duchy of Jalerad' would have a shorthand of 'Jalerad'.
+    - ---
+    - → [ElementTag(String)]
 
     script:
     ## Gets the current shorthand display name for the kingdom with the provided kingdom code.

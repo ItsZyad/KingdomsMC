@@ -12,7 +12,13 @@
 GenerateKingdomsDebug:
     type: task
     debug: false
-    definitions: type[ElementTag(String)]|message[?ElementTag(String)]|silent[?ElementTag(Boolean)]
+    definitions: type[?ElementTag(String) = 'DEBUG']|message[ElementTag(String)]|silent[?ElementTag(Boolean) = false]
+    description:
+    - Writes a given message to the debug console, with 'type' being the debug message type. See the debug command meta for more info: http://meta.denizenscript.com/Docs/Commands/debug.
+    - Kingdoms debug messages are silent by default, meaning they do not show to the attached player if they are an admin/op.
+    - ---
+    - → [Void]
+
     script:
     ## Writes a given message to the debug console, with 'type' being the debug message type.
     ## See the debug command meta for more info: http://meta.denizenscript.com/Docs/Commands/debug
@@ -70,12 +76,19 @@ DefaultInternalErrorMessages:
 
 GenerateInternalError:
     type: task
-    definitions: category[ElementTag(String)]|message[?ElementTag(String)]|silent[?ElementTag(Boolean)]
+    definitions: category[ElementTag(String)]|message[?ElementTag(String) = 'An internal error has occurred.']|silent[?ElementTag(Boolean) = false]
+    description:
+    - Writes a given message to the debug console with the 'ERROR' type and the provided internal error code.
+    - Narrates this message to the attached player if they are an have the kingdoms.admin permission or are ops when silent is provided as 'true'.
+    - silent is set to 'false' by default.
+    - ---
+    - → [Void]
+
     script:
     #TODO: Update this docstring
     ## Writes a given message to the debug console with the 'ERROR' type and the provided internal
     ## error code. Narrates this message to the attached player if they are an have the
-    ## kingdoms.admin permission or are ops when silent is provided as 'true'. It is set to 'false'
+    ## kingdoms.admin permission or are ops when silent is provided as 'true'. silent is set to 'false'
     ## by default
     ##
     ## category     : [ElementTag<String>]
@@ -110,6 +123,11 @@ ActionBarToggler:
     type: task
     debug: false
     definitions: player[PlayerTag]|message[ElementTag]|toggleType[?ElementTag(String)]
+    description:
+    - ...
+    - ---
+    - → [Void]
+
     script:
     ## Toggles a consistent message to be displayed to the player's actionbar based on the
     ## toggleType provided. If no toggleType is provided then the script will disable any enabled
@@ -147,7 +165,14 @@ Actionbar_Handler:
 
 Enum:
     type: procedure
-    definitions: enumKey[ElementTag(String)]|useDefault[?ElementTag(Boolean)]
+    definitions: enumKey[ElementTag(String)]|useDefault[?ElementTag(Boolean) = false]
+    description:
+    - Gets the data from the specified enum key. enum keys are dot-operated, meaning that the key: 'TerritoryType.Core' will get the Core constant inside the TerritoryType enum.
+    - If useDefault is set to true, the procedure will use the first key in the enum as a default value.
+    - useDeafult is set to false by default.
+    - ---
+    - → [?ElementTag(String) = null]
+
     script:
     ## Gets the data from the specified enum key. enum keys are dot-operated, meaning that the key:
     ## 'TerritoryType.Core' will get the Core constant inside the TerritoryType enum. If useDefault
@@ -184,6 +209,12 @@ Enum:
 EnforceType:
     type: procedure
     definitions: def[ObjectTag]|type[ElementTag(String)]|subtype[?ElementTag(String)]
+    description:
+    - Returns the definition passed into it if its type matches the type passed in. Additionally, a Kingdoms-standard subtype can be provided (only applicable for ElementTags) to further isolate a type.
+    - If the definition provided does not match the type provided, the procedure will return null.
+    - ---
+    - → [ObjectTag]
+
     script:
     ## Returns the definition passed into it if its type matches the type passed in. Additionally,
     ## a Kingdoms-standard subtype can be provided (only applicable for ElementTags) to further
