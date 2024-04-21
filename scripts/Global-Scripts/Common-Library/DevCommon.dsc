@@ -124,7 +124,8 @@ ActionBarToggler:
     debug: false
     definitions: player[PlayerTag]|message[ElementTag]|toggleType[?ElementTag(String)]
     description:
-    - ...
+    - Toggles a consistent message to be displayed to the player's actionbar based on the toggleType provided.
+    - If no toggleType is provided then the script will disable any enabled actionbar message.
     - ---
     - → [Void]
 
