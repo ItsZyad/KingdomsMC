@@ -107,7 +107,7 @@ AdminTools_Command:
                         - else:
                             - define keys <element[<[object]>].parsed.flag[<[currentKey]>].keys>
 
-                        - if <[keys].exists>:
+                        - if <[keys].is_truthy> && <[keys].exists>:
                             - determine <[keys].parse_tag[<[keyList].separated_by[.]>.<[parse_value]>]>
 
                         - else:
