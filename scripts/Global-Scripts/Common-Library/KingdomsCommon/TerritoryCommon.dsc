@@ -4,7 +4,7 @@
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Aug 2023
-## @Script Ver: v1.0
+## @Script Ver: v1.1
 ##
 ## ----------------END HEADER-----------------
 
@@ -72,7 +72,7 @@ GetClaims:
 
 AddClaim:
     type: task
-    definitions: kingdom[ElementTag(String)]|type[ChunkTag]|chunk[?ElementTag(String)]
+    definitions: kingdom[ElementTag(String)]|type[ElementTag(String)]|chunk[?ElementTag(String)]
     description:
     - Adds the provided chunk to the claims of the provided kingdom. Claim types can be core or
     - castle. If no claim type is provided, the script will assume 'castle'.
@@ -103,9 +103,12 @@ AddClaim:
         - run GenerateInternalError def.category:ValueError message:<element[Cannot add claim. Invalid claim type: <&sq><[type]><&sq> provided. Must match enum: Core, Castle]>
         - determine cancelled
 
+    - flag server kingdoms.claimInfo.allClaims:->:<[chunk]>
+
     - if <[type].to_lowercase> == core:
         - flag server kingdoms.<[kingdom]>.claims.core:->:<[chunk]>
         - flag server kingdoms.<[kingdom]>.claims.core:<server.flag[kingdoms.<[kingdom]>.claims.core].deduplicate>
+
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.claims.castle:->:<[chunk]>

@@ -1,26 +1,38 @@
 ##
-## This command is used by the player after using either /k coreclaim or /k castleclaim to activate
-## each respective claiming mode. /claim is then used, afterwards, to specify which chunks to claim
-## into the kingdom's territory.
+## This is a single script file which is reponsible for chunk claiming.
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Mar 2023
-## @Updated: Jul 2023
-## @Script Ver: v2.0
+## @Update 1: Jul 2023
+## @Update 2: Apr 2024
+## **** Note: This update converted the previous Claim_Command into a task script that can be
+## ****       called from the KingdomCommand.dsc file with all the relevant parameters needed 
+## ****       for chunk claiming.
+##
+## @Script Ver: v3.0
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 
-Claim_Command:
-    type: command
-    usage: /claim
-    name: claim
-    description: Claims kingdoms territory
+TerritoryClaim:
+    type: task
+    debug: false
+    definitions: claimingMode[ElementTag(String)]|chunk[ChunkTag]|kingdom[ElementTag(String)]
+    description:
+    - Will claim the provided chunk for the provided kingdom as either core or castle territory.
+    - ---
+    - → [Void]
+
     script:
-    - if !<player.has_flag[ClaimingMode]>:
-        - narrate format:callout "You have not selected a claiming mode! Please use <element[/k coreclaim].color[red]> or <element[/k castleclaim].color[red]> to use this command."
+    ## Will claim the provided chunk for the provided kingdom as either core or castle territory.
+    ##
+    ## claimingMode : [ElementTag(String)]
+    ## chunk        : [ChunkTag]
+    ## kingdom      : [ElementTag(String)]
+
+    - if !<[claimingMode].exists>:
+        - narrate format:callout "You have not selected a claiming mode! Please use <element[/k claim core].color[red]> or <element[/k claim castle].color[red]> to use this command."
         - determine cancelled
 
-    - define kingdom <player.flag[kingdom]>
     - define coreMax <server.flag[kingdoms.<[kingdom]>.claims.coreMax].if_null[0]>
     - define castleMax <server.flag[kingdoms.<[kingdom]>.claims.castleMax].if_null[0]>
     - define castleAmount <server.flag[kingdoms.<[kingdom]>.claims.castle].size.if_null[0]>
@@ -29,7 +41,6 @@ Claim_Command:
     - define castleChunks <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>]>
     - define combinedChunks <[castleChunks].include[<[coreChunks]>]>
     - define balance <server.flag[kingdoms.<[kingdom]>.balance].if_null[0]>
-    - define playerChunk <player.location.chunk>
     - define chunkConnected false
 
     # Calculation of chunk proximity #
@@ -38,27 +49,25 @@ Claim_Command:
 
             ## IMPORTANT! THIS IS FOR DEBUGGING PURPOSES
             ## DO NOT KEEP IN PRODUCTION!
-            - if <[value].world> != <player.location.world>:
+            - if <[value].world> != <[chunk].world>:
                 - foreach next
 
             - define chunkX <[value].x>
             - define chunkZ <[value].z>
-            - define chunkDiff <player.location.chunk.sub[<[chunkX]>,<[chunkZ]>]>
+            - define chunkDiff <[chunk].sub[<[chunkX]>,<[chunkZ]>]>
 
             - if <[chunkDiff].x.add[<[chunkDiff].z>].abs> == 1:
                 - define chunkConnected true
                 - foreach stop
 
     - foreach <util.notes.filter_tag[<[filter_value].starts_with[INTERNAL_STORY]>]> as:area:
-        - if <[area].bounding_box.intersects[<player.location.chunk.cuboid>]>:
+        - if <[area].bounding_box.intersects[<[chunk].cuboid>]>:
             - narrate format:callout "You are not allowed to claim a chunk here. This area is a point of interest!"
             - determine cancelled
 
-    - run FindKingdomOverlaps def.currentClaim:<[playerChunk]> save:overlap
-
-    - choose <player.flag[ClaimingMode]>:
-        - case CoreClaiming:
-            - if <[coreChunks].contains[<[playerChunk]>]>:
+    - choose <[claimingMode]>:
+        - case core:
+            - if <[coreChunks].contains[<[chunk]>]>:
                 - narrate format:callout "You have already claimed this chunk."
                 - determine cancelled
 
@@ -70,8 +79,7 @@ Claim_Command:
                 - narrate format:callout "You must have castle chunks claimed before making core claims."
                 - determine cancelled
 
-
-            - else if <entry[overlap].created_queue.determination.get[1]>:
+            - else if <server.flag[kingdoms.claimInfo.allClaims].contains[<[chunk]>]>:
                 - narrate format:callout "This chunk is already occupied. Double claiming could be considered an act of agression!"
                 - determine cancelled
 
@@ -100,23 +108,22 @@ Claim_Command:
                     - determine cancelled
 
                 - else:
-                    - flag server kingdoms.<[kingdom]>.claims.core:->:<player.location.chunk>
-                    - flag server kingdoms.claimInfo.allClaims:->:<player.location.chunk>
+                    - run AddClaim def.kingdom:<[kingdom]> def.type:core def.chunk:<[chunk]>
 
                     - if <server.has_flag[PreGameStart]>:
-                        - flag server kingdoms.<[kingdom]>.balance:-:<[corePrice].div[2]>
+                        - run SubBalance def.kingdom:<[kingdom]> def.amount:<[corePrice].div[2]>
 
                         - if <server.flag[kingdoms.<[kingdom]>.claims.core].size> < 20:
-                            - flag server kingdoms.<[kingdom]>.upkeep:+:5
+                            - run AddUpkeep def.kingdom:<[kingdom]> def.amount:5
 
                     - else:
-                        - flag server kingdoms.<[kingdom]>.balance:-:<[corePrice]>
-                        - flag server kingdoms.<[kingdom]>.upkeep:+:30
+                        - run SubBalance def.kingdom:<[kingdom]> def.amount:<[corePrice]>
+                        - run AddUpkeep def.kingdom:<[kingdom]> def.amount:30
 
-            - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].if_null[<list[]>].include[<server.online_ops>]>
+            - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].if_null[<list[]>].include[<server.online_ops>]>
 
-        - case CastleClaiming:
-            - if <[castleChunks].contains[<[playerChunk]>]>:
+        - case castle:
+            - if <[castleChunks].contains[<[chunk]>]>:
                 - narrate format:callout "You have already claimed this chunk."
                 - determine cancelled
 
@@ -125,25 +132,10 @@ Claim_Command:
                 - determine cancelled
 
             - else:
-                - flag server kingdoms.<[kingdom]>.claims.castle:->:<player.location.chunk>
-                - flag server kingdoms.claimInfo.allClaims:->:<player.location.chunk>
+                - run AddClaim def.kingdom:<[kingdom]> def.type:castle def.chunk:<[chunk]>
                 - narrate format:callout Claimed!
 
-            - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].if_null[<list[]>].include[<server.online_ops>]>
+            - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].if_null[<list[]>].include[<server.online_ops>]>
 
-FindKingdomOverlaps:
-    type: task
-    debug: false
-    definitions: currentClaim
-    script:
-    - foreach <server.flag[kingdoms.claimInfo.allClaims]>:
-        - if <[value]> == <[currentClaim]>:
-            - determine true
-
-    - determine false
-
-ResetClaimFlags:
-    type: world
-    events:
-        on player quits:
-        - flag <player> ClaimingMode:!
+        - default:
+            - narrate format:callout "Invalid claiming type. Valid claiming types are either: <element[castle].color[red]> or <element[core].color[red]>"

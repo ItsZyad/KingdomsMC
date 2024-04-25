@@ -13,7 +13,7 @@
 ## ****       /k and /ks command handlers. All of the subcommand should be found in their respecti-
 ## ****       -ve files under this folder.
 ##
-## @Script Ver: v3.0
+## @Script Ver: v3.1
 ##
 #- Note #1: The coreclaim/castleclaim system is just odd. Perhaps now is time to modernize it and
 #-          implement something like a wand that lets you claim chunks, or some sort of a visual
@@ -25,8 +25,9 @@
 Help_Strings:
     type: data
     CommandHelpStrings:
-        coreclaim: Claims <element[core territory].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]> for your kingdom. You need to the King or Vizier to do this action!
-        castleclaim: Claims <element[castle territory].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]> for your kingdom. You need to the King to do this action!
+        # coreclaim: Claims <element[core territory].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]> for your kingdom. You need to the King or Vizier to do this action!
+        # castleclaim: Claims <element[castle territory].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]> for your kingdom. You need to the King to do this action!
+        claim: Can be used to claim the two types of contigious territory in Kingdoms: core and castle.<n> Use: <element[/k claim <element[core].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]>].color[gray]> or <element[/k claim <element[castle].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]>].color[gray]>
         unclaim: Unclaims the chunk you are standing in if it is a part of your claims. You are refunded for its full upkeep value but not its upfront value.
         balance: Shows the joint kingdom bank account.
         deposit: Adds the specified amount of money to your kingdom's balance.
@@ -49,13 +50,14 @@ Help_Strings:
 
 Kingdom_Command:
     type: command
+    debug: false
     usage: /kingdom
     name: kingdom
     description: Umbrella command for managing your own kingdom
     aliases:
         - k
     tab completions:
-        1: help|coreclaim|castleclaim|unclaim|balance|guards|deposit|withdraw|trade|rename|npc|warp|ideas|outline|influence
+        1: help|claim|unclaim|balance|guards|deposit|withdraw|trade|rename|npc|warp|ideas|outline|influence
         2: help
 
     tab complete:
@@ -70,6 +72,9 @@ Kingdom_Command:
 
         - define kingdomRealNames <script[KingdomRealShortNames].data_key[].values.exclude[data]>
         - determine <list[set|list|allow|deny].include[<[kingdomRealNames].parse_tag[<list[kingdom:|<[parse_value]>].unseparated>]>]>
+
+    - else if <context.args.get[1]> == claim:
+        - determine <list[core|castle]>
 
     script:
     - define kingdom <player.flag[kingdom]>
@@ -159,6 +164,17 @@ Kingdom_Command:
 
         - else:
             - showfake red_stained_glass <[claimsCuboid].outline_2d[<player.location.y.add[20]>]> duration:<[persistTime]>
+
+        #------------------------------------------------------------------------------------------
+
+        Claim:
+        - define territoryType <[args].get[2]>
+
+        - if !<[territoryType].to_lowercase.is_in[core|castle]>:
+            - narrate format:callout "Invalid claiming type. Valid claiming types are either: <element[castle].color[red]> or <element[core].color[red]>"
+            - determine cancelled
+
+        - run TerritoryClaim def.claimingMode:<[territoryType]> def.kingdom:<[kingdom]> def.chunk:<player.location.chunk>
 
         #------------------------------------------------------------------------------------------
 
