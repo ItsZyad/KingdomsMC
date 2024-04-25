@@ -15,7 +15,7 @@ SetInitialSidebar:
     debug: false
     events:
         on player joins:
-        - run SidebarLoader def:<player>
+        - ~run SidebarLoader def:<player>
 
         - if !<player.has_flag[kingdom]>:
             - narrate format:debug "<yellow><bold>WARNING: <&r>Player kingdom flag not set! Using kingdom functions may have unexpected/untested side-effects"
@@ -93,7 +93,7 @@ SidebarLoader:
             - sidebar add "values:<&sp>Prestige: <[kingdomData].deep_get[prestige].round_to_precision[0.05]> / 100" players:<[player]>
 
             # Set Prestige Degradation Line
-            - run GetPrestigeDegradation save:prestigeScales
+            - ~run GetPrestigeDegradation save:prestigeScales
             - define prestigeScales <entry[prestigeScales].created_queue.determination.get[1]>
 
             - if <[prestigeScales].get[<[kingdom]>]> >= 0:
@@ -170,4 +170,4 @@ ToggleSidebar_Command:
     - else if <context.raw_args> == show:
         - flag <player> hideSidebar:!
         - sidebar remove
-        - run SidebarLoader def:<player>|true
+        - ~run SidebarLoader def:<player>|true
