@@ -198,13 +198,10 @@ AdminTools_Command:
                     - define flag <[object].flag[<[flagName]>]> if:<[object].has_flag[<[flagName]>]>
 
                 - if <[flag]> != null:
-                    - narrate <element[                                                     ].strikethrough>
-                    - run FlagVisualizer_Recur def.flag:<[flag]> def.flagName:<[flagName]>
+                    - run FlagVisualizer def.flag:<[flag]> def.flagName:<[flagName]>
 
                     - if <script.queues.get[1].determination.get[1].exists>:
                         - narrate <element[<[flagName]>: ].color[green].italicize><script.queues.get[1].determination.get[1]>
-
-                    - narrate <element[                                                     ].strikethrough>
 
                 - else:
                     - narrate <element[                                                     ].strikethrough>
