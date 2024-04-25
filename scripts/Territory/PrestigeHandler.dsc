@@ -10,6 +10,7 @@
 
 PrestigeDegradation_Handler:
     type: world
+    debug: false
     events:
         on system time hourly every:24:
         - run GetPrestigeDegradation save:prestigeScales
@@ -25,6 +26,7 @@ PrestigeDegradation_Handler:
 
 GetPrestigeDegradation:
     type: task
+    debug: false
     description:
     - Generates a set of values for each kingdom on how much prestige they should gain or lose
     - depending on each kingdom's prestige deviation from the average.
