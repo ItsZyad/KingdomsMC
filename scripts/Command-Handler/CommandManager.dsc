@@ -364,8 +364,8 @@ GenerateSingularUsage_CM:
 
 FormattedSameFileHelp_CM:
     type: task
-    definitions: script|size|page|title
     debug: false
+    definitions: script|size|page|title
     script:
     - define commands <util.scripts.filter[filename.equals[<[script].filename>]].filter_tag[<[filter_value].parsed_key[enabled].if_null[true]>].filter[container_type.equals[command]].parse_tag[<script[CommandManager_Data].parsed_key[formatting.lang.formatted_help_same_file.command_line]>]>
     - define pages <[commands].sub_lists[<[size]>].size>
@@ -693,6 +693,9 @@ CommandManager:
             - foreach next
 
         - if <[map.required].parsed.if_null[false]>:
+            - if <[exemptions].get[<[value]>].contains[<[argname]>]>:
+                - foreach next
+
             - define "tickutil_commands.ArgManager.error_messages:->:Missing required <[map.type].if_null[null].equals[prefixed].if_true[prefixed ].if_false[]>argument '<[argname].proc[GenerateSingularUsage_CM].context[<[map]>].custom_color[emphasis]>'!"
             - define tickutil_commands.ArgManager.panic true
 
@@ -704,6 +707,8 @@ CommandManager:
 
         - if <[map.default].exists>:
             - define arg.<[argname]> <[map.default].parsed>
+
+    - define exemptions:!
 
     - mark fatal_error
 

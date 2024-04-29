@@ -31,7 +31,7 @@ GetPrestigeDegradation:
     - Generates a set of values for each kingdom on how much prestige they should gain or lose
     - depending on each kingdom's prestige deviation from the average.
     - ---
-    - RET: `[MapTag((ElementTag(String)), (ElementTag(Float)))]`
+    - → `[MapTag((ElementTag(String)), (ElementTag(Float)))]`
 
     script:
     ## Generates a set of values for each kingdom on how much prestige they should gain or lose
