@@ -43,19 +43,10 @@ GenerateKingdomsDebug:
     - define messagePrefix <[messagePrefix].color[gray]> if:<[type].to_lowercase.equals[log]>
 
     - define formattedMessage <element[<[messagePrefix]><[message]>]>
-    - run debug_debug def.type:<[type]> def.formattedMessage:<[formattedMessage]>
+    - debug LOG <[formattedMessage]>
 
     - if !<[silent]> && <player.exists> && <player.has_permission[kingdoms.admin]>:
         - narrate <[formattedMessage]>
-
-
-# wow so meta...
-DEBUG_DEBUG:
-    type: task
-    definitions: type|formattedMessage
-    script:
-    - debug DEBUG --------------------------
-    - debug type:<[type]> <[formattedMessage]>
 
 
 InternalErrorTypes:
@@ -76,6 +67,7 @@ DefaultInternalErrorMessages:
 
 GenerateInternalError:
     type: task
+    debug: false
     definitions: category[ElementTag(String)]|message[?ElementTag(String) = 'An internal error has occurred.']|silent[?ElementTag(Boolean) = false]
     description:
     - Writes a given message to the debug console with the 'ERROR' type and the provided internal error code.
@@ -101,22 +93,14 @@ GenerateInternalError:
     - define errorType <proc[Enum].context[InternalErrorTypes.<[category]>|true]>
     - define message <[message].if_null[<script[DefaultInternalErrorMessages].data_key[errors.<[errorType]>]>]>
 
-    - define messagePrefix <element[[Internal <[errorType].color[gold]>] <&gt><&gt> ].color[red]>
-    - define formattedMessage <[messagePrefix]><[message].color[white]>
+    - define messagePrefix <element[[Kingdoms Internal <[errorType].color[gold]>] <&gt><&gt> ].color[red]>
+    - define formattedMessage <[messagePrefix]><[message].color[#ff7070]>
 
-    - run DEBUG_ERROR def.formattedMessage:<[formattedMessage]>
+    - debug LOG <[formattedMessage]>
+    - debug LOG " "
 
     - if !<[silent]>:
         - narrate <[formattedMessage]>
-
-
-DEBUG_ERROR:
-    type: task
-    definitions: formattedMessage
-    script:
-    - debug DEBUG <element[KINGDOMS ERROR                                    ].color[red].bold>
-    - debug DEBUG <[formattedMessage]>
-    - debug DEBUG <element[                                                  ].strikethrough>
 
 
 ActionBarToggler:
