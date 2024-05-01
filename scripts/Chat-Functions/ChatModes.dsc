@@ -8,6 +8,7 @@ KChat_Config:
 
 ChatCallStack:
     type: task
+    debug: false
     definitions: fullText|text|player
     script:
     # Found in: Chat-Functions/Misc.dsc
@@ -23,6 +24,7 @@ ChatCallStack:
 
 ChatCallStack_Handler:
     type: world
+    debug: false
     events:
         on player chats priority:2:
         - define fullText <context.full_text>
@@ -39,6 +41,7 @@ ChatCallStack_Handler:
 
 LocalChat_Command:
     type: command
+    debug: false
     name: chat
     usage: /chat
     description: "Switches the player's chat configuration"
@@ -67,6 +70,7 @@ LocalChat_Command:
 
 KingdomsChat_Handler:
     type: task
+    debug: false
     definitions: player|message
     script:
         - define opPrefix ""
@@ -104,6 +108,7 @@ KingdomsChat_Handler:
 
 FakeChat_Command:
     type: command
+    debug: false
     name: fakechat
     usage: /fakechat [player] [chat]
     permission: kingdoms.admin

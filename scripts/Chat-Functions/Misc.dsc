@@ -1,5 +1,6 @@
 Amogus:
     type: task
+    debug: false
     definitions: text
     script:
     - if <[text].contains[<&co>amogus<&co>]>:
@@ -10,6 +11,7 @@ Amogus:
 
 AmogusToggler:
     type: command
+    debug: false
     name: amogus
     usage: /amogus
     description: ඞ
@@ -24,6 +26,7 @@ AmogusToggler:
 
 AmogusMode:
     type: task
+    debug: false
     definitions: text|player
     script:
     - if <[player].has_flag[amogus]>:
@@ -36,6 +39,7 @@ AmogusMode:
 
 MuteHandler:
     type: world
+    debug: false
     events:
         on player chats server_flagged:BlanketMute:
         - if !<player.has_permission[kingdoms.admin]>:
