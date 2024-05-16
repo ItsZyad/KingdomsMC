@@ -51,8 +51,8 @@ MerchantStrategy_Behaviour:
         Buy_Expensive:
             # The range of prices the merchant should be filtering items to be between
             price_filter:
-                low: 100
-                high: 5000
+                low: 50
+                high: 100
                 bias: 0.7
             price_shift: 0.55
             # Dictates the number of times the merchant will loop over the priceControlledItems
@@ -64,7 +64,7 @@ MerchantStrategy_Behaviour:
         Buy_Cheap:
             price_filter:
                 low: 0
-                high: 100
+                high: 25
                 bias: 0.5
             # Acts as a fallback when no items within the merchant's category are within their
             # the price_filter range.
@@ -74,14 +74,14 @@ MerchantStrategy_Behaviour:
         Buy_Lots:
             price_filter:
                 low: 0
-                high: 800
+                high: 40
                 bias: 0.2
             price_shift: 0.4
             loop_iterations: 4
         Buy_Frugal:
             price_filter:
                 low: 0
-                high: 2000
+                high: 70
                 bias: 0.4
             price_shift: 0.4
             loop_iterations: 2

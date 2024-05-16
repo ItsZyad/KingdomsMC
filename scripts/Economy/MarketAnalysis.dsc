@@ -26,7 +26,7 @@ SellAnalysisGenerator:
     ##
     ## market : [ElementTag<String>]
     ##
-    ## >>> [MapTag
+    ## >>> ?[MapTag
     ##         <MapTag<
     ##             ElementTag<Float>;
     ##             ElementTag<Integer>;
@@ -98,7 +98,7 @@ PurchaseAnalysisGenerator:
     ##
     ## market : [ElementTag<String>]
     ##
-    ## >>> [MapTag
+    ## >>> ?[MapTag
     ##         <MapTag<
     ##             ElementTag<Float>;
     ##             ElementTag<Integer>;
@@ -126,6 +126,7 @@ PurchaseAnalysisGenerator:
 
     ## SUBPATHS
     ItemAnalysisGenerator:
+    # TODO: Make sure that this is supposed to be supplyMap.original and not .current
     - define supplyAmounts <server.flag[economy.markets.<[market]>.supplyMap.original]>
     - define marketDemand <server.flag[economy.markets.<[market]>.buyData]>
 
@@ -133,7 +134,7 @@ PurchaseAnalysisGenerator:
     # and the average amount of that item that gets spawned in merchant inventories weekly
     - define saleToAmountRatio <element[<[marketDemand].deep_get[<[item]>.totalAmount].div[<[supplyAmounts].get[<[item]>]>]>]>
     ## NOTE: Uncomment when you introduce new transaction scheme
-    #- define allPrices <[marketDemand].deep_get[<[item]>.transactions].parse_tag[<[parse_value].deep_get[buy.price]>].if_null[null]>
+    # - define allPrices <[marketDemand].deep_get[<[item]>.transactions].parse_tag[<[parse_value].deep_get[buy.price]>].if_null[null]>
     - define allPrices <[marketDemand].deep_get[<[item]>.transactions].parse_tag[<[parse_value].get[price]>]>
     - define averageSellPrice <[allPrices].average>
     - inject <script.name> path:StandardDevCalculator
