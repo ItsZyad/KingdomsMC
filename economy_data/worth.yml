@@ -1,0 +1,3509 @@
+items:
+  stone:
+    base: '1.38'
+    supplyProb: '0.95'
+    amountMod: '1'
+    govCap: '4.2'
+  granite:
+    base: '1.90'
+    supplyProb: '0.9378'
+  polished_granite:
+    base: '1.84'
+    supplyProb: '0.9397'
+  diorite:
+    base: '1.50'
+    supplyProb: '0.89'
+    amountMod: '1'
+    govCap: '2.7'
+  polished_diorite:
+    base: '1.46'
+    supplyProb: '0.9522'
+  andesite:
+    base: '1.70'
+    supplyProb: '0.92'
+    amountMod: '1'
+    govCap: '3.45'
+  polished_andesite:
+    base: '1.65'
+    supplyProb: '0.946'
+  deepslate:
+    base: '2.77'
+    supplyProb: '0.9093'
+  cobbled_deepslate:
+    base: '1.32'
+    supplyProb: '0.9568'
+  polished_deepslate:
+    base: '1.28'
+    supplyProb: '0.9581'
+  calcite:
+    base: '1.10'
+    supplyProb: '0.964'
+  tuff:
+    base: '0.26'
+    supplyProb: '0.9915'
+  dripstone_block:
+    base: '3.92'
+    supplyProb: '0.8716'
+  grass_block:
+    base: '0.63'
+    supplyProb: '0.99'
+    amountMod: '2.8'
+    govCap: '1.4'
+  dirt:
+    base: '0.53'
+    supplyProb: '1'
+    amountMod: '2'
+    govCap: '1.4'
+  coarse_dirt:
+    base: '0.58'
+    supplyProb: '0.981'
+  podzol:
+    base: '2.63'
+    supplyProb: '0.9139'
+  rooted_dirt:
+    base: '0.58'
+    supplyProb: '0.981'
+  mud:
+    base: '0.58'
+    supplyProb: '0.981'
+  crimson_nylium:
+    base: '2.25'
+    supplyProb: '0.9263'
+  warped_nylium:
+    base: '2.25'
+    supplyProb: '0.9263'
+  cobblestone:
+    base: '1.10'
+    supplyProb: '0.99'
+    amountMod: '2'
+    govCap: '1.4'
+  oak_planks:
+    base: '2.27'
+    supplyProb: '0.75'
+    amountMod: '1'
+    govCap: '2'
+  spruce_planks:
+    base: '2.27'
+    supplyProb: '0.9257'
+  birch_planks:
+    base: '2.27'
+    supplyProb: '0.9257'
+  jungle_planks:
+    base: '2.27'
+    supplyProb: '0.9257'
+  acacia_planks:
+    base: '2.27'
+    supplyProb: '0.9257'
+  dark_oak_planks:
+    base: '2.27'
+    supplyProb: '0.9257'
+  mangrove_planks:
+    base: '2.27'
+    supplyProb: '0.9257'
+  crimson_planks:
+    base: '2.96'
+    supplyProb: '0.9031'
+  warped_planks:
+    base: '2.96'
+    supplyProb: '0.9031'
+  oak_sapling:
+    base: '1.80'
+    supplyProb: '0.9411'
+  spruce_sapling:
+    base: '1.80'
+    supplyProb: '0.9411'
+  birch_sapling:
+    base: '1.80'
+    supplyProb: '0.9411'
+  jungle_sapling:
+    base: '1.80'
+    supplyProb: '0.9411'
+  acacia_sapling:
+    base: '1.80'
+    supplyProb: '0.9411'
+  dark_oak_sapling:
+    base: '1.80'
+    supplyProb: '0.9411'
+  mangrove_propagule:
+    base: '1.80'
+    supplyProb: '0.9411'
+  sand:
+    base: '0.55'
+    supplyProb: '0.79'
+    amountMod: '1.5'
+    govCap: '1.4'
+  red_sand:
+    base: '1.63'
+    supplyProb: '1'
+    amountMod: '1'
+    govCap: '1.4'
+  gravel:
+    base: '0.55'
+    supplyProb: '0.79'
+    amountMod: '1.2'
+    govCap: '1.4'
+  coal_ore:
+    base: '6.60'
+    supplyProb: '0.9'
+    amountMod: '1.1'
+    govCap: '115'
+  deepslate_coal_ore:
+    base: '6.60'
+    supplyProb: '0.7839'
+  iron_ore:
+    base: '9.90'
+    supplyProb: '0.43'
+    amountMod: '1'
+    govCap: '260'
+  deepslate_iron_ore:
+    base: '9.90'
+    supplyProb: '0.6758'
+  copper_ore:
+    base: '7.70'
+    supplyProb: '0.7479'
+  deepslate_copper_ore:
+    base: '7.70'
+    supplyProb: '0.7479'
+  gold_ore:
+    base: '33'
+    supplyProb: '0.3'
+    amountMod: '1'
+    govCap: '340'
+  deepslate_gold_ore:
+    base: '33'
+    supplyProb: '0.9659'
+  redstone_ore:
+    base: '2.47'
+    supplyProb: '0.3'
+    amountMod: '1'
+    govCap: '190'
+  deepslate_redstone_ore:
+    base: '2.47'
+    supplyProb: '0.9191'
+  emerald_ore:
+    base: '41.25'
+    supplyProb: '0.9574'
+  deepslate_emerald_ore:
+    base: '41.25'
+    supplyProb: '0.9574'
+  lapis_ore:
+    base: '9.94'
+    supplyProb: '0.5'
+    amountMod: '1.3'
+    govCap: '340'
+  deepslate_lapis_ore:
+    base: '9.94'
+    supplyProb: '0.6745'
+  diamond_ore:
+    base: '412.50'
+    supplyProb: '0.25'
+    amountMod: '1'
+    govCap: '1700'
+  deepslate_diamond_ore:
+    base: '412.50'
+    supplyProb: '0.5739'
+  nether_gold_ore:
+    base: '33'
+    supplyProb: '0.9659'
+  nether_quartz_ore:
+    base: '14.44'
+    supplyProb: '0.5272'
+  ancient_debris:
+    base: '968'
+    supplyProb: '0.02'
+  coal_block:
+    base: '72.86'
+    supplyProb: '0.9247'
+  raw_iron_block:
+    base: '109.30'
+    supplyProb: '0.8871'
+  raw_copper_block:
+    base: '84.95'
+    supplyProb: '0.9122'
+  raw_gold_block:
+    base: '364.32'
+    supplyProb: '0.6236'
+  amethyst_block:
+    base: '34.92'
+    supplyProb: '0.9639'
+  iron_block:
+    base: '153.01'
+    supplyProb: '0.25'
+    amountMod: '1'
+    govCap: '550'
+  copper_block:
+    base: '106.23'
+    supplyProb: '0.8903'
+  gold_block:
+    base: '487.77'
+    supplyProb: '0.19'
+    amountMod: '1'
+    govCap: '1350'
+  diamond_block:
+    base: '4554'
+    supplyProb: '0.14'
+    amountMod: '1'
+    govCap: '3800'
+  netherite_block:
+    base: '39807.26'
+    supplyProb: '0.02'
+  exposed_copper:
+    base: '51.52'
+    supplyProb: '0.9468'
+  weathered_copper:
+    base: '41.22'
+    supplyProb: '0.9574'
+  oxidized_copper:
+    base: '30.91'
+    supplyProb: '0.9681'
+  cut_copper:
+    base: '103.04'
+    supplyProb: '0.8936'
+  exposed_cut_copper:
+    base: '49.97'
+    supplyProb: '0.9484'
+  weathered_cut_copper:
+    base: '39.98'
+    supplyProb: '0.9587'
+  oxidized_cut_copper:
+    base: '29.98'
+    supplyProb: '0.0183'
+  cut_copper_stairs:
+    base: '146.83'
+    supplyProb: '0.8483'
+  exposed_cut_copper_stairs:
+    base: '71.21'
+    supplyProb: '0.9264'
+  weathered_cut_copper_stairs:
+    base: '56.97'
+    supplyProb: '0.9411'
+  oxidized_cut_copper_stairs:
+    base: '42.72'
+    supplyProb: '0.9559'
+  cut_copper_slab:
+    base: '50.49'
+    supplyProb: '0.9478'
+  exposed_cut_copper_slab:
+    base: '24.49'
+    supplyProb: '0.1981'
+  weathered_cut_copper_slab:
+    base: '19.59'
+    supplyProb: '0.3585'
+  oxidized_cut_copper_slab:
+    base: '14.69'
+    supplyProb: '0.519'
+  waxed_copper_block:
+    base: '114.08'
+    supplyProb: '0.8821'
+  waxed_exposed_copper:
+    base: '59.91'
+    supplyProb: '0.9381'
+  waxed_weathered_copper:
+    base: '49.72'
+    supplyProb: '0.9486'
+  waxed_oxidized_copper:
+    base: '39.51'
+    supplyProb: '0.9592'
+  waxed_cut_copper:
+    base: '110.92'
+    supplyProb: '0.8854'
+  waxed_exposed_cut_copper:
+    base: '58.38'
+    supplyProb: '0.9397'
+  waxed_weathered_cut_copper:
+    base: '48.49'
+    supplyProb: '0.9499'
+  waxed_oxidized_cut_copper:
+    base: '38.59'
+    supplyProb: '0.9601'
+  waxed_cut_copper_stairs:
+    base: '154.27'
+    supplyProb: '0.8406'
+  waxed_exposed_cut_copper_stairs:
+    base: '79.41'
+    supplyProb: '0.918'
+  waxed_weathered_cut_copper_stairs:
+    base: '65.31'
+    supplyProb: '0.9325'
+  waxed_oxidized_cut_copper_stairs:
+    base: '51.20'
+    supplyProb: '0.9471'
+  waxed_cut_copper_slab:
+    base: '58.90'
+    supplyProb: '0.9392'
+  waxed_exposed_cut_copper_slab:
+    base: '33.16'
+    supplyProb: '0.9657'
+  waxed_weathered_cut_copper_slab:
+    base: '28.30'
+    supplyProb: '0.0733'
+  waxed_oxidized_cut_copper_slab:
+    base: '23.45'
+    supplyProb: '0.2321'
+  oak_log:
+    base: '9.06'
+    supplyProb: '0.77'
+    amountMod: '1'
+    govCap: '2'
+  spruce_log:
+    base: '9.06'
+    supplyProb: '0.7033'
+  birch_log:
+    base: '9.06'
+    supplyProb: '0.7033'
+  jungle_log:
+    base: '9.06'
+    supplyProb: '0.7033'
+  acacia_log:
+    base: '9.06'
+    supplyProb: '0.7033'
+  dark_oak_log:
+    base: '9.06'
+    supplyProb: '0.7033'
+  mangrove_log:
+    base: '9.06'
+    supplyProb: '0.7033'
+  mangrove_roots:
+    base: '0.09'
+    supplyProb: '0.9971'
+  muddy_mangrove_roots:
+    base: '0.05'
+    supplyProb: '0.9984'
+  crimson_stem:
+    base: '11.83'
+    supplyProb: '0.6126'
+  warped_stem:
+    base: '11.83'
+    supplyProb: '0.6126'
+  stripped_oak_log:
+    base: '10.35'
+    supplyProb: '0.6611'
+  stripped_spruce_log:
+    base: '10.35'
+    supplyProb: '0.6611'
+  stripped_birch_log:
+    base: '10.35'
+    supplyProb: '0.6611'
+  stripped_jungle_log:
+    base: '10.35'
+    supplyProb: '0.6611'
+  stripped_acacia_log:
+    base: '10.35'
+    supplyProb: '0.6611'
+  stripped_dark_oak_log:
+    base: '10.35'
+    supplyProb: '0.6611'
+  stripped_mangrove_log:
+    base: '10.35'
+    supplyProb: '0.6611'
+  stripped_crimson_stem:
+    base: '12.42'
+    supplyProb: '0.5933'
+  stripped_warped_stem:
+    base: '12.42'
+    supplyProb: '0.5933'
+  stripped_oak_wood:
+    base: '13.39'
+    supplyProb: '0.5615'
+  stripped_spruce_wood:
+    base: '13.39'
+    supplyProb: '0.5615'
+  stripped_birch_wood:
+    base: '13.39'
+    supplyProb: '0.5615'
+  stripped_jungle_wood:
+    base: '13.39'
+    supplyProb: '0.5615'
+  stripped_acacia_wood:
+    base: '13.39'
+    supplyProb: '0.5615'
+  stripped_dark_oak_wood:
+    base: '13.39'
+    supplyProb: '0.5615'
+  stripped_mangrove_wood:
+    base: '13.39'
+    supplyProb: '0.5615'
+  stripped_crimson_hyphae:
+    base: '16.06'
+    supplyProb: '0.4741'
+  stripped_warped_hyphae:
+    base: '16.06'
+    supplyProb: '0.4741'
+  oak_wood:
+    base: '11.72'
+    supplyProb: '0.6162'
+  spruce_wood:
+    base: '11.72'
+    supplyProb: '0.6162'
+  birch_wood:
+    base: '11.72'
+    supplyProb: '0.6162'
+  jungle_wood:
+    base: '11.72'
+    supplyProb: '0.6162'
+  acacia_wood:
+    base: '11.72'
+    supplyProb: '0.6162'
+  dark_oak_wood:
+    base: '11.72'
+    supplyProb: '0.6162'
+  mangrove_wood:
+    base: '11.72'
+    supplyProb: '0.6162'
+  crimson_hyphae:
+    base: '15.30'
+    supplyProb: '0.499'
+  warped_hyphae:
+    base: '15.30'
+    supplyProb: '0.499'
+  oak_leaves:
+    base: '2.20'
+    supplyProb: '0.928'
+  spruce_leaves:
+    base: '2.20'
+    supplyProb: '0.928'
+  birch_leaves:
+    base: '2.20'
+    supplyProb: '0.928'
+  jungle_leaves:
+    base: '2.20'
+    supplyProb: '0.928'
+  acacia_leaves:
+    base: '2.20'
+    supplyProb: '0.928'
+  dark_oak_leaves:
+    base: '2.20'
+    supplyProb: '0.928'
+  mangrove_leaves:
+    base: '2.20'
+    supplyProb: '0.928'
+  azalea_leaves:
+    base: '2.20'
+    supplyProb: '0.928'
+  flowering_azalea_leaves:
+    base: '2.60'
+    supplyProb: '0.9149'
+  sponge:
+    base: '12.71'
+    supplyProb: '0.3'
+    amountMod: '1'
+    govCap: '112'
+  wet_sponge:
+    base: '11'
+    supplyProb: '0.6398'
+  glass:
+    base: '0.69'
+    supplyProb: '0.8'
+    amountMod: '1'
+    govCap: '4.2'
+  tinted_glass:
+    base: '17.61'
+    supplyProb: '0.4234'
+  lapis_block:
+    base: '109.71'
+    supplyProb: '0.34'
+    amountMod: '1'
+    govCap: '1430'
+  sandstone:
+    base: '2.13'
+    supplyProb: '0.68'
+    amountMod: '1'
+    govCap: '4.2'
+  chiseled_sandstone:
+    base: '4.22'
+    supplyProb: '0.8618'
+  cut_sandstone:
+    base: '2.07'
+    supplyProb: '0.9322'
+  cobweb:
+    base: '0.01'
+    supplyProb: '0.9997'
+  grass:
+    base: '0.01'
+    supplyProb: '0.9997'
+  fern:
+    base: '0.01'
+    supplyProb: '0.9997'
+  azalea:
+    base: '1.80'
+    supplyProb: '0.9411'
+  flowering_azalea:
+    base: '1.80'
+    supplyProb: '0.9411'
+  dead_bush:
+    base: '0.01'
+    supplyProb: '0.9997'
+  seagrass:
+    base: '0.02'
+    supplyProb: '0.9993'
+  sea_pickle:
+    base: '3.74'
+    supplyProb: '0.81'
+    amountMod: '1'
+    govCap: '25'
+  white_wool:
+    base: '6.40'
+    supplyProb: '0.7904'
+  orange_wool:
+    base: '8.25'
+    supplyProb: '0.7299'
+  magenta_wool:
+    base: '11.78'
+    supplyProb: '0.6143'
+  light_blue_wool:
+    base: '7.42'
+    supplyProb: '0.757'
+  yellow_wool:
+    base: '7.64'
+    supplyProb: '0.7498'
+  lime_wool:
+    base: '9.99'
+    supplyProb: '0.6729'
+  pink_wool:
+    base: '7.42'
+    supplyProb: '0.757'
+  gray_wool:
+    base: '8.24'
+    supplyProb: '0.7302'
+  light_gray_wool:
+    base: '8.25'
+    supplyProb: '0.7299'
+  cyan_wool:
+    base: '16.20'
+    supplyProb: '0.4695'
+  purple_wool:
+    base: '13.16'
+    supplyProb: '0.5691'
+  blue_wool:
+    base: '19.45'
+    supplyProb: '0.3631'
+  brown_wool:
+    base: '10.85'
+    supplyProb: '0.6447'
+  green_wool:
+    base: '13.15'
+    supplyProb: '0.5694'
+  red_wool:
+    base: '6.99'
+    supplyProb: '0.7711'
+  black_wool:
+    base: '9.60'
+    supplyProb: '0.6857'
+  dandelion:
+    base: '1.32'
+    supplyProb: '0.9568'
+  poppy:
+    base: '1.10'
+    supplyProb: '0.964'
+  blue_orchid:
+    base: '1.10'
+    supplyProb: '0.964'
+  allium:
+    base: '5.50'
+    supplyProb: '0.8199'
+  azure_bluet:
+    base: '1.93'
+    supplyProb: '0.9368'
+  red_tulip:
+    base: '1.93'
+    supplyProb: '0.9368'
+  orange_tulip:
+    base: '1.93'
+    supplyProb: '0.9368'
+  white_tulip:
+    base: '1.93'
+    supplyProb: '0.9368'
+  pink_tulip:
+    base: '1.93'
+    supplyProb: '0.9368'
+  oxeye_daisy:
+    base: '1.65'
+    supplyProb: '0.946'
+  cornflower:
+    base: '2.75'
+    supplyProb: '0.91'
+  lily_of_the_valley:
+    base: '2.75'
+    supplyProb: '0.91'
+  wither_rose:
+    base: '225'
+    supplyProb: '0.7676'
+  spore_blossom:
+    base: '3.80'
+    supplyProb: '0.8756'
+  brown_mushroom:
+    base: '1.10'
+    supplyProb: '0.86'
+    amountMod: '1'
+    govCap: '2.8'
+  red_mushroom:
+    base: '1.10'
+    supplyProb: '0.86'
+    amountMod: '1'
+    govCap: '2.8'
+  crimson_fungus:
+    base: '1.32'
+    supplyProb: '0.9568'
+  warped_fungus:
+    base: '1.32'
+    supplyProb: '0.9568'
+  crimson_roots:
+    base: '0.03'
+    supplyProb: '0.999'
+  warped_roots:
+    base: '0.03'
+    supplyProb: '0.999'
+  nether_sprouts:
+    base: '0.02'
+    supplyProb: '0.9993'
+  weeping_vines:
+    base: '6.45'
+    supplyProb: '0.7888'
+  twisting_vines:
+    base: '6.45'
+    supplyProb: '0.7888'
+  sugar_cane:
+    base: '0.55'
+    supplyProb: '0.91'
+    amountMod: '1'
+    govCap: '14'
+  kelp:
+    base: '3.13'
+    supplyProb: '0.98'
+    amountMod: '1'
+    govCap: '12'
+  moss_carpet:
+    base: '1.45'
+    supplyProb: '0.9525'
+  moss_block:
+    base: '2.20'
+    supplyProb: '0.928'
+  hanging_roots:
+    base: '0.03'
+    supplyProb: '0.999'
+  big_dripleaf:
+    base: '3.50'
+    supplyProb: '0.8854'
+  small_dripleaf:
+    base: '2.30'
+    supplyProb: '0.9247'
+  bamboo:
+    base: '0.81'
+    supplyProb: '0.99'
+    amountMod: '1'
+    govCap: '8'
+  oak_slab:
+    base: '1.11'
+    supplyProb: '0.9637'
+  spruce_slab:
+    base: '1.11'
+    supplyProb: '0.9637'
+  birch_slab:
+    base: '1.11'
+    supplyProb: '0.9637'
+  jungle_slab:
+    base: '1.11'
+    supplyProb: '0.9637'
+  acacia_slab:
+    base: '1.11'
+    supplyProb: '0.9637'
+  dark_oak_slab:
+    base: '1.11'
+    supplyProb: '0.9637'
+  mangrove_slab:
+    base: '1.11'
+    supplyProb: '0.9637'
+  crimson_slab:
+    base: '1.45'
+    supplyProb: '0.9525'
+  warped_slab:
+    base: '1.45'
+    supplyProb: '0.9525'
+  stone_slab:
+    base: '0.68'
+    supplyProb: '0.9777'
+  smooth_stone_slab:
+    base: '0.84'
+    supplyProb: '0.9725'
+  sandstone_slab:
+    base: '1.04'
+    supplyProb: '0.9659'
+  cut_sandstone_slab:
+    base: '1.01'
+    supplyProb: '0.9669'
+  cobblestone_slab:
+    base: '0.54'
+    supplyProb: '0.9823'
+  brick_slab:
+    base: '7.84'
+    supplyProb: '0.7433'
+  stone_brick_slab:
+    base: '0.66'
+    supplyProb: '0.9784'
+  mud_brick_slab:
+    base: '1.82'
+    supplyProb: '0.9404'
+  nether_brick_slab:
+    base: '4.17'
+    supplyProb: '0.8635'
+  quartz_slab:
+    base: '36.60'
+    supplyProb: '0.9622'
+  red_sandstone_slab:
+    base: '3.10'
+    supplyProb: '0.8985'
+  cut_red_sandstone_slab:
+    base: '3'
+    supplyProb: '0.9018'
+  purpur_slab:
+    base: '3.27'
+    supplyProb: '0.8929'
+  prismarine_slab:
+    base: '10.46'
+    supplyProb: '0.6575'
+  prismarine_brick_slab:
+    base: '22.31'
+    supplyProb: '0.2695'
+  dark_prismarine_slab:
+    base: '21.32'
+    supplyProb: '0.3019'
+  smooth_quartz:
+    base: '93.36'
+    supplyProb: '0.9036'
+  smooth_red_sandstone:
+    base: '7.90'
+    supplyProb: '0.7413'
+  smooth_sandstone:
+    base: '2.66'
+    supplyProb: '0.9129'
+  smooth_stone:
+    base: '1.72'
+    supplyProb: '0.9437'
+  bricks:
+    base: '15.99'
+    supplyProb: '0.4764'
+  bookshelf:
+    base: '26.55'
+    supplyProb: '0.47'
+    amountMod: '1'
+    govCap: '196'
+  mossy_cobblestone:
+    base: '6.53'
+    supplyProb: '0.56'
+    amountMod: '0.8'
+    govCap: '126'
+  obsidian:
+    base: '130.80'
+    supplyProb: '0.34'
+    amountMod: '0.65'
+    govCap: '182'
+  torch:
+    base: '2.46'
+    supplyProb: '0.96'
+    amountMod: '1.35'
+    govCap: '5.6'
+  end_rod:
+    base: '5.17'
+    supplyProb: '0.8307'
+  chorus_flower:
+    base: '27.50'
+    supplyProb: '0.0995'
+  purpur_block:
+    base: '6.67'
+    supplyProb: '0.7816'
+  purpur_pillar:
+    base: '6.47'
+    supplyProb: '0.7881'
+  purpur_stairs:
+    base: '9.50'
+    supplyProb: '0.6889'
+  chest:
+    base: '16.89'
+    supplyProb: '0.84'
+    amountMod: '1'
+    govCap: '5.6'
+  crafting_table:
+    base: '8.81'
+    supplyProb: '0.7115'
+  farmland:
+    base: '0.48'
+    supplyProb: '0.9843'
+  furnace:
+    base: '8.18'
+    supplyProb: '0.84'
+    amountMod: '1'
+    govCap: '11.9'
+  ladder:
+    base: '2.46'
+    supplyProb: '0.75'
+    amountMod: '1'
+    govCap: '0.7'
+  cobblestone_stairs:
+    base: '1.57'
+    supplyProb: '0.87'
+    amountMod: '1'
+    govCap: '2.1'
+  snow:
+    base: '2.09'
+    supplyProb: '0.9316'
+  ice:
+    base: '1.70'
+    supplyProb: '0.9443'
+  snow_block:
+    base: '4.27'
+    supplyProb: '0.8602'
+  cactus:
+    base: '5.50'
+    supplyProb: '0.78'
+    amountMod: '1'
+    govCap: '210'
+  clay:
+    base: '12.80'
+    supplyProb: '0.76'
+    amountMod: '1'
+    govCap: '16.8'
+  jukebox:
+    base: '522.71'
+    supplyProb: '0.46'
+  oak_fence:
+    base: '10.75'
+    supplyProb: '0.648'
+  spruce_fence:
+    base: '10.75'
+    supplyProb: '0.648'
+  birch_fence:
+    base: '10.75'
+    supplyProb: '0.648'
+  jungle_fence:
+    base: '10.75'
+    supplyProb: '0.648'
+  acacia_fence:
+    base: '10.75'
+    supplyProb: '0.648'
+  dark_oak_fence:
+    base: '10.75'
+    supplyProb: '0.648'
+  mangrove_fence:
+    base: '10.75'
+    supplyProb: '0.648'
+  crimson_fence:
+    base: '13.38'
+    supplyProb: '0.5619'
+  warped_fence:
+    base: '13.38'
+    supplyProb: '0.5619'
+  pumpkin:
+    base: '30'
+    supplyProb: '0.46'
+    amountMod: '1'
+    govCap: '70'
+  carved_pumpkin:
+    base: '12.69'
+    supplyProb: '0.5845'
+  jack_o_lantern:
+    base: '15'
+    supplyProb: '0.34'
+    amountMod: '1'
+    govCap: '78.4'
+  netherrack:
+    base: '1.75'
+    supplyProb: '0.9427'
+  soul_sand:
+    base: '11'
+    supplyProb: '0.6398'
+  soul_soil:
+    base: '11'
+    supplyProb: '0.6398'
+  basalt:
+    base: '0.26'
+    supplyProb: '0.9915'
+  polished_basalt:
+    base: '0.25'
+    supplyProb: '0.9918'
+  smooth_basalt:
+    base: '0.33'
+    supplyProb: '0.9892'
+  soul_torch:
+    base: '5.13'
+    supplyProb: '0.832'
+  glowstone:
+    base: '36.96'
+    supplyProb: '0.23'
+    amountMod: '1'
+    govCap: '98'
+  stone_bricks:
+    base: '1.34'
+    supplyProb: '0.8'
+    amountMod: '1'
+    govCap: '16.8'
+  mossy_stone_bricks:
+    base: '6.77'
+    supplyProb: '0.7783'
+  cracked_stone_bricks:
+    base: '1.68'
+    supplyProb: '0.945'
+  chiseled_stone_bricks:
+    base: '2.65'
+    supplyProb: '0.9132'
+  packed_mud:
+    base: '3.84'
+    supplyProb: '0.8743'
+  mud_bricks:
+    base: '3.72'
+    supplyProb: '0.8782'
+  deepslate_bricks:
+    base: '1.24'
+    supplyProb: '0.9594'
+  cracked_deepslate_bricks:
+    base: '1.55'
+    supplyProb: '0.9492'
+  deepslate_tiles:
+    base: '1.20'
+    supplyProb: '0.9607'
+  cracked_deepslate_tiles:
+    base: '1.50'
+    supplyProb: '0.9509'
+  chiseled_deepslate:
+    base: '2.61'
+    supplyProb: '0.9145'
+  brown_mushroom_block:
+    base: '2.20'
+    supplyProb: '0.928'
+  red_mushroom_block:
+    base: '2.20'
+    supplyProb: '0.928'
+  mushroom_stem:
+    base: '2.20'
+    supplyProb: '0.928'
+  iron_bars:
+    base: '6.58'
+    supplyProb: '0.7845'
+  chain:
+    base: '22.13'
+    supplyProb: '0.2754'
+  glass_pane:
+    base: '0.25'
+    supplyProb: '0.95'
+    amountMod: '1'
+    govCap: '3.5'
+  melon:
+    base: '38.50'
+    supplyProb: '0.9602'
+  vine:
+    base: '5.50'
+    supplyProb: '0.8199'
+  glow_lichen:
+    base: '6.70'
+    supplyProb: '0.7806'
+  brick_stairs:
+    base: '22.79'
+    supplyProb: '0.2537'
+  stone_brick_stairs:
+    base: '1.91'
+    supplyProb: '0.9375'
+  mud_brick_stairs:
+    base: '5.30'
+    supplyProb: '0.8265'
+  mycelium:
+    base: '11'
+    supplyProb: '0.6398'
+  lily_pad:
+    base: '3.30'
+    supplyProb: '0.83'
+    amountMod: '1'
+    govCap: '56'
+  nether_bricks:
+    base: '8.50'
+    supplyProb: '0.7217'
+  cracked_nether_bricks:
+    base: '10.62'
+    supplyProb: '0.6523'
+  chiseled_nether_bricks:
+    base: '16.83'
+    supplyProb: '0.4489'
+  nether_brick_fence:
+    base: '34.43'
+    supplyProb: '0.9644'
+  nether_brick_stairs:
+    base: '12.11'
+    supplyProb: '0.6035'
+  sculk:
+    base: '30.69'
+    supplyProb: '0.9683'
+  sculk_vein:
+    base: '42.68'
+    supplyProb: '0.9559'
+  sculk_catalyst:
+    base: '108.89'
+    supplyProb: '0.8875'
+  sculk_shrieker:
+    base: '97.28'
+    supplyProb: '0.8995'
+  enchanting_table:
+    base: '1530.58'
+    supplyProb: '0.02'
+  end_stone:
+    base: '17.50'
+    supplyProb: '0.427'
+  end_stone_bricks:
+    base: '16.97'
+    supplyProb: '0.4443'
+  dragon_egg:
+    base: '1100'
+    supplyProb: '0.02'
+  sandstone_stairs:
+    base: '3.04'
+    supplyProb: '0.9005'
+  ender_chest:
+    base: '1019.16'
+    supplyProb: '0.02'
+  emerald_block:
+    base: '455.40'
+    supplyProb: '0.5295'
+  oak_stairs:
+    base: '3.23'
+    supplyProb: '0.69'
+    amountMod: '1'
+    govCap: '2'
+  spruce_stairs:
+    base: '3.23'
+    supplyProb: '0.8942'
+  birch_stairs:
+    base: '3.23'
+    supplyProb: '0.69'
+    amountMod: '1'
+    govCap: '2'
+  jungle_stairs:
+    base: '3.23'
+    supplyProb: '0.69'
+    amountMod: '1'
+    govCap: '2'
+  acacia_stairs:
+    base: '3.23'
+    supplyProb: '0.69'
+    amountMod: '1'
+    govCap: '2'
+  dark_oak_stairs:
+    base: '3.23'
+    supplyProb: '0.69'
+    amountMod: '1'
+    govCap: '2'
+  mangrove_stairs:
+    base: '3.23'
+    supplyProb: '0.69'
+    amountMod: '1'
+    govCap: '3'
+  crimson_stairs:
+    base: '4.22'
+    supplyProb: '0.8618'
+  warped_stairs:
+    base: '4.22'
+    supplyProb: '0.8618'
+  beacon:
+    base: '27964.18'
+    supplyProb: '0.02'
+  cobblestone_wall:
+    base: '1.05'
+    supplyProb: '0.9656'
+  mossy_cobblestone_wall:
+    base: '6.20'
+    supplyProb: '0.797'
+  brick_wall:
+    base: '15.19'
+    supplyProb: '0.5026'
+  prismarine_wall:
+    base: '20.27'
+    supplyProb: '0.3363'
+  red_sandstone_wall:
+    base: '6'
+    supplyProb: '0.8035'
+  mossy_stone_brick_wall:
+    base: '6.43'
+    supplyProb: '0.7895'
+  granite_wall:
+    base: '1.80'
+    supplyProb: '0.9411'
+  stone_brick_wall:
+    base: '1.27'
+    supplyProb: '0.9584'
+  mud_brick_wall:
+    base: '3.53'
+    supplyProb: '0.8844'
+  nether_brick_wall:
+    base: '8.07'
+    supplyProb: '0.7358'
+  andesite_wall:
+    base: '1.61'
+    supplyProb: '0.9473'
+  red_nether_brick_wall:
+    base: '34.45'
+    supplyProb: '0.9644'
+  sandstone_wall:
+    base: '2.02'
+    supplyProb: '0.9339'
+  end_stone_brick_wall:
+    base: '16.12'
+    supplyProb: '0.4722'
+  diorite_wall:
+    base: '1.42'
+    supplyProb: '0.9535'
+  blackstone_wall:
+    base: '1.46'
+    supplyProb: '0.9522'
+  polished_blackstone_wall:
+    base: '1.42'
+    supplyProb: '0.9535'
+  polished_blackstone_brick_wall:
+    base: '1.38'
+    supplyProb: '0.9548'
+  cobbled_deepslate_wall:
+    base: '1.25'
+    supplyProb: '0.9591'
+  polished_deepslate_wall:
+    base: '1.22'
+    supplyProb: '0.9601'
+  deepslate_brick_wall:
+    base: '1.18'
+    supplyProb: '0.9614'
+  deepslate_tile_wall:
+    base: '1.14'
+    supplyProb: '0.9627'
+  anvil:
+    base: '500.97'
+    supplyProb: '0.4825'
+  chipped_anvil:
+    base: '250.49'
+    supplyProb: '0.7412'
+  damaged_anvil:
+    base: '125.24'
+    supplyProb: '0.8706'
+  chiseled_quartz_block:
+    base: '147.89'
+    supplyProb: '0.8472'
+  quartz_block:
+    base: '74.69'
+    supplyProb: '0.9228'
+  quartz_bricks:
+    base: '72.45'
+    supplyProb: '0.9252'
+  quartz_pillar:
+    base: '73.94'
+    supplyProb: '0.9236'
+  quartz_stairs:
+    base: '106.43'
+    supplyProb: '0.8901'
+  white_terracotta:
+    base: '14.79'
+    supplyProb: '0.5157'
+  orange_terracotta:
+    base: '14.94'
+    supplyProb: '0.5108'
+  magenta_terracotta:
+    base: '15.35'
+    supplyProb: '0.4974'
+  light_blue_terracotta:
+    base: '14.85'
+    supplyProb: '0.5137'
+  yellow_terracotta:
+    base: '14.87'
+    supplyProb: '0.5131'
+  lime_terracotta:
+    base: '15.14'
+    supplyProb: '0.5042'
+  pink_terracotta:
+    base: '14.85'
+    supplyProb: '0.5137'
+  gray_terracotta:
+    base: '14.94'
+    supplyProb: '0.5108'
+  light_gray_terracotta:
+    base: '14.94'
+    supplyProb: '0.5108'
+  cyan_terracotta:
+    base: '15.87'
+    supplyProb: '0.4803'
+  purple_terracotta:
+    base: '15.51'
+    supplyProb: '0.4921'
+  blue_terracotta:
+    base: '16.24'
+    supplyProb: '0.4682'
+  brown_terracotta:
+    base: '15.24'
+    supplyProb: '0.501'
+  green_terracotta:
+    base: '15.51'
+    supplyProb: '0.4921'
+  red_terracotta:
+    base: '14.80'
+    supplyProb: '0.5154'
+  black_terracotta:
+    base: '15.10'
+    supplyProb: '0.5056'
+  hay_block:
+    base: '27.32'
+    supplyProb: '0.1054'
+  white_carpet:
+    base: '4.22'
+    supplyProb: '0.8618'
+  orange_carpet:
+    base: '5.45'
+    supplyProb: '0.8215'
+  magenta_carpet:
+    base: '7.77'
+    supplyProb: '0.7456'
+  light_blue_carpet:
+    base: '4.90'
+    supplyProb: '0.8396'
+  yellow_carpet:
+    base: '5.04'
+    supplyProb: '0.835'
+  lime_carpet:
+    base: '6.59'
+    supplyProb: '0.7842'
+  pink_carpet:
+    base: '4.90'
+    supplyProb: '0.8396'
+  gray_carpet:
+    base: '5.44'
+    supplyProb: '0.8219'
+  light_gray_carpet:
+    base: '5.45'
+    supplyProb: '0.8215'
+  cyan_carpet:
+    base: '10.69'
+    supplyProb: '0.65'
+  purple_carpet:
+    base: '8.69'
+    supplyProb: '0.7154'
+  blue_carpet:
+    base: '12.84'
+    supplyProb: '0.5796'
+  brown_carpet:
+    base: '7.16'
+    supplyProb: '0.7655'
+  green_carpet:
+    base: '8.68'
+    supplyProb: '0.7158'
+  red_carpet:
+    base: '4.61'
+    supplyProb: '0.849'
+  black_carpet:
+    base: '6.34'
+    supplyProb: '0.7924'
+  terracotta:
+    base: '16'
+    supplyProb: '0.4761'
+  packed_ice:
+    base: '14.08'
+    supplyProb: '0.539'
+  dirt_path:
+    base: '0.48'
+    supplyProb: '0.9843'
+  sunflower:
+    base: '3.30'
+    supplyProb: '0.8919'
+  lilac:
+    base: '2.75'
+    supplyProb: '0.91'
+  rose_bush:
+    base: '1.10'
+    supplyProb: '0.964'
+  peony:
+    base: '1.10'
+    supplyProb: '0.964'
+  tall_grass:
+    base: '0.01'
+    supplyProb: '0.9997'
+  large_fern:
+    base: '0.01'
+    supplyProb: '0.9997'
+  white_stained_glass:
+    base: '0.70'
+    supplyProb: '0.9771'
+  orange_stained_glass:
+    base: '0.86'
+    supplyProb: '0.9718'
+  magenta_stained_glass:
+    base: '1.27'
+    supplyProb: '0.9584'
+  light_blue_stained_glass:
+    base: '0.76'
+    supplyProb: '0.9751'
+  yellow_stained_glass:
+    base: '0.79'
+    supplyProb: '0.9741'
+  lime_stained_glass:
+    base: '1.06'
+    supplyProb: '0.9653'
+  pink_stained_glass:
+    base: '0.76'
+    supplyProb: '0.9751'
+  gray_stained_glass:
+    base: '0.86'
+    supplyProb: '0.9718'
+  light_gray_stained_glass:
+    base: '0.86'
+    supplyProb: '0.9718'
+  cyan_stained_glass:
+    base: '1.78'
+    supplyProb: '0.9417'
+  purple_stained_glass:
+    base: '1.43'
+    supplyProb: '0.9532'
+  blue_stained_glass:
+    base: '2.16'
+    supplyProb: '0.9293'
+  brown_stained_glass:
+    base: '1.16'
+    supplyProb: '0.962'
+  green_stained_glass:
+    base: '1.43'
+    supplyProb: '0.9532'
+  red_stained_glass:
+    base: '0.71'
+    supplyProb: '0.9768'
+  black_stained_glass:
+    base: '1.01'
+    supplyProb: '0.9669'
+  white_stained_glass_pane:
+    base: '0.25'
+    supplyProb: '0.9918'
+  orange_stained_glass_pane:
+    base: '0.31'
+    supplyProb: '0.9898'
+  magenta_stained_glass_pane:
+    base: '0.45'
+    supplyProb: '0.9853'
+  light_blue_stained_glass_pane:
+    base: '0.27'
+    supplyProb: '0.9912'
+  yellow_stained_glass_pane:
+    base: '0.28'
+    supplyProb: '0.9908'
+  lime_stained_glass_pane:
+    base: '0.38'
+    supplyProb: '0.9876'
+  pink_stained_glass_pane:
+    base: '0.27'
+    supplyProb: '0.9912'
+  gray_stained_glass_pane:
+    base: '0.31'
+    supplyProb: '0.9898'
+  light_gray_stained_glass_pane:
+    base: '0.31'
+    supplyProb: '0.9898'
+  cyan_stained_glass_pane:
+    base: '0.63'
+    supplyProb: '0.9794'
+  purple_stained_glass_pane:
+    base: '0.51'
+    supplyProb: '0.9833'
+  blue_stained_glass_pane:
+    base: '0.77'
+    supplyProb: '0.9748'
+  brown_stained_glass_pane:
+    base: '0.41'
+    supplyProb: '0.9866'
+  green_stained_glass_pane:
+    base: '0.51'
+    supplyProb: '0.9833'
+  red_stained_glass_pane:
+    base: '0.25'
+    supplyProb: '0.9918'
+  black_stained_glass_pane:
+    base: '0.36'
+    supplyProb: '0.9882'
+  prismarine:
+    base: '21.34'
+    supplyProb: '0.3012'
+  prismarine_bricks:
+    base: '45.54'
+    supplyProb: '0.953'
+  dark_prismarine:
+    base: '43.52'
+    supplyProb: '0.955'
+  prismarine_stairs:
+    base: '30.41'
+    supplyProb: '0.0042'
+  prismarine_brick_stairs:
+    base: '64.89'
+    supplyProb: '0.933'
+  dark_prismarine_stairs:
+    base: '62.02'
+    supplyProb: '0.9359'
+  sea_lantern:
+    base: '58.19'
+    supplyProb: '0.9399'
+  red_sandstone:
+    base: '6.32'
+    supplyProb: '0.7931'
+  chiseled_red_sandstone:
+    base: '12.51'
+    supplyProb: '0.5904'
+  cut_red_sandstone:
+    base: '6.13'
+    supplyProb: '0.7993'
+  red_sandstone_stairs:
+    base: '9.01'
+    supplyProb: '0.705'
+  magma_block:
+    base: '69.14'
+    supplyProb: '0.9286'
+  nether_wart_block:
+    base: '118.80'
+    supplyProb: '0.8773'
+  warped_wart_block:
+    base: '118.80'
+    supplyProb: '0.8773'
+  red_nether_bricks:
+    base: '36.26'
+    supplyProb: '0.9625'
+  bone_block:
+    base: '4.80'
+    supplyProb: '0.8428'
+  shulker_box:
+    base: '83.58'
+    supplyProb: '0.9137'
+  white_shulker_box:
+    base: '83.32'
+    supplyProb: '0.9139'
+  orange_shulker_box:
+    base: '84.65'
+    supplyProb: '0.9126'
+  magenta_shulker_box:
+    base: '88.19'
+    supplyProb: '0.9089'
+  light_blue_shulker_box:
+    base: '83.83'
+    supplyProb: '0.9134'
+  yellow_shulker_box:
+    base: '84.05'
+    supplyProb: '0.9132'
+  lime_shulker_box:
+    base: '86.40'
+    supplyProb: '0.9107'
+  pink_shulker_box:
+    base: '83.83'
+    supplyProb: '0.9134'
+  gray_shulker_box:
+    base: '84.64'
+    supplyProb: '0.9126'
+  light_gray_shulker_box:
+    base: '84.65'
+    supplyProb: '0.9126'
+  cyan_shulker_box:
+    base: '92.60'
+    supplyProb: '0.9043'
+  purple_shulker_box:
+    base: '89.57'
+    supplyProb: '0.9075'
+  blue_shulker_box:
+    base: '95.86'
+    supplyProb: '0.901'
+  brown_shulker_box:
+    base: '87.26'
+    supplyProb: '0.9099'
+  green_shulker_box:
+    base: '89.56'
+    supplyProb: '0.9075'
+  red_shulker_box:
+    base: '83.40'
+    supplyProb: '0.9138'
+  black_shulker_box:
+    base: '86.01'
+    supplyProb: '0.9111'
+  white_glazed_terracotta:
+    base: '18.49'
+    supplyProb: '0.3946'
+  orange_glazed_terracotta:
+    base: '18.68'
+    supplyProb: '0.3883'
+  magenta_glazed_terracotta:
+    base: '19.19'
+    supplyProb: '0.3716'
+  light_blue_glazed_terracotta:
+    base: '18.56'
+    supplyProb: '0.3923'
+  yellow_glazed_terracotta:
+    base: '18.59'
+    supplyProb: '0.3913'
+  lime_glazed_terracotta:
+    base: '18.93'
+    supplyProb: '0.3801'
+  pink_glazed_terracotta:
+    base: '18.56'
+    supplyProb: '0.3923'
+  gray_glazed_terracotta:
+    base: '18.68'
+    supplyProb: '0.3883'
+  light_gray_glazed_terracotta:
+    base: '18.68'
+    supplyProb: '0.3883'
+  cyan_glazed_terracotta:
+    base: '19.84'
+    supplyProb: '0.3503'
+  purple_glazed_terracotta:
+    base: '19.39'
+    supplyProb: '0.3651'
+  blue_glazed_terracotta:
+    base: '20.30'
+    supplyProb: '0.3353'
+  brown_glazed_terracotta:
+    base: '19.05'
+    supplyProb: '0.3762'
+  green_glazed_terracotta:
+    base: '19.39'
+    supplyProb: '0.3651'
+  red_glazed_terracotta:
+    base: '18.50'
+    supplyProb: '0.3942'
+  black_glazed_terracotta:
+    base: '18.88'
+    supplyProb: '0.3818'
+  white_concrete:
+    base: '0.57'
+    supplyProb: '0.9813'
+  orange_concrete:
+    base: '0.73'
+    supplyProb: '0.9761'
+  magenta_concrete:
+    base: '1.14'
+    supplyProb: '0.9627'
+  light_blue_concrete:
+    base: '0.63'
+    supplyProb: '0.9794'
+  yellow_concrete:
+    base: '0.66'
+    supplyProb: '0.9784'
+  lime_concrete:
+    base: '0.93'
+    supplyProb: '0.9695'
+  pink_concrete:
+    base: '0.63'
+    supplyProb: '0.9794'
+  gray_concrete:
+    base: '0.73'
+    supplyProb: '0.9761'
+  light_gray_concrete:
+    base: '0.73'
+    supplyProb: '0.9761'
+  cyan_concrete:
+    base: '1.65'
+    supplyProb: '0.946'
+  purple_concrete:
+    base: '1.30'
+    supplyProb: '0.9574'
+  blue_concrete:
+    base: '2.03'
+    supplyProb: '0.9335'
+  brown_concrete:
+    base: '1.03'
+    supplyProb: '0.9663'
+  green_concrete:
+    base: '1.30'
+    supplyProb: '0.9574'
+  red_concrete:
+    base: '0.58'
+    supplyProb: '0.981'
+  black_concrete:
+    base: '0.89'
+    supplyProb: '0.9709'
+  white_concrete_powder:
+    base: '0.57'
+    supplyProb: '0.9813'
+  orange_concrete_powder:
+    base: '0.73'
+    supplyProb: '0.9761'
+  magenta_concrete_powder:
+    base: '1.14'
+    supplyProb: '0.9627'
+  light_blue_concrete_powder:
+    base: '0.63'
+    supplyProb: '0.9794'
+  yellow_concrete_powder:
+    base: '0.66'
+    supplyProb: '0.9784'
+  lime_concrete_powder:
+    base: '0.93'
+    supplyProb: '0.9695'
+  pink_concrete_powder:
+    base: '0.63'
+    supplyProb: '0.9794'
+  gray_concrete_powder:
+    base: '0.73'
+    supplyProb: '0.9761'
+  light_gray_concrete_powder:
+    base: '0.73'
+    supplyProb: '0.9761'
+  cyan_concrete_powder:
+    base: '1.65'
+    supplyProb: '0.946'
+  purple_concrete_powder:
+    base: '1.30'
+    supplyProb: '0.9574'
+  blue_concrete_powder:
+    base: '2.03'
+    supplyProb: '0.9335'
+  brown_concrete_powder:
+    base: '1.03'
+    supplyProb: '0.9663'
+  green_concrete_powder:
+    base: '1.30'
+    supplyProb: '0.9574'
+  red_concrete_powder:
+    base: '0.58'
+    supplyProb: '0.981'
+  black_concrete_powder:
+    base: '0.89'
+    supplyProb: '0.9709'
+  turtle_egg:
+    base: '18.98'
+    supplyProb: '0.3785'
+  dead_tube_coral_block:
+    base: '0.03'
+    supplyProb: '0.999'
+  dead_brain_coral_block:
+    base: '0.03'
+    supplyProb: '0.999'
+  dead_bubble_coral_block:
+    base: '0.03'
+    supplyProb: '0.999'
+  dead_fire_coral_block:
+    base: '0.03'
+    supplyProb: '0.999'
+  dead_horn_coral_block:
+    base: '0.03'
+    supplyProb: '0.999'
+  tube_coral_block:
+    base: '3.43'
+    supplyProb: '0.8877'
+  brain_coral_block:
+    base: '3.43'
+    supplyProb: '0.8877'
+  bubble_coral_block:
+    base: '3.43'
+    supplyProb: '0.8877'
+  fire_coral_block:
+    base: '3.43'
+    supplyProb: '0.8877'
+  horn_coral_block:
+    base: '3.43'
+    supplyProb: '0.8877'
+  tube_coral:
+    base: '2.87'
+    supplyProb: '0.906'
+  brain_coral:
+    base: '2.87'
+    supplyProb: '0.906'
+  bubble_coral:
+    base: '2.87'
+    supplyProb: '0.906'
+  fire_coral:
+    base: '2.87'
+    supplyProb: '0.906'
+  horn_coral:
+    base: '2.87'
+    supplyProb: '0.906'
+  dead_brain_coral:
+    base: '0.01'
+    supplyProb: '0.9997'
+  dead_bubble_coral:
+    base: '0.01'
+    supplyProb: '0.9997'
+  dead_fire_coral:
+    base: '0.01'
+    supplyProb: '0.9997'
+  dead_horn_coral:
+    base: '0.01'
+    supplyProb: '0.9997'
+  dead_tube_coral:
+    base: '0.01'
+    supplyProb: '0.9997'
+  tube_coral_fan:
+    base: '3.17'
+    supplyProb: '0.8962'
+  brain_coral_fan:
+    base: '3.17'
+    supplyProb: '0.8962'
+  bubble_coral_fan:
+    base: '3.17'
+    supplyProb: '0.8962'
+  fire_coral_fan:
+    base: '3.17'
+    supplyProb: '0.8962'
+  horn_coral_fan:
+    base: '3.17'
+    supplyProb: '0.8962'
+  dead_tube_coral_fan:
+    base: '0.03'
+    supplyProb: '0.999'
+  dead_brain_coral_fan:
+    base: '0.03'
+    supplyProb: '0.999'
+  dead_bubble_coral_fan:
+    base: '0.03'
+    supplyProb: '0.999'
+  dead_fire_coral_fan:
+    base: '0.03'
+    supplyProb: '0.999'
+  dead_horn_coral_fan:
+    base: '0.03'
+    supplyProb: '0.999'
+  blue_ice:
+    base: '116.58'
+    supplyProb: '0.8796'
+  conduit:
+    base: '89.27'
+    supplyProb: '0.9078'
+  polished_granite_stairs:
+    base: '2.62'
+    supplyProb: '0.9142'
+  smooth_red_sandstone_stairs:
+    base: '11.26'
+    supplyProb: '0.6313'
+  mossy_stone_brick_stairs:
+    base: '9.65'
+    supplyProb: '0.684'
+  polished_diorite_stairs:
+    base: '2.08'
+    supplyProb: '0.9319'
+  mossy_cobblestone_stairs:
+    base: '9.31'
+    supplyProb: '0.6951'
+  end_stone_brick_stairs:
+    base: '24.18'
+    supplyProb: '0.2082'
+  stone_stairs:
+    base: '1.97'
+    supplyProb: '0.9355'
+  smooth_sandstone_stairs:
+    base: '3.79'
+    supplyProb: '0.8759'
+  smooth_quartz_stairs:
+    base: '133.04'
+    supplyProb: '0.8626'
+  granite_stairs:
+    base: '2.71'
+    supplyProb: '0.9113'
+  andesite_stairs:
+    base: '2.42'
+    supplyProb: '0.9208'
+  red_nether_brick_stairs:
+    base: '51.67'
+    supplyProb: '0.9466'
+  polished_andesite_stairs:
+    base: '2.35'
+    supplyProb: '0.9231'
+  diorite_stairs:
+    base: '2.14'
+    supplyProb: '0.9299'
+  cobbled_deepslate_stairs:
+    base: '1.88'
+    supplyProb: '0.9384'
+  polished_deepslate_stairs:
+    base: '1.82'
+    supplyProb: '0.9404'
+  deepslate_brick_stairs:
+    base: '1.77'
+    supplyProb: '0.942'
+  deepslate_tile_stairs:
+    base: '1.71'
+    supplyProb: '0.944'
+  polished_granite_slab:
+    base: '0.90'
+    supplyProb: '0.9705'
+  smooth_red_sandstone_slab:
+    base: '3.87'
+    supplyProb: '0.8733'
+  mossy_stone_brick_slab:
+    base: '3.32'
+    supplyProb: '0.8913'
+  polished_diorite_slab:
+    base: '0.72'
+    supplyProb: '0.9764'
+  mossy_cobblestone_slab:
+    base: '3.20'
+    supplyProb: '0.8952'
+  end_stone_brick_slab:
+    base: '8.32'
+    supplyProb: '0.7276'
+  smooth_sandstone_slab:
+    base: '1.30'
+    supplyProb: '0.9574'
+  smooth_quartz_slab:
+    base: '45.75'
+    supplyProb: '0.9527'
+  granite_slab:
+    base: '0.93'
+    supplyProb: '0.9695'
+  andesite_slab:
+    base: '0.83'
+    supplyProb: '0.9728'
+  red_nether_brick_slab:
+    base: '17.77'
+    supplyProb: '0.4181'
+  polished_andesite_slab:
+    base: '0.81'
+    supplyProb: '0.9735'
+  diorite_slab:
+    base: '0.73'
+    supplyProb: '0.9761'
+  cobbled_deepslate_slab:
+    base: '0.65'
+    supplyProb: '0.9787'
+  polished_deepslate_slab:
+    base: '0.63'
+    supplyProb: '0.9794'
+  deepslate_brick_slab:
+    base: '0.61'
+    supplyProb: '0.98'
+  deepslate_tile_slab:
+    base: '0.59'
+    supplyProb: '0.9807'
+  scaffolding:
+    base: '1.02'
+    supplyProb: '0.9666'
+  redstone:
+    base: '3.30'
+    supplyProb: '0.8919'
+  redstone_torch:
+    base: '4.38'
+    supplyProb: '0.5'
+    amountMod: '1'
+    govCap: '75'
+  redstone_block:
+    base: '27.32'
+    supplyProb: '0.39'
+    amountMod: '1'
+    govCap: '750'
+  repeater:
+    base: '15.39'
+    supplyProb: '0.51'
+    amountMod: '1'
+    govCap: '130'
+  comparator:
+    base: '34.34'
+    supplyProb: '0.49'
+    amountMod: '1'
+    govCap: '150'
+  piston:
+    base: '30.35'
+    supplyProb: '0.65'
+    amountMod: '1'
+    govCap: '370'
+  sticky_piston:
+    base: '40.94'
+    supplyProb: '0.62'
+    amountMod: '1'
+    govCap: '400'
+  slime_block:
+    base: '91.08'
+    supplyProb: '0.45'
+    amountMod: '0.5'
+    govCap: '6500'
+  honey_block:
+    base: '16.49'
+    supplyProb: '0.46'
+  observer:
+    base: '29.85'
+    supplyProb: '0.49'
+    amountMod: '1'
+    govCap: '950'
+  hopper:
+    base: '103.83'
+    supplyProb: '0.66'
+    amountMod: '1'
+    govCap: '225'
+  dispenser:
+    base: '17.38'
+    supplyProb: '0.59'
+    amountMod: '1'
+    govCap: '310'
+  dropper:
+    base: '10.23'
+    supplyProb: '0.59'
+    amountMod: '1'
+    govCap: '330'
+  lectern:
+    base: '29.75'
+    supplyProb: '0.0258'
+  target:
+    base: '38.90'
+    supplyProb: '0.9598'
+  lever:
+    base: '2.20'
+    supplyProb: '0.79'
+    amountMod: '1'
+    govCap: '35'
+  lightning_rod:
+    base: '37.72'
+    supplyProb: '0.58'
+    amountMod: '1'
+    govCap: '275'
+  daylight_detector:
+    base: '58.10'
+    supplyProb: '0.66'
+    amountMod: '1'
+    govCap: '360'
+  sculk_sensor:
+    base: '88.20'
+    supplyProb: '0.9089'
+  tripwire_hook:
+    base: '10.72'
+    supplyProb: '0.74'
+    amountMod: '1'
+    govCap: '60'
+  trapped_chest:
+    base: '27.33'
+    supplyProb: '0.1051'
+  tnt:
+    base: '52.62'
+    supplyProb: '0.9456'
+  redstone_lamp:
+    base: '48.15'
+    supplyProb: '0.9503'
+  note_block:
+    base: '19.74'
+    supplyProb: '0.33'
+    amountMod: '1'
+    govCap: '50.4'
+  stone_button:
+    base: '1.38'
+    supplyProb: '0.89'
+    amountMod: '1.35'
+    govCap: '12'
+  polished_blackstone_button:
+    base: '1.49'
+    supplyProb: '0.9512'
+  oak_button:
+    base: '2.27'
+    supplyProb: '0.9'
+    amountMod: '1.35'
+    govCap: '8'
+  spruce_button:
+    base: '2.27'
+    supplyProb: '0.9257'
+  birch_button:
+    base: '2.27'
+    supplyProb: '0.9257'
+  jungle_button:
+    base: '2.27'
+    supplyProb: '0.9257'
+  acacia_button:
+    base: '2.27'
+    supplyProb: '0.9257'
+  dark_oak_button:
+    base: '2.27'
+    supplyProb: '0.9257'
+  mangrove_button:
+    base: '2.27'
+    supplyProb: '0.9257'
+  crimson_button:
+    base: '2.96'
+    supplyProb: '0.9031'
+  warped_button:
+    base: '2.96'
+    supplyProb: '0.9031'
+  stone_pressure_plate:
+    base: '2.73'
+    supplyProb: '0.91'
+    amountMod: '1'
+    govCap: '14'
+  polished_blackstone_pressure_plate:
+    base: '2.95'
+    supplyProb: '0.9034'
+  light_weighted_pressure_plate:
+    base: '116.64'
+    supplyProb: '0.65'
+    amountMod: '0.75'
+    govCap: '160'
+  heavy_weighted_pressure_plate:
+    base: '36.59'
+    supplyProb: '0.6'
+    amountMod: '0.75'
+    govCap: '410'
+  oak_pressure_plate:
+    base: '4.49'
+    supplyProb: '0.92'
+    amountMod: '1'
+    govCap: '15'
+  spruce_pressure_plate:
+    base: '4.49'
+    supplyProb: '0.853'
+  birch_pressure_plate:
+    base: '4.49'
+    supplyProb: '0.853'
+  jungle_pressure_plate:
+    base: '4.49'
+    supplyProb: '0.853'
+  acacia_pressure_plate:
+    base: '4.49'
+    supplyProb: '0.853'
+  dark_oak_pressure_plate:
+    base: '4.49'
+    supplyProb: '0.853'
+  mangrove_pressure_plate:
+    base: '4.49'
+    supplyProb: '0.853'
+  crimson_pressure_plate:
+    base: '5.86'
+    supplyProb: '0.8081'
+  warped_pressure_plate:
+    base: '5.86'
+    supplyProb: '0.8081'
+  iron_door:
+    base: '35.11'
+    supplyProb: '0.59'
+    amountMod: '1'
+    govCap: '120'
+  oak_door:
+    base: '4.31'
+    supplyProb: '0.8589'
+  spruce_door:
+    base: '4.31'
+    supplyProb: '0.8589'
+  birch_door:
+    base: '4.31'
+    supplyProb: '0.8589'
+  jungle_door:
+    base: '4.31'
+    supplyProb: '0.8589'
+  acacia_door:
+    base: '4.31'
+    supplyProb: '0.8589'
+  dark_oak_door:
+    base: '4.31'
+    supplyProb: '0.8589'
+  mangrove_door:
+    base: '4.31'
+    supplyProb: '0.8589'
+  crimson_door:
+    base: '5.62'
+    supplyProb: '0.816'
+  warped_door:
+    base: '5.62'
+    supplyProb: '0.816'
+  iron_trapdoor:
+    base: '71.70'
+    supplyProb: '0.9259'
+  oak_trapdoor:
+    base: '6.47'
+    supplyProb: '0.7881'
+  spruce_trapdoor:
+    base: '6.47'
+    supplyProb: '0.7881'
+  birch_trapdoor:
+    base: '6.47'
+    supplyProb: '0.7881'
+  jungle_trapdoor:
+    base: '6.47'
+    supplyProb: '0.7881'
+  acacia_trapdoor:
+    base: '6.47'
+    supplyProb: '0.7881'
+  dark_oak_trapdoor:
+    base: '6.47'
+    supplyProb: '0.7881'
+  mangrove_trapdoor:
+    base: '6.47'
+    supplyProb: '0.7881'
+  crimson_trapdoor:
+    base: '8.44'
+    supplyProb: '0.7236'
+  warped_trapdoor:
+    base: '8.44'
+    supplyProb: '0.7236'
+  oak_fence_gate:
+    base: '8.57'
+    supplyProb: '0.7194'
+  spruce_fence_gate:
+    base: '8.57'
+    supplyProb: '0.7194'
+  birch_fence_gate:
+    base: '8.57'
+    supplyProb: '0.7194'
+  jungle_fence_gate:
+    base: '8.57'
+    supplyProb: '0.7194'
+  acacia_fence_gate:
+    base: '8.57'
+    supplyProb: '0.7194'
+  dark_oak_fence_gate:
+    base: '8.57'
+    supplyProb: '0.7194'
+  mangrove_fence_gate:
+    base: '8.57'
+    supplyProb: '0.7194'
+  crimson_fence_gate:
+    base: '9.88'
+    supplyProb: '0.6765'
+  warped_fence_gate:
+    base: '9.88'
+    supplyProb: '0.6765'
+  powered_rail:
+    base: '55.47'
+    supplyProb: '0.9427'
+  detector_rail:
+    base: '18.12'
+    supplyProb: '0.4067'
+  rail:
+    base: '6.58'
+    supplyProb: '0.7845'
+  activator_rail:
+    base: '18.02'
+    supplyProb: '0.4099'
+  saddle:
+    base: '110'
+    supplyProb: '0.26'
+    amountMod: '1'
+    govCap: '140'
+  minecart:
+    base: '88.70'
+    supplyProb: '0.32'
+    amountMod: '1'
+    govCap: '32.2'
+  chest_minecart:
+    base: '104.53'
+    supplyProb: '0.892'
+  furnace_minecart:
+    base: '95.91'
+    supplyProb: '0.9009'
+  tnt_minecart:
+    base: '139.91'
+    supplyProb: '0.8555'
+  hopper_minecart:
+    base: '190.60'
+    supplyProb: '0.8031'
+  carrot_on_a_stick:
+    base: '7.15'
+    supplyProb: '0.7659'
+  warped_fungus_on_a_stick:
+    base: '7.63'
+    supplyProb: '0.7502'
+  elytra:
+    base: '6000'
+    supplyProb: '0.02'
+  oak_boat:
+    base: '10.90'
+    supplyProb: '0.6431'
+  oak_chest_boat:
+    base: '27.51'
+    supplyProb: '0.0992'
+  spruce_boat:
+    base: '10.90'
+    supplyProb: '0.6431'
+  spruce_chest_boat:
+    base: '27.51'
+    supplyProb: '0.0992'
+  birch_boat:
+    base: '10.90'
+    supplyProb: '0.6431'
+  birch_chest_boat:
+    base: '27.51'
+    supplyProb: '0.0992'
+  jungle_boat:
+    base: '10.90'
+    supplyProb: '0.6431'
+  jungle_chest_boat:
+    base: '27.51'
+    supplyProb: '0.0992'
+  acacia_boat:
+    base: '10.90'
+    supplyProb: '0.6431'
+  acacia_chest_boat:
+    base: '27.51'
+    supplyProb: '0.0992'
+  dark_oak_boat:
+    base: '10.90'
+    supplyProb: '0.6431'
+  dark_oak_chest_boat:
+    base: '27.51'
+    supplyProb: '0.0992'
+  mangrove_boat:
+    base: '10.90'
+    supplyProb: '0.6431'
+  mangrove_chest_boat:
+    base: '27.51'
+    supplyProb: '0.0992'
+  turtle_helmet:
+    base: '5.28'
+    supplyProb: '0.8271'
+  scute:
+    base: '1.10'
+    supplyProb: '0.964'
+  flint_and_steel:
+    base: '18.84'
+    supplyProb: '0.3831'
+  apple:
+    base: '3.30'
+    supplyProb: '0.87'
+    amountMod: '1.5'
+    govCap: '14'
+  bow:
+    base: '7.89'
+    supplyProb: '0.85'
+    amountMod: '1'
+    govCap: '110'
+  arrow:
+    base: '0.54'
+    supplyProb: '0.96'
+    amountMod: '1'
+    govCap: '16'
+  coal:
+    base: '8.80'
+    supplyProb: '0.76'
+    amountMod: '2'
+    govCap: '17'
+  charcoal:
+    base: '11.33'
+    supplyProb: '0.8'
+    amountMod: '2'
+    govCap: '4'
+  diamond:
+    base: '550'
+    supplyProb: '0.5'
+    amountMod: '0.9'
+    govCap: '510'
+  emerald:
+    base: '55'
+    supplyProb: '0.36'
+    amountMod: '0.8'
+    govCap: '550'
+  lapis_lazuli:
+    base: '13.25'
+    supplyProb: '0.5661'
+  quartz:
+    base: '19.25'
+    supplyProb: '0.3697'
+  amethyst_shard:
+    base: '9'
+    supplyProb: '0.35'
+    amountMod: '1.5'
+    govCap: '2000'
+  raw_iron:
+    base: '13.20'
+    supplyProb: '0.5678'
+  iron_ingot:
+    base: '18.48'
+    supplyProb: '0.65'
+    amountMod: '1.1'
+    govCap: '135'
+  raw_copper:
+    base: '10.26'
+    supplyProb: '0.664'
+  copper_ingot:
+    base: '12.83'
+    supplyProb: '0.69'
+    amountMod: '1.25'
+    govCap: '20'
+  raw_gold:
+    base: '44'
+    supplyProb: '0.9545'
+  gold_ingot:
+    base: '58.91'
+    supplyProb: '0.45'
+    amountMod: '1'
+    govCap: '190'
+  netherite_ingot:
+    base: '4807.64'
+    supplyProb: '0.02'
+  netherite_scrap:
+    base: '1210'
+    supplyProb: '0.02'
+  wooden_sword:
+    base: '5.55'
+    supplyProb: '0.8183'
+  wooden_shovel:
+    base: '4.42'
+    supplyProb: '0.8553'
+  wooden_pickaxe:
+    base: '8.69'
+    supplyProb: '0.7154'
+  wooden_axe:
+    base: '8.69'
+    supplyProb: '0.7154'
+  wooden_hoe:
+    base: '6.58'
+    supplyProb: '0.7845'
+  stone_sword:
+    base: '3.25'
+    supplyProb: '0.47'
+    amountMod: '1'
+    govCap: '75'
+  stone_shovel:
+    base: '3.27'
+    supplyProb: '0.8929'
+  stone_pickaxe:
+    base: '5.32'
+    supplyProb: '0.49'
+    amountMod: '1'
+    govCap: '70'
+  stone_axe:
+    base: '5.32'
+    supplyProb: '0.5'
+    amountMod: '1'
+    govCap: '65'
+  stone_hoe:
+    base: '4.31'
+    supplyProb: '0.53'
+    amountMod: '1'
+    govCap: '55'
+  golden_sword:
+    base: '116.56'
+    supplyProb: '0.8796'
+  golden_shovel:
+    base: '59.93'
+    supplyProb: '0.9381'
+  golden_pickaxe:
+    base: '171.81'
+    supplyProb: '0.8225'
+  golden_axe:
+    base: '171.81'
+    supplyProb: '0.8225'
+  golden_hoe:
+    base: '116.46'
+    supplyProb: '0.8797'
+  iron_sword:
+    base: '37.32'
+    supplyProb: '0.35'
+    amountMod: '1'
+    govCap: '220'
+  iron_shovel:
+    base: '20.31'
+    supplyProb: '0.335'
+  iron_pickaxe:
+    base: '55.37'
+    supplyProb: '0.34'
+    amountMod: '1'
+    govCap: '210'
+  iron_axe:
+    base: '55.37'
+    supplyProb: '0.38'
+    amountMod: '1'
+    govCap: '200'
+  iron_hoe:
+    base: '38.02'
+    supplyProb: '0.41'
+    amountMod: '1'
+    govCap: '155'
+  diamond_sword:
+    base: '1079.10'
+    supplyProb: '0.19'
+    amountMod: '0.37'
+    govCap: '588'
+  diamond_shovel:
+    base: '541.20'
+    supplyProb: '0.4409'
+  diamond_pickaxe:
+    base: '1586.15'
+    supplyProb: '0.2'
+    amountMod: '0.38'
+    govCap: '910'
+  diamond_axe:
+    base: '1586.15'
+    supplyProb: '0.21'
+    amountMod: '0.39'
+    govCap: '910'
+  diamond_hoe:
+    base: '1069.17'
+    supplyProb: '0.25'
+    amountMod: '0.4'
+    govCap: '560'
+  netherite_sword:
+    base: '5827.87'
+    supplyProb: '0.02'
+  netherite_shovel:
+    base: '5295.35'
+    supplyProb: '0.02'
+  netherite_pickaxe:
+    base: '6329.85'
+    supplyProb: '0.02'
+  netherite_axe:
+    base: '6329.85'
+    supplyProb: '0.02'
+  netherite_hoe:
+    base: '5818.04'
+    supplyProb: '0.02'
+  stick:
+    base: '1.12'
+    supplyProb: '0.99'
+    amountMod: '1'
+    govCap: '0.35'
+  bowl:
+    base: '1.67'
+    supplyProb: '0.53'
+    amountMod: '1'
+    govCap: '0.7'
+  mushroom_stew:
+    base: '3.79'
+    supplyProb: '0.8759'
+  string:
+    base: '1.65'
+    supplyProb: '0.76'
+    amountMod: '1'
+    govCap: '7'
+  feather:
+    base: '0.55'
+    supplyProb: '0.91'
+    amountMod: '1'
+    govCap: '4.2'
+  gunpowder:
+    base: '11'
+    supplyProb: '0.6398'
+  wheat_seeds:
+    base: '1.10'
+    supplyProb: '0.95'
+    amountMod: '1'
+    govCap: '27'
+  wheat:
+    base: '3.30'
+    supplyProb: '0.93'
+    amountMod: '3'
+    govCap: '12.6'
+  bread:
+    base: '9.70'
+    supplyProb: '0.71'
+    amountMod: '1'
+    govCap: '42'
+  leather_helmet:
+    base: '24.38'
+    supplyProb: '0.46'
+    amountMod: '1'
+    govCap: '72.8'
+  leather_chestplate:
+    base: '37.80'
+    supplyProb: '0.44'
+    amountMod: '1'
+    govCap: '119'
+  leather_leggings:
+    base: '33.43'
+    supplyProb: '0.48'
+    amountMod: '1'
+    govCap: '105'
+  leather_boots:
+    base: '19.71'
+    supplyProb: '0.51'
+    amountMod: '1'
+    govCap: '58.8'
+  chainmail_helmet:
+    base: '150'
+    supplyProb: '0.4'
+    amountMod: '1'
+    govCap: '56'
+  chainmail_chestplate:
+    base: '325'
+    supplyProb: '0.35'
+    amountMod: '1'
+    govCap: '56'
+  chainmail_leggings:
+    base: '250'
+    supplyProb: '0.38'
+    amountMod: '1'
+    govCap: '70'
+  chainmail_boots:
+    base: '150'
+    supplyProb: '0.41'
+    amountMod: '1'
+    govCap: '42'
+  iron_helmet:
+    base: '88.70'
+    supplyProb: '0.25'
+    amountMod: '1'
+    govCap: '30.8'
+  iron_chestplate:
+    base: '137.49'
+    supplyProb: '0.22'
+    amountMod: '1'
+    govCap: '30.8'
+  iron_leggings:
+    base: '121.60'
+    supplyProb: '0.25'
+    amountMod: '1'
+    govCap: '30.8'
+  iron_boots:
+    base: '71.70'
+    supplyProb: '0.29'
+    amountMod: '1'
+    govCap: '30.8'
+  diamond_helmet:
+    base: '2640'
+    supplyProb: '0.13'
+    amountMod: '1'
+    govCap: '1400'
+  diamond_chestplate:
+    base: '4092'
+    supplyProb: '0.12'
+    amountMod: '1'
+    govCap: '2450'
+  diamond_leggings:
+    base: '3619'
+    supplyProb: '0.15'
+    amountMod: '1'
+    govCap: '2100'
+  diamond_boots:
+    base: '2134'
+    supplyProb: '0.16'
+    amountMod: '1'
+    govCap: '1190'
+  golden_helmet:
+    base: '282.77'
+    supplyProb: '0.7079'
+  golden_chestplate:
+    base: '438.29'
+    supplyProb: '0.5472'
+  golden_leggings:
+    base: '387.63'
+    supplyProb: '0.5996'
+  golden_boots:
+    base: '228.57'
+    supplyProb: '0.7639'
+  netherite_helmet:
+    base: '7373.16'
+    supplyProb: '0.02'
+  netherite_chestplate:
+    base: '8810.64'
+    supplyProb: '0.02'
+  netherite_leggings:
+    base: '8342.37'
+    supplyProb: '0.02'
+  netherite_boots:
+    base: '6872.22'
+    supplyProb: '0.02'
+  flint:
+    base: '0.55'
+    supplyProb: '0.982'
+  porkchop:
+    base: '4.40'
+    supplyProb: '0.8559'
+  cooked_porkchop:
+    base: '5.50'
+    supplyProb: '0.8199'
+  painting:
+    base: '14.13'
+    supplyProb: '0.31'
+    amountMod: '1'
+    govCap: '35'
+  golden_apple:
+    base: '436.61'
+    supplyProb: '0.22'
+    amountMod: '1'
+    govCap: '140'
+  enchanted_golden_apple:
+    base: '4679.34'
+    supplyProb: '0.02'
+  oak_sign:
+    base: '4.62'
+    supplyProb: '0.8487'
+  spruce_sign:
+    base: '4.62'
+    supplyProb: '0.8487'
+  birch_sign:
+    base: '4.62'
+    supplyProb: '0.8487'
+  jungle_sign:
+    base: '4.62'
+    supplyProb: '0.8487'
+  acacia_sign:
+    base: '4.62'
+    supplyProb: '0.8487'
+  dark_oak_sign:
+    base: '4.62'
+    supplyProb: '0.8487'
+  mangrove_sign:
+    base: '4.62'
+    supplyProb: '0.8487'
+  crimson_sign:
+    base: '5.92'
+    supplyProb: '0.8062'
+  warped_sign:
+    base: '5.92'
+    supplyProb: '0.8062'
+  bucket:
+    base: '54.33'
+    supplyProb: '0.74'
+    amountMod: '1'
+    govCap: '30.8'
+  water_bucket:
+    base: '61.41'
+    supplyProb: '0.68'
+    amountMod: '1'
+    govCap: '180'
+  lava_bucket:
+    base: '68.28'
+    supplyProb: '0.6'
+    amountMod: '1'
+    govCap: '190'
+  powder_snow_bucket:
+    base: '62.54'
+    supplyProb: '0.9354'
+  snowball:
+    base: '1.10'
+    supplyProb: '0.38'
+    amountMod: '1'
+    govCap: '1.4'
+  leather:
+    base: '5.08'
+    supplyProb: '0.63'
+    amountMod: '1'
+    govCap: '14'
+  milk_bucket:
+    base: '64.70'
+    supplyProb: '0.43'
+    amountMod: '1'
+    govCap: '56'
+  pufferfish_bucket:
+    base: '67.31'
+    supplyProb: '0.9305'
+  salmon_bucket:
+    base: '67.31'
+    supplyProb: '0.9305'
+  cod_bucket:
+    base: '67.31'
+    supplyProb: '0.9305'
+  tropical_fish_bucket:
+    base: '67.31'
+    supplyProb: '0.9305'
+  axolotl_bucket:
+    base: '67.31'
+    supplyProb: '0.9305'
+  tadpole_bucket:
+    base: '55.21'
+    supplyProb: '0.943'
+  brick:
+    base: '4.12'
+    supplyProb: '0.69'
+    amountMod: '1'
+    govCap: '29.4'
+  clay_ball:
+    base: '3.30'
+    supplyProb: '0.81'
+    amountMod: '1'
+    govCap: '4.2'
+  dried_kelp_block:
+    base: '32.37'
+    supplyProb: '0.9666'
+  paper:
+    base: '0.54'
+    supplyProb: '0.7'
+    amountMod: '1'
+    govCap: '14'
+  book:
+    base: '5.08'
+    supplyProb: '0.41'
+    amountMod: '1'
+    govCap: '63'
+  slime_ball:
+    base: '11'
+    supplyProb: '0.11'
+    amountMod: '1'
+    govCap: '70'
+  egg:
+    base: '0.55'
+    supplyProb: '0.89'
+    amountMod: '1.4'
+    govCap: '1.4'
+  compass:
+    base: '74.13'
+    supplyProb: '0.49'
+    amountMod: '1'
+    govCap: '30.8'
+  recovery_compass:
+    base: '747.53'
+    supplyProb: '0.2278'
+  bundle:
+    base: '10.04'
+    supplyProb: '0.6712'
+  fishing_rod:
+    base: '6.39'
+    supplyProb: '0.73'
+    amountMod: '1'
+    govCap: '14'
+  clock:
+    base: '229.38'
+    supplyProb: '0.763'
+  spyglass:
+    base: '33.97'
+    supplyProb: '0.9649'
+  glowstone_dust:
+    base: '8.80'
+    supplyProb: '0.25'
+    amountMod: '2'
+    govCap: '1750'
+  cod:
+    base: '3.30'
+    supplyProb: '0.98'
+    amountMod: '1'
+    govCap: '110'
+  salmon:
+    base: '3.58'
+    supplyProb: '0.98'
+    amountMod: '1'
+    govCap: '110'
+  tropical_fish:
+    base: '1.65'
+    supplyProb: '0.81'
+    amountMod: '0.8'
+    govCap: '175'
+  pufferfish:
+    base: '5.50'
+    supplyProb: '0.65'
+    amountMod: '0.85'
+    govCap: '440'
+  cooked_cod:
+    base: '4.12'
+    supplyProb: '0.96'
+    amountMod: '1'
+    govCap: '120'
+  cooked_salmon:
+    base: '4.47'
+    supplyProb: '0.96'
+    amountMod: '1'
+    govCap: '120'
+  ink_sac:
+    base: '3.30'
+    supplyProb: '0.8919'
+  glow_ink_sac:
+    base: '3.55'
+    supplyProb: '0.52'
+    amountMod: '1'
+    govCap: '450'
+  cocoa_beans:
+    base: '4.56'
+    supplyProb: '0.88'
+    amountMod: '1'
+    govCap: '150'
+  white_dye:
+    base: '0.58'
+    supplyProb: '0.981'
+  orange_dye:
+    base: '1.93'
+    supplyProb: '0.9368'
+  magenta_dye:
+    base: '5.50'
+    supplyProb: '0.8199'
+  light_blue_dye:
+    base: '1.10'
+    supplyProb: '0.964'
+  yellow_dye:
+    base: '1.32'
+    supplyProb: '0.9568'
+  lime_dye:
+    base: '3.69'
+    supplyProb: '0.8792'
+  pink_dye:
+    base: '1.10'
+    supplyProb: '0.964'
+  gray_dye:
+    base: '1.92'
+    supplyProb: '0.9371'
+  light_gray_dye:
+    base: '1.93'
+    supplyProb: '0.9368'
+  cyan_dye:
+    base: '9.96'
+    supplyProb: '0.6739'
+  purple_dye:
+    base: '6.89'
+    supplyProb: '0.7744'
+  blue_dye:
+    base: '13.25'
+    supplyProb: '0.5661'
+  brown_dye:
+    base: '4.56'
+    supplyProb: '0.8507'
+  green_dye:
+    base: '6.88'
+    supplyProb: '0.7747'
+  red_dye:
+    base: '0.66'
+    supplyProb: '0.9784'
+  black_dye:
+    base: '3.30'
+    supplyProb: '0.8919'
+  bone_meal:
+    base: '0.58'
+    supplyProb: '0.77'
+    amountMod: '1'
+    govCap: '30'
+  bone:
+    base: '1.75'
+    supplyProb: '0.79'
+    amountMod: '1'
+    govCap: '28'
+  sugar:
+    base: '0.55'
+    supplyProb: '0.82'
+    amountMod: '2'
+    govCap: '14'
+  cake:
+    base: '189.20'
+    supplyProb: '0.66'
+    amountMod: '1'
+    govCap: '252'
+  white_bed:
+    base: '24.71'
+    supplyProb: '0.1909'
+  orange_bed:
+    base: '29.98'
+    supplyProb: '0.0183'
+  magenta_bed:
+    base: '40.04'
+    supplyProb: '0.9586'
+  light_blue_bed:
+    base: '27.62'
+    supplyProb: '0.0956'
+  yellow_bed:
+    base: '28.24'
+    supplyProb: '0.0753'
+  lime_bed:
+    base: '34.94'
+    supplyProb: '0.9639'
+  pink_bed:
+    base: '27.62'
+    supplyProb: '0.0956'
+  gray_bed:
+    base: '29.95'
+    supplyProb: '0.0193'
+  light_gray_bed:
+    base: '29.98'
+    supplyProb: '0.0183'
+  cyan_bed:
+    base: '52.64'
+    supplyProb: '0.9456'
+  purple_bed:
+    base: '43.98'
+    supplyProb: '0.9546'
+  blue_bed:
+    base: '61.90'
+    supplyProb: '0.9361'
+  brown_bed:
+    base: '37.39'
+    supplyProb: '0.9614'
+  green_bed:
+    base: '43.95'
+    supplyProb: '0.9546'
+  red_bed:
+    base: '26.39'
+    supplyProb: '0.1359'
+  black_bed:
+    base: '33.83'
+    supplyProb: '0.9651'
+  cookie:
+    base: '1.37'
+    supplyProb: '0.87'
+    amountMod: '1'
+    govCap: '55'
+  filled_map:
+    base: '10'
+    supplyProb: '0.6726'
+  shears:
+    base: '36.59'
+    supplyProb: '0.9622'
+  melon_slice:
+    base: '4.65'
+    supplyProb: '0.97'
+    amountMod: '1.75'
+    govCap: '25'
+  dried_kelp:
+    base: '3.91'
+    supplyProb: '0.872'
+  pumpkin_seeds:
+    base: '4.50'
+    supplyProb: '0.95'
+    amountMod: '1'
+    govCap: '27'
+  melon_seeds:
+    base: '4.50'
+    supplyProb: '0.95'
+    amountMod: '1'
+    govCap: '27'
+  beef:
+    base: '5.50'
+    supplyProb: '0.75'
+    amountMod: '0.98'
+    govCap: '80'
+  cooked_beef:
+    base: '6.88'
+    supplyProb: '0.78'
+    amountMod: '0.98'
+    govCap: '90'
+  chicken:
+    base: '2.75'
+    supplyProb: '0.8'
+    amountMod: '1'
+    govCap: '55'
+  cooked_chicken:
+    base: '3.44'
+    supplyProb: '0.8'
+    amountMod: '1'
+    govCap: '90'
+  rotten_flesh:
+    base: '0.39'
+    supplyProb: '0.99'
+    amountMod: '1'
+    govCap: '6'
+  ender_pearl:
+    base: '55'
+    supplyProb: '0.9432'
+  blaze_rod:
+    base: '14'
+    supplyProb: '0.5416'
+  ghast_tear:
+    base: '82.50'
+    supplyProb: '0.9148'
+  gold_nugget:
+    base: '6.55'
+    supplyProb: '0.7855'
+  nether_wart:
+    base: '16.50'
+    supplyProb: '0.4597'
+  potion:
+    base: '100'
+    supplyProb: '0.8967'
+  glass_bottle:
+    base: '0.68'
+    supplyProb: '0.9777'
+  spider_eye:
+    base: '3.30'
+    supplyProb: '0.88'
+    amountMod: '1'
+    govCap: '115'
+  fermented_spider_eye:
+    base: '4.85'
+    supplyProb: '0.8412'
+  blaze_powder:
+    base: '7'
+    supplyProb: '0.7708'
+  magma_cream:
+    base: '17.82'
+    supplyProb: '0.4165'
+  brewing_stand:
+    base: '16.78'
+    supplyProb: '0.4505'
+  cauldron:
+    base: '121.60'
+    supplyProb: '0.8744'
+  ender_eye:
+    base: '61.38'
+    supplyProb: '0.9366'
+  glistering_melon_slice:
+    base: '52.49'
+    supplyProb: '0.9458'
+  experience_bottle:
+    base: '25'
+    supplyProb: '0.1814'
+  fire_charge:
+    base: '8.75'
+    supplyProb: '0.7135'
+  writable_book:
+    base: '8.75'
+    supplyProb: '0.7135'
+  written_book:
+    base: '10.48'
+    supplyProb: '0.6568'
+  item_frame:
+    base: '12.92'
+    supplyProb: '0.5769'
+  glow_item_frame:
+    base: '16.31'
+    supplyProb: '0.4659'
+  flower_pot:
+    base: '12.11'
+    supplyProb: '0.6035'
+  carrot:
+    base: '0.83'
+    supplyProb: '0.98'
+    amountMod: '2'
+    govCap: '15'
+  potato:
+    base: '0.55'
+    supplyProb: '0.99'
+    amountMod: '2'
+    govCap: '20'
+  baked_potato:
+    base: '0.69'
+    supplyProb: '0.91'
+    amountMod: '1'
+    govCap: '35'
+  poisonous_potato:
+    base: '0.28'
+    supplyProb: '0.9908'
+  map:
+    base: '72.17'
+    supplyProb: '0.9254'
+  golden_carrot:
+    base: '48.97'
+    supplyProb: '0.9494'
+  skeleton_skull:
+    base: '5000'
+    supplyProb: '0.02'
+  wither_skeleton_skull:
+    base: '10000'
+    supplyProb: '0.02'
+  player_head:
+    base: '5000'
+    supplyProb: '0.02'
+  zombie_head:
+    base: '5000'
+    supplyProb: '0.02'
+  creeper_head:
+    base: '5000'
+    supplyProb: '0.02'
+  dragon_head:
+    base: '25000'
+    supplyProb: '0.02'
+  nether_star:
+    base: '30000'
+    supplyProb: '0.02'
+  pumpkin_pie:
+    base: '30.48'
+    supplyProb: '0.9'
+    amountMod: '1'
+    govCap: '165'
+  firework_rocket:
+    base: '11.12'
+    supplyProb: '0.6359'
+  firework_star:
+    base: '101.75'
+    supplyProb: '0.8949'
+  enchanted_book:
+    base: '89.30'
+    supplyProb: '0.9077'
+  nether_brick:
+    base: '2.19'
+    supplyProb: '0.9283'
+  prismarine_shard:
+    base: '5.50'
+    supplyProb: '0.8199'
+  prismarine_crystals:
+    base: '8.25'
+    supplyProb: '0.7299'
+  rabbit:
+    base: '1.65'
+    supplyProb: '0.78'
+    amountMod: '0.98'
+    govCap: '57'
+  cooked_rabbit:
+    base: '2.06'
+    supplyProb: '0.7'
+    amountMod: '0.86'
+    govCap: '64'
+  rabbit_stew:
+    base: '6.10'
+    supplyProb: '0.8003'
+  rabbit_foot:
+    base: '22'
+    supplyProb: '0.2796'
+  rabbit_hide:
+    base: '1.31'
+    supplyProb: '0.9571'
+  armor_stand:
+    base: '7.11'
+    supplyProb: '0.7672'
+  iron_horse_armor:
+    base: '132'
+    supplyProb: '0.8636'
+  golden_horse_armor:
+    base: '385'
+    supplyProb: '0.6023'
+  diamond_horse_armor:
+    base: '3300'
+    supplyProb: '0.02'
+  leather_horse_armor:
+    base: '33.43'
+    supplyProb: '0.9655'
+  lead:
+    base: '8.45'
+    supplyProb: '0.7233'
+  name_tag:
+    base: '55'
+    supplyProb: '0.9432'
+  mutton:
+    base: '1.10'
+    supplyProb: '0.75'
+    amountMod: '0.95'
+    govCap: '55'
+  cooked_mutton:
+    base: '1.38'
+    supplyProb: '0.7'
+    amountMod: '0.95'
+    govCap: '65'
+  white_banner:
+    base: '37.15'
+    supplyProb: '0.9616'
+  orange_banner:
+    base: '47.58'
+    supplyProb: '0.9508'
+  magenta_banner:
+    base: '67.49'
+    supplyProb: '0.9303'
+  light_blue_banner:
+    base: '42.90'
+    supplyProb: '0.9557'
+  yellow_banner:
+    base: '44.14'
+    supplyProb: '0.9544'
+  lime_banner:
+    base: '57.40'
+    supplyProb: '0.9407'
+  pink_banner:
+    base: '42.90'
+    supplyProb: '0.9557'
+  gray_banner:
+    base: '47.53'
+    supplyProb: '0.9509'
+  light_gray_banner:
+    base: '47.58'
+    supplyProb: '0.9508'
+  cyan_banner:
+    base: '92.42'
+    supplyProb: '0.9045'
+  purple_banner:
+    base: '75.28'
+    supplyProb: '0.9222'
+  blue_banner:
+    base: '110.75'
+    supplyProb: '0.8856'
+  brown_banner:
+    base: '62.25'
+    supplyProb: '0.9357'
+  green_banner:
+    base: '75.22'
+    supplyProb: '0.9223'
+  red_banner:
+    base: '40.48'
+    supplyProb: '0.9582'
+  black_banner:
+    base: '55.20'
+    supplyProb: '0.943'
+  end_crystal:
+    base: '136.81'
+    supplyProb: '0.8587'
+  chorus_fruit:
+    base: '5.50'
+    supplyProb: '0.8199'
+  popped_chorus_fruit:
+    base: '6.88'
+    supplyProb: '0.7747'
+  beetroot:
+    base: '0.66'
+    supplyProb: '0.99'
+    amountMod: '2'
+    govCap: '17'
+  beetroot_seeds:
+    base: '0.22'
+    supplyProb: '0.95'
+    amountMod: '1'
+    govCap: '27'
+  beetroot_soup:
+    base: '1.67'
+    supplyProb: '0.9453'
+  dragon_breath:
+    base: '180'
+    supplyProb: '0.814'
+  splash_potion:
+    base: '40.72'
+    supplyProb: '0.9579'
+  spectral_arrow:
+    base: '17.16'
+    supplyProb: '0.4381'
+  tipped_arrow:
+    base: '13.02'
+    supplyProb: '0.5737'
+  lingering_potion:
+    base: '50.20'
+    supplyProb: '0.9481'
+  shield:
+    base: '30.17'
+    supplyProb: '0.0121'
+  totem_of_undying:
+    base: '8230'
+    supplyProb: '0.02'
+  shulker_shell:
+    base: '34.20'
+    supplyProb: '0.9647'
+  iron_nugget:
+    base: '2.05'
+    supplyProb: '0.9329'
+  music_disc_13:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_cat:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_blocks:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_chirp:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_far:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_mall:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_mellohi:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_stal:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_strad:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_ward:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_11:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_wait:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_otherside:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_5:
+    base: '132'
+    supplyProb: '0.8636'
+  music_disc_pigstep:
+    base: '132'
+    supplyProb: '0.8636'
+  disc_fragment_5:
+    base: '14'
+    supplyProb: '0.5416'
+  trident:
+    base: '78.83'
+    supplyProb: '0.9186'
+  phantom_membrane:
+    base: '1.40'
+    supplyProb: '0.9542'
+  nautilus_shell:
+    base: '6.58'
+    supplyProb: '0.7845'
+  heart_of_the_sea:
+    base: '44.39'
+    supplyProb: '0.9541'
+  crossbow:
+    base: '33.71'
+    supplyProb: '0.9652'
+  suspicious_stew:
+    base: '5.20'
+    supplyProb: '0.8297'
+  loom:
+    base: '7.60'
+    supplyProb: '0.7511'
+  flower_banner_pattern:
+    base: '2.17'
+    supplyProb: '0.9289'
+  creeper_banner_pattern:
+    base: '4950.53'
+    supplyProb: '0.02'
+  skull_banner_pattern:
+    base: '9900.53'
+    supplyProb: '0.02'
+  mojang_banner_pattern:
+    base: '4633.08'
+    supplyProb: '0.02'
+  globe_banner_pattern:
+    base: '481.80'
+    supplyProb: '0.5023'
+  piglin_banner_pattern:
+    base: '5832.25'
+    supplyProb: '0.02'
+  goat_horn:
+    base: '8.79'
+    supplyProb: '0.7122'
+  composter:
+    base: '7.30'
+    supplyProb: '0.761'
+  barrel:
+    base: '14.73'
+    supplyProb: '0.5177'
+  smoker:
+    base: '42.64'
+    supplyProb: '0.956'
+  blast_furnace:
+    base: '97.28'
+    supplyProb: '0.8995'
+  cartography_table:
+    base: '9.65'
+    supplyProb: '0.684'
+  fletching_table:
+    base: '9.67'
+    supplyProb: '0.6834'
+  grindstone:
+    base: '7.16'
+    supplyProb: '0.7655'
+  smithing_table:
+    base: '43.74'
+    supplyProb: '0.9548'
+  stonecutter:
+    base: '21.94'
+    supplyProb: '0.2816'
+  bell:
+    base: '147.23'
+    supplyProb: '0.8479'
+  lantern:
+    base: '17.35'
+    supplyProb: '0.4319'
+  soul_lantern:
+    base: '19.81'
+    supplyProb: '0.3513'
+  sweet_berries:
+    base: '3.30'
+    supplyProb: '0.8919'
+  glow_berries:
+    base: '3.30'
+    supplyProb: '0.76'
+    amountMod: '1'
+    govCap: '300'
+  campfire:
+    base: '36.98'
+    supplyProb: '0.9618'
+  soul_campfire:
+    base: '39.05'
+    supplyProb: '0.9597'
+  shroomlight:
+    base: '44.35'
+    supplyProb: '0.9542'
+  honeycomb:
+    base: '9'
+    supplyProb: '0.7053'
+  bee_nest:
+    base: '39.87'
+    supplyProb: '0.9588'
+  beehive:
+    base: '39.87'
+    supplyProb: '0.9588'
+  honey_bottle:
+    base: '4.25'
+    supplyProb: '0.8608'
+  honeycomb_block:
+    base: '34.92'
+    supplyProb: '0.9639'
+  lodestone:
+    base: '4442.53'
+    supplyProb: '0.02'
+  crying_obsidian:
+    base: '392.40'
+    supplyProb: '0.5946'
+  blackstone:
+    base: '1.54'
+    supplyProb: '0.9496'
+  blackstone_slab:
+    base: '0.75'
+    supplyProb: '0.9754'
+  blackstone_stairs:
+    base: '2.19'
+    supplyProb: '0.9283'
+  gilded_blackstone:
+    base: '58'
+    supplyProb: '0.9401'
+  polished_blackstone:
+    base: '1.49'
+    supplyProb: '0.9512'
+  polished_blackstone_slab:
+    base: '0.73'
+    supplyProb: '0.9761'
+  polished_blackstone_stairs:
+    base: '2.12'
+    supplyProb: '0.9306'
+  chiseled_polished_blackstone:
+    base: '2.95'
+    supplyProb: '0.9034'
+  polished_blackstone_bricks:
+    base: '1.45'
+    supplyProb: '0.9525'
+  polished_blackstone_brick_slab:
+    base: '0.71'
+    supplyProb: '0.9768'
+  polished_blackstone_brick_stairs:
+    base: '2.07'
+    supplyProb: '0.9322'
+  cracked_polished_blackstone_bricks:
+    base: '1.81'
+    supplyProb: '0.9407'
+  respawn_anchor:
+    base: '2268.06'
+    supplyProb: '0.02'
+  candle:
+    base: '10.54'
+    supplyProb: '0.6549'
+  white_candle:
+    base: '11.01'
+    supplyProb: '0.6395'
+  orange_candle:
+    base: '12.35'
+    supplyProb: '0.5956'
+  magenta_candle:
+    base: '15.88'
+    supplyProb: '0.48'
+  light_blue_candle:
+    base: '11.52'
+    supplyProb: '0.6228'
+  yellow_candle:
+    base: '11.74'
+    supplyProb: '0.6156'
+  lime_candle:
+    base: '14.09'
+    supplyProb: '0.5386'
+  pink_candle:
+    base: '11.52'
+    supplyProb: '0.6228'
+  gray_candle:
+    base: '12.34'
+    supplyProb: '0.5959'
+  light_gray_candle:
+    base: '12.35'
+    supplyProb: '0.5956'
+  cyan_candle:
+    base: '20.29'
+    supplyProb: '0.3356'
+  purple_candle:
+    base: '17.26'
+    supplyProb: '0.4348'
+  blue_candle:
+    base: '23.55'
+    supplyProb: '0.2289'
+  brown_candle:
+    base: '14.95'
+    supplyProb: '0.5105'
+  green_candle:
+    base: '17.25'
+    supplyProb: '0.4352'
+  red_candle:
+    base: '11.09'
+    supplyProb: '0.6369'
+  black_candle:
+    base: '13.70'
+    supplyProb: '0.5514'
+  small_amethyst_bud:
+    base: '2.25'
+    supplyProb: '0.9263'
+  medium_amethyst_bud:
+    base: '4.69'
+    supplyProb: '0.8464'
+  large_amethyst_bud:
+    base: '7.17'
+    supplyProb: '0.7652'
+  amethyst_cluster:
+    base: '8.58'
+    supplyProb: '0.7191'
+  pointed_dripstone:
+    base: '1.01'
+    supplyProb: '0.9669'
+  ochre_froglight:
+    base: '59.44'
+    supplyProb: '0.9386'
+  verdant_froglight:
+    base: '59.44'
+    supplyProb: '0.9386'
+  pearlescent_froglight:
+    base: '59.44'
+    supplyProb: '0.9386'
+  echo_shard:
+    base: '92.30'
+    supplyProb: '0.9046'

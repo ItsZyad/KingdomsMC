@@ -25,59 +25,248 @@ pasta_data:
         - stick
         - stone_axe
         - string
-past_data:
-  recent:
-    '1':
-      Fyndalin-1:
-        items:
-          feather:
-            saleToAmountRatio: '0.0063'
-            totalAmountItem: '4'
-            totalValueItem: '12'
+more_pasta:
+  '1':
+    Fyndalin-1:
+      items:
+        buyAnalysis:
+          stone_bricks:
+            saleToAmountRatio: '0.0844'
+            totalAmountItem: '13'
+            totalValueItem: '48'
             sellPriceInfo:
-              average: '3'
+              average: '12'
               stDev: '0'
-          stone_axe:
-            saleToAmountRatio: '0.0062'
-            totalAmountItem: '2'
-            totalValueItem: '3'
+          sugar_cane:
+            saleToAmountRatio: '0.3125'
+            totalAmountItem: '20'
+            totalValueItem: '4.925'
             sellPriceInfo:
-              average: '3'
-              stDev: '0'
-          string:
-            saleToAmountRatio: '0.0258'
+              average: '2.4625'
+              stDev: '0.4389'
+          cactus:
+            saleToAmountRatio: '0.1163'
+            totalAmountItem: '20'
+            totalValueItem: '63.75'
+            sellPriceInfo:
+              average: '31.875'
+              stDev: '6.634'
+          glass:
+            saleToAmountRatio: '0.0097'
             totalAmountItem: '5'
+            totalValueItem: '15'
+            sellPriceInfo:
+              average: '3'
+              stDev: '0'
+          bone:
+            saleToAmountRatio: '0.018'
+            totalAmountItem: '10'
             totalValueItem: '5'
             sellPriceInfo:
               average: '5'
               stDev: '0'
-          stone_button:
-            saleToAmountRatio: '0.0079'
-            totalAmountItem: '1'
-            totalValueItem: '6'
-            sellPriceInfo:
-              average: '6'
-              stDev: '0'
-          oak_planks:
-            saleToAmountRatio: '0.028'
-            totalAmountItem: '27'
-            totalValueItem: '40.5'
-            sellPriceInfo:
-              average: '1.5'
-              stDev: '0'
-          oak_log:
-            saleToAmountRatio: '0.0103'
+        sellAnalysis:
+          sugar_cane:
+            saleToAmountRatio: '0.1663'
             totalAmountItem: '10'
+            totalValueItem: '14'
+            sellPriceInfo:
+              average: '1.4'
+              stDev: '0'
+          cactus:
+            saleToAmountRatio: '0.0581'
+            totalAmountItem: '10'
+            totalValueItem: '172'
+            sellPriceInfo:
+              average: '17.2'
+              stDev: '0'
+          glass:
+            saleToAmountRatio: '0.0579'
+            totalAmountItem: '30'
+            totalValueItem: '43.5'
+            sellPriceInfo:
+              average: '1.45'
+              stDev: '0'
+  '2':
+    Fyndalin-1:
+      items:
+        buyAnalysis:
+          stone_bricks:
+            saleToAmountRatio: '0.0244'
+            totalAmountItem: '13'
+            totalValueItem: '48'
+            sellPriceInfo:
+              average: '12'
+              stDev: '0'
+          sugar_cane:
+            saleToAmountRatio: '0.3125'
+            totalAmountItem: '20'
+            totalValueItem: '4.925'
+            sellPriceInfo:
+              average: '2.4625'
+              stDev: '0.4389'
+          cactus:
+            saleToAmountRatio: '0.1163'
+            totalAmountItem: '20'
+            totalValueItem: '63.75'
+            sellPriceInfo:
+              average: '31.875'
+              stDev: '6.634'
+          glass:
+            saleToAmountRatio: '0.0097'
+            totalAmountItem: '5'
             totalValueItem: '15'
             sellPriceInfo:
-              average: '1.5'
+              average: '3'
               stDev: '0'
-          birch_stairs:
-            saleToAmountRatio: '0.0079'
-            totalAmountItem: '7'
-            totalValueItem: '10.5'
+          bone:
+            saleToAmountRatio: '0.018'
+            totalAmountItem: '10'
+            totalValueItem: '5'
             sellPriceInfo:
-              average: '1.5'
+              average: '5'
               stDev: '0'
-        totalValue: '115'
-        totalAmount: '56'
+        sellAnalysis:
+          sugar_cane:
+            saleToAmountRatio: '0.1463'
+            totalAmountItem: '10'
+            totalValueItem: '14'
+            sellPriceInfo:
+              average: '1.4'
+              stDev: '0'
+          cactus:
+            saleToAmountRatio: '0.0581'
+            totalAmountItem: '10'
+            totalValueItem: '172'
+            sellPriceInfo:
+              average: '17.2'
+              stDev: '0'
+          glass:
+            saleToAmountRatio: '0.0579'
+            totalAmountItem: '30'
+            totalValueItem: '43.5'
+            sellPriceInfo:
+              average: '1.45'
+              stDev: '0'
+  '3':
+    Fyndalin-1:
+      items:
+        buyAnalysis:
+          stone_bricks:
+            saleToAmountRatio: '0.0944'
+            totalAmountItem: '13'
+            totalValueItem: '48'
+            sellPriceInfo:
+              average: '12'
+              stDev: '0'
+          sugar_cane:
+            saleToAmountRatio: '0.3125'
+            totalAmountItem: '20'
+            totalValueItem: '4.925'
+            sellPriceInfo:
+              average: '2.4625'
+              stDev: '0.4389'
+          cactus:
+            saleToAmountRatio: '0.1163'
+            totalAmountItem: '20'
+            totalValueItem: '63.75'
+            sellPriceInfo:
+              average: '31.875'
+              stDev: '6.634'
+          glass:
+            saleToAmountRatio: '0.0097'
+            totalAmountItem: '5'
+            totalValueItem: '15'
+            sellPriceInfo:
+              average: '3'
+              stDev: '0'
+          bone:
+            saleToAmountRatio: '0.018'
+            totalAmountItem: '10'
+            totalValueItem: '5'
+            sellPriceInfo:
+              average: '5'
+              stDev: '0'
+        sellAnalysis:
+          sugar_cane:
+            saleToAmountRatio: '0.1563'
+            totalAmountItem: '10'
+            totalValueItem: '14'
+            sellPriceInfo:
+              average: '1.4'
+              stDev: '0'
+          cactus:
+            saleToAmountRatio: '0.0581'
+            totalAmountItem: '10'
+            totalValueItem: '172'
+            sellPriceInfo:
+              average: '17.2'
+              stDev: '0'
+          glass:
+            saleToAmountRatio: '0.0579'
+            totalAmountItem: '30'
+            totalValueItem: '43.5'
+            sellPriceInfo:
+              average: '1.45'
+              stDev: '0'
+  '4':
+    Fyndalin-1:
+      items:
+        buyAnalysis:
+          stone_bricks:
+            saleToAmountRatio: '0.0744'
+            totalAmountItem: '13'
+            totalValueItem: '48'
+            sellPriceInfo:
+              average: '12'
+              stDev: '0'
+          sugar_cane:
+            saleToAmountRatio: '0.3125'
+            totalAmountItem: '20'
+            totalValueItem: '4.925'
+            sellPriceInfo:
+              average: '2.4625'
+              stDev: '0.4389'
+          cactus:
+            saleToAmountRatio: '0.1163'
+            totalAmountItem: '20'
+            totalValueItem: '63.75'
+            sellPriceInfo:
+              average: '31.875'
+              stDev: '6.634'
+          glass:
+            saleToAmountRatio: '0.0097'
+            totalAmountItem: '5'
+            totalValueItem: '15'
+            sellPriceInfo:
+              average: '3'
+              stDev: '0'
+          bone:
+            saleToAmountRatio: '0.018'
+            totalAmountItem: '10'
+            totalValueItem: '5'
+            sellPriceInfo:
+              average: '5'
+              stDev: '0'
+        sellAnalysis:
+          sugar_cane:
+            saleToAmountRatio: '0.1563'
+            totalAmountItem: '10'
+            totalValueItem: '14'
+            sellPriceInfo:
+              average: '1.4'
+              stDev: '0'
+          cactus:
+            saleToAmountRatio: '0.0581'
+            totalAmountItem: '10'
+            totalValueItem: '172'
+            sellPriceInfo:
+              average: '17.2'
+              stDev: '0'
+          glass:
+            saleToAmountRatio: '0.0579'
+            totalAmountItem: '30'
+            totalValueItem: '43.5'
+            sellPriceInfo:
+              average: '1.45'
+              stDev: '0'
