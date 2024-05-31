@@ -53,7 +53,7 @@ DEBUG_SaveCurrentConfig:
     ##
     ## >>> [Void]
 
-    - ~fileread origin:../Kingdoms/config.yml save:config
+    - ~fileread path:../Kingdoms/config.yml save:config
     - flag server kingdoms.encodedConfig:<entry[config].data>
 
 
