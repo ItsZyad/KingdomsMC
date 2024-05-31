@@ -90,10 +90,8 @@ PaginatedInterface:
 
         - define outList:->:<[itemList].get[<[value]>]>
 
-    - repeat <[outList].size> from:<[interface].size.sub[<[interface].empty_slots>]>:
-        - inventory set slot:<[value].sub[1]> origin:<[outList].get[<[outList].size.sub[<[value]>]>]> destination:<[interface]>
-
-    # - define interface <[interface].include[<[outList]>]>
+    - foreach <[outList]>:
+        - inventory set slot:<[loop_index]> origin:<[value].as[item]> destination:<[interface]>
 
     - adjust def:interface title:<[title]> if:<[title].exists>
     - adjust def:interface "title:<[interface].title> (page <[page]>/<[maxPages]>)"
@@ -139,7 +137,6 @@ PaginatedInterface_Handler:
     events:
         on player clicks Page_Back in PaginatedInterface_Window priority:0:
         - inject <script.name> path:InitializeVariables
-        # - narrate format:debug PAGE_BACK
 
         - if <[pageNum].sub[1].is[OR_MORE].than[1]>:
             - run PaginatedInterface def.itemList:<[itemList]> def.page:<[pageNum].sub[1]> def.player:<player> def.title:<[title]> def.footer:<[footer]>
@@ -151,7 +148,6 @@ PaginatedInterface_Handler:
 
         on player clicks Page_Forward in PaginatedInterface_Window priority:0:
         - inject <script.name> path:InitializeVariables
-        # - narrate format:debug PAGE_FORWARD
 
         - if <[pageNum].add[1].is[OR_LESS].than[<[maxPages]>]>:
             - run PaginatedInterface def.itemList:<[itemList]> def.page:<[pageNum].add[1]> def.player:<player> def.title:<[title]> def.footer:<[footer]>
@@ -162,8 +158,8 @@ PaginatedInterface_Handler:
         - determine cancelled
 
         on player closes PaginatedInterface_Window:
-        - wait 2t
+        - wait 5t
         - if <player.open_inventory> == <player.inventory>:
             - customevent id:PaginatedInvClose
-            - flag <player> <player.flag[datahold.paginated.tempFlagName]>:!
+            - flag <player> <player.flag[datahold.paginated.tempFlagName]>:! if:<player.has_flag[datahold.paginated.tempFlagName]>
             - flag <player> dataHold.paginated:!
