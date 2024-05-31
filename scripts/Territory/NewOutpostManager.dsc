@@ -418,6 +418,7 @@ OutpostWand_Handler:
         - flag player size:!
         - flag player redefiningOutpost:!
         - flag player outpostAlreadyNamed:!
+        - flag player noChat.outposts.definingOutpost:!
 
 
 ##############################################################################
