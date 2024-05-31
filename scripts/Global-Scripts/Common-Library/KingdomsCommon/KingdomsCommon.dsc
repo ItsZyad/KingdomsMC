@@ -58,6 +58,7 @@ KingdomTextColors:
 
 GetKingdomList:
     type: procedure
+    debug: false
     definitions: isCodeNames[?ElementTag(Boolean)]
     description:
     - Generates a list of all the valid kingdom code names.
@@ -87,6 +88,7 @@ GetKingdomList:
 # TODO: Change name to 'IsValidKingdomCode'
 ValidateKingdomCode:
     type: procedure
+    debug: false
     definitions: kingdomCode[ElementTag(String)]
     description:
     - Checks id the kingdom code provided is a valid one.
@@ -105,6 +107,7 @@ ValidateKingdomCode:
 
 IsKingdomBankrupt:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Checks if the provided kingdom is bankrupt
@@ -150,6 +153,7 @@ IsKingdomBankrupt:
 
 GetBalance:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Returns the balance of a given kingdom.
@@ -172,6 +176,7 @@ GetBalance:
 
 SetBalance:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Sets the balance of a given kingdom to a given amount.
@@ -200,6 +205,7 @@ SetBalance:
 
 AddBalance:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Adds a given amount to the provided kingdom's balance.
@@ -228,6 +234,7 @@ AddBalance:
 
 SubBalance:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Subtracts a given amount to the provided kingdom's balance.
@@ -256,6 +263,7 @@ SubBalance:
 
 GetUpkeep:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets a given kingdom's total daily upkeep.
@@ -278,6 +286,7 @@ GetUpkeep:
 
 SetUpkeep:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Sets the upkeep of a given kingdom to a given amount.
@@ -306,6 +315,7 @@ SetUpkeep:
 
 AddUpkeep:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Adds a given amount to the provided kingdom's upkeep.
@@ -334,6 +344,7 @@ AddUpkeep:
 
 SubUpkeep:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Subtracts a given amount from the kingdom's upkeep.
@@ -362,6 +373,7 @@ SubUpkeep:
 
 GetPrestige:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets the given kingdom's prestige.
@@ -384,6 +396,7 @@ GetPrestige:
 
 SetPrestige:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Sets the prestige of a kingdom to a given amount.
@@ -416,6 +429,7 @@ SetPrestige:
 
 AddPrestige:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Adds a given amount of prestige to a kingdom.
@@ -450,6 +464,7 @@ AddPrestige:
 
 SubPrestige:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Subtracts a given amount of prestige from a kingdom.
@@ -484,6 +499,7 @@ SubPrestige:
 
 GetDescription:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets the description of a kingdom. Returns null if there is none.
@@ -509,6 +525,7 @@ GetDescription:
 
 SetDescription:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|description[ElementTag(String)]
     description:
     - Sets the description of a kingdom.
@@ -536,6 +553,7 @@ SetDescription:
 
 GetKingdomName:
     type: procedure
+    debug: false
     definitions: kingdomCode[ElementTag(String)]
     description:
     - Gets the current display name for the kingdom with the provided kingdom code.
@@ -558,6 +576,7 @@ GetKingdomName:
 
 GetKingdomShortName:
     type: procedure
+    debug: false
     definitions: kingdomCode
     description:
     - Gets the current shorthand display name for the kingdom with the provided kingdom code.
