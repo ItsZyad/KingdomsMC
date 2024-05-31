@@ -24,6 +24,7 @@ MerchantInterfaceChangeMode_Item:
 
 KMerchant_Assignment:
     type: assignment
+    debug: false
     actions:
         on assignment:
         - trigger name:click state:true
@@ -60,6 +61,15 @@ RunMerchantInterface:
 
     script:
     - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
+
+    - if !<[merchant].has_flag[merchantData.supply]>:
+        - define footer <inventory[MerchantInterfaceNewFooter_Window]>
+        - inject <script.name> path:OpenInterface
+
+        # TODO: Add an item saying that no items are on sale
+
+        - stop
+
     - define itemList <list[]>
 
     - foreach <[merchant].flag[merchantData.supply]>:
@@ -86,7 +96,7 @@ RunMerchantInterface:
         - define itemList:->:<[item]>
 
     - define footer <inventory[MerchantInterfaceNewFooter_Window]>
-    - inject RunMerchantInterface path:OpenInterface
+    - inject <script.name> path:OpenInterface
 
 
 KMerchantWindow_Handler:
@@ -150,14 +160,14 @@ KMerchantWindow_Handler:
         - if <context.slot> == -998:
             - determine cancelled
 
+        - define merchant <player.flag[dataHold.interactingMerchant]>
+        - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
+        - define price <context.item.flag[price]>
+        - define market <[merchant].flag[merchantData.linkedMarket]>
+
         - if <player.flag[dataHold.merchantMode]> == buy:
             - if !<context.item.has_flag[price]>:
                 - determine cancelled
-
-            - define price <context.item.flag[price]>
-            - define merchant <player.flag[dataHold.interactingMerchant]>
-            - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
-            - define market <[merchant].flag[merchantData.linkedMarket]>
 
             # If player shift clicks, buy 10 of the item instead of just 1
             - if <context.click> == SHIFT_LEFT:
@@ -176,7 +186,7 @@ KMerchantWindow_Handler:
 
                     # take the appropriate amount of money and give
                     # the player the items;
-                    - take money quantity:<[price].mul[<[purchaseAmount]>]>
+                    - money take quantity:<[price].mul[<[purchaseAmount]>]>
 
                     # Create item without any of the BM Item's flags or lore
                     - define selectedItem <context.item>
@@ -185,12 +195,12 @@ KMerchantWindow_Handler:
 
                     - give <[selectedItem]> quantity:<[purchaseAmount]>
 
-                    - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
                     - define interactingPlayers <[merchant].flag[dataHold.interactingPlayers]>
 
                     - foreach <[interactingPlayers]> as:target:
                         - inventory adjust d:<[target].open_inventory> slot:<context.slot> lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]> player:<[target]>
 
+                    - narrate format:callout "Bought <[purchaseAmount].color[aqua]> of <[selectedItem].material.name.color[white].italicize> for: <red>$<[price].mul[<[purchaseAmount]>].format_number[#,##0.0]>"
                     - run TransactionRecorder def.price:<[price]> def.item:<context.item.material.name> def.amount:<[purchaseAmount]> def.merchant:<[merchant]> def.player:<player> def.market:<[market]>
 
                 - else:
@@ -208,9 +218,6 @@ KMerchantWindow_Handler:
                 - determine cancelled
 
             - define itemName <context.item.material.name>
-            - define price <context.item.flag[price]>
-            - define merchant <player.flag[dataHold.interactingMerchant]>
-            - define market <[merchant].flag[merchantData.linkedMarket]>
             - define wealth <[merchant].flag[merchantData.wealth]>
             - define sBias <[merchant].flag[merchantData.spendBias]>
             - define merchantItemBudget <[merchant].flag[merchantData.sellData.items.<[itemName]>.alloc]>
@@ -253,7 +260,7 @@ KMerchantWindow_Handler:
             - flag <[merchant]> merchantData.balance:-:<[price].mul[<[sellAmount]>]>
             - flag <[merchant]> merchantData.sellData.items.<[itemName]>.spent:+:<[price].mul[<[sellAmount]>]>
             - flag <[merchant]> merchantData.supply.<[itemName]>.quantity:+:<[sellAmount]>
-            - narrate format:callout "Sold <[itemName].color[white].italicize> for: <red>$<[price].mul[<[sellAmount]>].format_number[#,##0.0]>"
+            - narrate format:callout "Sold <[sellAmount].color[aqua]> of <[itemName].color[white].italicize> for: <red>$<[price].mul[<[sellAmount]>].format_number[#,##0.0]>"
 
             - run TransactionRecorder def.price:<[price]> def.item:<context.item.material.name> def.amount:<[sellAmount]> def.merchant:<[merchant]> def.player:<player> def.market:<[market]> def.mode:sell
 
