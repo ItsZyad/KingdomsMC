@@ -47,6 +47,8 @@ Debug:
     Verify thread: false
     # Whether to show some extra info output (will spam your console).
     Extra info: false
+    # Optionally you can set an alternate URL here to any valid instance of https://github.com/DenizenScript/DenizenPastingWebsite - 'default' corresponds to https://paste.denizenscript.com/New/Log
+    Paste URL: default
 Scripts:
     World:
         Events:
@@ -148,6 +150,15 @@ Commands:
         # This is mostly to clean up saves, but could potentially be abused.
         # Set to 'false' if you're worried about security.
         Allow file deletion: true
+    General:
+        # When this goes to prod, I should have built my own Denizen fork without these dumbass
+        # restrictors in place.
+        #
+        # I'm not a child. I don't need traning wheels ffs.
+        Allow unrestricted file access: true
+        Confirm allowing unrestricted file access: true
+        Unrestricted file access is very bad and dangerous are you sure you want that: true
+    # Don't change this unrestricted file access option though: true
     Restart:
         # Whether scripts are allowed to stop or restart your server.
         # This is usually only done intentionally, and quite identifiable if done on accident,
@@ -172,7 +183,7 @@ Commands:
         Allow read: true
         # Set 'true' to enable the 'filewrite' generic command.
         # This setting does not affect YAML or other specific-file-type commands.
-        Allow write: false
+        Allow write: true
         # The restricted file path, under plugins/Denizen/, for "fileread" and "filewrite" to be limited to. Set to 'none' to remove the path restriction.
         Restrict path: none
     Log:
@@ -304,7 +315,7 @@ Saves:
 # The below value is how many times automatic updates have been applied
 # since you last cleaned this file.
 # ----------- End Important! -----------
-times_changed: 8
+times_changed: 9
 # This is a special map of custom colors by name, for the '&' tag base to use. 'default' is used when the name is unrecognized. You can add extra keys here.
 # Tags work here and will be pre-parsed at load time. RGB color codes work here.
 Colors:
