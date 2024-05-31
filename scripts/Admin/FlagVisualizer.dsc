@@ -161,7 +161,7 @@ FlagVisualizer_Recur:
                     - narrate <proc[MakeTabbed].context[<element[<[formattedIndex].color[gray]>: <entry[Recur].created_queue.determination.get[1].color[white]>]>|<[tabWidth]>]>
 
         - default:
-            - if <[flag].as[entity].exists>:
+            - if <[flag].as[entity].exists> && <[flag].object_type> != Element:
                 - define name <[flag].name.color[aqua]>
                 - define uuid <[flag].uuid>
 
