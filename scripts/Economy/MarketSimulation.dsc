@@ -200,6 +200,8 @@ MerchantPurchaseDecider:
     - else:
         - define sortedItemDemand <list[]>
 
+    - run flagvisualizer def.flag:<[sortedItemDemand].parse_tag[<[parse_value].get[1]>]> def.flagName:SID
+
     - foreach <[biasControlledItems].random[<[biasControlledItems].size>]> as:item:
         - define availableSupply <server.flag[economy.markets.<[marketName]>.supplyMap.current.<[item].get[name]>].if_null[0]>
 
@@ -287,6 +289,7 @@ MerchantPurchaseDecider:
             - flag <[merchant]> merchantData.supply.<[item].get[name]>.price:<[item].get[base]>
             - flag server economy.markets.<[marketName]>.supplyMap.current.<[item].get[name]>:-:<[reasonablePurchaseAmount].round>
 
+    - run flagvisualizer def.flag:<[biasControlledItems]>
     - flag <[merchant]> cachedInterface:!
 
     CalculateItemPurchaseAmount:
@@ -356,7 +359,13 @@ MerchantSellDecider:
     - define wealth <[merchant].flag[merchantData.wealth]>
     - define totalSupply <[merchant].flag[merchantData.supply].values.parse_tag[<[parse_value].get[quantity].if_null[0]>].sum>
 
-    - if !<server.has_flag[economy.markets.<[marketName]>.sellData]>:
+    - yaml load:economy_data/past-economy-data.yml id:past
+    - define pastData <yaml[past].read[past_data]>
+    - yaml id:past unload
+
+    - define sellAnalyses <[pastData].parse_value_tag[<[parse_value].deep_get[<[marketName]>.items.sellAnalysis]>].if_null[null]>
+
+    - if !<server.has_flag[economy.markets.<[marketName]>.sellData]> || <[sellAnalyses]> == null:
         - foreach <[merchant].flag[merchantData.supply]> key:item as:itemData:
             - define buyPrice <[itemData].get[price]>
             - define sellPrice <[buyPrice].mul[<element[1].sub[<[sBias].div[3]>]>].round_up_to_precision[0.05]>
@@ -367,10 +376,6 @@ MerchantSellDecider:
             - flag <[merchant]> merchantData.sellData.items.<[item]>.price:<[sellPrice]>
 
         - stop
-
-    - yaml load:economy_data/past-economy-data.yml id:past
-    - define pastData <yaml[past].read[past_data]>
-    - yaml id:past unload
 
     - inject <script.name> path:FindItemTrend
 
@@ -414,7 +419,6 @@ MerchantSellDecider:
     - run flagvisualizer def.flag:<[allocations]> def.flagName:allocations
 
     FindItemTrend:
-    - define sellAnalyses <[pastData].parse_value_tag[<[parse_value].deep_get[<[marketName]>.items.sellAnalysis]>]>
     - define itemTrends <map[]>
 
     - foreach <[sellAnalyses]> key:day as:data:
@@ -459,43 +463,62 @@ MarketSubTickPriceAdjuster:
         - run SellAnalysisGenerator def.market:<[marketName]> save:sellAnalysis
         - define sellAnalysis <entry[sellAnalysis].created_queue.determination.get[1]>
 
-        - run flagvisualizer def.flag:<[sellAnalysis]> def.flagName:sellAnalysis
-
     - if <server.has_flag[economy.markets.<[marketName]>.buyData]>:
         - run PurchaseAnalysisGenerator def.market:<[marketName]> save:buyAnalysis
         - define buyAnalysis <entry[buyAnalysis].created_queue.determination.get[1]>
 
-        - run flagvisualizer def.flag:<[buyAnalysis]> def.flagName:buyAnalysis
-
-    - if <[buyAnalysis].exists>:
-        - define validMerchants <server.flag[economy.markets.<[marketName]>.merchants].filter_tag[<[filter_value].flag[merchantData.supply].keys.contains[<[buyAnalysis].get[items].keys>]>].parse_tag[<[parse_value].as[npc]>]>
-        - inject <script.name> path:AnalyzeBuyDataOnly
-
-        - determine <[buyAnalysis].get[items].keys>
-
-    - else if <[sellAnalysis].exists>:
+    - if !<[buyAnalysis].exists>:
         - define validMerchants <server.flag[economy.markets.<[marketName]>.merchants].filter_tag[<[filter_value].flag[merchantData.supply].keys.contains[<[sellAnalysis].get[items].keys>]>].parse_tag[<[parse_value].as[npc]>]>
         - inject <script.name> path:AnalyzeSellDataOnly
 
         - determine <[sellAnalysis].get[items].keys>
+
+    - else if !<[sellAnalysis].exists>:
+        - define validMerchants <server.flag[economy.markets.<[marketName]>.merchants].filter_tag[<[filter_value].flag[merchantData.supply].keys.contains[<[buyAnalysis].get[items].keys>]>].parse_tag[<[parse_value].as[npc]>]>
+        - inject <script.name> path:AnalyzeBuyDataOnly
+
+        - determine <[buyAnalysis].get[items].keys>
 
     - else:
         - foreach <[sellAnalysis].get[items]> key:item as:data:
             - if !<[merchant].flag[merchantData.supply].keys.contains[<[item]>]>:
                 - foreach next
 
-            - if <[buyAnalysis].deep_get[items.<[item]>].exists>:
-                - define newSAR <[data].get[saleToAmountRatio].sub[<[buyAnalysis].deep_get[items.<[item]>.saleToAmountRatio]>]>
-                # - define overallSold <[data].get[totalAmountItem].sub[<[buyAnalysis].deep_get[items.<[item]>.totalAmountItem]>]>
-                # - define overallValue <[data].get[totalValueItem].sub[<[buyAnalysis].deep_get[items.<[item]>.totalValueItem]>]>
+            - define newSAR <[data].get[saleToAmountRatio].sub[<[buyAnalysis].deep_get[items.<[item]>.saleToAmountRatio].if_null[0]>]>
+            - define newSAR <[newSAR].sub[<[newSAR].mul[2]>]>
 
-                - if <[newSAR]> > 0:
-                    - define priceIncrease <[merchant].flag[merchantData.supply.<[item]>.price].mul[<[newSAR].add[1]>].round_to_precision[0.01]>
-                    - narrate format:debug "Price increase for: <[item].color[red]>; <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> -<&gt> <[priceIncrease].color[red]>"
+            - if <[newSAR]> > 0:
+                - define priceIncrease <[merchant].flag[merchantData.supply.<[item]>.price].mul[<[newSAR].add[1]>].round_to_precision[0.01]>
 
-                - else:
-                    - define priceDecrease <[merchant].flag[merchantData.supply.<[item]>.price].sub[<[merchant].flag[merchantData.supply.<[item]>.price].mul[<[newSAR].abs>]>].round_to_precision[0.01]>
-                    - narrate format:debug "Price decrease for: <[item].color[aqua]>; <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> -<&gt> <[priceDecrease].color[aqua]>"
+                - flag <[merchant]> merchantData.supply.<[item]>.lastWeekAvg:<[merchant].flag[merchantData.supply.<[item]>.price]>
+                - flag <[merchant]> merchantData.supply.<[item]>.price:<[priceIncrease]>
+
+                - narrate format:debug "SAR: <[newSAR]>"
+                - narrate format:debug "INCREASE: <[item].color[red].pad_right[20]>; <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> -<&gt> <[priceIncrease].color[red]>"
+
+            - else:
+                - define priceDecrease <[merchant].flag[merchantData.supply.<[item]>.price].sub[<[merchant].flag[merchantData.supply.<[item]>.price].mul[<[newSAR].abs>]>].round_to_precision[0.01]>
+
+                - flag <[merchant]> merchantData.supply.<[item]>.lastWeekAvg:<[merchant].flag[merchantData.supply.<[item]>.price]>
+                - flag <[merchant]> merchantData.supply.<[item]>.price:<[priceDecrease]>
+
+                - narrate format:debug "SAR: <[newSAR]>"
+                - narrate format:debug "DECREASE: <[item].color[aqua].pad_right[20]>; <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> -<&gt> <[priceDecrease].color[aqua]>"
+
+            - narrate format:debug -------------------
+
+            # - else:
+            #     - define SAR <[data].get[saleToAmountRatio]>
+
+            #     - if <[SAR]> > <[priceIncreaseThreshold]>:
+            #         - foreach next
+
+            #     - define priceDecrease <[merchant].flag[merchantData.supply.<[item]>.price].sub[<[merchant].flag[merchantData.supply.<[item]>.price].mul[<[SAR]>]>].round_to_precision[0.01]>
+
+            #     # - flag <[merchant]> merchantData.supply.<[item]>.lastWeekAvg:<[merchant].flag[merchantData.supply.<[item]>.price]>
+            #     # - flag <[merchant]> merchantData.supply.<[item]>.price:<[priceIncrease]>
+
+            #     - narrate format:debug "DECREASE: <[item].color[red]>; <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> -<&gt> <[priceDecrease].color[red]>"
 
         - determine <[buyAnalysis].get[items].keys.include[<[sellAnalysis].get[items].keys>].deduplicate>
 
@@ -519,7 +542,7 @@ MarketSubTickPriceAdjuster:
         - flag <[merchant]> merchantData.supply.<[item]>.lastWeekAvg:<[merchant].flag[merchantData.supply.<[item]>.price]>
         - flag <[merchant]> merchantData.supply.<[item]>.price:<[priceIncrease]>
 
-        - narrate format:debug "Price increased for: <[item].color[red]> from: <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> to: <[priceIncrease].color[red]>"
+        - narrate format:debug "INCREASE: <[item].color[red]> from: <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> to: <[priceIncrease].color[red]>"
 
     AnalyzeBuyDataOnly:
     - define sBias <[merchant].flag[merchantData.spendBias]>
@@ -536,15 +559,12 @@ MarketSubTickPriceAdjuster:
         - if <[SAR]> > <[priceDecreaseThreshold]>:
             - foreach next
 
-        - narrate format:debug MER:<[merchant].flag[merchantdata.supply.<[item]>]>
-        - narrate format:debug SAR:<[SAR]>
-
         - define priceDecrease <[merchant].flag[merchantData.supply.<[item]>.price].sub[<[merchant].flag[merchantData.supply.<[item]>.price].mul[<[SAR]>]>].round_to_precision[0.01]>
 
         - flag <[merchant]> merchantData.supply.<[item]>.lastWeekAvg:<[merchant].flag[merchantData.supply.<[item]>.price]>
         - flag <[merchant]> merchantData.supply.<[item]>.price:<[priceDecrease]>
 
-        - narrate format:debug "Price decreased for: <[item].color[aqua]> from: <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> to: <[priceDecrease].color[aqua]>"
+        - narrate format:debug "DECREASE: <[item].color[aqua]> from: <[merchant].flag[merchantData.supply.<[item]>.price].color[gold]> to: <[priceDecrease].color[aqua]>"
 
 
 MarketSubTick:
@@ -585,6 +605,10 @@ MarketTick:
             - run AssignPurchaseStrategy def.merchant:<[merchant]>
             - run MerchantPurchaseDecider def.marketName:<[marketName]> def.merchant:<[merchant]>
             - run MerchantSellDecider def.marketName:<[marketName]> def.merchant:<[merchant]>
+
+        ## UNCOMMENT WHEN IN PROD.
+        # - flag server economy.markets.<[marketName]>.sellData:!
+        # - flag server economy.markets.<[marketName]>.buyData:!
 
     # The main tick should handle:
     #x 1. Merchant re-purchasing new resources (See old demand response code + NewMerchantPriceDecider)
