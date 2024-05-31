@@ -29,8 +29,7 @@ GiveSoldierItemFromArmory:
     ## >>> [Void]
 
     - if !<[armories].exists>:
-        - run GetSquadSMLocation def.squadName:<[squadName]> def.kingdom:<[kingdom]> save:SMLocation
-        - define SMLocation <entry[SMLocation].created_queue.determination.get[1]>
+        - define SMLocation <proc[GetSquadSMLocation].context[<[kingdom]>|<[squadName]>]>
         - define filledArmories <[SMLocation].flag[squadManager.armories].filter_tag[<[filter_value].inventory.is_empty.not>]>
 
     - else:

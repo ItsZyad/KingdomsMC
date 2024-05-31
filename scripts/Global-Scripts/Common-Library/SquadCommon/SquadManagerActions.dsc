@@ -10,7 +10,7 @@
 ## ----------------END HEADER-----------------
 
 GenerateSMID:
-    type: task
+    type: procedure
     definitions: location[LocationTag]
     description:
     - Generates the ID used to refer to SMs in the kingdom flag using the location of the SM.
@@ -271,7 +271,7 @@ GetSMSquads:
 
 
 GetSquadSMLocation:
-    type: task
+    type: procedure
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the SM associated with the squad provided.
@@ -293,4 +293,7 @@ GetSquadSMLocation:
         - if <[value].contains[<[squadName]>]>:
             - define SMID <[key]>
             - define location <[barracks].get[<[SMID]>].get[location]>
+
             - determine <[location]>
+
+    - determine null

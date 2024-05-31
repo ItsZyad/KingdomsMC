@@ -117,9 +117,7 @@ SoldierCombat_Handler:
             - define soldier <context.entity>
             - define kingdom <[soldier].flag[soldier.kingdom]>
             - define squadName <[soldier].flag[soldier.squad]>
-
-            - run GetSquadSMLocation def.squadName:<[squadName]> def.kingdom:<[kingdom]> save:SMLocation
-            - define SMLocation <entry[SMLocation].created_queue.determination.get[1]>
+            - define SMLocation <proc[GetSquadSMLocation].context[<[kingdom]>|<[squadName]>]>
 
             - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<-:<[soldier]>
             - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>

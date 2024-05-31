@@ -632,8 +632,7 @@ SquadManager_Handler:
         - if <[kingdom]> != <proc[GetSMKingdom].context[<[SMLocation]>]>:
             - determine cancelled
 
-        - run GenerateSMID def.location:<context.location> save:smid
-        - define SMID <entry[smid].created_queue.determination.get[1]>
+        - define SMID <context.location.proc[GenerateSMID]>
         - define squadList <proc[GetSMSquads].context[<[SMLocation]>].keys>
         - define barrackList <proc[GetKingdomSquadManagers].context[<[kingdom]>]>
 

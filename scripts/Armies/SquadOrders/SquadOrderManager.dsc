@@ -268,8 +268,7 @@ SquadEquipmentChecker:
     - define standardEquipment <proc[GetSquadEquipment].context[<[kingdom]>|<[squadName]>]>
 
     # Get SMLocation and find armory locations
-    - run GetSquadSMLocation def.squadName:<[squadName]> def.kingdom:<[kingdom]> save:SMLocation
-    - define SMLocation <entry[SMLocation].created_queue.determination.get[1]>
+    - define SMLocation <proc[GetSquadSMLocation].context[<[kingdom]>|<[squadName]>]>
     - define filledArmories <proc[GetSMArmoryLocations].context[<[SMLocation]>].filter_tag[<[filter_value].inventory.is_empty.not>]>
 
     # Loop through all squad soldiers with squad leader coming first to give them priority for
