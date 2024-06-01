@@ -203,6 +203,25 @@ SquadOptions_Handler:
         - define displayName <[squadInfo].get[displayName]>
 
         - run FormationWalk def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.npcsPerRow:3 def.finalLocation:<[location].with_yaw[<player.location.yaw.round_to_precision[5]>]> def.lineLength:6 def.player:<player>
+        - narrate format:debug "This tool is being phased out."
+
+        ## LINE MOVE SQUAD
+        on player left clicks block with:FormationLineTool_Item flagged:datahold.armies.drawingFormation.pointTwo:
+        - determine passively cancelled
+
+        - define kingdom <player.flag[kingdom]>
+        - define squadInfo <player.flag[datahold.squadInfo]>
+        - define npcList <[squadInfo].get[npcList]>
+        - define squadLeader <[squadInfo].get[squadLeader]>
+        - define pointTwo <player.flag[datahold.armies.drawingFormation.pointTwo]>
+        - define pointOne <player.flag[datahold.armies.drawingFormation.pointOne]>
+
+        - run DrawLineFormationWalk def.npcList:<[npcList]> def.soldierSpacing:3 def.squadLeader:<[squadLeader]> def.player:<player> def.pointOne:<[pointOne]> def.pointTwo:<[pointTwo]>
+
+        - wait 1s
+
+        - run CreateParticleLine path:ClearParticleLineFlag def.flagName:formationLine
+        - flag <player> datahold.armies.drawingFormation:!
 
         ## EXITS ORDERS
         on player clicks block with:ExitSquadControls_Item:

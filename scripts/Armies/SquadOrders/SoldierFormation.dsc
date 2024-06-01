@@ -14,9 +14,10 @@
 
 ClosestSquadMember:
     type: task
+    debug: false
     definitions: npcList|location
     script:
-    - define closestNpc null
+    - define closestNpc <[npcList].get[1]>
     - define closestDist 99999
 
     - foreach <[npcList]> as:npc:
@@ -78,6 +79,47 @@ FormationWalk:
 
                 - flag <[closestSquadMember]> dataHold.formationPathfinding:<[lineDistanceVector]>
                 - define sentNPCs:->:<[closestSquadMember]>
+
+
+DrawLineFormationWalk:
+    type: task
+    definitions: npcList|soldierSpacing|squadLeader|player|pointOne|pointTwo
+    script:
+    - define npcList <[npcList].include[<[squadLeader]>]>
+    - define formationLine <[pointOne].points_between[<[pointTwo]>].include[<[pointOne]>|<[pointTwo]>]>
+    - define soliderSpacing 2 if:<[soldierSpacing].exists.not>
+    - define soldiersPerLine <[formationLine].size.div[<[soldierSpacing]>].round_down>
+    - define lines <[npcList].size.div[<[soldiersPerLine]>].round_up>
+    - define directionFacing <[player].location.yaw>
+
+    - define unsentSoldiers <[npcList]>
+
+    - repeat <[lines]> as:lineNum:
+        - foreach <[formationLine]> as:pos:
+            - if <[unsentSoldiers].is_empty>:
+                - stop
+
+            - if <[loop_index].mod[<[soldierSpacing]>]> != 0:
+                - foreach next
+
+            - define pos <[pos].with_pitch[0]>
+
+            - if <[unsentSoldiers]> == <[npcList]>:
+                - define closestSquadMember <[squadLeader]>
+
+            - else:
+                - run ClosestSquadMember def.npcList:<[unsentSoldiers]> def.location:<[pos]> save:closest
+                - define closestSquadMember <entry[closest].created_queue.determination.get[1]>
+
+            - flag <[closestSquadMember]> dataHold.formationPathfinding:<[pos].add[0,1,0].with_yaw[<[directionFacing]>]>
+            - define unsentSoldiers:<-:<[closestSquadMember]>
+
+            - walk <[closestSquadMember]> <[pos].add[0,1,0].with_yaw[<[directionFacing]>]>
+
+        # Shifts the entire line back two blocks relative to the player's yaw
+        - define pointOne <[pointOne].with_yaw[<[directionFacing]>].backward_flat[2.5]>
+        - define pointTwo <[pointTwo].with_yaw[<[directionFacing]>].backward_flat[2.5]>
+        - define formationLine <[pointOne].points_between[<[pointTwo]>].include[<[pointOne]>|<[pointTwo]>]>
 
 
 FormationWalkFix_Handler:
