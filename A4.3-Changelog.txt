@@ -1,0 +1,40 @@
+Alpha 0.4.1 :: 07-OCT-2023 -> 23-FEB-2024;
+__________________________________________
+    BUG FIXES / PERFORMANCE:
+    - Removed dozens of obsolete scripts that were eating up memory on startup.
+    - Updated callout formats and standardized them.
+    - Made the /k and /ks command processors MUCH faster.
+    - Made the Kingdoms-Dynmap bridge much more efficient.
+    - Fixed ඞ. You will now ඞ correctly.
+
+    LARGE ADDITIONS:
+    - [Technical] Created a standard library which packages all basic functionality into smaller functions called the Kingdoms Application Programming Interface (KAPI). This should help with code standardization, make modding possible, and help cut down on trivial errors in the future.
+    - Implemented the Kingdoms Package Manager (KPM). This allows for the complete modularization of the Kingdoms codebase. KPM will be instrumental to modding for Kingdoms by allowing developers to segement code into different pacakges/addons and hot-swapping them while the server is running.
+
+Alpha 0.4.2 :: 23-FEB-2024 -> 30-APR-2024;
+__________________________________________
+    BUG FIXES / PERFORMANCE:
+    - Fixed bug which reactivated sidebar whenever it updated even if the player had it set to hidden.
+    - Fixed a rare issue with paginated interfaces which caused normally unstackable items to stack.
+    - Improved startup time by reducing console debugs and read/write calls on server start.
+    - Improved the way that Kingdoms handles player input and generates its custom chat messages. A marked improvement to chat performance was recorded.
+
+    SMALL ADDITIONS:
+    - [Technical] Fully modernized the flag visualizer, a very important dev tool which potential future modders will rely heavily on, by increasing performance by up to 20ms in some instances and cleaning up its interface.
+    - Fleshed out KAPI and divided into numerous 'namespaces' depending on which part of the codebases it interfaces with (armies, economy, KPM, etc.)
+    - Added basic visual interface to KPM. This allows you to load, unload, and read addon information without having to use commands.
+
+    LARGE ADDITION:
+    - Added prestige degredation; prestige will decay over time in kingdoms which have a lower prestige level than the average of all other kingdoms.
+    - Retired '/k castleclaim' and '/k coreclaim' commands in favor of a unified '/k claim' command. (I also took this opportunity to slightly improve the performance of the claiming code).
+    - Introduced environment-variable crop growth. Different factors such as biome humidity, temperature, overall climate, and altitude will affect crop growth rates, forcing more specialization between kingdoms.
+
+Alpha 0.4.3 :: 15-MAY-2024 -> xx;
+__________________________________________
+    BUG FIXES / PERFORMANCE:
+    - Fixed *A LOT* of longstanding issues with the markets such as weird null values that break entire systems, whole simulation ticks that don't go through, and general weirdness with merchant interfaces.
+        * This likely isn't the last we'll see of markets-related bugs, but there should still be a vast difference between this and Alpha 0.4.0p4.
+    - Fixed a small bug which blocked players from chatting after using the outpost claiming command.
+
+    SMALL ADDITIONS:
+    - Added a new formation walk tool to the squads system: Drawable formation lines. These allow the commander of a squad to determine the exact size of the formation using a special wand.
