@@ -45,6 +45,7 @@ SquadInterface_Item:
 
 SquadSelectionGUI:
     type: task
+    debug: false
     definitions: player
     script:
     - define __player <[player]>
@@ -68,7 +69,7 @@ SquadSelectionGUI:
             - define npcListShort <[npcList].get[1].to[4].if_null[<list[]>]>
             - define npcListShort <[npcListShort].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]>
 
-            - if <[npcListShort].size> < <[npcList]>:
+            - if <[npcListShort].size> < <[npcList].size>:
                 - define remainingNpcNumber <[npcList].size.sub[<[npcListShort].size>]>
                 - define npcListShort:->:<element[And <[remainingNpcNumber]> Others...].color[gray]>
 
@@ -178,6 +179,7 @@ SquadEquipment_Window:
 
 SquadSelection_Handler:
     type: world
+    debug: false
     events:
         ## CLICK SQUAD LIST ICON
         on player clicks SquadInterface_Item in PaginatedInterface_Window flagged:viewingSquads:
@@ -380,6 +382,7 @@ SquadDeleteConfirmation_Window:
 
 SquadDeletion_Handler:
     type: world
+    debug: false
     events:
         on player clicks SquadConfirm_Item in SquadDeleteConfirmation_Window:
         - define squadInfo <player.flag[datahold.armies.squadInfo]>
@@ -397,6 +400,7 @@ SquadDeletion_Handler:
 
 SpawnSquadNPCs:
     type: task
+    debug: false
     definitions: atManager|spawnLocation|SMLocation|squadName|player
     FindSpacesAroundSM:
     - define areasAroundSM <list[<[SMLocation].left[1]>|<[SMLocation].right[1]>|<[SMLocation].forward[1]>|<[SMLocation].backward[1]>]>
@@ -487,6 +491,7 @@ SpawnSquadNPCs:
 # TODO Also: Make different soldier types lol
 SpawnNewSoldiers:
     type: task
+    debug: false
     definitions: type|location|amount|squadName|kingdom|SMLocation
     script:
     ## NOTE: Script is bound change as I introduce new soldier types
