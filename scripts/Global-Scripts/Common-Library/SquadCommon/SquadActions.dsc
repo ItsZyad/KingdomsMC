@@ -7,11 +7,13 @@
 ## @Date: Oct 2023
 ## @Script Ver: v0.1
 ##
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 # TODO -- New KAPI Scripts to Add:
 # TODO/ CreateSquad/SpawnSquad @ location
 # TODO/
+
+############################################# GETTERS #############################################
 
 HasSquadSpawned:
     type: procedure
@@ -271,6 +273,9 @@ GetSquadEquipment:
     - define equipment.hotbar <list[]> if:<[equipment].get[hotbar].exists.not>
 
     - determine <[equipment]>
+
+
+############################################# SETTERS #############################################
 
 
 # TODO: It needs to be standard across KAPI for setters to return whether they were successful.

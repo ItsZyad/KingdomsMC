@@ -6,7 +6,9 @@
 ## @Date: Oct 2023
 ## @Script Ver: v0.1
 ##
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
+
+############################################# GETTERS #############################################
 
 GetKingdomSquadManagers:
     type: procedure
@@ -66,6 +68,7 @@ GetMaxAllowedSMs:
     # Note: future configurable(?)
     - determine <server.flag[kingdoms.<[kingdom]>.armies.maximumAllowedSMs].if_null[4]>
 
+############################################# SETTERS #############################################
 
 WriteArmyDataToKingdom:
     type: task
