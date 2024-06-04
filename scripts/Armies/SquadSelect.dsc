@@ -401,70 +401,23 @@ SquadDeletion_Handler:
 SpawnSquadNPCs:
     type: task
     debug: false
-    definitions: atManager|spawnLocation|SMLocation|squadName|player
-    FindSpacesAroundSM:
-    - define areasAroundSM <list[<[SMLocation].left[1]>|<[SMLocation].right[1]>|<[SMLocation].forward[1]>|<[SMLocation].backward[1]>]>
-
-    - foreach <[areasAroundSM]> as:location:
-        - if <[location].material.name> == air && <[location].up[1].material.name> == air:
-            - define spawnLocation <[location]>
-            - foreach stop
-
-    SpawnSoldiers:
-    - define hasSpawned <proc[HasSquadSpawned].context[<[kingdom]>|<[squadName]>]>
-    - define soldiers <proc[GetSquadManpower].context[<[kingdom]>|<[squadName]>]>
-    - define equipment <proc[GetSquadEquipment].context[<[kingdom]>|<[squadName]>]>
-    - define soldierList <list[]>
-
-    - inject <script.name> path:SpawnSquadLeader
-
-    - if !<[hasSpawned]>:
-        - foreach <proc[GetSquadComposition].context[<[kingdom]>|<[squadName]>]> key:type as:amount:
-            - run SpawnNewSoldiers def.type:<[type]> def.location:<[spawnLocation]> def.amount:<[amount]> def.squadName:<[squadName]> def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> save:soldiers
-            - define soldier <entry[soldiers].created_queue.determination.get[1]>
-            - flag <[soldier]> soldier.isSquadLeader:false
-            - flag <[soldier]> soldier.squad:<[squadName]>
-            - flag <[soldier]> soldier.kingdom:<[kingdom]>
-            - define soldierList <[soldierList].include[<[soldier]>]>
-
-            - equip <[soldier]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]> hand:<[equipment].get[hotbar].get[1]>
-            - inventory fill d:<[soldier].inventory> o:<[equipment].get[hotbar]>
-
-    - flag <player> datahold.squadInfo.npcList:<[soldierList]>
-    - flag <player> datahold.squadInfo.squadLeader:<[squadLeader]>
-    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.hasSpawned:true
-    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<[soldierList]>
-    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.sentinelSquad:<[kingdom]>_<[squadName]>
-
-    - ~run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[player].flag[kingdom]>
-    - run GiveSquadTools def.player:<player>
-
-    SpawnSquadLeader:
-    - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
-
-    - create player "&4Squad Leader" <[spawnLocation]> traits:sentinel save:squad_leader
-    - define squadLeader <entry[squad_leader].created_npc>
-    - flag <[squadLeader]> soldier.isSquadLeader:true
-    - flag <[squadLeader]> soldier.squad:<[squadName]>
-    - flag <[squadLeader]> soldier.kingdom:<[kingdom]>
-    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.squadLeader:<[squadLeader]>
-
-    - equip <[squadLeader]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]> hand:<[equipment].get[hotbar].get[1]>
-
-    - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
-    - execute as_server "sentinel respawntime -1 --id <[squadLeader].id>" silent
-    - execute as_server "sentinel addtarget event:pvsentinel --id <[squadLeader].id>" silent
-    - execute as_server "sentinel addignore squad:<[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
-    - execute as_server "sentinel attackrate 0.5 --id <[squadLeader].id>" silent
-    - execute as_server "sentinel speed 1.15 --id <[squadLeader].id>" silent
-    - execute as_server "sentinel accuracy 2.7 --id <[squadLeader].id>" silent
-
-    - foreach <proc[GetMembers].context[<[kingdom]>]> as:player:
-        - execute as_server "sentinel addignore player:<[player].name>"
-
-    - assignment set to:<[squadLeader]> script:SoldierManager_Assignment
+    definitions: atManager[ElementTag(Boolean)]|SMLocation[LocationTag]|squadName[ElementTag(String)]|player[PlayerTag]|spawnLocation[?LocationTag]
+    description:
+    - This script handles the spawning of new or existing squads at a given squad manager.
+    - ---
+    - → [Void]
 
     script:
+    ## This script handles the spawning of new or existing squads at a given squad manager.
+    ##
+    ## atManager     :  [ElementTag<Boolean>]
+    ## SMLocation    :  [LocationTag]
+    ## squadName     :  [ElementTag<String>]
+    ## player        :  [PlayerTag]
+    ## spawnLocation : ?[LocationTag]
+    ##
+    ## >>> [Void]
+
     - define kingdom <[player].flag[kingdom]>
 
     - if <[atManager].if_null[false]>:
@@ -486,16 +439,73 @@ SpawnSquadNPCs:
             # TODO/ to determine the intial spawn location.
             - narrate WIP
 
+    FindSpacesAroundSM:
+    - define areasAroundSM <list[<[SMLocation].left[1]>|<[SMLocation].right[1]>|<[SMLocation].forward[1]>|<[SMLocation].backward[1]>]>
+
+    - foreach <[areasAroundSM]> as:location:
+        - if <[location].material.name> == air && <[location].up[1].material.name> == air:
+            - define spawnLocation <[location]>
+            - foreach stop
+
+    SpawnSoldiers:
+    - define hasSpawned <proc[HasSquadSpawned].context[<[kingdom]>|<[squadName]>]>
+    - define soldierList <list[]>
+
+    - if !<[hasSpawned]>:
+        - foreach <proc[GetSquadComposition].context[<[kingdom]>|<[squadName]>]> key:type as:amount:
+            - run SpawnNewSoldiers def.type:<[type]> def.location:<[spawnLocation]> def.amount:<[amount]> def.squadName:<[squadName]> def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> save:soldiers
+            - define soldierList <entry[soldiers].created_queue.determination.get[1]>
+
+    - flag <player> datahold.squadInfo.npcList:<[soldierList].remove[1]>
+    - flag <player> datahold.squadInfo.squadLeader:<[soldierList].get[1]>
+    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.hasSpawned:true
+    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<[soldierList].remove[1]>
+    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.sentinelSquad:<[kingdom]>_<[squadName]>
+
+    - ~run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[player].flag[kingdom]>
+    - run GiveSquadTools def.player:<player>
+
+    # SpawnSquadLeader:
+    # - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+
+    # - create player "&4Squad Leader" <[spawnLocation]> traits:sentinel save:squad_leader
+    # - define squadLeader <entry[squad_leader].created_npc>
+    # - flag <[squadLeader]> soldier.isSquadLeader:true
+    # - flag <[squadLeader]> soldier.squad:<[squadName]>
+    # - flag <[squadLeader]> soldier.kingdom:<[kingdom]>
+    # - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.squadLeader:<[squadLeader]>
+
+    # - equip <[squadLeader]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]> hand:<[equipment].get[hotbar].get[1]>
+
+    # - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
+    # - execute as_server "sentinel respawntime -1 --id <[squadLeader].id>" silent
+    # - execute as_server "sentinel addtarget event:pvsentinel --id <[squadLeader].id>" silent
+    # - execute as_server "sentinel addignore squad:<[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
+    # - execute as_server "sentinel attackrate 0.5 --id <[squadLeader].id>" silent
+    # - execute as_server "sentinel speed 1.15 --id <[squadLeader].id>" silent
+    # - execute as_server "sentinel accuracy 2.7 --id <[squadLeader].id>" silent
+
+    # - foreach <proc[GetMembers].context[<[kingdom]>]> as:player:
+    #     - execute as_server "sentinel addignore player:<[player].name>"
+
+    # - assignment set to:<[squadLeader]> script:SoldierManager_Assignment
+
 
 # TODO: Make this differentiate between different soldier types
 # TODO Also: Make different soldier types lol
 SpawnNewSoldiers:
     type: task
     debug: false
-    definitions: type|location|amount|squadName|kingdom|SMLocation
+    definitions: type[ElementTag(String)]|location[LocationTag]|amount[ElementTag(Integer)]|squadName[ElementTag(String)]|kingdom[ElementTag(String)]|SMLocation[LocationTag]
+    description:
+    - Spawns in the specified amount of the given soldier type at the provided location.
+    - NOTE: Script is bound change as I introduce new soldier types.
+    - ---
+    - → [ListTag(NPCTag)]
+
     script:
-    ## NOTE: Script is bound change as I introduce new soldier types
     ## Spawns in the specified amount of the given soldier type at the provided location.
+    ## NOTE: Script is bound change as I introduce new soldier types
     ##
     ## type       : [ElementTag<String>]
     ## location   : [LocationTag]
@@ -503,18 +513,36 @@ SpawnNewSoldiers:
     ## squadName  : [ElementTag<String>]
     ## kingdom    : [ElementTag<String>]
     ## SMLocation : [LocationTag]
+    ##
+    ## >>> [ListTag<NPCTag>]
 
     - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
     - define soldierList <list[]>
 
-    - repeat <[amount]>:
-        - create player <element[Squad Member]> <[location]> traits:sentinel save:new_soldier
+    - repeat <[amount].add[1]>:
+
+        - define soldierName <element[Squad Member]>
+        - define isSquadLeader false
+
+        # Special case for squad leader;
+        - if <[value]> == 1:
+            - define soldierName <element[&4Squad Leader]>
+            - define isSquadLeader true
+
+        - create player <[soldierName]> <[location]> traits:sentinel save:new_soldier
         - define soldier <entry[new_soldier].created_npc>
         - define soldierList <[soldierList].include[<[soldier]>]>
 
         - flag <[soldier]> soldier.squad:<[squadName]>
         - flag <[soldier]> soldier.kingdom:<[kingdom]>
+        - flag <[soldier]> soldier.isSquadLeader:<[isSquadLeader]>
+
         - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:->:<[soldier]>
+
+        # Special case for squad leader;
+        - if <[value]> == 1:
+            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.squadLeader:<[soldier]>
+            - assignment set to:<[soldier]> script:SoldierManager_Assignment
 
         - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[soldier].id>" silent
         - execute as_server "sentinel respawntime -1 --id <[soldier].id>" silent
@@ -523,6 +551,10 @@ SpawnNewSoldiers:
         - execute as_server "sentinel attackrate 0.5 --id <[soldier].id>" silent
         - execute as_server "sentinel speed 1.15 --id <[soldier].id>" silent
         - execute as_server "sentinel accuracy 2.7 --id <[soldier].id>" silent
+
+        - define equipment <proc[GetSquadEquipment].context[<[kingdom]>|<[squadName]>]>
+        - equip <[soldier]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]> hand:<[equipment].get[hotbar].get[1]>
+        - inventory fill d:<[soldier].inventory> o:<[equipment].get[hotbar]>
 
         - foreach <proc[GetMembers].context[<[kingdom]>]> as:player:
             - execute as_server "sentinel addignore player:<[player].name>"
