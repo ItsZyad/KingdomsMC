@@ -306,6 +306,9 @@ RenameSquad:
     - flag <[SMLocation]> squadManager.squads.squadList.<[newInternalName]>:<[squadInfo]>
     - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>:!
 
+    - foreach <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]> as:soldier:
+        - flag <[soldier]> soldier.squad:<[newInternalName]>
+
     - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
 
 
