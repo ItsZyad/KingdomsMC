@@ -232,42 +232,42 @@ SquadManagerUpgrade_Data:
 
         SquadAmount:
             0:
-                value: 1
+                value: 4
                 cost: 0
                 upkeepAdd: 0
                 message:
                 - <element[Base SM squad limit:]>
                 - <aqua><[currentLevelData].get[value]>
             1:
-                value: 2
+                value: 5
                 cost: 600
                 upkeepAdd: 100
                 message:
                 - <element[Increases this SM's maximum amount].color[green]>
                 - <element[of held squads to:].color[green]> <aqua><[currentLevelData].get[value]>
             2:
-                value: 3
+                value: 6
                 cost: 800
                 upkeepAdd: 150
                 message:
                 - <element[Increases this SM's maximum amount].color[green]>
                 - <element[of held squads to:].color[green]> <aqua><[currentLevelData].get[value]>
             3:
-                value: 4
+                value: 7
                 cost: 1000
                 upkeepAdd: 200
                 message:
                 - <element[Increases this SM's maximum amount].color[green]>
                 - <element[of held squads to:].color[green]> <aqua><[currentLevelData].get[value]>
             4:
-                value: 5
+                value: 8
                 cost: 1200
                 upkeepAdd: 250
                 message:
                 - <element[Increases this SM's maximum amount].color[green]>
                 - <element[of held squads to:].color[green]> <aqua><[currentLevelData].get[value]>
             5:
-                value: 6
+                value: 9
                 cost: 1400
                 upkeepAdd: 300
                 message:
@@ -276,42 +276,42 @@ SquadManagerUpgrade_Data:
 
         SquadSize:
             0:
-                value: 15
+                value: 10
                 cost: 0
                 upkeepAdd: 0
                 message:
                 - <element[Base squad size:]>
                 - <aqua><[currentLevelData].get[value]>
             1:
-                value: 25
+                value: 20
                 cost: 3500
                 upkeepAdd: 500
                 message:
                 - <element[Increases this SM's maximum squad size to:].color[green]>
                 - <aqua><[currentLevelData].get[value]>
             2:
-                value: 35
+                value: 30
                 cost: 4250
                 upkeepAdd: 650
                 message:
                 - <element[Increases this SM's maximum squad size to:].color[green]>
                 - <aqua><[currentLevelData].get[value]>
             3:
-                value: 50
+                value: 45
                 cost: 6000
                 upkeepAdd: 850
                 message:
                 - <element[Increases this SM's maximum squad size to:].color[green]>
                 - <aqua><[currentLevelData].get[value]>
             4:
-                value: 60
+                value: 55
                 cost: 7000
                 upkeepAdd: 1000
                 message:
                 - <element[Increases this SM's maximum squad size to:].color[green]>
                 - <aqua><[currentLevelData].get[value]>
             5:
-                value: 75
+                value: 70
                 cost: 8250
                 upkeepAdd: 1200
                 message:
