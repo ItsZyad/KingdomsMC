@@ -20,7 +20,7 @@ FormationLineTool_Handler:
             - narrate format:callout "Cannot detect any blocks near you! Please get closer to your target location."
             - determine cancelled
 
-        - narrate format:callout "P1: <player.cursor_on[100]>"
+        - narrate format:callout "Set point one as: <player.cursor_on[100].xyz.color[aqua]>"
         - flag <player> datahold.armies.drawingFormation.pointOne:<player.cursor_on[100]>
 
         on player right clicks block with:FormationLineTool_Item flagged:datahold.armies.drawingFormation:
