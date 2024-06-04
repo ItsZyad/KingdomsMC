@@ -267,7 +267,7 @@ GetSquadEquipment:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
         - determine null
 
-    - define equipment <server.flag[kigndoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.standardEquipment]>
+    - define equipment <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.standardEquipment]>
     - define equipment.hotbar <list[]> if:<[equipment].get[hotbar].exists.not>
 
     - determine <[equipment]>
