@@ -273,32 +273,41 @@ GetSquadEquipment:
     - determine <[equipment]>
 
 
+# TODO: It needs to be standard across KAPI for setters to return whether they were successful.
 RenameSquad:
     type: task
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|newName[ElementTag(String)]|SMLocation[?LocationTag]
     description:
-    - Renames the squad with the provided name to a new name.
+    - Renames the squad with the provided name to a new name. Will return true if the action was successful.
     - ---
-    - → [Void]
+    - → [ElementTag(Boolean)]
 
     script:
-    ## Renames the squad with the provided name to a new name.
+    ## Renames the squad with the provided name to a new name. Will return true if the action was successful.
     ##
-    ## kingdom    : [ElementTag<String>]
-    ## squadName  : [ElementTag<String>]
-    ## newName    : [ElementTag<String>]
+    ## kingdom    :  [ElementTag<String>]
+    ## squadName  :  [ElementTag<String>]
+    ## newName    :  [ElementTag<String>]
     ## SMLocation : ?[LocationTag]
     ##
-    ## >>> [Void]
+    ## >>> [ElementTag<Boolean>]
 
     - define newInternalName <[newName].replace_text[ ].with[-]>
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot rename squad. Invalid kingdom code provided: <[kingdom]>]>
+        - determine false
 
     - if !<[SMLocation].exists>:
         - define SMLocation <server.flag[kingdoms.<[kingdom]>.armies.barracks].filter_tag[<[filter_value].get[stationedSquads].contains[<[squadName]>]>].get[1]>
 
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
+        - determine false
+
     - if <server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[newInternalName]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot rename squad: <[squadName]> to: <[newInternalName]>. Squad with that name already exists]>
-        - determine cancelled
+        - determine false
 
     - define squadInfo <[SMLocation].flag[squadManager.squads.squadList.<[squadName]>]>
     - define squadInfo <[squadInfo].with[name].as[<[newInternalName]>].with[displayName].as[<[newName]>]>
@@ -310,6 +319,7 @@ RenameSquad:
         - flag <[soldier]> soldier.squad:<[newInternalName]>
 
     - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
+    - determine true
 
 
 DeleteSquad:
