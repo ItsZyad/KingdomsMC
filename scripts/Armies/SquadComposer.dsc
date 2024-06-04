@@ -12,7 +12,7 @@
 SquadCompositionOneSoldier_Item:
     type: item
     material: leather_helmet
-    display name: <italic><bold>Add One Swordsman
+    display name: <&r><bold>Add One Swordsman
     mechanisms:
         hides: all
     flags:
@@ -21,10 +21,22 @@ SquadCompositionOneSoldier_Item:
         unitType: swordsmen
 
 
-SquadCompositionFiveSoldiers_Item:
+SquadCompositionTwoSoldiers_Item:
     type: item
     material: chainmail_helmet
-    display name: <gray><italic><bold>Add Five Swordsmen
+    display name: <gray><bold>Add Two Swordsmen
+    mechanisms:
+        hides: all
+    flags:
+        displayItem: true
+        amount: 2
+        unitType: swordsmen
+
+
+SquadCompositionFiveSoldiers_Item:
+    type: item
+    material: iron_helmet
+    display name: <aqua><bold>Add Five Swordsmen
     mechanisms:
         hides: all
     flags:
@@ -36,7 +48,7 @@ SquadCompositionFiveSoldiers_Item:
 SquadCompositionOneArcher_Item:
     type: item
     material: bow
-    display name: <italic><bold>Add One Archer
+    display name: <&r><bold>Add One Archer
     mechanisms:
         hides: all
     flags:
@@ -45,15 +57,15 @@ SquadCompositionOneArcher_Item:
         unitType: archers
 
 
-SquadCompositionFiveArchers_Item:
+SquadCompositionTwoArchers_Item:
     type: item
     material: bow
-    display name: <gray><italic><bold>Add Five Archers
+    display name: <gray><bold>Add Two Archers
     mechanisms:
         hides: all
     flags:
         displayItem: true
-        amount: 5
+        amount: 2
         unitType: archers
 
 
@@ -90,16 +102,17 @@ SquadComposition_Interface:
     gui: true
     title: Compose a Squad
     slots:
-    - [SquadCompositionOneSoldier_Item] [SquadCompositionFiveSoldiers_Item] [SquadInfoSeparator_Item] [] [] [] [] [] []
-    - [] [] [SquadInfoSeparator_Item] [] [] [] [] [] []
-    - [] [] [SquadInfoSeparator_Item] [] [] [] [] [] []
-    - [] [] [SquadInfoSeparator_Item] [] [] [] [] [] []
-    - [] [] [SquadInfoSeparator_Item] [] [] [] [] [] []
-    - [SquadCompositionCancel_Item] [SquadCompositionAccept_Item] [SquadCompositionInfo_Item] [] [] [] [] [] []
+    - [SquadCompositionOneSoldier_Item] [SquadCompositionTwoSoldiers_Item] [SquadCompositionFiveSoldiers_Item] [SquadInfoSeparator_Item] [] [] [] [] []
+    - [SquadCompositionOneArcher_Item] [SquadCompositionTwoArchers_Item] [] [SquadInfoSeparator_Item] [] [] [] [] []
+    - [] [] [] [SquadInfoSeparator_Item] [] [] [] [] []
+    - [] [] [] [SquadInfoSeparator_Item] [] [] [] [] []
+    - [] [] [] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
+    - [SquadCompositionCancel_Item] [SquadCompositionAccept_Item] [SquadCompositionInfo_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item] [SquadInfoSeparator_Item]
 
 
 SquadComposition_Handler:
     type: world
+    debug: false
     events:
         on player clicks item in SquadComposition_Interface:
         - ratelimit <player> 1t
@@ -112,13 +125,18 @@ SquadComposition_Handler:
             - define placeItem <player.item_on_cursor>
             - define squadInfoItemSlot <context.inventory.find_item[SquadCompositionInfo_Item]>
             - define squadInfoItem <context.inventory.slot[<[squadInfoItemSlot]>]>
+
+            - if <player.has_flag[datahold.armies.squadComp]>:
+                - if <[placeItem].flag[unitType]> != <player.flag[datahold.armies.squadComp].get[1].get[unit]>:
+                    - narrate format:callout "Cannot mix unit types in the same squad!"
+                    - determine cancelled
+
             - flag <player> datahold.armies.manpower:<player.flag[datahold.armies.manpower].if_null[0].add[<[placeItem].flag[amount]>]>
             - flag <player> datahold.armies.squadComp:->:<map[unit=<[placeItem].flag[unitType]>;amount=<[placeItem].flag[amount]>]>
 
             - inventory adjust slot:<[squadInfoItemSlot]> "lore:Total Manpower Required:|<bold><player.flag[datahold.armies.manpower].if_null[0]>" destination:<context.inventory>
             - adjust def:placeItem display:<[placeItem].display.split[ ].remove[1].space_separated>
-
-            - flag <[placeItem]> displayItem:!
+            - adjust def:placeItem flag:displayItem:!
 
             - inventory set slot:<context.slot> origin:<[placeItem]> destination:<context.inventory>
             - determine cancelled
