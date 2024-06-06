@@ -20,10 +20,10 @@ GiveSoldierItemFromArmory:
     script:
     ## Gives the provided soldier an item from their squad's armory if it exists.
     ##
-    ## kingdom   : [ElementTag<String>]
-    ## squadName : [ElementTag<String>]
-    ## soldier   : [NPCTag]
-    ## item      : [ItemTag]
+    ## kingdom   :  [ElementTag<String>]
+    ## squadName :  [ElementTag<String>]
+    ## soldier   :  [NPCTag]
+    ## item      :  [ItemTag]
     ## armories  : ?[ListTag<LocationTag>]
     ##
     ## >>> [Void]
@@ -59,8 +59,7 @@ GiveSoldierItemFromArmory:
 
             - else:
                 - define nextHotbarItemSlot <[soldier].inventory.find_item[*]>
-                - give to:<[loc].inventory> <[soldier].slot[<[nextHotbarItemSlot]>]>
+                - give to:<[loc].inventory> <[soldier].inventory.slot[<[nextHotbarItemSlot]>]>
                 - give to:<[soldier].inventory> <[item]>
-                - adjust <[soldier]> item_slot:1
 
             - take from:<[loc].inventory> item:<[item]>
