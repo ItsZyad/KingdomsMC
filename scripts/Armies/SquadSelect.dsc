@@ -244,7 +244,8 @@ SquadSelection_Handler:
             - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
             - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
 
-            - run RenameSquad def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.newName:<context.message> def.SMLocation:<[SMLocation]>
+            - run RenameSquad def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.newName:<context.message> def.SMLocation:<[SMLocation]> save:rename
+            - define renameSuccessful <entry[rename].created_queue.determination.get[1]>
             # - define squadInfo <[SMLocation].flag[squadManager.squads.squadList.<[squadName]>]>
             # - define squadInfo <[squadInfo].with[name].as[<[newInternalName]>].with[displayName].as[<context.message>]>
 
@@ -253,7 +254,11 @@ SquadSelection_Handler:
 
             # - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
 
-            - narrate format:callout "Renamed <[squadName].replace[-].with[ ].color[gray]> to: <context.message.color[red]>."
+            - if <[renameSuccessful]>:
+                - narrate format:callout "Renamed <[squadName].replace[-].with[ ].color[gray]> to: <context.message.color[red]>."
+
+            - else:
+                - narrate format:callout "An error occurred. Cannot rename squad."
 
         - flag <player> noChat.armies.renamingSquad:!
         - determine cancelled
@@ -520,7 +525,6 @@ SpawnNewSoldiers:
     - define soldierList <list[]>
 
     - repeat <[amount].add[1]>:
-
         - define soldierName <element[Squad Member]>
         - define isSquadLeader false
 
@@ -548,6 +552,7 @@ SpawnNewSoldiers:
         - execute as_server "sentinel respawntime -1 --id <[soldier].id>" silent
         - execute as_server "sentinel addtarget event:pvsentinel --id <[soldier].id>" silent
         - execute as_server "sentinel addignore squad:<[kingdom]>_<[squadName]> --id <[soldier].id>" silent
+        - execute as_server "sentinel addignore denizen_proc:SoldierIgnoreKingdomPlayers:<[soldier]> --id <[soldier].id>" silent
         - execute as_server "sentinel attackrate 0.5 --id <[soldier].id>" silent
         - execute as_server "sentinel speed 1.15 --id <[soldier].id>" silent
         - execute as_server "sentinel accuracy 2.7 --id <[soldier].id>" silent
@@ -556,11 +561,28 @@ SpawnNewSoldiers:
         - equip <[soldier]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]> hand:<[equipment].get[hotbar].get[1]>
         - inventory fill d:<[soldier].inventory> o:<[equipment].get[hotbar]>
 
-        - foreach <proc[GetMembers].context[<[kingdom]>]> as:player:
-            - execute as_server "sentinel addignore player:<[player].name>"
-
         # Note: could have a system where the NPCs can specialize in a certain type of weapon
         #       thus utilizing something like:
         #       - execute as_server "sentinel weapondirect iron_axe diamond_axe"
 
     - determine <[soldierList]>
+
+
+SoldierIgnoreKingdomPlayers:
+    type: procedure
+    definitions: entity[EntityTag]|context[MapTag]
+    description:
+    - Returns false if the provided entity is a player and is a member of the soldier's kingdom.
+    - ---
+    - → [ElementTag(Boolean)]
+
+    script:
+    ## Returns false if the provided entity is a player and is a member of the soldier's kingdom.
+    ##
+    ## entity  : [EntityTag]
+    ## context : [MapTag]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - if <[entity].is_player> && <[entity].flag[kingdom]> == <[context].flag[kingdom]>:
+        - determine true
