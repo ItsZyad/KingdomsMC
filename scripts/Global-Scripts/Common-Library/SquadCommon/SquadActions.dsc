@@ -410,6 +410,8 @@ CreateSquadReference:
     - define internalName <[displayName].replace_text[ ].with[-]>
     - define squadID <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].last.get[ID].add[1].if_null[1]>
     - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+    - define hotbar <script.data_key[data.UnitTypeHotbars.<[squadComp].keys.get[1]>]>
+
     - definemap squadMap:
         npcList: <list[]>
         squadComp: <[squadComp]>
@@ -424,13 +426,18 @@ CreateSquadReference:
             chestplate: <item[leather_chestplate].with_flag[defaultArmor]>
             leggings: <item[leather_leggings].with_flag[defaultArmor]>
             boots: <item[leather_boots].with_flag[defaultArmor]>
-            hotbar: <list[wooden_sword]>
+            hotbar: <[hotbar]>
 
     - flag <[SMLocation]> squadManager.squads.squadList.<[internalName]>:<[squadMap]>
     - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]>
 
     - if <player.exists>:
         - narrate format:callout "Created squad with name: <[displayName]>"
+
+    data:
+        UnitTypeHotbars:
+            swordsmen: <list[wooden_sword]>
+            archers: <list[bow]>
 
 
 GiveSquadTools:
