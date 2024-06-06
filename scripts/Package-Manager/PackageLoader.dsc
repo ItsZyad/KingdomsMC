@@ -129,10 +129,12 @@ LoadAddon:
 
     - if !<util.has_file[../<[addonDir]>]>:
         - narrate format:admincallout "Cannot load addon... Source directory does not exist.<n>Was the addon folder deleted after package indexing occurred?"
+        - customevent id:KingdomsAddonLoadError context:<map[name=<[addonName]>]>
         - stop
 
     - if !<util.has_file[../<[addonDir]>/package.yml]>:
         - narrate format:admincallout "Cannot load addon... Source directory does not contain a package.yml."
+        - customevent id:KingdomsAddonLoadError context:<map[name=<[addonName]>]>
         - stop
 
     - ~filecopy origin:../<[addonDir]> destination:scripts/Packages/<[addonName]> save:folderCopy
@@ -146,6 +148,7 @@ LoadAddon:
 
     - else:
         - narrate format:admincallout "Cannot load addon... Source directory does not exist.<n>Was the addon folder deleted after package indexing occurred?"
+        - customevent id:KingdomsAddonLoadError context:<map[name=<[addonName]>]>
 
 
 RecursiveDelete:
