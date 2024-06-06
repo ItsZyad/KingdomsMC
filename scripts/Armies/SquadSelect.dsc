@@ -565,6 +565,7 @@ SpawnNewSoldiers:
 
 SoldierIgnoreKingdomPlayers:
     type: procedure
+    debug: false
     definitions: entity[EntityTag]|context[MapTag]
     description:
     - Returns false if the provided entity is a player and is a member of the soldier's kingdom.
