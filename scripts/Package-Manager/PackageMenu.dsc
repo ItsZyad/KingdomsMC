@@ -85,6 +85,18 @@ UnloadAddon_Item:
     display name: <red><bold>Unload Addon
 
 
+ForceLoadAddonDisabled_Item:
+    type: item
+    material: gray_wool
+    display name: <gray><bold>Force Loading Disabled
+
+
+ForceLoadAddonEnabled_Item:
+    type: item
+    material: red_wool
+    display name: <red><bold>Force Loading Enabled
+
+
 AddonControls_Window:
     type: inventory
     inventory: chest
@@ -92,7 +104,7 @@ AddonControls_Window:
     title: Addon Controls
     slots:
     - [] [] [] [] [] [] [] [] []
-    - [] [LoadAddon_Item] [] [] [] [] [] [] []
+    - [] [LoadAddon_Item] [] [ForceLoadAddonDisabled_Item] [] [] [] [] []
     - [] [] [] [] [] [] [] [] []
     - [InterfaceFiller_Item] [Info_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item] [InterfaceFiller_Item]
     - [] [] [] [] [] [] [] [] []
@@ -139,6 +151,19 @@ AddonGUI_Handler:
         on custom event id:KingdomsAddonUnloaded:
         - flag <player> datahold.addons.addonLoadCooldown expire:5s
         - inventory set origin:LoadAddon_Item slot:<context.inventory.find_item[AddonUnloading_Item]> d:<context.inventory>
+
+        on custom event id:KingdomsAddonLoadError:
+        - inventory adjust slot:<context.inventory.find_item[LoadAddon_Item]> d:<context.inventory> "lore:<red>An Error Occurred!"
+        - wait 10s
+        - inventory adjust slot:<context.inventory.find_item[LoadAddon_Item]> d:<context.inventory> lore:<list[]>
+
+        on player clicks ForceLoadAddonDisabled_Item in AddonControls_Window:
+        - inventory set slot:<context.slot> d:<context.inventory> origin:ForceLoadAddonEnabled_Item
+        - flag <player> datahold.addons.forceLoad
+
+        on player clicks ForceLoadAddonEnabled_Item in AddonControls_Window:
+        - inventory set slot:<context.slot> d:<context.inventory> origin:ForceLoadAddonDisabled_Item
+        - flag <player> datahold.addons.forceLoad:!
 
         on player closes AddonControls_Window:
         - flag <player> datahold.addons.addonName:!
