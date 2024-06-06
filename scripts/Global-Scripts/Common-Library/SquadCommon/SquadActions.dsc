@@ -468,8 +468,10 @@ GiveSquadTools:
     - give FormationLineTool_Item
     - give SquadAttackAllTool_Item
     - give SquadAttackTool_Item
+    - give SquadAttackMonstersTool_Item
     - inventory set slot:9 origin:ExitSquadControls_Item
     - inventory set slot:8 origin:MiscOrders_Item
+    - inventory set slot:7 origin:SquadClearAllAttacksTool_Item
     - adjust <player> item_slot:1
 
 
@@ -491,6 +493,8 @@ ResetSquadTools:
     - define __player <[player]>
 
     - run LoadTempInventory def.player:<player>
+
+    - flag <player> datahold.armies.squadTools:!
 
     - if <player.has_flag[datahold.armies.previousItemSlot]>:
         - adjust <player> item_slot:<player.flag[datahold.armies.previousItemSlot]>

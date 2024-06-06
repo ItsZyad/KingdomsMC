@@ -84,9 +84,32 @@ SquadAttackTool_Item:
         hides: ALL
 
 
+SquadAttackMonstersTool_Item:
+    type: item
+    material: tipped_arrow
+    display name: <element[Attack Monsters Order].color[#8f6464].bold>
+    mechanisms:
+        potion_effects:
+        - [type=INSTANT_DAMAGE]
+        hides: ALL
+
+
+SquadClearAllAttacksTool_Item:
+    type: item
+    material: spectral_arrow
+    display name: <element[Clear All Attack Orders].color[gold].bold>
+    mechanisms:
+        hides: ALL
+
+
 SquadOptions_Handler:
     type: world
     events:
+        ## PREVENT TAKING ITEMS
+        on player clicks in inventory flagged:datahold.armies.squadTools:
+        - narrate format:callout "Please exit squad orders mode first to be able to do that!"
+        - determine cancelled
+
         ## MISC ORDERS
         on player right clicks block with:MiscOrders_Item flagged:datahold.armies.squadTools:
         - if <player.flag[datahold.armies.squadTools]> != 1:
@@ -190,6 +213,47 @@ SquadOptions_Handler:
             - run SquadAttackSquadOrder def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.enemyKingdom:<[enemySquadInfo].get[squadLeader].flag[soldier.kingdom]> def.enemySquadName:<[enemySquadInfo].get[name]>
             - run SoldierParticleGenerator def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.orderType:attackSquad
 
+        ## ATTACK ORDER: MONSTERS
+        on player right clicks block with:SquadAttackMonstersTool_Item:
+        - ratelimit <player> 1s
+
+        - define kingdom <player.flag[kingdom]>
+        - define squadInfo <player.flag[datahold.squadInfo]>
+        - define squadName <[squadInfo].get[name]>
+        - define squadLeader <[squadInfo].get[squadLeader]>
+        - define npcList <[squadInfo].get[npcList]>
+
+        - if <[squadLeader].has_flag[soldier.order]> && <[squadLeader].flag[soldier.order]> == attackMonsters:
+            - flag <[squadLeader]> datahold.armies.particles:!
+            - flag <[squadLeader]> soldier.order:!
+
+            - run SquadRemoveAllOrders def.kingdom:<[kingdom]> def.squadName:<[squadName]>
+
+        - else:
+            - flag <[squadLeader]> datahold.armies.particles
+            - flag <[squadLeader]> soldier.order:attackMonsters
+
+            - run SquadRemoveAllOrders def.kingdom:<[kingdom]> def.squadName:<[squadName]>
+            - run SquadAttackMonstersOrder def.kingdom:<[kingdom]> def.squadName:<[squadName]>
+            - run SoldierParticleGenerator def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.orderType:attackMonsters
+
+        ## CLEAR ATTACK ORDERS
+        on player right clicks block with:SquadClearAllAttacksTool_Item:
+        - ratelimit <player> 1s
+
+        - define kingdom <player.flag[kingdom]>
+        - define squadInfo <player.flag[datahold.squadInfo]>
+        - define squadName <[squadInfo].get[name]>
+        - define squadLeader <[squadInfo].get[squadLeader]>
+
+        - flag <[squadLeader]> datahold.armies.particles:!
+        - flag <[squadLeader]> soldier.order:!
+
+        - run SquadRemoveAllOrders def.kingdom:<[kingdom]> def.squadName:<[squadName]>
+
+        # - foreach <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]> as:soldier:
+        #     - execute as_server "sentinel removetarget monsters --id <[soldier].id>" silent
+
         ## REG. MOVE SQUAD
         on player right clicks block with:SquadMoveTool_Item:
         - ratelimit <player> 1s
@@ -226,6 +290,7 @@ SquadOptions_Handler:
         ## EXITS ORDERS
         on player clicks block with:ExitSquadControls_Item:
         - flag <player> datahold.squadInfo:!
+        - flag <player> datahold.armies.squadTools:!
         - run ResetSquadTools def.player:<player>
         - run ActionBarToggler def.player:<player> def.toggleType:false
 
@@ -262,6 +327,7 @@ SoldierParticleGenerator:
     - definemap orderFormats:
         attackAll: 2|red
         attackSquad: 1.5|fuchsia
+        attackMonsters: 1.5|#8f6464
 
     - define orderType attackAll if:<[orderType].exists.not.or[<[orderType].is_in[<[orderFormats].keys>]>]>
 

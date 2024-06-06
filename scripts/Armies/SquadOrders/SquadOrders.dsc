@@ -58,6 +58,28 @@ SquadAttackSquadOrder:
         - execute as_server "sentinel addtarget squad:<[enemySquadSentinelName]> --id <[soldier].id>" silent
 
 
+SquadAttackMonstersOrder:
+    type: task
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    description:
+    - Orders the given squad to attack monsters and hostile mobs whenever they can.
+    - ---
+    - → [Void]
+
+    script:
+    ## Orders the given squad to attack monsters and hostile mobs whenever they can.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [Void]
+
+    - define soldierList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]>
+
+    - foreach <[soldierList]> as:soldier:
+        - execute as_server "sentinel addtarget denizen_proc:SquadAttackMonsters_Procedure:<[soldier]> --id <[soldier].id>" silent
+
+
 SquadRemoveAllOrders:
     type: task
     definitions: kingdom|squadName
@@ -105,6 +127,23 @@ SquadAttackAll_Procedure:
     - else:
         - determine passively false
         - execute as_server "sentinel forgive --id <[context].as[npc].id>" silent
+
+
+SquadAttackMonsters_Procedure:
+    type: procedure
+    debug: false
+    definitions: entity|context
+    script:
+    - ratelimit <queue> 25t
+
+    - if <[context].as[npc].is_navigating>:
+        - stop
+
+    - if <[entity].is_monster>:
+        - determine true
+
+    - determine passively false
+    - execute as_server "sentinel forgive --id <[context].as[npc].id>" silent
 
 ## Death Handlers
 #################################################
