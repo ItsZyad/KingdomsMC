@@ -470,31 +470,6 @@ SpawnSquadNPCs:
     - ~run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[player].flag[kingdom]>
     - run GiveSquadTools def.player:<player>
 
-    # SpawnSquadLeader:
-    # - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
-
-    # - create player "&4Squad Leader" <[spawnLocation]> traits:sentinel save:squad_leader
-    # - define squadLeader <entry[squad_leader].created_npc>
-    # - flag <[squadLeader]> soldier.isSquadLeader:true
-    # - flag <[squadLeader]> soldier.squad:<[squadName]>
-    # - flag <[squadLeader]> soldier.kingdom:<[kingdom]>
-    # - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.squadLeader:<[squadLeader]>
-
-    # - equip <[squadLeader]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]> hand:<[equipment].get[hotbar].get[1]>
-
-    # - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
-    # - execute as_server "sentinel respawntime -1 --id <[squadLeader].id>" silent
-    # - execute as_server "sentinel addtarget event:pvsentinel --id <[squadLeader].id>" silent
-    # - execute as_server "sentinel addignore squad:<[kingdom]>_<[squadName]> --id <[squadLeader].id>" silent
-    # - execute as_server "sentinel attackrate 0.5 --id <[squadLeader].id>" silent
-    # - execute as_server "sentinel speed 1.15 --id <[squadLeader].id>" silent
-    # - execute as_server "sentinel accuracy 2.7 --id <[squadLeader].id>" silent
-
-    # - foreach <proc[GetMembers].context[<[kingdom]>]> as:player:
-    #     - execute as_server "sentinel addignore player:<[player].name>"
-
-    # - assignment set to:<[squadLeader]> script:SoldierManager_Assignment
-
 
 SpawnNewSoldiers:
     type: task
