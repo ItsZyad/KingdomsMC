@@ -4,11 +4,12 @@
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jul 2021
-## @Updated: May 2022
-## @Script Ver: v1.0
+## @Update 1: May 2022
+## @Update 2: May 2024
+## @Script Ver: v1.1
 ##
 ##ignorewarning invalid_data_line_quotes
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 # Note: future configurable
 CustomJoinMessages:
@@ -16,21 +17,19 @@ CustomJoinMessages:
     player_list:
         fuzzysloth: "the trident king has returned!"
 
+
 KingdomSelection_Handler:
     type: world
     debug: false
     events:
         on player joins:
-        # Get players out of the pre-migration world
-        - if <server.worlds.contains[KingdomsCurrent]> && <player.location.world.name> != KingdomsCurrent:
-            - teleport <player> <world[KingdomsCurrent].spawn_location>
-
-        - if !<player.has_flag[kingdom]>:
+        - if !<player.is_in[<server.players>]> || <player.has_flag[testingKSH]>:
             - wait 1s
 
-            - narrate "<gold><bold>Sorry to Bother!"
-            - narrate "<underline>Welcome to Kingdoms!<underline.end_format> Before you get playing, please just ensure that you have adjusted your video settings so that your GUI size is 2 or 1."
-            - narrate "<gray><italic>Minecraft does a poor job of scaling text based on screen resolution and UI size. By adjusting the size of your UI you will avoid a bunch of issues relating to text running off the screen that may occur while playing."
+            - narrate <element[<&sp>].underline.repeat[40]><n>
+            - narrate "<gold><bold>Sorry to Bother!<n>"
+            - narrate "Before you get playing, please just ensure that you have adjusted your video settings so that your GUI size is 2 or 1."
+            - narrate <element[Minecraft does a poor job of scaling text based on screen resolution and UI size. By adjusting the size of your UI you will avoid a bunch of issues relating to text running off the screen that may occur while playing.].italicize.color[<element[Vintage.light_red].proc[GetColor]>]>
             - narrate <&sp>
             - narrate "<gold><bold>Thank you!"
             - narrate <element[<&sp>].underline.repeat[40]>
