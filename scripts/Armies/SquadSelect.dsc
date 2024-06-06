@@ -496,21 +496,17 @@ SpawnSquadNPCs:
     # - assignment set to:<[squadLeader]> script:SoldierManager_Assignment
 
 
-# TODO: Make this differentiate between different soldier types
-# TODO Also: Make different soldier types lol
 SpawnNewSoldiers:
     type: task
     debug: false
     definitions: type[ElementTag(String)]|location[LocationTag]|amount[ElementTag(Integer)]|squadName[ElementTag(String)]|kingdom[ElementTag(String)]|SMLocation[LocationTag]
     description:
     - Spawns in the specified amount of the given soldier type at the provided location.
-    - NOTE: Script is bound change as I introduce new soldier types.
     - ---
     - → [ListTag(NPCTag)]
 
     script:
     ## Spawns in the specified amount of the given soldier type at the provided location.
-    ## NOTE: Script is bound change as I introduce new soldier types
     ##
     ## type       : [ElementTag<String>]
     ## location   : [LocationTag]
@@ -523,6 +519,13 @@ SpawnNewSoldiers:
 
     - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
     - define soldierList <list[]>
+
+    # I won't have the script terminate altogether, but if you've reached this point and there's an
+    # unrecognized unit-type then something's seriously wrong...
+    # Make sure there isn't an addon that's fucking with this.
+    - if !<script.data_key[UnitTypeConfigurations.<[type].to_titlecase>].exists>:
+        - define type Swordsmen
+        - run GenerateInternalError def.silent:false def.message:<element[Cannot recognize provided unit type: <[type].underline>. Could this be a bad param? Defaulting to unit type: <&sq>swordsmen<&sq>.]>
 
     - repeat <[amount].add[1]>:
         - define soldierName <element[Squad Member]>
@@ -539,6 +542,7 @@ SpawnNewSoldiers:
 
         - flag <[soldier]> soldier.squad:<[squadName]>
         - flag <[soldier]> soldier.kingdom:<[kingdom]>
+        - flag <[soldier]> soldier.type:<[type]>
         - flag <[soldier]> soldier.isSquadLeader:<[isSquadLeader]>
 
         - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:->:<[soldier]>
@@ -548,14 +552,13 @@ SpawnNewSoldiers:
             - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.squadLeader:<[soldier]>
             - assignment set to:<[soldier]> script:SoldierManager_Assignment
 
+        # General configurations;
         - execute as_server "sentinel squad <[kingdom]>_<[squadName]> --id <[soldier].id>" silent
         - execute as_server "sentinel respawntime -1 --id <[soldier].id>" silent
-        - execute as_server "sentinel addtarget event:pvsentinel --id <[soldier].id>" silent
         - execute as_server "sentinel addignore squad:<[kingdom]>_<[squadName]> --id <[soldier].id>" silent
         - execute as_server "sentinel addignore denizen_proc:SoldierIgnoreKingdomPlayers:<[soldier]> --id <[soldier].id>" silent
-        - execute as_server "sentinel attackrate 0.5 --id <[soldier].id>" silent
-        - execute as_server "sentinel speed 1.15 --id <[soldier].id>" silent
-        - execute as_server "sentinel accuracy 2.7 --id <[soldier].id>" silent
+
+        - inject <script> path:UnitTypeConfigurations.<[type].to_titlecase>
 
         - define equipment <proc[GetSquadEquipment].context[<[kingdom]>|<[squadName]>]>
         - equip <[soldier]> boots:<[equipment].get[boots]> head:<[equipment].get[helmet]> chest:<[equipment].get[chestplate]> legs:<[equipment].get[leggings]> hand:<[equipment].get[hotbar].get[1]>
@@ -566,6 +569,23 @@ SpawnNewSoldiers:
         #       - execute as_server "sentinel weapondirect iron_axe diamond_axe"
 
     - determine <[soldierList]>
+
+    # Note: Future configurables
+    UnitTypeConfigurations:
+        Swordsmen:
+        - execute as_server "sentinel addtarget event:pvsentinel --id <[soldier].id>" silent
+        - execute as_server "sentinel attackrate 0.5 --id <[soldier].id>" silent
+        - execute as_server "sentinel attackrate 0.1 'ranged' --id <[soldier].id>" silent
+        - execute as_server "sentinel speed 1.15 --id <[soldier].id>" silent
+        - execute as_server "sentinel accuracy 2.7 --id <[soldier].id>" silent
+
+        Archers:
+        - execute as_server "sentinel speed 1.3 --id <[soldier].id>" silent
+        - execute as_server "sentinel attackrate 0.5 'ranged' --id <[soldier].id>" silent
+        - execute as_server "sentinel attackrate 0.1 --id <[soldier].id>" silent
+        - execute as_server "sentinel projectilerange 50 --id <[soldier].id>" silent
+        - execute as_server "sentinel accuracy 2.2 --id <[soldier].id>" silent
+        - execute as_server "sentinel targettime 1.75 --id <[soldier].id>" silent
 
 
 SoldierIgnoreKingdomPlayers:
