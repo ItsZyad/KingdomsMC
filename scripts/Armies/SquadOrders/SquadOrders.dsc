@@ -96,9 +96,13 @@ SquadRemoveAllOrders:
 
     - foreach <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]> as:soldier:
         - define proceduralTargets <[soldier].sentinel.targets.filter_tag[<[filter_value].starts_with[denizen_proc]>]>
+        - define squadTargets <[soldier].sentinel.targets.filter_tag[<[filter_value].starts_with[squad]>]>
 
         - foreach <[proceduralTargets]> as:proc:
             - execute as_server "sentinel removetarget <[proc]> --id <[soldier].id>" silent
+
+        - foreach <[squadTargets]> as:squad:
+            - execute as_server "sentinel removetarget <[squad]> --id <[soldier].id> " silent
 
         - execute as_server "sentinel forgive --id <[soldier].id>" silent
 
