@@ -559,7 +559,7 @@ SpawnNewSoldiers:
         - execute as_server "sentinel attackrate 0.5 'ranged' --id <[soldier].id>" silent
         - execute as_server "sentinel attackrate 0.1 --id <[soldier].id>" silent
         - execute as_server "sentinel projectilerange 50 --id <[soldier].id>" silent
-        - execute as_server "sentinel accuracy 2.2 --id <[soldier].id>" silent
+        - execute as_server "sentinel accuracy 1.4 --id <[soldier].id>" silent
         - execute as_server "sentinel targettime 1.75 --id <[soldier].id>" silent
 
 
