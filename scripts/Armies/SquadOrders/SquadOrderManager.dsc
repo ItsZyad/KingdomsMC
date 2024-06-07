@@ -113,6 +113,9 @@ SquadOptions_Handler:
         ## MISC ORDERS
         on player right clicks block with:MiscOrders_Item flagged:datahold.armies.squadTools:
         - if <player.flag[datahold.armies.squadTools]> != 1:
+            - repeat 9:
+                - inventory slot:<[value]> set origin:air
+
             - run GiveSquadTools def.player:<player> def.saveInv:false
 
         - else:
@@ -120,6 +123,9 @@ SquadOptions_Handler:
                 - inventory slot:<[value]> set origin:air
 
             - give to:<player.inventory> SquadRecall_Item
+            - flag <player> datahold.armies.squadTools:2
+
+            - adjust <player> item_slot:1
 
         - determine cancelled
 
@@ -266,8 +272,10 @@ SquadOptions_Handler:
         - define squadLeader <[squadInfo].get[squadLeader]>
         - define displayName <[squadInfo].get[displayName]>
 
-        - run FormationWalk def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.npcsPerRow:3 def.finalLocation:<[location].with_yaw[<player.location.yaw.round_to_precision[5]>]> def.lineLength:6 def.player:<player>
-        - narrate format:debug "This tool is being phased out."
+        - define npcsPerRow <player.flag[datahold.armies.npcsPerRow].if_null[3]>
+        - define lineLength <player.flag[datahold.armies.lineLength].div[2].if_null[6]>
+
+        - run FormationWalk def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.npcsPerRow:<[npcsPerRow]> def.finalLocation:<[location].with_yaw[<player.location.yaw.round_to_precision[5]>]> def.lineLength:<[lineLength]> def.player:<player>
 
         ## LINE MOVE SQUAD
         on player left clicks block with:FormationLineTool_Item flagged:datahold.armies.drawingFormation.pointTwo:

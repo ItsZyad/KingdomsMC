@@ -54,7 +54,8 @@ FormationWalk:
     - repeat <[rows]> as:row:
         - define formationLinePoints <proc[DiagonalLineHelper].context[<[finalLocation].backward_flat[<[row].sub[1].mul[<[verticalSpacing]>]>]>|<[lineLength]>]>
         - define formationLine <[formationLinePoints].get[1].points_between[<[formationLinePoints].get[2]>].include[<[formationLinePoints]>]>
-        - define spacing <[formationLine].size.div[<[npcsPerRow]>].round>
+        # - define spacing <[formationLine].size.div[<[npcsPerRow]>].round>
+        - define spacing 3
 
         - showfake green_wool <[formationLine]> players:<[player]>
 
@@ -93,6 +94,9 @@ DrawLineFormationWalk:
     - define directionFacing <[player].location.yaw>
 
     - define unsentSoldiers <[npcList]>
+
+    - flag <[player]> datahold.armies.lineLength:<[pointOne].sub[<[pointTwo]>].vector_length>
+    - flag <[player]> datahold.armies.npcsPerRow:<[soldiersPerLine]>
 
     - repeat <[lines]> as:lineNum:
         - foreach <[formationLine]> as:pos:
