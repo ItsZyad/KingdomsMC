@@ -36,6 +36,10 @@ __________________________________________
     - Fixed *A LOT* of longstanding issues with the markets such as weird null values that break entire systems, whole simulation ticks that don't go through, and general weirdness with merchant interfaces.
         * This likely isn't the last we'll see of markets-related bugs, but there should still be a vast difference between this and Alpha 0.4.0p4.
     - Fixed a small bug which blocked players from chatting after using the outpost claiming command.
+    - Fixed bug which prevented the player from giving squad orders after renaming it in certain instances.
 
     SMALL ADDITIONS:
     - Added a new formation walk tool to the squads system: Drawable formation lines. These allow the commander of a squad to determine the exact size of the formation using a special wand.
+    - Mixing different unit types in the same squad is no longer allowed.
+    - Added new soldier type: Archer.
+    - Using the regular squad formation walk tool after the line formation tool will cause it to remember the previous formation.
