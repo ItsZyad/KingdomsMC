@@ -96,12 +96,6 @@ Kingdom_Command:
             - narrate <&sp>
             - narrate format:callout "<&r><italic>You can also type 'help' after each of the kingdom commands to learn more about them individually."
 
-        - case castleclaim:
-            - narrate format:debug "Sub-command is being re-implemented. See note #1 in CommandHandler/KingdomCommand.dsc."
-
-        - case coreclaim:
-            - narrate format:debug "Sub-command is being re-implemented. See note #1 in CommandHandler/KingdomCommand.dsc."
-
         - case trade:
             - narrate format:debug "Sub-command is being re-implemented."
 
