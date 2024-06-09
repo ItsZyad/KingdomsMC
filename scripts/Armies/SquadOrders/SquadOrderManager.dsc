@@ -321,7 +321,12 @@ SquadOptions_Handler:
 SoldierParticleGenerator:
     type: task
     debug: false
-    definitions: npcList|squadLeader|orderType
+    definitions: npcList[ListTag(NPCTag)]|squadLeader[NPCTag]|orderType[?ElementTag(String)]
+    description:
+    - Applies a particle effect to a list of soldiers which changes depending on the type of order they are given.
+    - ---
+    - [Void]
+
     script:
     ## Applies a particle effect to a list of soldiers which changes depending on the type of order
     ## they are given.
@@ -330,6 +335,8 @@ SoldierParticleGenerator:
     ## squadLeader : [NPCTag]
     ## orderType   : ?[ElementTag<String>]
     ##               Accepted Values: attackAll, attackSquad
+    ##
+    ## >>> [Void]
 
     - define waitTime 7t
     - definemap orderFormats:

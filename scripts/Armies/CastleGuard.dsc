@@ -474,6 +474,7 @@ GuardKingdomEngagement_Window:
     - [] [GuardEngageRaptoran_Item] [] [GuardEngageCentran_Item] [] [GuardEngageCambrian_Item] [] [GuardEngageViridian_Item] []
 
 
+# TODO: REMOVE 4-KINGDOM HARD-CODING!!
 GuardEngageRaptoran_Item:
     type: item
     material: red_banner
@@ -540,8 +541,19 @@ GuardKingdomEngagement_Handler:
 
 GuardSetup:
     type: task
-    definitions: player
+    definitions: player[PlayerTag]
+    description:
+    - Will spawn and set up a castle guard NPC under the same kingdom as the provided player.
+    - ---
+    - → [Void]
+
     script:
+    ## Will spawn and set up a castle guard NPC under the same kingdom as the provided player.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [Void]
+
     - define numberOfGuards <server.flag[kingdoms.<[player].flag[kingdom]>.castleGuards].size.if_null[0]>
 
     - create player "<red><bold>[<[numberOfGuards].add[1]>]Castle Guard" <[player].location> traits:sentinel save:new_guard
@@ -602,8 +614,21 @@ GuardIgnoreFriendlies:
 GuardTargetSelection:
     type: procedure
     debug: false
-    definitions: entity|context
+    definitions: entity[EntityTag]|context[NPCTag]
+    description:
+    - Will return true if the provided entity is not in the same kingdom as the guard (provided as <[context]>), and the guard has orders to attack the entity.
+    - ---
+    - → [ElementTag(Boolean)]
+
     script:
+    ## Will return true if the provided entity is not in the same kingdom as the guard (provided as
+    ## <[context]>), and the guard has orders to attack the entity.
+    ##
+    ## entity  : [EntityTag]
+    ## context : [NPCTag]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
     - ratelimit <queue> 1s
     - define guard <[context]>
     - define nearestPlayers <[guard].location.find_players_within[<[guard].sentinel.guard_distance_minimum>]>
@@ -659,8 +684,21 @@ GuardTargetSelection:
 
 StaggeredPathfind:
     type: task
-    definitions: npc|endLocation|recursionDepth|speed
+    definitions: npc[NPCTag]|endLocation[LocationTag]|recursionDepth[ElementTag(Integer)]|speed[?ElementTag(Integer)]
+    description:
+    - Will make the provided NPC walk to the provided endLocation in a series of 20 block intervals to avoid having Minecraft's default pathfinding teleport them to far away places.
+    - ---
+    - → [Void]
+
     script:
+    ## Will make the provided NPC walk to the provided endLocation in a series of 20 block
+    ## intervals to avoid having Minecraft's default pathfinding teleport them to far away places.
+    ##
+    ## npc            :  [NPCTag]
+    ## endLocation    :  [LocationTag]
+    ## speed          :  [ElementTag<Integer>]
+    ## recursionDepth : ?[ElementTag<Integer>]
+
     - define recursionDepth <[recursionDepth].if_null[0]>
     - define speed <[speed].if_null[1]>
     - define path <[npc].location.find_path[<[endLocation]>]>

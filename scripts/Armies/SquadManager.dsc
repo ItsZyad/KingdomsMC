@@ -787,12 +787,17 @@ SquadManagerDeletion_Handler:
 RecalculateSquadManagerAOE:
     type: task
     debug: false
-    definitions: AOESize|SMLocation|player|barracksArea
+    definitions: AOESize[ElementTag(Integer)]|SMLocation[LocationTag]|player[PlayerTag]|barracksArea[CuboidTag]
+    description:
+    - Generates the cuboid object representing the SM's area
+    - ---
+    - → [CuboidTag]
+
     AreaCalculation:
     ## Generates the cuboid object representing the SM's area
     ##
-    ## AOESize    : [ElementTag<Integer>]
-    ## SMLocation : [LocationTag]
+    ## AOESize      : [ElementTag<Integer>]
+    ## SMLocation   : [LocationTag]
     ##
     ## >>> [CuboidTag]
 
@@ -826,7 +831,12 @@ RecalculateSquadManagerAOE:
 CalculateSMCost:
     type: procedure
     debug: false
-    definitions: kingdom
+    definitions: kingdom[ElementTag(String)]
+    description:
+    - Calculates the amount of funds needed to activate an SM
+    - ---
+    - → [ElementTag(Float)]
+
     script:
     ## Calculates the amount of funds needed to activate an SM
     ##
@@ -842,14 +852,19 @@ CalculateSMCost:
 
 BedSMLocation:
     type: procedure
-    definitions: player|bedLocation
+    definitions: player[PlayerTag]|bedLocation[LocationTag]
+    description:
+    - Returns the cuboid area that contains the provided location, if any.
+    - ---
+    - → [?LocationTag]
+
     script:
     ## Returns the cuboid area that contains the provided location, if any.
     ##
     ## bedLocation : [LocationTag]
     ## player      : [PlayerTag]
     ##
-    ## >>> [LocationTag<?>]
+    ## >>> [?LocationTag]
 
     - define kingdom <[player].flag[kingdom]>
     - define barracks <proc[GetKingdomSquadManagers].context[<[kingdom]>]>
@@ -867,10 +882,15 @@ BedSMLocation:
 CountBedsInSquadManagerArea:
     type: procedure
     debug: false
-    definitions: location
+    definitions: location[LocationTag]
+    description:
+    - Counts the number of beds contained within the area of a squadManager. the SM is identified by its location, passed in by definition.
+    - ---
+    - → [ElementTag(Integer)]
+
     script:
     ## Counts the number of beds contained within the area of a squadManager. the SM is identified
-    ## by its location, passed in by definition
+    ## by its location, passed in by definition.
     ##
     ## location : [LocationTag]
     ##
@@ -884,7 +904,12 @@ CountBedsInSquadManagerArea:
 ShowArmoriesAOE:
     type: task
     debug: false
-    definitions: locationList|player
+    definitions: locationList[ListTag(LocationTag)]|player[PlayerTag]
+    description:
+    - Displays to the given player a set of glimmering particles indicating at the given list of locations.
+    - ---
+    - → [Void]
+
     script:
     ## Displays to the given player a set of glimmering particles indicating at the given list of
     ## locations.
@@ -910,9 +935,14 @@ ShowArmoriesAOE:
 ShowSquadManagerAOE:
     type: task
     debug: false
-    definitions: area|player
+    definitions: area[CuboidTag]|player[PlayerTag]
+    description:
+    - Displays to the given player a box-shaped outline of the given area.
+    - ---
+    - → [Void]
+
     script:
-    ## Displays to the given player a box-shaped outline of the given area
+    ## Displays to the given player a box-shaped outline of the given area.
     ##
     ## area   : [CuboidTag]
     ## player : [PlayerTag]

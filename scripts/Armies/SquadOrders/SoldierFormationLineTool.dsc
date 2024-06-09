@@ -57,9 +57,9 @@ CreateParticleLine:
     ##
     ## pointOne : [LocationTag]
     ## pointTwo : [LocationTag]
-    ## particle : [ElementTag(String)]
-    ## flagName : [ElementTag(String)]
-    ## targets  : [ListTag(PlayerTag)] | [PlayerTag]
+    ## particle : [ElementTag<String>]
+    ## flagName : [ElementTag<String>]
+    ## targets  : [ListTag<PlayerTag>] | [PlayerTag]
     ##
     ## >>> [Void]
 

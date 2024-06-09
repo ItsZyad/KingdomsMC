@@ -13,9 +13,14 @@
 
 SquadAttackAllOrder:
     type: task
-    definitions: kingdom|squadName
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    description:
+    - Causes the given squad to attack all other soliders regardless of kingdom.
+    - ---
+    - → [Void]
+
     script:
-    ## Causes the given squad to attack all other soliders regardless of kingdom
+    ## Causes the given squad to attack all other soliders regardless of kingdom.
     ##
     ## kingdom   : [ElementTag<String>]
     ## squadName : [ElementTag<String>]
@@ -34,7 +39,12 @@ SquadAttackAllOrder:
 
 SquadAttackSquadOrder:
     type: task
-    definitions: kingdom|squadName|enemyKingdom|enemySquadName
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|enemyKingdom[ElementTag(String)]|enemySquadName[ElementTag(String)]
+    description:
+    - Causes the given squad to attack an enemy squad only. Will cancel if the 'enemy' squad provided is of the same kingdom.
+    - ---
+    - → [Void]
+
     script:
     ## Causes the given squad to attack an enemy squad only. Will cancel if the 'enemy' squad
     ## provided is of the same kingdom.
@@ -82,9 +92,14 @@ SquadAttackMonstersOrder:
 
 SquadRemoveAllOrders:
     type: task
-    definitions: kingdom|squadName
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    description:
+    - Cancels a given squads active orders and causes all of its soldiers to forgive their targets.
+    - ---
+    - → [Void]
+
     script:
-    ## Cancels a given squads active orders and causes all of its soldiers to forgive their targets
+    ## Cancels a given squads active orders and causes all of its soldiers to forgive their targets.
     ##
     ## kingdom   : [ElementTag<String>]
     ## squadName : [ElementTag<String>]
@@ -112,8 +127,20 @@ SquadRemoveAllOrders:
 SquadAttackAll_Procedure:
     type: procedure
     debug: false
-    definitions: entity|context
+    definitions: entity[EntityTag]|context[NPCTag]
+    description:
+    - Will return true if the provided entity is a soldier in another kingdom's army.
+    - ---
+    - → [Void]
+
     script:
+    ## Will return true if the provided entity is a soldier in another kingdom's army.
+    ##
+    ## entity  : [EntityTag]
+    ## context : [NPCTag]
+    ##
+    ## >>> [Void]
+
     - ratelimit <queue> 25t
 
     - if <[context].as[npc].is_navigating>:
@@ -136,8 +163,20 @@ SquadAttackAll_Procedure:
 SquadAttackMonsters_Procedure:
     type: procedure
     debug: false
-    definitions: entity|context
+    definitions: entity[EntityTag]|context[NPCTag]
+    description:
+    - Will return true if the provided entity is a monster.
+    - ---
+    - → [Void]
+
     script:
+    ## Will return true if the provided entity is a monster.
+    ##
+    ## entity  : [EntityTag]
+    ## context : [NPCTag]
+    ##
+    ## >>> [Void]
+
     - ratelimit <queue> 25t
 
     - if <[context].as[npc].is_navigating>:

@@ -46,8 +46,20 @@ SquadInterface_Item:
 SquadSelectionGUI:
     type: task
     debug: false
-    definitions: player
+    definitions: player[PlayerTag]
+    description:
+    - Opens the squad selection interface, accessible through the squad manager for the provided player.
+    - ---
+    - → [Void]
+
     script:
+    ## Opens the squad selection interface, accessible through the squad manager for the provided
+    ## player.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [Void]
+
     - define __player <[player]>
     - define kingdom <player.flag[kingdom]>
     - define squadList <proc[GetKingdomSquads].context[<[kingdom]>].keys>

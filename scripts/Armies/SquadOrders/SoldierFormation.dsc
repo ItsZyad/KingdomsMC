@@ -1,7 +1,7 @@
 ##
 ## All tasks and helpers related to making squads move will be found here.
 ##
-## @Author: Zyad (ITSZYAD#9280)
+## @Author: Zyad <ITSZYAD#9280>
 ## @Date: Mar 2023
 ## @Updated: Jun 2023
 ##           -- All useless helper functions and test scripts were removed and remaining items
@@ -15,7 +15,10 @@
 ClosestSquadMember:
     type: task
     debug: false
-    definitions: npcList|location
+    definitions: npcList[ListTag(NPCTag)]|location[LocationTag]
+    description:
+    - @Helper
+
     script:
     - define closestNpc <[npcList].get[1]>
     - define closestDist 99999
@@ -30,7 +33,10 @@ ClosestSquadMember:
 
 DiagonalLineHelper:
     type: procedure
-    definitions: loc|length
+    definitions: loc[LocationTag]|length[ElementTag(Integer)]
+    description:
+    - @Helper
+
     script:
     - define locRight <[loc].with_yaw[<[loc].yaw.add[90]>]>
     - define locLeft <[loc].with_yaw[<[loc].yaw.sub[90]>]>
@@ -41,8 +47,26 @@ DiagonalLineHelper:
 
 FormationWalk:
     type: task
-    definitions: npcList|npcsPerRow|squadLeader|finalLocation|lineLength|player
+    definitions: npcList[ListTag(NPCTag)]|npcsPerRow[ElementTag(Integer)]|squadLeader[NPCTag]|finalLocation[LocationTag]|lineLength[ElementTag(Integer)]|player[PlayerTag]
+    description:
+    - Will arrange the provided list of NPCs into a set of rows as per the provided parameters: 'lineLength' and 'npcsPerRow'. Will take the parameter 'finalLocation' as the position to be assumed by the squadLeader.
+    - ---
+    - → [Void]
+
     script:
+    ## Will arrange the provided list of NPCs into a set of rows as per the provided parameters:
+    ## 'lineLength' and 'npcsPerRow'. Will take the parameter 'finalLocation' as the position to be
+    ## assumed by the squadLeader.
+    ##
+    ## npcList       : [ListTag<NPCTag>]
+    ## npcsPerRow    : [ElementTag<Integer>]
+    ## squadLeader   : [NPCTag]
+    ## finalLocation : [LocationTag]
+    ## lineLength    : [ElementTag<Integer>]
+    ## player        : [PlayerTag]
+    ##
+    ## >>> [Void]
+
     - define lineLength <[lineLength].if_null[6]>
 
     # Note: adding one to the npcList size to account for squad leader;
@@ -84,8 +108,29 @@ FormationWalk:
 
 DrawLineFormationWalk:
     type: task
-    definitions: npcList|soldierSpacing|squadLeader|player|pointOne|pointTwo
+    definitions: npcList[ListTag(NPCTag)]|soldierSpacing[ElementTag(Float)]|squadLeader[NPCTag]|player[PlayerTag]|pointOne[LocationTag]|pointTwo[LocationTag]
+    description:
+    - Will assign the provided list of npcs walk orders to a location along a line between the two provided points with the specified distance 'soldierSpacing' between them (in blocks).
+    - If there are too many NPCs to fit on one line of the provided parameters, it will create the appropriate number of rows behind the initial line.
+    - ---
+    - → [Void]
+
     script:
+    ## Will assign the provided list of npcs walk orders to a location along a line between the
+    ## two provided points with the specified distance 'soldierSpacing' between them (in blocks).
+    ##
+    ## If there are too many NPCs to fit on one line of the provided parameters, it will create the
+    ## appropriate number of rows behind the initial line.
+    ##
+    ## npcList        : [ListTag<NPCTag>]
+    ## soldierSpacing : [ElementTag<Float>]
+    ## squadLeader    : [NPCTag]
+    ## player         : [PlayerTag]
+    ## pointOne       : [LocationTag]
+    ## pointTwo       : [LocationTag]
+    ##
+    ## >>> [Void]
+
     - define npcList <[npcList].include[<[squadLeader]>]>
     - define formationLine <[pointOne].points_between[<[pointTwo]>].include[<[pointOne]>|<[pointTwo]>]>
     - define soliderSpacing 2 if:<[soldierSpacing].exists.not>
