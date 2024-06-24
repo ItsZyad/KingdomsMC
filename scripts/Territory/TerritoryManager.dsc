@@ -33,14 +33,14 @@ TerritoryClaim:
         - narrate format:callout "You have not selected a claiming mode! Please use <element[/k claim core].color[red]> or <element[/k claim castle].color[red]> to use this command."
         - determine cancelled
 
-    - define coreMax <server.flag[kingdoms.<[kingdom]>.claims.coreMax].if_null[0]>
-    - define castleMax <server.flag[kingdoms.<[kingdom]>.claims.castleMax].if_null[0]>
-    - define castleAmount <server.flag[kingdoms.<[kingdom]>.claims.castle].size.if_null[0]>
-    - define coreAmount <server.flag[kingdoms.<[kingdom]>.claims.core].size.if_null[0]>
-    - define coreChunks <server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>
-    - define castleChunks <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>]>
+    - define coreMax <proc[GetMaxClaims].context[<[kingdom]>|core]>
+    - define castleMax <proc[GetMaxClaims].context[<[kingdom]>|castle]>
+    - define coreChunks <proc[GetClaims].context[<[kingdom]>|core]>
+    - define castleChunks <proc[GetClaims].context[<[kingdom]>|castle]>
+    - define coreAmount <[coreChunks].size>
+    - define castleAmount <[castleChunks].size>
     - define combinedChunks <[castleChunks].include[<[coreChunks]>]>
-    - define balance <server.flag[kingdoms.<[kingdom]>.balance].if_null[0]>
+    - define balance <proc[GetBalance].context[<[kingdom]>]>
     - define chunkConnected false
 
     # Calculation of chunk proximity #
@@ -79,7 +79,7 @@ TerritoryClaim:
                 - narrate format:callout "You must have castle chunks claimed before making core claims."
                 - determine cancelled
 
-            - else if <server.flag[kingdoms.claimInfo.allClaims].contains[<[chunk]>]>:
+            - else if <proc[GetAllClaims].contains[<[chunk]>]>:
                 - narrate format:callout "This chunk is already occupied. Double claiming could be considered an act of agression!"
                 - determine cancelled
 
@@ -89,7 +89,7 @@ TerritoryClaim:
 
             - else:
                 # Core Plot Price Equation #
-                - define realPrestige <element[100].sub[<server.flag[kingdoms.<[kingdom]>.prestige]>]>
+                - define realPrestige <element[100].sub[<[kingdom].proc[GetPrestige]>]>
                 - define prestigeMultiplier <util.e.power[<element[0.02186].mul[<[realPrestige]>]>].sub[0.9]>
                 - define corePrice <[prestigeMultiplier].mul[100].round_to_precision[100]>
 
@@ -103,14 +103,14 @@ TerritoryClaim:
                     - if <server.has_flag[PreGameStart]>:
                         - run SubBalance def.kingdom:<[kingdom]> def.amount:<[corePrice].div[2]>
 
-                        - if <server.flag[kingdoms.<[kingdom]>.claims.core].size> < 20:
+                        - if <proc[GetClaims].context[<[kingdom]>|core].size> < 20:
                             - run AddUpkeep def.kingdom:<[kingdom]> def.amount:5
 
                     - else:
                         - run SubBalance def.kingdom:<[kingdom]> def.amount:<[corePrice]>
                         - run AddUpkeep def.kingdom:<[kingdom]> def.amount:30
 
-            - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].if_null[<list[]>].include[<server.online_ops>]>
+            - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         - case castle:
             - if <[castleChunks].contains[<[chunk]>]>:
@@ -125,7 +125,7 @@ TerritoryClaim:
                 - run AddClaim def.kingdom:<[kingdom]> def.type:castle def.chunk:<[chunk]>
                 - narrate format:callout Claimed!
 
-            - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].if_null[<list[]>].include[<server.online_ops>]>
+            - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         - default:
             - narrate format:callout "Invalid claiming type. Valid claiming types are either: <element[castle].color[red]> or <element[core].color[red]>"
