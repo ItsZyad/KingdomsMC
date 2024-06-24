@@ -507,7 +507,7 @@ Kingdom_Command:
             - foreach <server.flag[kingdoms.<[kingdom]>.castleGuards]> as:guard:
                 - if <[guard].flag[kingdom]> == <[kingdom]>:
                     - define guardItem <item[GuardList_Item]>
-                    - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+                    - define kingdomColor <proc[GetKingdomColor].context[<[kingdom]>]>
 
                     - adjust def:guardItem skull_skin:<[guard].skull_skin>
                     - adjust def:guardItem display:<element[<[guard].name>].bold.color[<[kingdomColor]>]>

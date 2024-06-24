@@ -436,12 +436,12 @@ OutpostHandler:
 
             - if <[whichKingdom]> == <player.flag[kingdom]>:
                 - repeat 3:
-                    - actionbar "You are now entering the outpost: <context.area.split[@].get[2].color[<script[KingdomTextColors].data_key[<[whichKingdom]>]>]>"
+                    - actionbar "You are now entering the outpost: <context.area.split[@].get[2].color[<proc[GetKingdomColor].context[<[whichKingdom]>]>]>"
                     - wait 1s
 
             - else:
                 - repeat 3:
-                    - actionbar "You are now entering a <server.flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>].color[<script[KingdomTextColors].data_key[<[whichKingdom]>]>]> outpost"
+                    - actionbar "You are now entering a <server.flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>].color[<proc[GetKingdomColor].context[<[whichKingdom]>]>]> outpost"
                     - wait 1s
 
         on player exits area:

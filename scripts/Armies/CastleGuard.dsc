@@ -475,10 +475,10 @@ GuardKingdomEngagement_Window:
     - define itemList <list[<item[air]>]>
 
     - foreach <[kingdomList]> as:kingdom:
-        - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
-        - define item <item[<[kingdomColor]>_banner]>
+        - define kingdomColorName <proc[GetKingdomColor].context[<[kingdom]>].name>
+        - define item <item[<[kingdomColorName]>_banner]>
 
-        - adjust def:item display:<element[Engage Members of <proc[GetKingdomShortName].context[<[kingdom]>]>].bold.color[<proc[GetColor].context[Default.<[kingdomColor]>]>]>
+        - adjust def:item display:<element[Engage Members of <proc[GetKingdomShortName].context[<[kingdom]>]>].bold.color[<proc[GetColor].context[Default.<[kingdomColorName]>]>]>
         - adjust def:item flag:kingdom:<[kingdom]>
 
         - define itemList:->:<[item]>

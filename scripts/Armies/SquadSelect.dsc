@@ -281,7 +281,7 @@ SquadSelection_Handler:
 
         - if !<[leatherItems].is_empty>:
             - define kingdom <player.flag[kingdom]>
-            - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>].as[color]>
+            - define kingdomColor <proc[GetKingdomColor].context[<[kingdom]>]>
             - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
 
             #- IMPORTANT: If you do follow through on making default equipment customizable then
@@ -504,7 +504,6 @@ SpawnNewSoldiers:
     ##
     ## >>> [ListTag<NPCTag>]
 
-    - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
     - define soldierList <list[]>
 
     # I won't have the script terminate altogether, but if you've reached this point and there's an

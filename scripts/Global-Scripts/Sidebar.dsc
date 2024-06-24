@@ -63,7 +63,7 @@ SidebarLoader:
             - define kingdomName <proc[GetKingdomName].context[<[kingdom]>]>
             - define kingdomData <server.flag[kingdoms.<[kingdom]>]>
             - define totalOutpostUpkeep <server.flag[<[kingdom]>.outposts.totalUpkeep].if_null[0]>
-            - sidebar set "title:<bold> <[kingdomName].color[<script[KingdomTextColors].data_key[<[player].flag[kingdom]>]>]>  " "values:<&r>|<&sp>Balance: <yellow>$<[kingdomData].get[balance].round_down.format_number>" players:<[player]>
+            - sidebar set "title:<bold> <[kingdomName].color[<proc[GetKingdomColor].context[<[kingdom]>]>]>  " "values:<&r>|<&sp>Balance: <yellow>$<[kingdomData].get[balance].round_down.format_number>" players:<[player]>
 
             # Set Upkeep Line
             - if !<server.has_flag[PauseUpkeep]>:

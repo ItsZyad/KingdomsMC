@@ -25,7 +25,7 @@ ChunkMap:
                 - foreach <[kingdomList]> as:kingdom:
                     # - define kingdomTerritory <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
                     - define kingdomTerritory <proc[GetClaims]>
-                    - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+                    - define kingdomColor <proc[GetKingdomColor].context[<[kingdom]>]>
 
                     - if <[currentChunk]> == <[playerChunk]> && <[kingdomTerritory].contains[<[currentChunk]>]>:
                         - define chunkList:->:<element[P].color[<[kingdomColor]>]>
