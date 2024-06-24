@@ -312,6 +312,91 @@ GetColor:
         - determine #ffffff
 
 
+SkinnyLetters:
+    type: data
+    All:
+        q: 𝗊
+        w: 𝗐
+        e: 𝖾
+        r: 𝗋
+        t: 𝗍
+        y: 𝗒
+        u: 𝗎
+        i: 𝗂
+        o: 𝗈
+        p: 𝗉
+        a: 𝖺
+        s: 𝗌
+        d: 𝖽
+        f: 𝖿
+        g: 𝗀
+        h: 𝗁
+        j: 𝗃
+        k: 𝗄
+        l: 𝗅
+        z: 𝗓
+        x: 𝗑
+        c: 𝖼
+        v: 𝗏
+        b: 𝖻
+        n: 𝗇
+        m: 𝗆
+        Q: 𝖰
+        W: 𝖶
+        E: 𝖤
+        R: 𝖱
+        T: 𝖳
+        Y: 𝖸
+        U: 𝖴
+        I: 𝖨
+        O: 𝖮
+        P: 𝖯
+        A: 𝖠
+        S: 𝖲
+        D: 𝖣
+        F: 𝖥
+        G: 𝖦
+        H: 𝖧
+        J: 𝖩
+        K: 𝖪
+        L: 𝖫
+        Z: 𝖹
+        X: 𝖷
+        C: 𝖢
+        V: 𝖵
+        B: 𝖡
+        N: 𝖭
+        M: 𝖬
+
+
+ConvertToSkinnyLetters:
+    type: procedure
+    definitions: text[ElementTag(String)]
+    description:
+    - Returns the provided text but with all valid letters made into 'skinny' letters.
+    - ---
+    - [ElementTag(String)]
+
+    script:
+    ## Returns the provided text but with all valid letters made into 'skinny' letters.
+    ##
+    ## text : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - define splitted <[text].split[]>
+    - define output <list[]>
+
+    - foreach <[splitted]> as:char:
+        - if <[char].is_in[<script[SkinnyLetters].data_key[All].keys>]>:
+            - define output:->:<script[SkinnyLetters].data_key[All.<[char]>]>
+
+        - else:
+            - define output:->:<[char]>
+
+    - determine <[output].unseparated>
+
+
 ##ignorewarning enumerated_script_name
 
 debug:
