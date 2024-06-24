@@ -25,7 +25,7 @@ GetKingdomSquadManagers:
     ##
     ## >>> [MapTag]
 
-    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks].if_null[<map[]>]>
 
 
 GetKingdomSquads:
@@ -43,7 +43,7 @@ GetKingdomSquads:
     ##
     ## >>> [ListTag<MapTag>]
 
-    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList]>
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].if_null[<list[]>]>
 
 
 GetMaxAllowedSMs:

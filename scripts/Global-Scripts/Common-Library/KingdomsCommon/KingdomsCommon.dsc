@@ -155,7 +155,7 @@ GetBalance:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.balance]>
+    - determine <server.flag[kingdoms.<[kingdom]>.balance].if_null[0]>
 
 
 SetBalance:
@@ -265,7 +265,7 @@ GetUpkeep:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.upkeep]>
+    - determine <server.flag[kingdoms.<[kingdom]>.upkeep].if_null[0]>
 
 
 SetUpkeep:
@@ -375,7 +375,7 @@ GetPrestige:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom prestige. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.prestige]>
+    - determine <server.flag[kingdoms.<[kingdom]>.prestige].if_null[0]>
 
 
 SetPrestige:
@@ -636,4 +636,4 @@ GetKingdomWarStatus:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom war status. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.warStatus]>
+    - determine <server.flag[kingdoms.<[kingdom]>.warStatus].if_null[false]>

@@ -27,7 +27,7 @@ GetMembers:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom members. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.members]>
+    - determine <server.flag[kingdoms.<[kingdom]>.members].if_null[<list[]>]>
 
 
 AddMember:

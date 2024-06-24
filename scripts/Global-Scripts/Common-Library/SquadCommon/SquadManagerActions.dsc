@@ -24,6 +24,10 @@ GenerateSMID:
     ##
     ## >>> [ElementTag<Integer>]
 
+    - if !<[location].object_type> != Location:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot generate a SMID. Provided parameter: <[location].color[red]> is not of type: LocationTag.]>
+        - determine null
+
     - determine <[location].simple.split[,].remove[last].unseparated>
 
 
@@ -33,7 +37,7 @@ GetSMLocation:
     description:
     - Gets the location of a specific squad manager, provided the SM's kingdom and ID.
     - ---
-    - → [LocationTag]
+    - → ?[LocationTag]
 
     script:
     ## Gets the location of a specific squad manager, provided the SM's kingdom and ID.
@@ -41,13 +45,13 @@ GetSMLocation:
     ## SMID    : [ElementTag<Integer>]
     ## kingdom : [ElementTag<String>]
     ##
-    ## >>> [LocationTag]
+    ## >>> ?[LocationTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get SM Location. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get SM Location. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.location]>
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.location].if_null[null]>
 
 
 GetSMName:
@@ -56,19 +60,19 @@ GetSMName:
     description:
     - Gets the internal name of the squad manager.
     - ---
-    - → [ElementTag(String)]
+    - → ?[ElementTag(String)]
 
     script:
     ## Gets the internal name of the squad manager.
     ##
     ## SMLocation : [LocationTag]
     ##
-    ## >>> [ElementTag<String>]
+    ## >>> ?[ElementTag<String>]
 
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.name]>
+    - determine <[SMLocation].flag[squadManager.name].if_null[null]>
 
 
 GetSMKingdom:
@@ -77,19 +81,19 @@ GetSMKingdom:
     description:
     - Gets the squad manager's kingdom affiliation.
     - ---
-    - → [ElementTag(String)]
+    - → ?[ElementTag(String)]
 
     script:
     ## Gets the squad manager's kingdom affiliation.
     ##
     ## SMLocation : [LocationTag]
     ##
-    ## >>> [ElementTag<String>]
+    ## >>> ?[ElementTag<String>]
 
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.kingdom]>
+    - determine <[SMLocation].flag[squadManager.kingdom].if_null[null]>
 
 
 GetMaxSMAOESize:
@@ -181,9 +185,7 @@ GetStationingCapacity:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - define stationCapacity <[SMLocation].flag[squadManager.levels.stationCapacity]>
-
-    - determine <[stationCapacity]>
+    - determine <[SMLocation].flag[squadManager.levels.stationCapacity].if_null[1]>
 
 
 GetSMAOESize:
@@ -192,19 +194,19 @@ GetSMAOESize:
     description:
     - Gets the current size of a squad manager's AOE.
     - ---
-    - → [ElementTag(Integer)]
+    - → ?[ElementTag(Integer)]
 
     script:
     ## Gets the current size of a squad manager's AOE.
     ##
     ## SMLocation : [LocationTag]
     ##
-    ## >>> [ElementTag<Integer>]
+    ## >>> ?[ElementTag<Integer>]
 
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.AOESize]>
+    - determine <[SMLocation].flag[squadManager.AOESize].if_null[null]>
 
 
 GetSMArea:
@@ -213,19 +215,19 @@ GetSMArea:
     description:
     - Gets the CuboidTag representing a squad manager's AOE.
     - ---
-    - → [CuboidTag]
+    - → ?[CuboidTag]
 
     script:
     ## Gets the CuboidTag representing a squad manager's AOE.
     ##
     ## SMLocation : [LocationTag]
     ##
-    ## >>> [CuboidTag]
+    ## >>> ?[CuboidTag]
 
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.area]>
+    - determine <[SMLocation].flag[squadManager.area].if_null[null]>
 
 
 GetSMArmoryLocations:
@@ -246,7 +248,7 @@ GetSMArmoryLocations:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.armories]>
+    - determine <[SMLocation].flag[squadManager.armories].if_null[<list[]>]>
 
 
 GetSMSquads:
@@ -267,7 +269,7 @@ GetSMSquads:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.squads.squadList]>
+    - determine <[SMLocation].flag[squadManager.squads.squadList].if_null[<list[]>]>
 
 
 GetSquadSMLocation:
@@ -276,7 +278,7 @@ GetSquadSMLocation:
     description:
     - Gets the SM associated with the squad provided.
     - ---
-    - → [LocationTag]
+    - → ?[LocationTag]
 
     script:
     ## Gets the SM associated with the squad provided.
@@ -284,7 +286,7 @@ GetSquadSMLocation:
     ## kingdom   : [ElementTag<String>]
     ## squadName : [ElementTag<String>]
     ##
-    ## >>> [LocationTag]
+    ## >>> ?[LocationTag]
 
     - define barracks <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
     - define stationingInfo <[barracks].parse_value_tag[<[parse_value].get[stationedSquads]>]>

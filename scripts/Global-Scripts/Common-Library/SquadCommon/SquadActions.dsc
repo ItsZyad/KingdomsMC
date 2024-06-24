@@ -121,7 +121,7 @@ GetSquadLeader:
     description:
     - Gets the npc currently acting as the leader of the squad provided.
     - ---
-    - → [NPCTag]
+    - → ?[NPCTag]
 
     script:
     ## Gets the npc currently acting as the leader of the squad provided.
@@ -129,7 +129,7 @@ GetSquadLeader:
     ## kingdom   : [ElementTag<String>]
     ## squadName : [ElementTag<String>]
     ##
-    ## >>> [NPCTag]
+    ## >>> ?[NPCTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad leader. Invalid kingdom code provided: <[kingdom]>]>
@@ -139,7 +139,7 @@ GetSquadLeader:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader]>
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader].if_null[null]>
 
 
 GetSquadID:
@@ -148,7 +148,7 @@ GetSquadID:
     description:
     - Gets the given squad's numerical ID.
     - ---
-    - [ElementTag(Integer)]
+    - ?[ElementTag(Integer)]
 
     script:
     ## Gets the given squad's numerical ID.
@@ -156,7 +156,7 @@ GetSquadID:
     ## kingdom   : [ElementTag<String>]
     ## squadName : [ElementTag<String>]
     ##
-    ## >>> [ElementTag<Integer>]
+    ## >>> ?[ElementTag<Integer>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad leader. Invalid kingdom code provided: <[kingdom]>]>
@@ -166,7 +166,7 @@ GetSquadID:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.ID]>
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.ID].if_null[null]>
 
 
 GetSquadName:
@@ -175,7 +175,7 @@ GetSquadName:
     description:
     - Gets the given squad's internal name.
     - ---
-    - → [ElementTag(String)]
+    - → ?[ElementTag(String)]
 
     script:
     ## Gets the given squad's internal name.
@@ -183,13 +183,13 @@ GetSquadName:
     ## kingdom   : [ElementTag<String>]
     ## ID        : [ElementTag<Integer>]
     ##
-    ## >>> [ElementTag<String>]
+    ## >>> ?[ElementTag<String>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad leader. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].filter_tag[<[filter_value].get[ID].equals[<[ID]>]>].get[1].get[name]>
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].filter_tag[<[filter_value].get[ID].equals[<[ID]>]>].get[1].get[name].if_null[null]>
 
 
 GetSquadDisplayName:
@@ -198,7 +198,7 @@ GetSquadDisplayName:
     description:
     - Gets the given squad's display name.
     - ---
-    - → [ElementTag(String)]
+    - → ?[ElementTag(String)]
 
     script:
     ## Gets the given squad's display name.
@@ -206,7 +206,7 @@ GetSquadDisplayName:
     ## kingdom   : [ElementTag<String>]
     ## squadName : [ElementTag<String>]
     ##
-    ## >>> [ElementTag<String>]
+    ## >>> ?[ElementTag<String>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad leader. Invalid kingdom code provided: <[kingdom]>]>
@@ -216,7 +216,7 @@ GetSquadDisplayName:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.displayName]>
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.displayName].if_null[null]>
 
 
 GetSquadEquipment:
@@ -269,7 +269,7 @@ GetSquadEquipment:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get squad by name: <[squadName]>]>
         - determine null
 
-    - define equipment <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.standardEquipment]>
+    - define equipment <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.standardEquipment].if_null[<map[]>]>
     - define equipment.hotbar <list[]> if:<[equipment].get[hotbar].exists.not>
 
     - determine <[equipment]>
@@ -345,6 +345,14 @@ DeleteSquad:
     ##
     ## >>> [Void]
 
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot delete squad. Invalid kingdom code provided: <[kingdom]>]>
+        - stop
+
+    - if <proc[GetSMLocation].context[<[SMLocation]>|<[kingdom]>]> == null:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot delete squad. Provided parameter: <[SMLocation].color[red]> is not a valid squad manager location!]>
+        - stop
+
     - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
 
     - if <[npcList].size> > 0:
@@ -370,6 +378,14 @@ DeleteSquadReference:
     ## squadName    : [ElementTag<String>]
     ##
     ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot delete squad. Invalid kingdom code provided: <[kingdom]>]>
+        - stop
+
+    - if <proc[GetSMLocation].context[<[SMLocation]>|<[kingdom]>]> == null:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot delete squad. Provided parameter: <[SMLocation].color[red]> is not a valid squad manager location!]>
+        - stop
 
     - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>:!
     - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>:!
@@ -398,6 +414,17 @@ CreateSquadReference:
     ## totalManpower : [ElementTag<Integer>]
     ##
     ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot create squad. Invalid kingdom code provided: <[kingdom]>]>
+        - stop
+
+    - if <proc[GetSMLocation].context[<[SMLocation]>|<[kingdom]>]> == null:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot create squad. Provided parameter: <[SMLocation].color[red]> is not a valid squad manager location!]>
+        - stop
+
+    - if !<[squadComp].object_type> != Map:
+        - run GenerateInternalError def.category:TypeError message:<element[Cannot create squad. Provided parameter: <[squadComp]> is not of type: MapTag]>
 
     - define barrackID <[SMLocation].xyz.replace_text[,]>
     - define squadLimitLevel <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.levels.squadLimitLevel]>
@@ -457,6 +484,14 @@ CalculateSquadUpkeep:
     ## squadComp : [MapTag<ElementTag<Integer>>]
     ##
     ## >>> [ElementTag<Float>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot calculate squad upkeep. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<[squadComp].object_type> != Map:
+        - run GenerateInternalError def.category:TypeError message:<element[Cannot calculate squad upkeep. Provided parameter: <[squadComp]> is not of type: MapTag]>
+        - determine null
 
     - define totalCost 0
 

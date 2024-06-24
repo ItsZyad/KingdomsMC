@@ -30,10 +30,10 @@ GetAllClaims:
 
     - if <[type].is_in[core|castle]>:
         - foreach <proc[GetKingdomList]> as:kingdom:
-            - define allClaims <[allClaims].include[<server.flag[kingdoms.<[kingdom]>.claims.<[type]>]>]>
+            - define allClaims <[allClaims].include[<server.flag[kingdoms.<[kingdom]>.claims.<[type]>].if_null[<list[]>]>]>
 
     - else:
-        - define allClaims <server.flag[kingdoms.claimInfo.allClaims]>
+        - define allClaims <server.flag[kingdoms.claimInfo.allClaims].if_null[<list[]>]>
 
     - determine <[allClaims]>
 
@@ -61,13 +61,13 @@ GetClaims:
 
     - choose <[type]>:
         - case castle:
-            - determine <server.flag[kingdoms.<[kingdom]>.claims.castle]>
+            - determine <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>]>
 
         - case core:
-            - determine <server.flag[kingdoms.<[kingdom]>.claims.core]>
+            - determine <server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>
 
         - default:
-            - determine <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
+            - determine <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
 
 
 AddClaim:
@@ -122,7 +122,7 @@ GetClaimsCuboid:
     - Returns a nested cuboid of the given kingdom's claims. Should a claim type not be specified
     - the procedure will assume 'core/castle'.
     - ---
-    - → [CuboidTag]
+    - → ?[CuboidTag]
 
     script:
     ## Returns a nested cuboid of the given kingdom's claims. Should a claim type not be specified
@@ -133,7 +133,7 @@ GetClaimsCuboid:
     ##         | Valid values:   core, castle, castlecore
     ##         | Default values: castlecore
     ##
-    ## >>> [CuboidTag]
+    ## >>> ?[CuboidTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
@@ -166,7 +166,7 @@ GetClaimsPolygon:
     description:
     - Returns a polygon created of all the chunks consisting a kingdom's core/castle claims.
     - ---
-    - → [PolygonTag]
+    - → ?[PolygonTag]
 
     script:
     ## Returns a polygon created of all the chunks consisting a kingdom's core/castle claims.
@@ -174,7 +174,7 @@ GetClaimsPolygon:
     ## kingdom : [ElementTag<String>]
     ## world   : [WorldTag]
     ##
-    ## >>> [PolygonTag]
+    ## >>> ?[PolygonTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
@@ -241,7 +241,7 @@ GetOutposts:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].if_null[<list>].is_empty>:
+    - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].if_null[<list[]>].is_empty>:
         - determine <map[]>
 
     - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].parse_value_tag[<[parse_value].include[area=<cuboid[<[parse_value].get[cornerone].world.name>,<[parse_value].get[cornerone].simple.split[,].remove[last].separated_by[,]>,<[parse_value].get[cornertwo].simple.split[,].remove[last].separated_by[,]>]>].exclude[cornerone|cornertwo]>]>
@@ -291,8 +291,6 @@ IsPlayerInCore:
     ##
     ## >>> [ElementTag<Boolean>]
 
-    - narrate <proc[GetAllOutposts]>
-
     - if !<[player].has_flag[kingdom]>:
         - determine false
 
@@ -302,7 +300,7 @@ IsPlayerInCore:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine false
 
-    - determine <[player].location.chunk.is_in[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
+    - determine <[player].location.chunk.is_in[<proc[GetClaims].context[<[kingdom]>|core]>]>
 
 
 IsPlayerInCastle:
@@ -329,7 +327,7 @@ IsPlayerInCastle:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine false
 
-    - determine <[player].location.chunk.is_in[<server.flag[kingdoms.<[kingdom]>.claims.castle]>]>
+    - determine <[player].location.chunk.is_in[<proc[GetClaims].context[<[kingdom]>|castle]>]>
 
 
 PlayerInWhichOutpost:
@@ -338,14 +336,14 @@ PlayerInWhichOutpost:
     description:
     - Checks if a player is in one of their own kingdom's outposts.
     - ---
-    - → [ElementTag(String)]
+    - → ?[ElementTag(String)]
 
     script:
     ## Checks if a player is in one of their own kingdom's outposts.
     ##
     ## player : [PlayerTag]
     ##
-    ## >>> [ElementTag<String>]
+    ## >>> ?[ElementTag<String>]
 
     - if !<[player].has_flag[kingdom]>:
         - determine null
