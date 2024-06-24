@@ -129,7 +129,9 @@ IsKingdomBankrupt:
 ## - Description
 ##
 ## Get
-## - Name
+## - Name/ShortName
+## - Color
+## - War Status
 ##
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -597,6 +599,10 @@ GetKingdomColor:
     ##
     ## >>> [ColorTag]
 
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom color. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
     - define asHex false if:<[asHex].exists.not>
     - define rawKingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
 
@@ -609,3 +615,25 @@ GetKingdomColor:
 
     - else:
         - determine <[rawKingdomColor].as[color]>
+
+
+GetKingdomWarStatus:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]
+    description:
+    - Returns true if the provided kingdom is currently at war.
+    - ---
+    - → [ElementTag(Boolean)]
+
+    script:
+    ## Returns true if the provided kingdom is currently at war.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom war status. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.warStatus]>
