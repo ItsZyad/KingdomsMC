@@ -138,7 +138,7 @@ PackageDependencyChecker_KPM:
         - if !<[validVersion]>:
             - flag server datahold.KPM.missingDependencies.<[descriptor].get[name]>:->:<[dependency]>
 
-    - if <server.flag[datahold.KPM.missingDependencies.<[descriptor].get[name]>].size> > 0:
+    - if <server.flag[datahold.KPM.missingDependencies.<[descriptor].get[name]>].if_null[<list[]>].size> > 0:
         - narrate format:notice "Required dependenc(ies): <server.flag[datahold.KPM.missingDependencies.<[descriptor].get[name]>].comma_separated.color[red]> for addon: <[descriptor].get[name].color[gold]> are unsupported or outdated. Addon will remain indexed, but to activate it you must install valid dependenc(ies) or use <element[/addon load ~f].color[red]>.<n>"
 
 
