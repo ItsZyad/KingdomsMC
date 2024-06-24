@@ -62,9 +62,11 @@ SidebarLoader:
             - define kingdom <[player].flag[kingdom]>
             - define kingdomName <proc[GetKingdomName].context[<[kingdom]>]>
 
+            - sidebar remove players:<[player]>
+
             # TODO: fix this as a part of the upkeep rework.
             - define totalOutpostUpkeep <server.flag[<[kingdom]>.outposts.totalUpkeep].if_null[0]>
-            - sidebar set "title:<bold> <[kingdomName].color[<proc[GetKingdomColor].context[<[kingdom]>]>]>  " players:<[player]>
+            - sidebar set "title:<bold> <[kingdomName].proc[ConvertToSkinnyLetters].color[<[kingdom].proc[GetKingdomColor]>]>  " players:<[player]>
 
             - sidebar add "values:<&r>|<&sp>Balance: <yellow>$<[kingdom].proc[GetBalance].round_down.format_number>" players:<[player]>
 
