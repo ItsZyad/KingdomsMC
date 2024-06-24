@@ -17,7 +17,7 @@ SetInitialSidebar:
         - ~run SidebarLoader def:<player>
 
         - if !<player.has_flag[kingdom]>:
-            - narrate format:debug "<yellow><bold>WARNING: <&r>Player kingdom flag not set! Using kingdom functions may have unexpected/untested side-effects"
+            - narrate format:callout "<yellow><bold>WARNING: <&r>Player kingdom flag not set! Using kingdom functions may have unexpected/untested side-effects"
 
 
 SidebarLoader:
@@ -61,13 +61,16 @@ SidebarLoader:
             # Initialize and set Balance line
             - define kingdom <[player].flag[kingdom]>
             - define kingdomName <proc[GetKingdomName].context[<[kingdom]>]>
-            - define kingdomData <server.flag[kingdoms.<[kingdom]>]>
+
+            # TODO: fix this as a part of the upkeep rework.
             - define totalOutpostUpkeep <server.flag[<[kingdom]>.outposts.totalUpkeep].if_null[0]>
-            - sidebar set "title:<bold> <[kingdomName].color[<proc[GetKingdomColor].context[<[kingdom]>]>]>  " "values:<&r>|<&sp>Balance: <yellow>$<[kingdomData].get[balance].round_down.format_number>" players:<[player]>
+            - sidebar set "title:<bold> <[kingdomName].color[<proc[GetKingdomColor].context[<[kingdom]>]>]>  " players:<[player]>
+
+            - sidebar add "values:<&r>|<&sp>Balance: <yellow>$<[kingdom].proc[GetBalance].round_down.format_number>" players:<[player]>
 
             # Set Upkeep Line
             - if !<server.has_flag[PauseUpkeep]>:
-                - sidebar add "values:<&sp>Upkeep: <yellow>$<[kingdomData].get[upkeep].add[<[totalOutpostUpkeep].if_null[0]>].round_down.format_number>" players:<[player]>
+                - sidebar add "values:<&sp>Upkeep: <yellow>$<[kingdom].proc[GetUpkeep].add[<[totalOutpostUpkeep].if_null[0]>].round_down.format_number>" players:<[player]>
 
             - else:
                 - sidebar add "values:<&sp>Upkeep: <aqua>Frozen!" players:<[player]>
@@ -76,19 +79,19 @@ SidebarLoader:
                 - sidebar add "values:<&sp>Fyndalin Tax Bonus: <green>$<server.flag[kingdoms.<[kingdom]>.powerstruggle.influenceBonuses.bonusTax].format_number>" players:<[player]>
 
             # Set Core Claim amount line
-            - sidebar add "values:<&sp>Core Claims: <[kingdomData].deep_get[claims.core].size.if_null[0]> / <[kingdomData].deep_get[claims.coreMax]>" players:<[player]>
+            - sidebar add "values:<&sp>Core Claims: <proc[GetClaims].context[<[kingdom]>|core].size.if_null[0]> / <proc[GetMaxClaims].context[<[kingdom]>|core]>" players:<[player]>
 
             # Set Castle Territory line
-            - sidebar add "values:<&sp>Castle Claims: <[kingdomData].deep_get[claims.castle].size.if_null[0]> / <[kingdomData].deep_get[claims.castleMax]>" players:<[player]>
+            - sidebar add "values:<&sp>Castle Claims: <proc[GetClaims].context[<[kingdom]>|castle].size.if_null[0]> / <proc[GetMaxClaims].context[<[kingdom]>|castle]>" players:<[player]>
 
             # Set War Status Line
-            - sidebar add "values:<&sp>War Status: <[kingdomData].deep_get[warStatus].if_true[At War].if_false[At Peace].color[<[warStatusColors].get[<[kingdomData].deep_get[warStatus]>]>]>" players:<[player]>
+            - sidebar add "values:<&sp>War Status: <[kingdom].proc[GetKingdomWarStatus].if_true[At War].if_false[At Peace].color[<[warStatusColors].get[<[kingdom].proc[GetKingdomWarStatus]>]>]>" players:<[player]>
 
             # Set Outpost Count Line
-            - sidebar add "values:<&sp>Outpost Count: <[kingdomData].deep_get[outposts.outpostList].size.if_null[0]>" players:<[player]>
+            - sidebar add "values:<&sp>Outpost Count: <[kingdom].proc[GetOutposts].size.if_null[0]>" players:<[player]>
 
             # Set Prestige Line
-            - sidebar add "values:<&sp>Prestige: <[kingdomData].deep_get[prestige].round_to_precision[0.05]> / 100" players:<[player]>
+            - sidebar add "values:<&sp>Prestige: <[kingdom].proc[GetPrestige].round_to_precision[0.025]> / 100" players:<[player]>
 
             # Set Prestige Degradation Line
             - ~run GetPrestigeDegradation save:prestigeScales
@@ -99,9 +102,6 @@ SidebarLoader:
 
             - else:
                 - sidebar add "values:<&sp>Prestige Decay: <element[<[prestigeScales].get[<[kingdom]>]>].color[red]>"
-
-            # Set Influences Line
-            - sidebar add "values:<&sp>Influence Points: <[kingdomData].deep_get[powerstruggle.influencePoints]>" players:<[player]>
 
             # Separator Line
             - sidebar add values:<element[<&sp>].repeat[30]> players:<[player]>
