@@ -118,12 +118,10 @@ SeekFolders_KPM:
         # TODO: Figure out if making it ignore all files but .dsc is actually a good design choice
         # TODO/ or if this whille bite me in the ass later...
         - else if <[item].split[.].get[2].to_lowercase.is_in[dsc]>:
-            - yaml load:<[subdirectory]>/<[item]> id:script
+            - fileread path:<[subdirectory]>/<[item]> save:script
 
-            - define contentList:->:<yaml[script].to_text>
+            - define contentList:->:<entry[script].data.utf8_decode>
             - define dirList:->:<element[<[subdirectory]>/<[item]>]>
-
-            - yaml unload id:script
 
     - definemap output:
         contentList: <[contentList]>
