@@ -33,15 +33,6 @@ KingdomRealNames:
         fyndalin: Fyndalin
 
 
-KingdomRealShortNames:
-    type: data
-    centran: Muspelheim
-    viridian: Viridia
-    raptoran: Altea
-    cambrian: Grovelia
-    fyndalin: Fyndalin
-
-
 KingdomTextColors:
     type: data
     centran: blue
