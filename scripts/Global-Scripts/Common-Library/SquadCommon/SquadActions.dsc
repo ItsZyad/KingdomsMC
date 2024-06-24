@@ -409,7 +409,7 @@ CreateSquadReference:
 
     - define internalName <[displayName].replace_text[ ].with[-]>
     - define squadID <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].last.get[ID].add[1].if_null[1]>
-    - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+    - define kingdomColor <proc[GetKingdomColor].context[<[kingdom]>]>
     - define hotbar <script.data_key[data.UnitTypeHotbars.<[squadComp].keys.get[1]>]>
 
     - definemap squadMap:
@@ -420,6 +420,7 @@ CreateSquadReference:
         displayName: <[displayName]>
         ID: <[squadID]>
         name: <[internalName]>
+        upkeep: <proc[CalculateSquadUpkeep].context[<[kingdom]>|<[squadComp]>]>
         # Note: could be an upgrade to allow for better default equipment(?)
         standardEquipment:
             helmet: <item[leather_helmet[color=<[kingdomColor]>]].with_flag[defaultArmor]>
@@ -434,10 +435,51 @@ CreateSquadReference:
     - if <player.exists>:
         - narrate format:callout "Created squad with name: <[displayName]>"
 
+    # Note: future configurable
     data:
         UnitTypeHotbars:
             swordsmen: <list[wooden_sword]>
             archers: <list[bow]>
+
+
+CalculateSquadUpkeep:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadComp[MapTag(ElementTag(Integer))]
+    description:
+    - Generates a daily upkeep cost for the squad with the provided kingdom and composition.
+    - ---
+    - → [ElementTag(Float)]
+
+    script:
+    ## Generates a daily upkeep cost for the squad with the provided kingdom and composition.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadComp : [MapTag<ElementTag<Integer>>]
+    ##
+    ## >>> [ElementTag<Float>]
+
+    - define totalCost 0
+
+    # This is the value above which prestige actually starts reducing the cost of the squad unit.
+    # (Must always be below 100).
+    - define prestigeCutoff 45
+    - define prestige <[kingdom].proc[GetPrestige]>
+    - define prestigeMultiplier <[prestige].sub[<[prestigeCutoff]>].div[100]>
+    - define prestigeMultiplier <[prestigeMultiplier].sub[<[prestigeMultiplier].mul[2]>].mul[2]>
+
+    - foreach <[squadComp]> as:amount key:unitType:
+        - define baseCost <script.data_key[data.UnitTypeBaseCosts.<[unitType]>].mul[<[amount]>]>
+        - define totalCost:+:<[baseCost].mul[<[prestigeMultiplier]>]>
+
+    - determine <[totalCost]>
+
+    data:
+        # All keys here will use the standard convention of plurality that Kingdoms uses for unit
+        # names (such as 'swordsmen' or 'archers'). But the costs listed here are all on an indivi-
+        # dual unit basis.
+        UnitTypeBaseCosts:
+            swordsmen: 35
+            archers: 30
 
 
 GiveSquadTools:
