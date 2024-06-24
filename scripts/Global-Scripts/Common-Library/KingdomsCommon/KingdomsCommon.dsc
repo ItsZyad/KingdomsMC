@@ -41,12 +41,13 @@ KingdomRealShortNames:
     cambrian: Grovelia
     fyndalin: Fyndalin
 
+
 KingdomTextColors:
     type: data
     centran: blue
     viridian: lime
     raptoran: red
-    cambrian: gold
+    cambrian: orange
     fyndalin: gray
 
 
@@ -597,3 +598,33 @@ GetKingdomShortName:
         - determine null
 
     - determine <script[KingdomRealNames].data_key[ShortNames.<[kingdomCode]>]>
+
+
+GetKingdomColor:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|asHex[?ElementTag(Boolean) = false]
+    description:
+    - Gets the provided kingdom's color.
+    - ---
+    - → [ColorTag]
+
+    script:
+    ## Gets the provided kingdom's color.
+    ##
+    ## kingdom :  [ElementTag<String>]
+    ## asHex   : ?[ElementTag<Boolean>]
+    ##
+    ## >>> [ColorTag]
+
+    - define asHex false if:<[asHex].exists.not>
+    - define rawKingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+
+    - if <[asHex]>:
+        - if <[rawKingdomColor].as[color].exists>:
+            - determine <[rawKingdomColor].as[color]>
+
+        - else:
+            - determine <proc[GetColor].context[Default.<[rawKingdomColor]>].as[color]>
+
+    - else:
+        - determine <[rawKingdomColor].as[color]>
