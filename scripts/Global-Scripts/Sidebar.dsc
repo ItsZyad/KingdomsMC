@@ -109,6 +109,8 @@ SidebarLoader:
         - else:
             - sidebar set title:<bold><gray>KINGDOMLESS
 
+            - sidebar add values:<&sp>
+            - sidebar add "values:Balance: <gray>$####"
             - sidebar add "values:Upkeep: <gray>$####"
             - sidebar add "values:Core Claims: ##/##"
             - sidebar add "values:Castle Claims: ##/##"
