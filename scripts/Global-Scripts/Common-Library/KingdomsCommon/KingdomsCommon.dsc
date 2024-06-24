@@ -19,28 +19,18 @@
 KingdomRealNames:
     type: data
     Names:
-        centran: Dominion of Muspelheim
-        viridian: Commonwealth of Viriditas
-        raptoran: Republic of Altea
-        cambrian: Grovelian Empire
-        fyndalin: Fyndalin Trust Territory
+        jalerad: The United Duchies of Jalerad
+        talpenhern: The Empire of Talpenhern
 
     ShortNames:
-        centran: Muspelheim
-        viridian: Viridia
-        raptoran: Altea
-        cambrian: Grovelia
-        fyndalin: Fyndalin
+        jalerad: Jalerad
+        talpenhern: Talpenhern
 
 
 KingdomTextColors:
     type: data
-    centran: blue
-    viridian: lime
-    raptoran: red
-    cambrian: orange
-    fyndalin: gray
-
+    jalerad: blue
+    talpenhern: red
 
 # Process of adding a new kingdom:
 # Add new kingdom data to kingdoms.yml such as balance etc.
