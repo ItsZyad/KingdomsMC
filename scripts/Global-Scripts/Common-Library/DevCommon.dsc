@@ -83,7 +83,7 @@ GenerateInternalError:
     ## kingdoms.admin permission or are ops when silent is provided as 'true'. silent is set to 'false'
     ## by default
     ##
-    ## category     : [ElementTag<String>]
+    ## category     :  [ElementTag<String>]
     ## message      : ?[ElementTag<String>]
     ## silent       : ?[ElementTag<Boolean>]
     ##
@@ -118,8 +118,8 @@ ActionBarToggler:
     ## toggleType provided. If no toggleType is provided then the script will disable any enabled
     ## actionbar message.
     ##
-    ## player     : [PlayerTag]
-    ## message    : [ElementTag]
+    ## player     :  [PlayerTag]
+    ## message    :  [ElementTag]
     ## toggleType : ?[ElementTag<String>]
     ##
     ## >>> [Void]
@@ -239,6 +239,78 @@ EnforceType:
                 - determine <[def]>
 
     - determine null
+
+
+ColorPalettes:
+    type: data
+    Colors:
+        Default:
+            white: f0f0f0
+            light_gray: 8f8f86
+            gray: 3c4247
+            black: 0b0c11
+            brown: 79441e
+            red: b21810
+            orange: f8730b
+            yellow: fac51f
+            lime: 71c808
+            green: 536f14
+            cyan: 07939d
+            light_blue: 22b6ea
+            blue: 2529a6
+            purple: 7f19bc
+            magenta: ca31bb
+            pink: f889aa
+
+        # All color palettes' keys must be equal to or supersets of Default's keys.
+        Vintage:
+            white: dddddd
+            light_gray: 8f8f86
+            gray: 8a96a7
+            dark_gray: 534f58
+            black: 232323
+            brown: 795a51
+            red: CE4D45
+            light_red: e8888b
+            orange: F19C65
+            gold: E8CA00
+            yellow: FFD265
+            lime: 71c808
+            light_green: 8BC34A
+            green: 2AA876
+            cyan: 07939d
+            light_blue: a2acca
+            blue: 0A7B83
+            purple: 8a638c
+            magenta: ca31bb
+            pink: f889aa
+
+
+GetColor:
+    type: procedure
+    definitions: colorPath[ElementTag(String)]
+    description:
+    - Gets a color from one of the Kingdoms-standard color palettes using standard dot notation, structured like: (palette).(color)
+    - ---
+    - → [ElementTag(String)]
+
+    script:
+    ## Gets a color from one of the Kingdoms-standard color palettes using standard dot notation,
+    ## structured like: <palette>.<color>
+    ##
+    ## colorPath: [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if <[colorPath].split[.].size> != 2:
+        - determine #eeeeee
+
+    - if <script[ColorPalettes].data_key[Colors.<[colorPath]>].exists>:
+        - determine #<script[ColorPalettes].data_key[Colors.<[colorPath]>]>
+
+    - else:
+        - determine #ffffff
+
 
 ##ignorewarning enumerated_script_name
 
