@@ -189,6 +189,37 @@ GetClaimsPolygon:
     - determine null
 
 
+GetMaxClaims:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|type[?ElementTag(String) = core]
+    description:
+    - Gets the maximum number of claims (of the type provided) that the provided kingdom can make.
+    - ---
+    - → [ElementTag(Integer)]
+
+    script:
+    ## Gets the maximum number of claims (of the type provided) that the provided kingdom can make.
+    ##
+    ## kingdom :  [ElementTag<String>]
+    ## type    : ?[ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Integer>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - choose <[type]>:
+        - case castle:
+            - determine <server.flag[kingdoms.<[kingdom]>.claims.castleMax].if_null[0]>
+
+        - case core:
+            - determine <server.flag[kingdoms.<[kingdom]>.claims.coreMax].if_null[0]>
+
+        - default:
+            - determine <server.flag[kingdoms.<[kingdom]>.claims.castleMax].if_null[0].add[<server.flag[kingdoms.<[kingdom]>.claims.coreMax].if_null[0]>]>
+
+
 GetOutposts:
     type: procedure
     definitions: kingdom[ElementTag(String)]
