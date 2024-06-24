@@ -120,22 +120,20 @@ DynmapTask:
     script:
     - define world <player.location.world>
     - define kingdomList <proc[GetKingdomList]>
-    - definemap KingdomTextColors:
-        raptoran: f14|812
-        centran: 34c|16a
-        viridian: 181|571
-        cambrian: c27100|faaa39
 
     # Main territory loop #
     - foreach <[kingdomList]> as:kingdom:
         - if <[world].has_flag[dynmap.cache.<[kingdom]>.main.cornerList]>:
+            - define kingdomColor <proc[GetKingdomColor].context[<[kingdom]>]>
+            - define fillColor <[kingdomColor].mix[<color[000000]>]>
+
             - foreach <[world].flag[dynmap.cache.<[kingdom]>.main.cornerList]> as:corner:
                 - define formattedCorner <[corner].simple.split[,].remove[last].space_separated>
                 - execute as_op "dmarker addcorner <[formattedCorner]> <[world].name>"
 
             - execute as_op "dmarker deletearea id:<[kingdom]>_main_territory set:regions"
             - execute as_op "dmarker addarea id:<[kingdom]>_main_territory set:regions label:<&dq>[Kingdom] <proc[GetKingdomName].context[<[kingdom]>]><&dq>"
-            - execute as_op "dmarker updatearea id:<[kingdom]>_main_territory set:outposts color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2"
+            - execute as_op "dmarker updatearea id:<[kingdom]>_main_territory set:outposts color:<[kingdomColor].hex> fillcolor:<[fillColor].hex> opacity:0.7 fillopacity:0.5 weight:2"
             - execute as_op "dmarker clearcorners" silent
 
         - foreach next
@@ -157,7 +155,7 @@ DynmapTask:
             - execute as_op "dmarker addcorner <[area].max.simple.replace_text[,].with[<&sp>]>" silent
             - execute as_op "dmarker deletearea id:<[ID]> set:outposts" silent
             - execute as_op "dmarker addarea id:<[ID]> set:outposts label:"[Outpost] <proc[GetKingdomName].context[<[kingdom]>]>"" silent
-            - execute as_op "dmarker updatearea id:<[ID]> set:outposts color:<[KingdomTextColors].get[<[kingdom]>].as[list].get[1]> fillcolor:<[KingdomTextColors].get[<[kingdom]>].as[list].get[2]> opacity:0.7 fillopacity:0.5 weight:2" silent
+            - execute as_op "dmarker updatearea id:<[ID]> set:outposts color:<[kingdomColor].hex> fillcolor:<[fillColor].hex> opacity:0.7 fillopacity:0.5 weight:2" silent
             - execute as_op "dmarker clearcorners" silent
 
     - narrate format:admincallout "Successfully refreshed Dynmap for world: <[world]>"

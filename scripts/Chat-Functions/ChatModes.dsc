@@ -89,7 +89,7 @@ KingdomsChat_Handler:
 
         - else if <[player].flag[ChatMode]> == kingdom:
             - define kingdom <[player].flag[kingdom]>
-            - define kingdomRealName <script[KingdomRealShortNames].data_key[<[kingdom]>]>
+            - define kingdomRealName <proc[GetKingdomName].context[<[kingdom]>]>
             - define kingdomMembers <server.flag[kingdoms.<[player].flag[kingdom]>.members]>
             - define kingdomOps <server.online_ops.filter_tag[<[filter_value].flag[kingdom].equals[<[kingdom]>]>]>
             - define applicableOps <server.online_ops.exclude[<[kingdomOps]>]>

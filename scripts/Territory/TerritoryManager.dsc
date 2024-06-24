@@ -93,16 +93,6 @@ TerritoryClaim:
                 - define prestigeMultiplier <util.e.power[<element[0.02186].mul[<[realPrestige]>]>].sub[0.9]>
                 - define corePrice <[prestigeMultiplier].mul[100].round_to_precision[100]>
 
-                - choose <[kingdom]>:
-                    - case raptoran:
-                        - define corePrice <[corePrice].mul[1.1]>
-
-                    - case centran:
-                        - define corePrice <[corePrice].mul[0.85]>
-
-                    - case cambrian:
-                        - define corePrice <[corePrice].mul[0.9]>
-
                 - if <[balance].is[LESS].than[<[corePrice]>]>:
                     - narrate format:callout "You do not have enough money to buy this plot of land! You need a total of: <bold>$<[corePrice]>"
                     - determine cancelled

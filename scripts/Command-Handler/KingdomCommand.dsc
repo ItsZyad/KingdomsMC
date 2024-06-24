@@ -63,14 +63,14 @@ Kingdom_Command:
     tab complete:
     - if <context.args.size> > 1 && <context.args.get[1]> == warp:
         - if <context.args.get[2].is_in[allow|deny]>:
-            - determine <script[KingdomRealShortNames].data_key[].values.exclude[data]>
+            - determine <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>
 
         - else if <context.args.get[2].starts_with[kingdom<&co>]>:
             - define kingdom <player.flag[kingdom]>
             - define warpList <server.flag[kingdoms.<[kingdom]>.warps].keys>
             - determine <[warpList]>
 
-        - define kingdomRealNames <script[KingdomRealShortNames].data_key[].values.exclude[data]>
+        - define kingdomRealNames <proc[GetKingdomList].context[false]>
         - determine <list[set|list|allow|deny].include[<[kingdomRealNames].parse_tag[<list[kingdom:|<[parse_value]>].unseparated>]>]>
 
     - else if <context.args.get[1]> == claim:
@@ -362,11 +362,10 @@ Kingdom_Command:
             - else if <[param].starts_with[kingdom<&co>]>:
                 - define chosenKingdomRN <[param].split[<&co>].get[2]>
                 - define warpName <context.args.get[3].if_null[main]>
-                # - define kingdomRealNames <script[KingdomRealShortNames].data_key[].values.exclude[data]>
                 - define kingdomRealNames <proc[GetKingdomList].context[false]>
-                - define chosenKingdomCN <script[KingdomRealShortNames].data_key[].invert.get[<[chosenKingdomRN]>]>
+                - define chosenKingdomCN <script[KingdomRealNames].data_key[ShortNames].invert.get[<[chosenKingdomRN]>]>
 
-                - if <[chosenKingdomRN]> == <script[KingdomRealShortNames].data_key[<[kingdom]>]>:
+                - if <[chosenKingdomRN]> == <[kingdom].proc[GetKingdomShortName]>:
                     - narrate format:callout "You do not need to specify the kingdom when teleporting to your own warps."
                     - determine cancelled
 
@@ -399,7 +398,7 @@ Kingdom_Command:
                         - narrate "<green>--<&gt> <[warp].get[1].color[aqua].bold><&co> <[warp].get[2].round.simple>"
 
             - else if <[param]> == deny:
-                - define kingdomCodeName <script[KingdomRealShortNames].data_key[].invert.get[<context.args.get[3]>]>
+                - define kingdomCodeName <script[KingdomRealNames].data_key[ShortNames].invert.get[<context.args.get[3]>]>
                 - if <server.flag[kingdoms.<[kingdom]>.openWarp].contains[<[kingdomCodeName]>]>:
                     - flag server kingdoms.<[kingdom]>.openWarp:<-:<[kingdomCodeName]>
                     - narrate format:callout "Removed kingdom: <context.args.get[3].color[red].bold> from your warp whitelist!"
@@ -408,8 +407,8 @@ Kingdom_Command:
                     - narrate format:callout "That kingdom was already not on your kingdom's warp whitelist."
 
             - else if <[param]> == allow:
-                - define kingdomRealNames <script[KingdomRealShortNames].data_key[].values.exclude[data]>
-                - define kingdomCodeNames <script[KingdomRealShortNames].data_key[].keys.exclude[type]>
+                - define kingdomRealNames <proc[GetKingdomList].context[false]>
+                - define kingdomCodeNames <proc[GetKingdomList]>
 
                 - if !<context.args.get[3].exists>:
                     - define openWarp <server.flag[kingdoms.<[kingdom]>.openWarp]>
@@ -418,7 +417,7 @@ Kingdom_Command:
                         - narrate format:callout "Your kingdom has its warps closed to all kingdoms"
 
                     - else:
-                        - narrate format:callout "Kingdoms that can access your warps:<n><server.flag[kingdoms.<[kingdom]>.openWarp].parse_tag[<script[KingdomRealShortNames].data_key[<[parse_value]>]>].separated_by[<n>]>"
+                        - narrate format:callout "Kingdoms that can access your warps:<n><server.flag[kingdoms.<[kingdom]>.openWarp].parse_tag[<proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>].separated_by[<n>]>"
 
                 - else if <[kingdomRealNames].contains[<context.args.get[3]>]>:
                     - define index <[kingdomRealNames].find[<context.args.get[3]>]>

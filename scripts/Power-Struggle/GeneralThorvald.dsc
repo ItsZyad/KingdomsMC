@@ -40,7 +40,7 @@ GeneralThorvald_I:
                 - define transferAmount <player.flag[transferData].get[amount]>
                 - define transferItem <player.flag[transferData].get[material]>
                 - define kingdom <player.flag[kingdom]>
-                - define kingdomRealName <script[KingdomRealShortNames].data_key[<[kingdom]>]>
+                - define kingdomRealName <proc[GetKingdomName].context[<[kingdom]>]>
 
                 - if <player.has_flag[transferData.amount]>:
                     - chat range:4 "Ah! I gather you are the representative from <[kingdomRealName]>."

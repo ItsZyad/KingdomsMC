@@ -422,7 +422,7 @@ GuardEngagement_Handler:
 
         on player clicks EngageOnSight_Item in EngagementRules_Window:
         - define guard <player.flag[clickedNPC]>
-        - flag <[guard]> targetInfo.whichAttack:<list[centran|raptoran|viridian|cambrian|fyndalin].exclude[<[guard].flag[kingdom]>]>
+        - flag <[guard]> targetInfo.whichAttack:<proc[GetKingdomList].exclude[<[guard].flag[kingdom]>]>
         - flag <[guard]> targetInfo.whichWarn:<list[]>
         - narrate format:callout "Guard will now engage all other kingdoms with hostility!"
 
@@ -431,7 +431,7 @@ GuardEngagement_Handler:
 
         - if <[guard].flag[targetInfo.reportInc].size> == 0:
             - flag <[guard]> targetInfo.whichAttack:<list[]>
-            - flag <[guard]> targetInfo.reportInc:<list[centran|raptoran|viridian|cambrian|fyndalin].exclude[<[guard].flag[kingdom]>]>
+            - flag <[guard]> targetInfo.reportInc:<proc[GetKingdomList].exclude[<[guard].flag[kingdom]>]>
             - narrate format:callout "Guard will now report all activity, within 20 blocks, that they see!"
 
         - else:
@@ -470,41 +470,29 @@ GuardKingdomEngagement_Window:
     inventory: chest
     title: Engage Certain Kingdoms
     gui: true
+    procedural items:
+    - define kingdomList <proc[GetKingdomList]>
+    - define itemList <list[<item[air]>]>
+
+    - foreach <[kingdomList]> as:kingdom:
+        - define kingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+        - define item <item[<[kingdomColor]>_banner]>
+
+        - adjust def:item display:<element[Engage Members of <proc[GetKingdomShortName].context[<[kingdom]>]>].bold.color[<proc[GetColor].context[Default.<[kingdomColor]>]>]>
+        - adjust def:item flag:kingdom:<[kingdom]>
+
+        - define itemList:->:<[item]>
+        - define itemList:->:<item[air]>
+
+        - if <[loop_index].mod[4]> == 0:
+            - define itemList:->:<item[air]>
+
+    - determine <[itemList]>
+
     slots:
-    - [] [GuardEngageRaptoran_Item] [] [GuardEngageCentran_Item] [] [GuardEngageCambrian_Item] [] [GuardEngageViridian_Item] []
-
-
-# TODO: REMOVE 4-KINGDOM HARD-CODING!!
-GuardEngageRaptoran_Item:
-    type: item
-    material: red_banner
-    display name: <red><bold>Engage Members of <script[KingdomRealShortNames].data_key[raptoran]>
-    flags:
-        kingdom: raptoran
-
-
-GuardEngageCentran_Item:
-    type: item
-    material: blue_banner
-    display name: <blue><bold>Engage Members of <script[KingdomRealShortNames].data_key[centran]>
-    flags:
-        kingdom: centran
-
-
-GuardEngageCambrian_Item:
-    type: item
-    material: orange_banner
-    display name: <gold><bold>Engage Members of <script[KingdomRealShortNames].data_key[cambrian]>
-    flags:
-        kingdom: cambrian
-
-
-GuardEngageViridian_Item:
-    type: item
-    material: green_banner
-    display name: <green><bold>Engage Members of <script[KingdomRealShortNames].data_key[viridian]>
-    flags:
-        kingdom: viridian
+    - [] [] [] [] [] [] [] [] []
+    - [] [] [] [] [] [] [] [] []
+    - [] [] [] [] [] [] [] [] []
 
 
 GuardKingdomEngagement_Handler:
@@ -698,6 +686,8 @@ StaggeredPathfind:
     ## endLocation    :  [LocationTag]
     ## speed          :  [ElementTag<Integer>]
     ## recursionDepth : ?[ElementTag<Integer>]
+    ##
+    ## >>> [Void]
 
     - define recursionDepth <[recursionDepth].if_null[0]>
     - define speed <[speed].if_null[1]>

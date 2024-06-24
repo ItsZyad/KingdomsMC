@@ -219,7 +219,7 @@ KingdomSwitcher_Command:
     description: Allows admins to switch their kingdom tag for debug purposes
     permission: kingdoms.admin.kingdomswitch
     tab completions:
-        1: centran|viridian|raptoran|cambrian|fyndalin
+        1: <proc[GetKingdomList]>
     script:
     - define kingdomList <proc[GetKingdomList]>
 
