@@ -29,8 +29,8 @@ KingdomRealNames:
 
 KingdomTextColors:
     type: data
-    jalerad: blue
-    talpenhern: red
+    jalerad: light_blue
+    talpenhern: orange
 
 # Process of adding a new kingdom:
 # Add new kingdom data to kingdoms.yml such as balance etc.
@@ -585,7 +585,7 @@ GetKingdomShortName:
 
 GetKingdomColor:
     type: procedure
-    definitions: kingdom[ElementTag(String)]|asHex[?ElementTag(Boolean) = false]
+    definitions: kingdom[ElementTag(String)]
     description:
     - Gets the provided kingdom's color.
     - ---
@@ -595,7 +595,6 @@ GetKingdomColor:
     ## Gets the provided kingdom's color.
     ##
     ## kingdom :  [ElementTag<String>]
-    ## asHex   : ?[ElementTag<Boolean>]
     ##
     ## >>> [ColorTag]
 
@@ -603,18 +602,16 @@ GetKingdomColor:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom color. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - define asHex false if:<[asHex].exists.not>
     - define rawKingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+    - define outputColor <color[#ffffff]>
 
-    - if <[asHex]>:
-        - if <[rawKingdomColor].as[color].exists>:
-            - determine <[rawKingdomColor].as[color]>
-
-        - else:
-            - determine <proc[GetColor].context[Default.<[rawKingdomColor]>].as[color]>
+    - if <[rawKingdomColor].as[color].exists>:
+        - define outputColor <[rawKingdomColor].as[color]>
 
     - else:
-        - determine <[rawKingdomColor].as[color]>
+        - define outputColor <proc[GetColor].context[Default.<[rawKingdomColor]>].as[color]>
+
+    - determine <[outputColor]>
 
 
 GetKingdomWarStatus:
