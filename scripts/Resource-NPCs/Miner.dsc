@@ -1,73 +1,49 @@
 ##
-## All code related to how loggers/woodcutters operate in addition to their AOEs.
+## All the scripts in the file relate to the operation of the Miner NPC that can be spawned by
+## kingdoms to extract resources.
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jun 2021
-## @Script Ver: v1.0
+## @Updated: Jun 2024
+## @Script Ver: v2.0
 ##
-##ignorewarning invalid_data_line_quotes
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 MinerRangeFinder:
     type: task
     debug: false
-    definitions: npc|radius|regenAOE
+    definitions: npc[NPCTag]
     script:
-
-    # Have it check that the NPC is at least 10 blocks below ground
-    # then have it carry out the checks relating to what block types
-    # are around it.
-
-    # Occasionally it should sprinkle in some ores/stones that aren't
-    # in it's direct vicinity but that will be rare and will heavily
-    # depend on NPC level and exp.
-
-    - define regenAOE <[regenAOE].if_null[true]>
-    - define npcLoc <[npc].location>
-    - define locOne <[npcLoc].add[<[radius]>,<[radius].div[2].round>,<[radius]>]>
-    - define locTwo <[npcLoc].sub[<[radius]>,<[radius].div[2].round>,<[radius]>]>
-    - define areaOfEffect <cuboid[<[npc].location.world.name>,<[locOne].simple.split[,].remove[last].separated_by[,]>,<[locTwo].simple.split[,].remove[last].separated_by[,]>]>
-
-    - if <[regenAOE]>:
-        - flag <[npc]> blockbuildup:!
-
-        - foreach <[areaOfEffect].blocks> as:block:
-            - if <[block].material.name> == air:
-                - foreach next
-
-            - flag <[npc]> blockBuildup.<[block].material.name>:++
-            - flag <[npc]> blockBuildup.totalBlocks:++
-
-    - narrate format:debug <[areaOfEffect].blocks.size>
-    - narrate format:debug <[npc].flag[blockBuildup]>
-
-    - showfake red_stained_glass <[areaOfEffect].outline> if:<[areaOfEffect].exists>
-
-    #                              1      2            3               4
-    - note <[areaOfEffect]> as:INTERNAL_mine_<[npc].flag[kingdom]>_<[npc].id>
-    - flag server kingdoms.<[npc].flag[kingdom]>.RNPCs.Miners.<[npc].id>.area:<cuboid[INTERNAL_mine_<[npc].flag[kingdom]>_<[npc].id>]>
     - flag server kingdoms.<[npc].flag[kingdom]>.RNPCs.Miners.<[npc].id>.NPC:<[npc]>
-    - flag <[npc]> AOE:<[areaOfEffect]>
+    - flag server kingdoms.<[npc].flag[kingdom]>.RNPCs.Miners.<[npc].id>.refreshTime:<[npc].location.world.time>
 
 ##ignorewarning raw_object_notation
-##ignorewarning def_of_nothing
 
 MineExperienceGain:
     type: data
     XP:
         clay_block: 0.02
+        clay: 0.02
         gravel: 0.03
         granite: 0.03
         andesite: 0.04
         diorite: 0.04
         stone: 0.05
+        cobblestone: 0.05
         coal_ore: 0.06
+        coal: 0.06
         lapis_ore: 0.08
+        lapis_lazuli: 0.08
         redstone_ore: 0.09
+        redstone: 0.09
         iron_ore: 0.1
+        iron_ingot: 0.1
         gold_ore: 0.25
+        gold_ingot: 0.25
         diamond_ore: 0.35
+        diamond: 0.35
         emerald_ore: 0.37
+        emerald: 0.37
         obsidian: 0.5
 
 
@@ -90,9 +66,205 @@ TrueItemRef:
         clay_block: clay
 
 
-## NOTE: This is a stopgap. Rewrite all RNPCs code for A5!!
+ResourceSeed_Data:
+    type: data
+    BaseSeed: 0
+    ResourceSeedShifts:
+        cobblestone: 0
+        clay: 3
+        diorite: 5
+        andesite: 6
+        granite: 7
+        gravel: 10
+        coal: 25
+        lapis_lazuli: 50
+        redstone: 70
+        iron_ingot: 80
+        gold_ingot: 150
+        diamond: 250
+        emerald: 300
+        obsidian: 700
+
+
+GetResourceValueAtChunk:
+    type: procedure
+    definitions: chunk[`ChunkTag`]|resource[`ElementTag(String)`]|octaveScale[`?ElementTag(Float) = 1.23`]|octaveAmp[`?ElementTag(Float) = 1.8`]
+    description:
+    - Will get a value between 0 and 20 indicating the prevalance of the given resource at the provided chunk.
+    - ---
+    - → `[ElementTag(Float)]`
+
+    script:
+    ## Will get a value between 0 and 20 indicating the prevalance of the given resource at the
+    ## provided chunk.
+    ##
+    ## chunk       :  [ChunkTag]
+    ## resource    :  [ElementTag<String>]
+    ## octaveScale : ?[ElementTag<Float>]
+    ## octaveAmp   : ?[ElementTag<Float>]
+    ##
+    ## >>> [ElementTag<Float>]
+
+    - if !<script[ResourceSeed_Data].data_key[ResourceSeedShifts].contains[<[resource]>]>:
+        - determine 0
+
+    - define octaveScale <[octaveScale].if_null[1.23]>
+    - define octaveAmp <[octaveAmp].if_null[1.8]>
+
+    - define baseSeed <script[ResourceSeed_Data].data_key[BaseSeed]>
+    - define resourceSeedShift <script[ResourceSeed_Data].data_key[ResourceSeedShifts.<[resource]>]>
+    - define seed <[baseSeed].add[<[resourceSeedShift]>]>
+
+    - define location <location[<[chunk].x>,0,<[chunk].z>,0,0,<[chunk].world.name>]>
+    - define xComp <[location].x>
+    - define zComp <[location].z>
+
+    - define oct1 <[location].with_y[<[seed]>].with_x[<[xComp].mul[1]>].with_z[<[zComp].mul[1]>].div[5].div[16].simplex_3d.add[1].div[2].mul[20].add[1]>
+    - define oct2 <[location].with_y[<[seed]>].with_x[<[xComp].mul[2]>].with_z[<[zComp].mul[2]>].div[5].div[16].simplex_3d.add[1].div[2].mul[20].add[1].mul[0.5]>
+    - define oct3 <[location].with_y[<[seed]>].with_x[<[xComp].mul[4]>].with_z[<[zComp].mul[4]>].div[5].div[16].simplex_3d.add[1].div[2].mul[20].add[1].mul[0.25]>
+
+    - define octSum <[oct1].add[<[oct2]>].add[<[oct3]>]>
+    - define ampedOcts <[octSum].div[<[octaveAmp]>].sub[5]>
+    - define scaledOcts <[ampedOcts].power[<[octaveScale]>]>
+
+    - if !<[scaledOcts].is_truthy> || <[scaledOcts]> == NaN || <[scaledOcts]> < 0:
+        - define scaledOcts 0
+
+    - else if <[scaledOcts]> > 20:
+        - define scaledOcts 20
+
+    - determine <[scaledOcts].round_to_precision[0.0001]>
+
+
 MinerItemGenerator:
     type: task
+    definitions: npc[NPCTag]
+    script:
+    - define kingdom <[npc].flag[kingdom]>
+    - define chunk <[npc].location.chunk>
+
+    - if !<[kingdom].exists>:
+        - foreach next
+
+    - if <[npc].inventory.is_full>:
+        - foreach next
+
+    - if <proc[IsKingdomBankrupt].context[<[kingdom]>]>:
+        - foreach next
+
+    - define surroundingMiners <[npc].location.find_npcs_within[9].filter_tag[<[filter_value].flag[RNPC].equals[miners]>].if_null[<list[]>].exclude[<[npc]>]>
+    - define overcrowdingPenalty <[surroundingMiners].size.sub[1].mul[25]>
+    - define overcrowdingPenalty 0 if:<[overcrowdingPenalty].is[LESS].than[0]>
+    - define overcrowdingPenalty 100 if:<[overcrowdingPenalty].is[MORE].than[100]>
+
+    - if <[surroundingMiners].size.is[MORE].than[1]>:
+        - adjust <[npc]> hologram_lines:<list[]>
+        - adjust <[npc]> hologram_lines:<list[Overcrowding Penalty:<&sp><[overcrowdingPenalty]><&pc>]>
+        - flag <[npc]> overcrowdingPen:<[overcrowdingPenalty]>
+
+        - if <[overcrowdingPenalty]> == 100:
+            - adjust <[npc]> hologram_lines:<list[Overcrowding Penalty:<&sp><red><[overcrowdingPenalty]><&pc>|This miner is disabled]>
+            - foreach next
+
+    - else:
+        - adjust <[npc]> hologram_lines:<list[]>
+        - flag <[npc]> overcrowdingPen:0
+
+    - if <[npc].has_flag[RNPC.cache.resourceMap]> && <[npc].flag[RNPC.cache.chunk]> == <[npc].location.chunk>:
+        - define resourceMap <[npc].flag[RNPC.cache.resourceMap]>
+
+    - else:
+        - inject <script.name> path:Subpaths.CalculateAllResourceValues
+        - flag <[npc]> RNPC.cache.resourceMap:<[resourceMap]>
+        - flag <[npc]> RNPC.cache.chunk:<[npc].location.chunk>
+
+    # This is the *total* number of resources that a miner can generate per tick. (which at the
+    # moment is one in-game day).
+    - define resourcesPerTick 32
+    - define resourcesPerTick <[resourcesPerTick].sub[<[npc].flag[RNPC.cache.carryOver].size>]> if:<[npc].has_flag[RNPC.cache.carryOver]>
+    - define totalResources <[resourceMap].values.sum.round_to_precision[0.001]>
+    - define proportionMap <[resourceMap].parse_value_tag[<[parse_value].div[<[totalResources]>].mul[<[resourcesPerTick]>].round>]>
+    - define carryOver <[npc].flag[RNPC.cache.carryOver].if_null[<map[]>]>
+
+    - foreach <[proportionMap].include[<[carryOver]>]> key:item as:amount:
+        - if !<[npc].inventory.can_fit[<[item]>].quantity[<[amount]>]>:
+            - foreach next
+
+        - if <[carryOver].size> < <[resourcesPerTick].div[10].round> && <util.random_chance[35]>:
+            - flag <[npc]> RNPC.cache.carryOver.<[item]>:++
+            - define amount:--
+
+        - give <[item]> to:<[npc].inventory> quantity:<[amount]>
+
+        - flag <[npc]> Level:+:<script[MineExperienceGain].data_key[XP.<[item]>].mul[<[amount].div[350].round_to_precision[0.01]>]>
+
+        - if <[npc].flag[Level].round> >= 100:
+            - foreach next
+
+        - define prevBaseLevel <[npc].flag[Level].round_down>
+
+        - if <[npc].flag[Level].round_down> == <[prevBaseLevel]>:
+            - foreach next
+
+        - define inventoryData <[npc].inventory.list_contents>
+        - adjust <[npc]> name:<[npc].nickname.split[<&sp>].get[1].to[-2].space_separated><&sp><[npc].flag[Level].round_down>
+        - adjust <[npc]> inventory_contents:<[inventoryData]>
+
+        - if <[npc].flag[outputMod]> >= 2:
+            - foreach next
+
+        - flag <[npc]> outputMod:+:<util.random.decimal[0].to[0.005]>
+
+    Subpaths:
+        CalculateAllResourceValues:
+        - define resourceMap <map[]>
+        - definemap specialMaterialCharacteristics:
+            diamond:
+                octaveAmp: 1.7
+                octaveScale: 1.11
+            obsidian:
+                octaveAmp: 2.3
+                octaveScale: 1.5
+            andesite:
+                octaveAmp: 0.97
+                octaveScale: 1.05
+            diorite:
+                octaveAmp: 0.97
+                octaveScale: 1.05
+            gravel:
+                octaveAmp: 1.97
+                octaveScale: 1.35
+            stone:
+                octaveAmp: 0.89
+                octaveScale: 1
+
+        - foreach <script[ResourceSeed_Data].data_key[ResourceSeedShifts].keys> as:material:
+            - if <[specialMaterialCharacteristics].contains[<[material]>]>:
+                - define octaveScale <[specialMaterialCharacteristics].deep_get[<[material]>.octaveScale]>
+                - define octaveAmp <[specialMaterialCharacteristics].deep_get[<[material]>.octaveAmp]>
+                - define resourceMap.<[material]>:<proc[GetResourceValueAtChunk].context[<[chunk]>|<[material]>|<[octaveScale]>|<[octaveAmp]>]>
+
+            - else:
+                - define resourceMap.<[material]>:<proc[GetResourceValueAtChunk].context[<[chunk]>|<[material]>]>
+
+
+MinerGeneration_Handler:
+    type: world
+    enabled: false
+    events:
+        on time changes in world:
+        - foreach <proc[GetKingdomList]> as:kingdom:
+            - foreach <server.flag[kingdoms.<[kingdom]>.RNPCs.miners].if_null[<list[]>]> as:miner:
+                - if <[miner].get[refreshTime].if_null[0]> != <context.time>:
+                    - foreach next
+
+                - run MinerItemGenerator def.npc:<[miner]>
+
+
+## EVERYTHING BELOW IS OLD CODE AND SHOULD NOT BE USED IN PROD. ANYMORE!! ##
+OLD_MinerItemGenerator:
+    type: task
+    enabled: false
     script:
     - define kingdomList <proc[GetKingdomList]>
     - define allMiners <list[]>
@@ -233,6 +405,7 @@ MinerItemGenerator:
 MinerGenerationNoticeUpdater:
     type: task
     debug: false
+    enabled: false
     script:
     - repeat 35:
         - define timeStart <util.current_time_millis>
@@ -246,12 +419,13 @@ MinerGenerationNoticeUpdater:
         - wait <element[1000].sub[<util.current_time_millis.sub[<[timeStart]>]>].div[1000].mul[20].round>t
 
 
-# MinerGeneration_Handler:
-#     type: world
-#     debug: false
-#     events:
-#         on system time secondly every:150:
-#         - run MinerItemGenerator
+OLD_MinerGeneration_Handler:
+    type: world
+    debug: false
+    enabled: false
+    events:
+        on system time secondly every:150:
+        - run OLD_MinerItemGenerator
 
-        #on player places block in:mine*:
-        #- determine cancelled
+        on player places block in:mine*:
+        - determine cancelled
