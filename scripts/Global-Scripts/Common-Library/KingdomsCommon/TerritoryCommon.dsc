@@ -11,6 +11,7 @@
 
 GetAllClaims:
     type: procedure
+    debug: false
     definitions: type[?ElementTag(String)]
     description:
     - Gets all claims of the provided type made by all kingdoms.
@@ -27,13 +28,14 @@ GetAllClaims:
     ## >>> [ListTag<ChunkTag>]
 
     - define allClaims <list[]>
+    - define type <[type].if_null[null]>
 
-    - if <[type].is_in[core|castle]>:
-        - foreach <proc[GetKingdomList]> as:kingdom:
-            - define allClaims <[allClaims].include[<server.flag[kingdoms.<[kingdom]>.claims.<[type]>].if_null[<list[]>]>]>
+    - if <[type]> == null:
+        - define allClaims <server.flag[kingdoms.claimInfo.allClaims].if_null[<list[]>]>
 
     - else:
-        - define allClaims <server.flag[kingdoms.claimInfo.allClaims].if_null[<list[]>]>
+        - foreach <proc[GetKingdomList]> as:kingdom:
+            - define allClaims <[allClaims].include[<server.flag[kingdoms.<[kingdom]>.claims.<[type]>].if_null[<list[]>]>]>
 
     - determine <[allClaims]>
 
