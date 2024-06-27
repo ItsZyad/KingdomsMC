@@ -585,6 +585,7 @@ GetKingdomShortName:
 
 GetKingdomColor:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets the provided kingdom's color.
@@ -616,6 +617,7 @@ GetKingdomColor:
 
 GetKingdomWarStatus:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Returns true if the provided kingdom is currently at war.
