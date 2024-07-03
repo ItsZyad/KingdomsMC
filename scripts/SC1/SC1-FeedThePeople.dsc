@@ -42,6 +42,18 @@ SC1_Population_Handler:
         - run SC1_FoodTick
 
 
+SC1_Food_Command:
+    type: command
+    name: food
+    usage: /food
+    description: Brings up the food management menu for your kingdom
+    script:
+    - if !<player.has_flag[kingdom]>:
+        - stop
+
+    - inventory open d:SC1_FoodManager_Window
+
+
 SC1_PopulationGrowthTick:
     type: task
     script:
