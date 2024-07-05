@@ -115,7 +115,7 @@ Letter_Command:
     script:
     - define args <context.raw_args.split_args>
     - define kingdom <[args].get[1]>
-    - define isUnsigned <[args].get[2]>
+    - define isUnsigned <[args].get[2].if_null[true]>
     - define title <[args].get[3].if_null[null]>
 
     - if !<[kingdom].proc[ValidateKingdomCode]>:
