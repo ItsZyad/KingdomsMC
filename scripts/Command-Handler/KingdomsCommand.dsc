@@ -112,10 +112,9 @@ Kingdoms_Command:
 
     script:
     - if <context.args.get[1]> == version:
-        - yaml load:kingdoms.yml id:kingdoms
-        - define hoverTest "<&7>Code Compostion: 99.4<&pc> Denizen // 0<&pc> Java // 0.6<&pc> Python"
-        - narrate format:callout <yaml[kingdoms].read[version].on_hover[<[hoverTest]>]>
-        - yaml load:kingdoms.yml id:kingdoms
+        - yaml load:../Kingdoms/config.yml id:config
+        - narrate format:callout <element[Kingdoms Version: <yaml[config].read[General.version].color[aqua]>]>
+        - yaml unload id:config
 
     - else if <context.args.get[1]> == about:
         - narrate format:callout "Kingdoms is an expansive Minecraft project which aims to blend the worlds of strategy and roleplay gaming into a medival/fantasy world rich with story and possibilities. The game, upon completion, should allow you to do just about anything you want from commanding an army, conducting diplomacy with other kingdoms, improving the lives of your subjects and much more. Kingdoms aims to be one of the most ambitious projects in Minecraft but is currently still in early development."
