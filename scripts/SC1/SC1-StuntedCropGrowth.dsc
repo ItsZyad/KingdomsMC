@@ -17,7 +17,7 @@ StuntedCropGrowth_Handler:
         - if <server.has_flag[PreGameStart]>:
             - stop
 
-        - define growChance <util.random_chance[40]>
+        - define growChance <util.random_chance[35]>
 
         - if !<[growChance]>:
             - determine cancelled
