@@ -41,22 +41,25 @@ Outpost_Command:
     type: command
     usage: /outpost
     name: outpost
+    description: Allows you to define and manage your claimed outposts.
     tab completions:
         1: claim|redefine|delete|cancel|showborder|list
 
     tab complete:
-        - if <context.args.get[1]> == showborder:
-            - if <context.args.size.is[MORE].than[1]>:
+    - define args <context.raw_args.split_args>
+
+    - choose <[args].get[1].to_lowercase.if_null[null]>:
+        - case showborder:
+            - if <[args].size.is[MORE].than[1]>:
                 - determine Duration<&sp>(seconds)<&sp>[Optional]
 
             - else:
                 - determine Outpost<&sp>Name
 
-        - else if <context.args.get[1]> == redefine:
-            - if <context.args.size.is[OR_MORE].than[1]>:
+        - case redefine:
+            - if <[args].size.is[OR_MORE].than[1]>:
                 - determine Outpost<&sp>Name<&sp>[Spaces<&sp>Allowed]
 
-    description: "Allows you to define and manage your claimed outposts"
     script:
     - if <server.has_flag[PreGameStart]> && !<player.is_op>:
         - determine cancelled
