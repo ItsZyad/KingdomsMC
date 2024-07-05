@@ -5,32 +5,31 @@
 ## @Date: Sep 2021
 ## @Script Ver: v1.0
 ##
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 KingdomUpkeepHandler:
     type: world
     events:
         on system time hourly every:48:
-        - if !<server.has_flag[RestrictedCreative]>:
-            - if !<server.has_flag[PauseUpkeep]>:
-                - define kingdomList <proc[GetKingdomList]>
+        - if <server.has_flag[PauseUpkeep]>:
+            - stop
 
-                - foreach <[kingdomList]> as:kingdom:
-                    - flag server kingdoms.<[kingdom]>.balance:-:<server.flag[kingdoms.<[kingdom]>.upkeep]>
-                    - flag server kingdoms.<[kingdom]>.balance:-:<server.flag[kingdoms.<[kingdom]>.outposts.totalUpkeep]>
+        - define kingdomList <proc[GetKingdomList]>
 
-                    - if <server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax].exists>:
-                        - flag server kingdoms.<[kingdom]>.balance:+:<server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax]>
+        - foreach <[kingdomList]> as:kingdom:
+            - flag server kingdoms.<[kingdom]>.balance:-:<[kingdom].proc[GetUpkeep]>
+            - flag server kingdoms.<[kingdom]>.balance:-:<server.flag[kingdoms.<[kingdom]>.outposts.totalUpkeep]>
 
-                    - if <server.flag[kingdoms.<[kingdom]>.balance].is[LESS].than[0]>:
-                        - define days <server.flag[indebtedKingdoms].get[<[kingdom]>].add[1].if_null[1]>
-                        - narrate format:debug <[days]>
+            - if <server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax].exists>:
+                - flag server kingdoms.<[kingdom]>.balance:+:<server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax]>
 
-                        - flag server indebtedKingdoms.<[kingdom]>:<[days]>
+            - if <[kingdom].proc[GetBalance].is[LESS].than[0]>:
+                - define days <server.flag[indebtedKingdoms].get[<[kingdom]>].add[1].if_null[1]>
+                - flag server indebtedKingdoms.<[kingdom]>:<[days]>
 
-                - narrate targets:<server.online_players> format:callout "Daily upkeep has been collected from all Kingdom banks."
+        - narrate targets:<server.online_players> format:callout "Daily upkeep has been collected from all Kingdom banks."
 
-                - run SidebarLoader def.target:<server.online_players>
+        - run SidebarLoader def.target:<server.online_players>
 
 
 NegativeBalanceAlert:
@@ -41,7 +40,7 @@ NegativeBalanceAlert:
         - wait 10t
         - define kingdom <player.flag[kingdom]>
 
-        - if <server.flag[kingdoms.<[kingdom]>.balance].is[LESS].than[0]>:
+        - if <[kingdom].proc[GetBalance].is[LESS].than[0]>:
             - define plural days!
 
             - if <server.flag[indebtedKingdoms].get[<player.flag[kingdom]>]> == 1:
