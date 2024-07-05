@@ -45,7 +45,7 @@ WorldNews_Command:
     - choose <[action]>:
         - case open:
             - flag <player> dataHold.viewingNews
-            - run WorldNewsViewer def.player:<player>
+            - run MailboxViewer def.player:<player>
 
         - case add:
             - if <[args].get[2]> == inhand:
@@ -67,7 +67,7 @@ WorldNews_Command:
                     - define newsID <server.flag[news.articles].last.get[newsID].if_null[0].add[1]>
 
                     - definemap newNews:
-                        content: <[bookContent]>
+                        content: <[bookContent].utf8_encode.gzip_compress>
                         title: <[title]>
                         subtitle: <[subtitle]>
                         expiry: <[expiry]>
@@ -93,6 +93,69 @@ WorldNews_Command:
             - narrate format:admincallout "Removed news article with ID: <[newsID]>"
 
 
+Letter_Command:
+    type: command
+    name: letter
+    usage: /letter [kingdom] [unsigned] ?[title]
+    description: Admin command for managing world news
+    permissions: kingdoms.admin.news
+    tab complete:
+    - define args <context.raw_args.split_args>
+
+    - choose <[args].size>:
+        - case 0:
+            - determine <proc[GetKingdomList].exclude[<player.flag[kingdom]>]>
+
+        - case 1:
+            - determine <list[true|false]>
+
+        - case 2:
+            - determine <list[?[title]]>
+
+    script:
+    - define args <context.raw_args.split_args>
+    - define kingdom <[args].get[1]>
+    - define isUnsigned <[args].get[2]>
+    - define title <[args].get[3].if_null[null]>
+
+    - if !<[kingdom].proc[ValidateKingdomCode]>:
+        - narrate format:callout <element[The provided kingdom: <[kingdom].color[red]> is not a valid kingdom!]>
+        - stop
+
+    - if !<player.item_in_hand.material.name.is_in[written_book|writable_book]>:
+        - narrate format:callout <element[The item in your hand must be a valid book item!]>
+        - stop
+
+    - if !<[isUnsigned].is_boolean>:
+        - define isUnsigned false
+
+    - define author <player.name>
+
+    - if <[isUnsigned]>:
+        - define author Unknown
+
+    - define bookContent <player.item_in_hand.book_pages>
+    - define expiry <duration[72h]>
+    - define subtitle <element[A letter from a neighbouring kingdom]>
+    - define title <player.item_in_hand.book_title.if_null[Letter]> if:<[title].equals[null]>
+    - define letterID <server.flag[letters.articles].last.get[letterID].if_null[0].add[1]>
+
+    - definemap newLetter:
+        content: <[bookContent].utf8_encode.gzip_compress>
+        title: <[title]>
+        subtitle: <[subtitle]>
+        expiry: <[expiry]>
+        kingdom: <[kingdom]>
+        originKingdom: <player.flag[kingdom]>
+        letterID: <[letterID]>
+        author: <[author]>
+
+    - flag server letters.articles:->:<[newLetter]>
+    - narrate format:callout "Sent letter to: <[kingdom].proc[GetKingdomShortName]>."
+
+    - take from:<player.inventory> o:<player.item_in_hand>
+
+
 NewsArticle_Item:
     type: item
     material: player_head
@@ -104,33 +167,40 @@ NewsArticle_Item:
 EmptyNews_Item:
     type: item
     material: player_head
-    display name: <gray><bold>No News Found
+    display name: <gray><bold>No News or Letters Found
     mechanisms:
         skull_skin: c42fe8de-3315-435b-a911-2fd93aabd58c|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODhhZTdlOGVhOGRkNWZmOGRlM2MzNjEwYTFjMWI2M2U4MGI3ZGRiZGRmZDUzMTRkZjNiYjhhYjQ4ZmZiNyJ9fX0=
 
 
-WorldNewsViewer:
+MailboxViewer:
     type: task
     definitions: player
     script:
-    - if <server.flag[news.articles].size.if_null[0]> == 0:
+    - define containsRelevantArticles <server.flag[letters.articles].if_null[<list[]>].filter_tag[<[filter_value].get[kingdom].equals[<[player].flag[kingdom]>]>].is_empty.not>
+    - define containsRelevantNews <server.flag[news.articles].if_null[<list[]>].filter_tag[<[filter_value].get[kingdoms].contains[<[player].flag[kingdom]>]>].is_empty.not>
+
+    - if !<[containsRelevantArticles]> && !<[containsRelevantNews]>:
         - define itemList <list[<item[EmptyNews_Item]>]>
 
     - else:
-        - define newsList <server.flag[news.articles]>
+        - define newsList <server.flag[news.articles].if_null[<list[]>].include[<server.flag[letters.articles].if_null[<list[]>]>]>
         - define itemList <list[]>
         - define newsItem <item[NewsArticle_Item]>
 
         - foreach <[newsList]> as:article:
             - if <[article].get[kingdoms].if_null[<list[all]>].get[1]> == all || <[article].get[kingdoms].contains[<[player].flag[kingdom]>]>:
                 - adjust def:newsItem display:<white><bold><[article].get[title]>
-                - flag <[newsItem]> content:<[article].get[content]>
+                - flag <[newsItem]> articleData:<[article].exclude[content]>
+                - flag <[newsItem]> articleData.content:<[article].get[content].gzip_decompress.utf8_decode.as[list]>
+                - flag <[newsItem]> articleData.originalFlag:<[article]>
 
                 - if <[article].get[subtitle].size> != 0:
-                    - adjust def:newsItem lore:<n><[article].get[subtitle]>
+                    - adjust def:newsItem lore:<[article].get[subtitle].italicize>
+
+                - adjust def:newsItem lore:<[newsItem].lore.include[<element[<n><gold><bold>Right click to retrieve from the mailbox]>]>
 
                 - if <[player].is_op> || <player.has_permission[kingdoms.admin]>:
-                    - adjust def:newsItem "lore:<n><gray>Temporary Article ID: <[article].get[newsID]>"
+                    - adjust def:newsItem lore:<[newsItem].lore.include[<dark_gray><element[Temporary Article ID: #<[article].get[newsID].if_null[<[article].get[letterID]>]>]>]>
 
                 - define itemList:->:<[newsItem]>
 
@@ -140,14 +210,28 @@ WorldNewsViewer:
 WorldNewsInterface_Handler:
     type: world
     events:
-        on player clicks NewsArticle_Item in PaginatedInterface_Window flagged:dataHold.viewingNews:
+        on player left clicks NewsArticle_Item in PaginatedInterface_Window flagged:dataHold.viewingNews:
         - define virtualBook <item[written_book]>
 
-        - adjust def:virtualBook book_pages:<context.item.flag[content]>
+        - adjust def:virtualBook book_pages:<context.item.flag[articleData].get[content]>
         - adjust def:virtualBook book_title:null
         - adjust def:virtualBook book_author:null
         - inventory close
         - adjust <player> show_book:<[virtualBook]>
+
+        on player right clicks NewsArticle_Item in PaginatedInterface_Window flagged:dataHold.viewingNews:
+        - if <context.item.flag[articleData].contains[letterID]>:
+            - define bookItem <item[written_book]>
+            - adjust def:bookItem book_pages:<context.item.flag[articleData].get[content]>
+            - adjust def:bookItem book_title:<context.item.flag[articleData].get[title]>
+            - adjust def:bookItem book_author:<context.item.flag[articleData].get[author]>
+            - adjust def:bookItem lore:<element[From: <context.item.flag[articleData].get[originKingdom].proc[GetKingdomShortName]>].color[gray].italicize>
+
+            - give to:<player.inventory> o:<[bookItem]>
+
+            - flag server letters.articles:<-:<context.item.flag[articleData].get[originalFlag]>
+            - inventory close
+            - run MailboxViewer def.player:<player>
 
         on custom event id:PaginatedInvClose flagged:dataHold.viewingNews:
         - flag <player> dataHold.viewingNews:!
@@ -181,7 +265,7 @@ Mailbox_Handler:
 
         - if <player.flag[kingdom]> == <context.location.flag[mailbox]> || <player.has_permission[kingdoms.admin.mailbox]>:
             - flag <player> dataHold.viewingNews
-            - run WorldNewsViewer def.player:<player>
+            - run MailboxViewer def.player:<player>
 
         - else:
             - narrate format:callout "You cannot open another kingdom's mailbox!"
