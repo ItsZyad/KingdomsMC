@@ -286,18 +286,18 @@ ReloadVerbosity_Handler:
         on ex command:
         - if <context.source_type> == PLAYER && <context.args.get[1]> == reload && <context.args.size> == 1:
             - determine passively cancelled
-            - narrate "<yellow>[Kingdoms] <&gt><&gt> <white>Reloading Scripts..."
+            - narrate "<yellow>[Kingdoms Backend] <&gt><&gt> <white>Reloading Scripts..."
             - define timeBeforeReload <util.current_time_millis>
             - reload
             - flag server reloadoverride:<player>
             - waituntil <server.has_flag[reloadoverride].not> max:10m
             - define reloadTime <util.current_time_millis.sub[<[timeBeforeReload]>]>
-            - narrate "<yellow>[Kingdoms] <&gt><&gt> <white>Processed <util.scripts.size.color[red].bold> Scripts!"
-            - narrate "<yellow>[Kingdoms] <&gt><&gt> <white>See console for more information regarding STP & processed event paths."
-            - narrate "<yellow>[Kingdoms] <&gt><&gt> <white>Reloaded all scripts in: <aqua><[reloadTime]>ms<white>!"
+            - narrate "<yellow>[Kingdoms Backend] <&gt><&gt> <white>Processed <util.scripts.size.color[red].bold> Scripts!"
+            - narrate "<yellow>[Kingdoms Backend] <&gt><&gt> <white>See console for more information regarding STP & processed event paths."
+            - narrate "<yellow>[Kingdoms Backend] <&gt><&gt> <white>Reloaded all scripts in: <aqua><[reloadTime]>ms<white>!"
 
         on reload scripts server_flagged:reloadoverride:
         - if <context.had_error>:
-            - narrate targets:<server.flag[reloadoverride]> "<yellow>[Kingdoms] <&gt><&gt> <red>WARNING! Error occured while reloading some or all scripts!"
+            - narrate targets:<server.flag[reloadoverride]> "<yellow>[Kingdoms Backend] <&gt><&gt> <red>WARNING! Error occured while reloading some or all scripts!"
 
         - flag server reloadoverride:!
