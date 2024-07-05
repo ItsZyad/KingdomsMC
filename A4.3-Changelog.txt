@@ -29,17 +29,44 @@ __________________________________________
     - Retired '/k castleclaim' and '/k coreclaim' commands in favor of a unified '/k claim' command. (I also took this opportunity to slightly improve the performance of the claiming code).
     - Introduced environment-variable crop growth. Different factors such as biome humidity, temperature, overall climate, and altitude will affect crop growth rates, forcing more specialization between kingdoms.
 
-Alpha 0.4.3 :: 15-MAY-2024 -> xx;
+Alpha 0.4.3 :: 15-MAY-2024 -> 31-JUL-2024;
 __________________________________________
     BUG FIXES / PERFORMANCE:
     - [Technical] All Kingdoms builds from now on will target 1.20.x
+    - [Technical] Added null checks to all API code. Should lead to fewer instances where you get random jumbles of code or null values on errors.
+    - [Technical] Began removing a lot of the 4-kingdom hard-coding that's been present since Alpha 0.2.0. It should be a lot easier to add and remove kingdoms on the fly now.
     - Fixed *A LOT* of longstanding issues with the markets such as weird null values that break entire systems, whole simulation ticks that don't go through, and general weirdness with merchant interfaces.
         * This likely isn't the last we'll see of markets-related bugs, but there should still be a vast difference between this and Alpha 0.4.0p4.
     - Fixed a small bug which blocked players from chatting after using the outpost claiming command.
     - Fixed bug which prevented the player from giving squad orders after renaming it in certain instances.
+    - Fixed a never seen bug which could cause players seeking to switch kingdoms to change sidebars while still remaining in the same kingdom technically.
+    - Optimized sidebar code. Updates should happen almost instantly now, fixing a rare but known issue where it would choke on certain values leading to obscenely long update times.
 
     SMALL ADDITIONS:
     - Added a new formation walk tool to the squads system: Drawable formation lines. These allow the commander of a squad to determine the exact size of the formation using a special wand.
     - Mixing different unit types in the same squad is no longer allowed.
     - Added new soldier type: Archer.
-    - Using the regular squad formation walk tool after the line formation tool will cause it to remember the previous formation.
+    - Using the regular squad formation walk tool after the line formation tool will make it remember the previous formation.
+    - Sidebar kingdom name font size has been significantly reduced. There should no longer be massive sidebars that take up half of your screen.
+
+    LARGE ADDITIONS:
+    - Miner NPCs have been reworked. They now make use of world-wide heat maps for different resources that mimic real life patterns of resource presence.
+        * I.e. some regions will be really rich in certain resources while really poor in others, further encouraging trade between kingdoms.
+    - Kingdoms can now send each other mail via the /letter command directly to each others' mailboxes.
+
+Scenario 1.0.0 :: 2-JUL-2024 -> 31-JUL-2024;
+__________________________________________
+    SMALL ADDITIONS:
+    - Slowed crop growth to 35% of vanilla crop growth rate.
+
+    LARGE ADDITIONS:
+    - Added food-population mechanics + Food fullfillment and information window via /food.
+
+Known Bugs;
+__________________________________________
+    - Squad NPCs may start to fight each other - on occasion - after exiting an engagement with another squad. I'm still not sure what triggers the behaviour but I'm looking into it.
+
+
+Additional Notes;
+__________________________________________
+    - I have been looking back through last year's log files, trying to find a root cause for the permissions issues that have always plagued the server (i.e. players logging in the wrong gamemode, weird bugs caused by not being able to access certain commands etc.). Turns out it wasn't an issue with Kingdoms, but with the perms plugin Kingdoms has always used: GroupManager. As it seems, GM doesn't actually have multi-world support and kept on overwriting its own values each time a player joined a world other than KingdomsCurrent (usually me oops). So Kingdoms now supports LuckPerms as its default permissions plugin.
