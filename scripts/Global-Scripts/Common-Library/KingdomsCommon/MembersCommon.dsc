@@ -54,6 +54,7 @@ AddMember:
         - run GenerateInternalError def.category:ValueError message:<element[No player exists with matcher: <[player]>]>
         - determine cancelled
 
+    - flag <[player]> kingdom:<[kingdom]>
     - flag server kingdoms.<[kingdom]>.members:->:<[player]>
     - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
