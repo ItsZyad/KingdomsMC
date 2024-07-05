@@ -56,3 +56,19 @@ Main_Menu:
     display name: Main Menu
     mechanisms:
         skull_skin: 7e06b124-31bd-4163-b703-ac749b3d431d|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTJkN2E3NTFlYjA3MWUwOGRiYmM5NWJjNWQ5ZDY2ZTVmNTFkYzY3MTI2NDBhZDJkZmEwM2RlZmJiNjhhN2YzYSJ9fX0=
+
+
+Check_Item:
+    type: item
+    material: player_head
+    display name: <green>Accept
+    mechanisms:
+        skull_skin: afb405c1-16ea-4a23-883f-97867e7db3f9|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTc5YTVjOTVlZTE3YWJmZWY0NWM4ZGMyMjQxODk5NjQ5NDRkNTYwZjE5YTQ0ZjE5ZjhhNDZhZWYzZmVlNDc1NiJ9fX0=
+
+
+Cross_Item:
+    type: item
+    material: player_head
+    display name: <red>Reject
+    mechanisms:
+        skull_skin: 7d564f56-f5f7-4a7a-855e-bbd4fc7b93ae|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWQwYTE0MjA4NDRjZTIzN2E0NWQyZTdlNTQ0ZDEzNTg0MWU5ZjgyZDA5ZTIwMzI2N2NmODg5NmM4NTE1ZTM2MCJ9fX0=
