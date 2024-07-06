@@ -3,9 +3,9 @@
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Jan 2023
-## @Script Ver: INDEV
+## @Script Ver: v1.0
 ##
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 
 WorldNews_Command:
