@@ -137,3 +137,26 @@ ClearDatahold_Handler:
         - define persistentData <player.flag[datahold.persistent]> if:<player.has_flag[datahold.persistent]>
         - flag <player> datahold:!
         - flag <player> datahold.persistent:<[persistentData]> if:<player.has_flag[datahold.persistent]>
+
+
+TempSaveInventory:
+    type: task
+    debug: false
+    definitions: player
+    script:
+    - if !<[player].has_flag[inventory_hold_outposts]>:
+        - repeat 36:
+            - flag <[player]> inventory_hold_outposts:->:<[player].inventory.slot[<[value]>]>
+            - inventory set slot:<[value]> origin:<item[air]>
+
+
+LoadTempInventory:
+    type: task
+    debug: false
+    definitions: player
+    script:
+    - if <player.has_flag[inventory_hold_outposts]>:
+        - repeat 36:
+            - inventory set slot:<[value]> origin:<[player].flag[inventory_hold_outposts].get[<[value]>]>
+
+        - flag <[player]> inventory_hold_outposts:!

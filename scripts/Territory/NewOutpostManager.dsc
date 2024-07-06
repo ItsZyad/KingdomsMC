@@ -13,30 +13,6 @@
 
 #TODO: Comment this!
 
-TempSaveInventory:
-    type: task
-    debug: false
-    definitions: player
-    script:
-    - if !<[player].has_flag[inventory_hold_outposts]>:
-        - repeat 36:
-            - flag <[player]> inventory_hold_outposts:->:<[player].inventory.slot[<[value]>]>
-            - inventory set slot:<[value]> origin:<item[air]>
-
-
-LoadTempInventory:
-    type: task
-    debug: false
-    definitions: player
-    script:
-    - if <player.has_flag[inventory_hold_outposts]>:
-        - repeat 36:
-            - inventory set slot:<[value]> origin:<[player].flag[inventory_hold_outposts].get[<[value]>]>
-
-        - flag <[player]> inventory_hold_outposts:!
-
-##############################################################################
-
 Outpost_Command:
     type: command
     usage: /outpost
