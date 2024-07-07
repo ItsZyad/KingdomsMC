@@ -256,3 +256,46 @@ AddKingdomFoodReserves:
 
     - define newAmount <[kingdom].proc[GetKingdomFoodReserves].add[<[amount]>]>
     - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.food:<[newAmount]>
+
+
+GetRiverArea:
+    type: procedure
+    description:
+    - Gets the AreaObject which encompasses the Vexell river area.
+    - Will return null if no such object exists.
+    - ---
+    - → [AreaObject]
+
+    script:
+    ## Gets the AreaObject which encompasses the Vexell river area.
+    ## Will return null if no such object exists.
+    ##
+    ## >>> [AreaObject]
+
+    - if !<server.has_flag[kingdoms.scenario-1.river.default.area]>:
+        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] River area flag is not set! Please make sure that it is defined before using this addon further!]> def.silent:false
+        - determine null
+
+    - determine <server.flag[kingdoms.scenario-1.river.default.area]>
+
+
+GetKingdomTradeEfficiency:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]
+    description:
+    - Gets the provided kingdom's current trade efficiency percentage with Fyndalin.
+    - ---
+    - → [ElementTag(Float)]
+
+    script:
+    ## Gets the provided kingdom's current trade efficiency percentage with Fyndalin.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Float>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot get river obstrustion rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine null
+
+    - determine <server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.tradeEfficiency].if_null[0]>

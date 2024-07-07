@@ -108,6 +108,17 @@ SidebarLoader:
             # Separator Line
             - sidebar add values:<element[<&sp>].repeat[30]> players:<[player]>
 
+            - define tradeEff <[kingdom].proc[GetKingdomTradeEfficiency].round_to_precision[0.001]>
+
+            - if <[tradeEff]> >= 0:
+                - sidebar add "values:<&sp>Trade Efficiency: <green>+<[tradeEff]>%"
+
+            - else:
+                - sidebar add "value:<&sp>Trade Efficiency: <red><[tradeEff]>%"
+
+            # Separator Line
+            - sidebar add values:<element[<&sp>].repeat[30]> players:<[player]>
+
         - else:
             - sidebar set title:<bold><gray>KINGDOMLESS
 
