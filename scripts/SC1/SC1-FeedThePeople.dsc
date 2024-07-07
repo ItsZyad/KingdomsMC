@@ -289,17 +289,3 @@ SC1_FoodManager_Handler:
 
         on player clicks InterfaceFiller_Item in SC1_FoodInput_Window:
         - determine cancelled
-
-
-DEBUG_ShuklerTest:
-    type: task
-    definitions: player|slot
-    script:
-    - define innerIndex 0
-    - define item <player.inventory.slot[<[slot]>]>
-
-    - foreach <[item].inventory_contents>:
-        - if <[item].material.food_points.exists>:
-            - inventory adjust slot:<[slot]> inventory_contents:<[item].inventory_contents.remove[<[innerIndex]>]> d:<[player].inventory>
-
-        - define innerIndex:++
