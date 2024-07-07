@@ -160,3 +160,15 @@ LoadTempInventory:
             - inventory set slot:<[value]> origin:<[player].flag[inventory_hold_outposts].get[<[value]>]>
 
         - flag <[player]> inventory_hold_outposts:!
+
+
+Invert:
+    type: procedure
+    definitions: number[ElementTag(Float)]
+    description:
+    - Makes positive numbers negative and makes negative numbers positive.
+    - ---
+    - → [ElementTag(Float)]
+
+    script:
+    - determine <[number].sub[<[number].mul[2]>]>
