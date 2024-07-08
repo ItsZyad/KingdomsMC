@@ -12,6 +12,7 @@
 
 GetKingdomPopulation:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets the current simulated population of the kingdom with the provided name.
@@ -38,6 +39,7 @@ GetKingdomPopulation:
 
 SetKingdomPopulation:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Integer)]
     description:
     - Sets the population of the kingdom with the provided name to the provided amount.
@@ -65,6 +67,7 @@ SetKingdomPopulation:
 
 AddKingdomPopulation:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Integer)]
     description:
     - Adds the amount specified to the provided kingdom's population.
@@ -93,6 +96,7 @@ AddKingdomPopulation:
 
 GetKingdomPopGrowth:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets the current population growth rate (in %) for the kingdom with the provided name.
@@ -119,6 +123,7 @@ GetKingdomPopGrowth:
 
 SetKingdomPopulationGrowth:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Sets the population growth of the kingdom with the provided name to the provided amount.
@@ -146,6 +151,7 @@ SetKingdomPopulationGrowth:
 
 AddKingdomPopulationGrowth:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Adds the amount specified to the provided kingdom's population growth rate and returns the new rate.
@@ -176,6 +182,7 @@ AddKingdomPopulationGrowth:
 
 GetKingdomFoodReserves:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets the current food reserves of the kingdom with the provided name. Each food reserve unit equates to half a vanilla Minecraft saturation point.
@@ -202,6 +209,7 @@ GetKingdomFoodReserves:
 
 SetKingdomFoodReserves:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Integer)]
     description:
     - Sets the food reserves of the kingdom with the provided name to the provided amount.
@@ -230,6 +238,7 @@ SetKingdomFoodReserves:
 
 AddKingdomFoodReserves:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Integer)]
     description:
     - Adds the amount specified to the provided kingdom's food reserves and returns the new rate.
@@ -260,6 +269,7 @@ AddKingdomFoodReserves:
 
 GetRiverArea:
     type: procedure
+    debug: false
     description:
     - Gets the AreaObject which encompasses the Vexell river area.
     - Will return null if no such object exists.
@@ -281,6 +291,7 @@ GetRiverArea:
 
 GetKingdomTradeEfficiency:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets the provided kingdom's current trade efficiency percentage with Fyndalin.
