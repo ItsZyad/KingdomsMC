@@ -23,6 +23,7 @@ RiverTradeEfficiencyImpact:
 
 SetRiverEmptyState:
     type: task
+    debug: false
     description:
     - Will go through the current Vexell river AreaObject and set its current state as the 'default', so that any additions onto this state are treated as obstructions.
     - ---
