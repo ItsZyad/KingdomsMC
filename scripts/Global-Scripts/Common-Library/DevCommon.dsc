@@ -288,6 +288,7 @@ ColorPalettes:
 
 GetColor:
     type: procedure
+    debug: false
     definitions: colorPath[ElementTag(String)]
     description:
     - Gets a color from one of the Kingdoms-standard color palettes using standard dot notation, structured like: (palette).(color)
@@ -371,6 +372,7 @@ SkinnyLetters:
 
 ConvertToSkinnyLetters:
     type: procedure
+    debug: false
     definitions: text[ElementTag(String)]
     description:
     - Returns the provided text but with all valid letters made into 'skinny' letters.
