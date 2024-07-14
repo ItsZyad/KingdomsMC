@@ -180,7 +180,7 @@ MakeTabbed:
     debug: false
     definitions: element|tabLevel
     script:
-    - define tabbedList <list[<element[¦   ].repeat[<[tabLevel].div_int[4]>]>|<[element]>]>
+    - define tabbedList <list[<element[¦   ].repeat[<[tabLevel].div_int[4].if_null[0]>]>|<[element]>]>
     - define unseparatedTab <[tabbedList].unseparated>
     - define chatWidth 320
 
