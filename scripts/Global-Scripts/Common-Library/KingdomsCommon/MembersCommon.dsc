@@ -6,7 +6,7 @@
 ## @Date: Aug 2023
 ## @Script Ver: v1.0
 ##
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 GetMembers:
     type: procedure
@@ -130,3 +130,27 @@ IsPlayerInKingdom:
     - define playerList <proc[GetMembers].context[<[kingdom]>]>
 
     - determine <[player].is_in[<[playerList]>]>
+
+
+IsPlayerKing:
+    type: procedure
+    definitions: player[PlayerTag]
+    description:
+    - Returns true if the provided player is the king of their kingdom.
+    - ---
+    - → [ElementTag(Boolean)]
+
+    script:
+    ## Returns true if the provided player is the king of their kingdom.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - define kingdom <player.flag[kingdom]>
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot check if a player is king. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.king].equals[<player>].if_null[false]>
