@@ -32,7 +32,7 @@ YAMLConfigCreator:
     # DENIZEN YIELDS TO MY WILL WHEN I PLEASE
     # I SPIT IN YOUR FACE, ODIN
 
-    - if !<[useSavedConfig]> && <server.flag[kingdoms.useSavedConfig].object_type> == Binary:
+    - if !<[useSavedConfig]> && <server.flag[kingdoms.encodedConfig].object_type> == Binary:
         - define yamlAsBinary <server.flag[kingdoms.encodedConfig]>
 
     - else:
