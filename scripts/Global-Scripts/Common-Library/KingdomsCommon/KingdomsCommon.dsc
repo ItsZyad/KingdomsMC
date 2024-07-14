@@ -13,7 +13,7 @@
 ## @Date: Jun 2023
 ## @Script Ver: v1.0
 ##
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 # Note: future configurable(?)
 KingdomRealNames:
@@ -613,26 +613,3 @@ GetKingdomColor:
         - define outputColor <proc[GetColor].context[Default.<[rawKingdomColor]>].as[color]>
 
     - determine <[outputColor]>
-
-
-GetKingdomWarStatus:
-    type: procedure
-    debug: false
-    definitions: kingdom[ElementTag(String)]
-    description:
-    - Returns true if the provided kingdom is currently at war.
-    - ---
-    - → [ElementTag(Boolean)]
-
-    script:
-    ## Returns true if the provided kingdom is currently at war.
-    ##
-    ## kingdom : [ElementTag<String>]
-    ##
-    ## >>> [ElementTag<Boolean>]
-
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom war status. Invalid kingdom code provided: <[kingdom]>]>
-        - determine null
-
-    - determine <server.flag[kingdoms.<[kingdom]>.warStatus].if_null[false]>
