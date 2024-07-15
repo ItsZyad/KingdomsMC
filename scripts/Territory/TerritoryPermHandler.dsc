@@ -38,7 +38,18 @@ IsInOwnDuchy:
 IsInAnyDuchy:
     type: procedure
     definitions: player[PlayerTag]
+    description:
+    - Returns true if the provided player is currently inside any of their kingdom's duchies.
+    - ---
+    - → [ElementTag(Boolean)]
+
     script:
+    ## Returns true if the provided player is currently inside any of their kingdom's duchies.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
     - define kingdom <[player].flag[kingdom]>
 
     - foreach <[kingdom].proc[GetKingdomDuchies]> as:duchy:
