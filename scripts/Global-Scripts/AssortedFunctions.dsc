@@ -2,28 +2,6 @@
 
 ## No header will be added :: file slated for deletion or rework.
 
-Paginate:
-    type: procedure
-    definitions: itemArrayMap|itemsPerPage|page
-    script:
-    - define outArray <list>
-    - define startPoint <element[<[page]>].mul[<[itemsPerPage]>]>
-
-    - define itemArray <[itemArrayMap].get[items]>
-
-    - narrate format:debug ARR:<[itemArray]>
-
-    - repeat <[itemsPerPage]>:
-        - if <[itemArray].size.is[LESS].than[<[value]>]>:
-            - define outArray:->:<[itemArray].get[<element[<[value]>].add[<[startPoint]>]>]>
-            - narrate format:debug <[itemArray].get[<element[<[value]>].add[<[startPoint]>]>]>
-
-        - else:
-            - repeat stop
-
-    - determine <[outArray]>
-
-
 New_Paginate_Task:
     type: task
     definitions: itemList|itemsPerPage|page
@@ -164,6 +142,7 @@ LoadTempInventory:
 
 Invert:
     type: procedure
+    debug: false
     definitions: number[ElementTag(Float)]
     description:
     - Makes positive numbers negative and makes negative numbers positive.
@@ -172,3 +151,55 @@ Invert:
 
     script:
     - determine <[number].sub[<[number].mul[2]>]>
+
+##ignorewarning bad_execute
+AffectOfflinePlayers:
+    type: task
+    definitions: playerList[ListTag(PlayerTag)]|scriptName[ElementTag(String)]|otherDefs[MapTag]|scriptPath[?ElementTag(String)]
+    description:
+    - Divides the provided playerList def into two lists- one containing online players, and the other offline players.
+    - It will then run the script with the provided name twice- once with the list of online players, and again each time one of the offline players joins.
+    - In all cases, the definitions will be passed in under the name 'playerList'.
+    - ---
+    - → [Void]
+
+    script:
+    ## Divides the provided playerList def into two lists- one containing online players, and the
+    ## other offline players.
+    ##
+    ## It will then run the script with the provided name twice- once with the list of online
+    ## players, and again each time one of the offline players joins.
+    ##
+    ## In all cases, the definitions will be passed in under the name 'playerList'.
+    ##
+    ## playerList : [ListTag<PlayerTag>]
+    ## scriptName : [ElementTag<String>]
+    ## scriptPath : [ElementTag<String>]
+    ##
+    ## >>> [Void]
+
+    - define onlinePlayers <[playerList].filter_tag[<[filter_value].is_online>]>
+    - define offlinePlayers <[playerList].exclude[<[onlinePlayers]>]>
+    - define runString <list[<element[run <[scriptName]>]>]>
+
+    - foreach <[otherDefs].exclude[_playerList]> key:defName as:def:
+        - define runString:->:<element[def.<[defName]>:<[def]>]>
+
+    - if <[scriptPath].exists>:
+        - define runString:->:<element[path:<[scriptPath]>]>
+
+    - foreach <[offlinePlayers]> as:player:
+        - flag server waitingForOfflinePlayer.<[player].uuid>:->:<[runString].space_separated>
+
+    - execute as_server "ex <[runString].include[<element[def._playerList:<[onlinePlayers]>]>].space_separated>"
+
+
+AffectOfflinePlayers_Handler:
+    type: world
+    events:
+        on player joins:
+        - if !<server.has_flag[waitingForOfflinePlayer.<player.uuid>]>:
+            - stop
+
+        - foreach <server.flag[waitingForOfflinePlayer.<player.uuid>]> as:runString:
+            - execute as_server "ex <[runString].include[<element[def._playerList:<list[<player>]>]>]>"
