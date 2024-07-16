@@ -103,6 +103,31 @@ GetAllMembers:
     - determine <proc[GetKingdomList].parse_tag[<server.flag[kingdoms.<[parse_value]>.members]>].combine.deduplicate>
 
 
+GetKing:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]
+    description:
+    - Returns the PlayerTag associated with the person currently kin of the provided kingdom.
+    - Returns null if the provided kingdom does not currently have a king.
+    - ---
+    - → ?[PlayerTag]
+
+    script:
+    ## Returns the PlayerTag associated with the person currently kin of the provided kingdom.
+    ##
+    ## Returns null if the provided kingdom does not currently have a king.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> ?[PlayerTag]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get king. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.king].if_null[null]>
+
+
 IsPlayerInKingdom:
     type: procedure
     definitions: kingdom[ElementTag(String)]|player[PlayerTag]
