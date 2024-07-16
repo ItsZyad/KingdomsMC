@@ -24,7 +24,7 @@ GetMembers:
     ## >>> [ListTag<PlayerTag>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom members. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom members. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.members].if_null[<list[]>]>
@@ -47,11 +47,11 @@ AddMember:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot add kingdom member. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add kingdom member. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - if !<[player].as[player].is_in[<server.players>]>:
-        - run GenerateInternalError def.category:ValueError message:<element[No player exists with matcher: <[player]>]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[No player exists with matcher: <[player]>]>
         - determine cancelled
 
     - flag <[player]> kingdom:<[kingdom]>
@@ -76,11 +76,11 @@ RemoveMember:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot remove kingdom member. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove kingdom member. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - if !<[player].as[player].is_in[<server.players>]>:
-        - run GenerateInternalError def.category:ValueError message:<element[No player exists with matcher: <[player]>]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[No player exists with matcher: <[player]>]>
         - determine cancelled
 
     - if <proc[GetMembers].context[<[kingdom]>].contains[<[player]>]>:
@@ -122,7 +122,7 @@ GetKing:
     ## >>> ?[PlayerTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get king. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get king. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.king].if_null[null]>
@@ -145,11 +145,11 @@ IsPlayerInKingdom:
     ## >>> [ElementTag<Boolean>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot check player-kingdom relationship. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check player-kingdom relationship. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - if !<[player].as[player].is_in[<server.players>]>:
-        - run GenerateInternalError def.category:ValueError message:<element[No player exists with matcher: <[player]>]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[No player exists with matcher: <[player]>]>
         - determine null
 
     - define playerList <proc[GetMembers].context[<[kingdom]>]>
@@ -175,7 +175,7 @@ IsPlayerKing:
     - define kingdom <player.flag[kingdom]>
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot check if a player is king. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check if a player is king. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.king].equals[<player>].if_null[false]>

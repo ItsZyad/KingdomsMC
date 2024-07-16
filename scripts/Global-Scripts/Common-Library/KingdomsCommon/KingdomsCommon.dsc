@@ -104,7 +104,7 @@ IsKingdomBankrupt:
     ## >>> [ElementTag<Boolean>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - define balance <proc[GetBalance].context[<[kingdom]>]>
@@ -152,7 +152,7 @@ GetBalance:
     ## >>> [ElementTag<Float>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.balance].if_null[0]>
@@ -176,11 +176,11 @@ SetBalance:
     ## >>> [Void]
 
     - if <[amount]> < 0:
-        - run GenerateInternalError def.category:ValueError message:<element[Cannot set kingdom balance to a value less than zero.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot set kingdom balance to a value less than zero.]>
         - determine cancelled
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.balance:<[amount]>
@@ -205,11 +205,11 @@ AddBalance:
     ## >>> [Void]
 
     - if <[amount]> < 0:
-        - run GenerateInternalError def.category:ValueError message:<element[Cannot add a value to the kingdom balance less than zero.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot add a value to the kingdom balance less than zero.]>
         - determine cancelled
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.balance:+:<[amount]>
@@ -234,11 +234,11 @@ SubBalance:
     ## >>> [Void]
 
     - if <[amount]> < 0:
-        - run GenerateInternalError def.category:ValueError message:<element[Cannot subtract a value to the kingdom balance less than zero.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot subtract a value to the kingdom balance less than zero.]>
         - determine cancelled
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.balance:-:<[amount]>
@@ -262,7 +262,7 @@ GetUpkeep:
     ## >>> [ElementTag<Float>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.upkeep].if_null[0]>
@@ -286,11 +286,11 @@ SetUpkeep:
     ## >>> [Void]
 
     - if <[amount]> < 0:
-        - run GenerateInternalError def.category:ValueError message:<element[Cannot set kingdom upkeep to a value less than zero.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot set kingdom upkeep to a value less than zero.]>
         - determine cancelled
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom upkeep. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom upkeep. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.upkeep:<[amount]>
@@ -315,11 +315,11 @@ AddUpkeep:
     ## >>> [Void]
 
     - if <[amount]> < 0:
-        - run GenerateInternalError def.category:ValueError message:<element[Cannot add a value to the kingdom upkeep less than zero.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot add a value to the kingdom upkeep less than zero.]>
         - determine cancelled
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom upkeep. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom upkeep. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.upkeep:+:<[amount]>
@@ -344,11 +344,11 @@ SubUpkeep:
     ## >>> [Void]
 
     - if <[amount]> < 0:
-        - run GenerateInternalError def.category:ValueError message:<element[Cannot subtract a value to the kingdom upkeep that is less than zero.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot subtract a value to the kingdom upkeep that is less than zero.]>
         - determine cancelled
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom upkeep. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom upkeep. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.upkeep:-:<[amount]>
@@ -372,7 +372,7 @@ GetPrestige:
     ## >>> [ElementTag<Float>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom prestige. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom prestige. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.prestige].if_null[0]>
@@ -396,15 +396,15 @@ SetPrestige:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom prestige. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom prestige. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - if !<[amount].is_decimal>:
-        - run GenerateInternalError def.category:TypeError message:<element[Cannot set prestige to a non-number value.]>
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot set prestige to a non-number value.]>
         - determine cancelled
 
     - if <[amount]> > 100 || <[amount]> < 0:
-        - run GenerateInternalError def.category:ValueError message:<element[Cannot set prestige to amount higher than 100 or lower than 0.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot set prestige to amount higher than 100 or lower than 0.]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.prestige:<[amount]>
@@ -429,17 +429,17 @@ AddPrestige:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom prestige. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom prestige. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - if !<[amount].is_decimal>:
-        - run GenerateInternalError def.category:TypeError message:<element[Cannot set prestige to a non-number value.]>
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot set prestige to a non-number value.]>
         - determine cancelled
 
     - define prestige <proc[GetPrestige].context[<[kingdom]>]>
 
     - if <[amount].add[<[prestige]>]> > 100:
-        - run GenerateInternalError def.category:ValueError message:<element[Cannot set prestige to amount higher than 100.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot set prestige to amount higher than 100.]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.prestige:+:<[amount]>
@@ -464,17 +464,17 @@ SubPrestige:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom prestige. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom prestige. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - if !<[amount].is_decimal>:
-        - run GenerateInternalError def.category:TypeError message:<element[Cannot set prestige to a non-number value.]>
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot set prestige to a non-number value.]>
         - determine cancelled
 
     - define prestige <proc[GetPrestige].context[<[kingdom]>]>
 
     - if <[amount].sub[<[prestige]>]> < 0:
-        - run GenerateInternalError def.category:ValueError message:<element[Cannot set prestige to amount lower than 0.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot set prestige to amount lower than 0.]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.prestige:-:<[amount]>
@@ -498,7 +498,7 @@ GetDescription:
     ## >>> [ElementTag<String>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom description. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom description. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - if <server.has_flag[kingdoms.<[kingdom]>.description]>:
@@ -525,11 +525,11 @@ SetDescription:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set kingdom description. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom description. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - if <[description].object_type.to_lowercase> != element:
-        - run GenerateInternalError def.category:TypeError message:<element[Cannot set description to a non-element value. Value provided is of: <&sq><[description].object_type><&sq> type!]>
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot set description to a non-element value. Value provided is of: <&sq><[description].object_type><&sq> type!]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.description:<[description]>
@@ -552,7 +552,7 @@ GetKingdomName:
     ## >>> [ElementTag<String>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdomCode]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom name. Invalid kingdom code provided: <[kingdomCode]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom name. Invalid kingdom code provided: <[kingdomCode]>]>
         - determine null
 
     - determine <script[KingdomRealNames].data_key[Names.<[kingdomCode]>]>
@@ -577,7 +577,7 @@ GetKingdomShortName:
     ## >>> [ElementTag<String>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdomCode]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom name. Invalid kingdom code provided: <[kingdomCode]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom name. Invalid kingdom code provided: <[kingdomCode]>]>
         - determine null
 
     - determine <script[KingdomRealNames].data_key[ShortNames.<[kingdomCode]>]>
@@ -600,7 +600,7 @@ GetKingdomColor:
     ## >>> [ColorTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom color. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom color. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - define rawKingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>

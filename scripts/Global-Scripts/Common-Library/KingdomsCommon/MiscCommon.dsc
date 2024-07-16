@@ -26,7 +26,7 @@ OpenWarpsToKingdom:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot modify kingdom warps. Invalid kingdom code(s) provided: <[kingdom]>/<[targetKingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot modify kingdom warps. Invalid kingdom code(s) provided: <[kingdom]>/<[targetKingdom]>]>
         - determine cancelled
 
     - if <server.flag[kingdoms.<[kingdom]>.openWarps].contains[<[targetKingdom]>]>:
@@ -50,7 +50,7 @@ CloseWarpsToKingdom:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot modify kingdom warps. Invalid kingdom code(s) provided: <[kingdom]>/<[targetKingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot modify kingdom warps. Invalid kingdom code(s) provided: <[kingdom]>/<[targetKingdom]>]>
         - determine cancelled
 
     - if <server.flag[kingdoms.<[kingdom]>.openWarps].contains[<[targetKingdom]>]>:
@@ -77,15 +77,15 @@ AddWarp:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot modify kingdom warps. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot modify kingdom warps. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - if <[location].object_type.to_lowercase> != location:
-        - run GenerateInternalError def.category:TypeError message:<element[Cannot modify kingdom warps. Expected type location for <&sq>Location<&sq> definition. Instead recieved type: <[location].object_type>]>
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot modify kingdom warps. Expected type location for <&sq>Location<&sq> definition. Instead recieved type: <[location].object_type>]>
         - determine cancelled
 
     - if <[warpName].object_type.to_lowercase> != element:
-        - run GenerateInternalError def.category:TypeError message:<element[Cannot modify kingdom warps. Expected type element for <&sq>warpName<&sq> definition. Instead recieved type: <[warpName].object_type>]>
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot modify kingdom warps. Expected type element for <&sq>warpName<&sq> definition. Instead recieved type: <[warpName].object_type>]>
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.warps.<[warpName]>:<[location]>
@@ -108,7 +108,7 @@ RemoveWarp:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot modify kingdom warps. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot modify kingdom warps. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - if <server.has_flag[kingdoms.<[kingdom]>.warps.<[warpName]>]>:

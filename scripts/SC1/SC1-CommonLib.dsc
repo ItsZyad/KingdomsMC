@@ -10,6 +10,12 @@
 ##ignorewarning invalid_data_line_quotes
 ## ------------------------------------------END HEADER-------------------------------------------
 
+HasSC1:
+    type: procedure
+    script:
+    - determine <util.has_file[scripts/SC1]>
+
+
 GetKingdomPopulation:
     type: procedure
     debug: false
@@ -31,7 +37,7 @@ GetKingdomPopulation:
     ## >>> [ElementTag<Integer>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot get kingdom population. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot get kingdom population. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
     - determine <server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.population].if_null[<script[SC1_PopulationData].data_key[<[kingdom]>.population]>].if_null[null]>
@@ -55,11 +61,11 @@ SetKingdomPopulation:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot set kingdom population. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom population. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
     - if !<[amount].is_integer>:
-        - run GenerateInternalError def.category:ValueError message:<element[[PACK/SC1] Cannot set kingdom population. Invalid amount specified: <[amount].bold>. Amount must be an integer.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[[PACK/SC1] Cannot set kingdom population. Invalid amount specified: <[amount].bold>. Amount must be an integer.]>
         - stop
 
     - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.population:<[amount]>
@@ -83,11 +89,11 @@ AddKingdomPopulation:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot set kingdom population. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom population. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
     - if !<[amount].is_integer>:
-        - run GenerateInternalError def.category:ValueError message:<element[[PACK/SC1] Cannot set kingdom population. Invalid amount specified: <[amount].bold>. Amount must be an integer.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[[PACK/SC1] Cannot set kingdom population. Invalid amount specified: <[amount].bold>. Amount must be an integer.]>
         - stop
 
     - define newAmount <[kingdom].proc[GetKingdomPopulation].add[<[amount]>]>
@@ -115,7 +121,7 @@ GetKingdomPopGrowth:
     ## >>> [ElementTag<Float>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot get kingdom population growth. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot get kingdom population growth. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
     - determine <server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.popGrowth].if_null[<script[SC1_PopulationData].data_key[<[kingdom]>.basePopGrowth]>].if_null[null]>
@@ -139,11 +145,11 @@ SetKingdomPopulationGrowth:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot set kingdom population growth rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom population growth rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
     - if !<[amount].is_decimal>:
-        - run GenerateInternalError def.category:ValueError message:<element[[PACK/SC1] Cannot set kingdom population growth rate. Invalid amount specified: <[amount].bold>. Amount must be a number.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[[PACK/SC1] Cannot set kingdom population growth rate. Invalid amount specified: <[amount].bold>. Amount must be a number.]>
         - stop
 
     - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.popGrowth:<[amount]>
@@ -169,11 +175,11 @@ AddKingdomPopulationGrowth:
     ## >>> ?[ElementTag<Float>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot set kingdom population growth rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom population growth rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
     - if !<[amount].is_decimal>:
-        - run GenerateInternalError def.category:ValueError message:<element[[PACK/SC1] Cannot set kingdom population growth rate. Invalid amount specified: <[amount].bold>. Amount must be a number.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[[PACK/SC1] Cannot set kingdom population growth rate. Invalid amount specified: <[amount].bold>. Amount must be a number.]>
         - stop
 
     - define newAmount <[kingdom].proc[GetKingdomPopGrowth].add[<[amount]>]>
@@ -201,14 +207,14 @@ GetKingdomFoodReserves:
     ## >>> [ElementTag<Integer>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot get kingdom population growth. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot get kingdom population growth. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
     - determine <server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.food].if_null[<script[SC1_PopulationData].data_key[<[kingdom]>.baseFoodReserves]>].if_null[null]>
 
 
 SetKingdomFoodReserves:
-    type: procedure
+    type: task
     debug: false
     definitions: kingdom[ElementTag(String)]|amount[ElementTag(Integer)]
     description:
@@ -226,11 +232,11 @@ SetKingdomFoodReserves:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot set kingdom food reserves. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom food reserves. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
     - if !<[amount].is_integer>:
-        - run GenerateInternalError def.category:ValueError message:<element[[PACK/SC1] Cannot set kingdom food reserves. Invalid amount specified: <[amount].bold>. Amount must be a number.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[[PACK/SC1] Cannot set kingdom food reserves. Invalid amount specified: <[amount].bold>. Amount must be a number.]>
         - stop
 
     - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.food:<[amount]>
@@ -256,11 +262,11 @@ AddKingdomFoodReserves:
     ## >>> ?[ElementTag<Integer>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot set kingdom food reserves. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom food reserves. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
     - if !<[amount].is_decimal>:
-        - run GenerateInternalError def.category:ValueError message:<element[[PACK/SC1] Cannot set kingdom food reserves. Invalid amount specified: <[amount].bold>. Amount must be a number.]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[[PACK/SC1] Cannot set kingdom food reserves. Invalid amount specified: <[amount].bold>. Amount must be a number.]>
         - stop
 
     - define newAmount <[kingdom].proc[GetKingdomFoodReserves].add[<[amount]>]>
@@ -274,16 +280,16 @@ GetRiverArea:
     - Gets the AreaObject which encompasses the Vexell river area.
     - Will return null if no such object exists.
     - ---
-    - → [AreaObject]
+    - → ?[AreaObject]
 
     script:
     ## Gets the AreaObject which encompasses the Vexell river area.
     ## Will return null if no such object exists.
     ##
-    ## >>> [AreaObject]
+    ## >>> ?[AreaObject]
 
     - if !<server.has_flag[kingdoms.scenario-1.river.default.area]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] River area flag is not set! Please make sure that it is defined before using this addon further!]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] River area flag is not set! Please make sure that it is defined before using this addon further!]> def.silent:false
         - determine null
 
     - determine <server.flag[kingdoms.scenario-1.river.default.area]>
@@ -294,7 +300,7 @@ GetKingdomTradeEfficiency:
     debug: false
     definitions: kingdom[ElementTag(String)]
     description:
-    - Gets the provided kingdom's current trade efficiency percentage with Fyndalin.
+    - Gets the provided kingdom's current trade efficiency bonus percentage with Fyndalin.
     - ---
     - → [ElementTag(Float)]
 
@@ -306,7 +312,7 @@ GetKingdomTradeEfficiency:
     ## >>> [ElementTag<Float>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[[PACK/SC1] Cannot get river obstrustion rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
-        - determine null
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot get river obstrustion rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine 0
 
     - determine <server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.tradeEfficiency].if_null[0]>

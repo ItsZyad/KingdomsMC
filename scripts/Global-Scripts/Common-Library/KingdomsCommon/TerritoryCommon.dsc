@@ -58,7 +58,7 @@ GetClaims:
     ## >>> [ListTag<ChunkTag>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - choose <[type]>:
@@ -92,17 +92,17 @@ AddClaim:
     ## >>> [Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
     - if <[chunk].object_type.to_lowercase> != chunk:
-        - run GenerateInternalError def.category:TypeError message:<element[Cannot add claim. Must be of type <&sq>Chunk<&sq>, type recieved: <[chunk].object_type>]>
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot add claim. Must be of type <&sq>Chunk<&sq>, type recieved: <[chunk].object_type>]>
         - determine cancelled
 
     - define type castle if:<[type].exists.not>
 
     - if !<[type].to_lowercase.is_in[core|castle]>:
-        - run GenerateInternalError def.category:ValueError message:<element[Cannot add claim. Invalid claim type: <&sq><[type]><&sq> provided. Must match enum: Core, Castle]>
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot add claim. Invalid claim type: <&sq><[type]><&sq> provided. Must match enum: Core, Castle]>
         - determine cancelled
 
     - flag server kingdoms.claimInfo.allClaims:->:<[chunk]>
@@ -138,7 +138,7 @@ GetClaimsCuboid:
     ## >>> ?[CuboidTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - choose <[type]>:
@@ -179,7 +179,7 @@ GetClaimsPolygon:
     ## >>> ?[PolygonTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - if <[world].has_flag[dynmap.cache.<[kingdom]>.cornerList]>:
@@ -208,7 +208,7 @@ GetMaxClaims:
     ## >>> [ElementTag<Integer>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - choose <[type]>:
@@ -240,7 +240,7 @@ GetOutposts:
     ## >>> [MapTag<CuboidTag;ElementTag;>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].if_null[<list[]>].is_empty>:
@@ -299,7 +299,7 @@ IsPlayerInCore:
     - define kingdom <[player].flag[kingdom]>
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine false
 
     - determine <[player].location.chunk.is_in[<proc[GetClaims].context[<[kingdom]>|core]>]>
@@ -326,7 +326,7 @@ IsPlayerInCastle:
     - define kingdom <[player].flag[kingdom]>
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine false
 
     - determine <[player].location.chunk.is_in[<proc[GetClaims].context[<[kingdom]>|castle]>]>
@@ -353,7 +353,7 @@ PlayerInWhichOutpost:
     - define kingdom <[player].flag[kingdom]>
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - define areas <proc[GetOutposts].context[<[kingdom]>].parse_value_tag[<[parse_value].get[area]>]>

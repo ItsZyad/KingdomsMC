@@ -26,11 +26,11 @@ IsAtWarWithKingdom:
     ## >>> [ElementTag<Boolean>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot check if kingdom is at war. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check if kingdom is at war. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - if !<proc[ValidateKingdomCode].context[<[otherKingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot check if kingdom is at war. Invalid kingdom code provided: <[otherKingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check if kingdom is at war. Invalid kingdom code provided: <[otherKingdom]>]>
         - determine null
 
     - foreach <[kingdom].proc[GetKingdomWars]> as:warID:
@@ -57,7 +57,7 @@ GetKingdomWarStatus:
     ## >>> [ElementTag<Boolean>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom war status. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom war status. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.warStatus].if_null[false]>
@@ -80,7 +80,7 @@ GetKingdomWars:
     ## >>> [ListTag<ElementTag<String>>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom war list. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom war list. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
     # This will only contain IDs, but actual war data will be contained within kingdoms.wars

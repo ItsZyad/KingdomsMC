@@ -26,7 +26,7 @@ GetKingdomDuchies:
     ## >>> [ListTag<ElementTag<String>>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get kingdom duchies. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom duchies. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine <list[]>
 
     - determine <server.flag[kingdoms.<[kingdom]>.duchies].keys.if_null[<list[]>]>
@@ -51,11 +51,11 @@ GetDuke:
     ## >>> ?[PlayerTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
     - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get duke. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duke. Invalid duchy name provided: <[duchy]>]> def.silent:false
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.duke]>
@@ -81,19 +81,19 @@ SetDuke:
     ## >>> ?[Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
     - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set duke. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duke. Invalid duchy name provided: <[duchy]>]> def.silent:false
         - determine null
 
     - if <[player].object_type> != Player:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set duke. Provided parameter: <[player]> is not a valid player.]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duke. Provided parameter: <[player]> is not a valid player.]> def.silent:false
         - determine null
 
     - if !<[player].is_in[<[kingdom].proc[GetMembers]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot set duke. Provided player is not a part of this kingdom.]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duke. Provided player is not a part of this kingdom.]> def.silent:false
         - determine null
 
     - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.duke:<[player]>
@@ -118,11 +118,11 @@ RemoveDuke:
     ## >>> ?[Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot unset duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot unset duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
     - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot unset duke. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot unset duke. Invalid duchy name provided: <[duchy]>]> def.silent:false
         - determine null
 
     - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.duke:!
@@ -145,11 +145,11 @@ GetDuchyTerritory:
     ## >>> [ListTag?<ChunkTag>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine <list[]>
 
     - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get duchy territory. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duchy territory. Invalid duchy name provided: <[duchy]>]> def.silent:false
         - determine <list[]>
 
     - determine <server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.territory]>
@@ -172,11 +172,11 @@ AddDuchy:
     ## >>> ?[Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot create duchy. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create duchy. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
     - if <server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot create duchy. Duchy with provided name: <[duchy]> already exists.]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create duchy. Duchy with provided name: <[duchy]> already exists.]> def.silent:false
         - determine null
 
     - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.territory:<list[]>
@@ -200,11 +200,11 @@ RemoveDuchy:
     ## >>> ?[Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot remove duchy. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove duchy. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
     - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot remove duchy. Duchy with provided name: <[duchy]> does not exist.]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove duchy. Duchy with provided name: <[duchy]> does not exist.]> def.silent:false
         - determine null
 
     - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>:!
@@ -230,30 +230,30 @@ AddDuchyClaim:
     ## >>> ?[Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot add duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
     - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot add duchy territory. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add duchy territory. Invalid duchy name provided: <[duchy]>]> def.silent:false
         - determine null
 
     - if <[chunk].object_type> != Chunk:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot add duchy territory. Provided parameter: <[chunk]> is not a valid chunk]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add duchy territory. Provided parameter: <[chunk]> is not a valid chunk]> def.silent:false
         - determine null
 
     - define kingdomCore <proc[GetClaims].context[<[kingdom]>|core]>
 
     - if !<[chunk].is_in[<[kingdomCore]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot add duchy territory. Provided chunk does not belong to the provided kingdom: <[kingdom]>.<n> Additionally, duchy chunks cannot be claimed from a kingdom<&sq>s castle chunks]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add duchy territory. Provided chunk does not belong to the provided kingdom: <[kingdom]>.<n> Additionally, duchy chunks cannot be claimed from a kingdom<&sq>s castle chunks]> def.silent:false
         - determine null
 
     - if <[kingdomCore].size> <= 1:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot add duchy territory. Kingdom must have more than one core chunk to designate duchies]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add duchy territory. Kingdom must have more than one core chunk to designate duchies]> def.silent:false
         - determine null
 
     - foreach <server.flag[kingdoms.<[kingdom]>.duchies]> as:duchyData:
         - if <[duchyData].get[territory].contains[<[chunk]>]>:
-            - run GenerateInternalError def.category:GenericError message:<element[Cannot add duchy territory. Provided chunk already belongs to a duchy.]> def.silent:false
+            - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add duchy territory. Provided chunk already belongs to a duchy.]> def.silent:false
             - determine null
 
     - if !<[chunk].is_in[<server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.territory]>]>:
@@ -280,15 +280,15 @@ RemoveDuchyClaim:
     ## >>> ?[Void]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot remove duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
     - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot remove duchy territory. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove duchy territory. Invalid duchy name provided: <[duchy]>]> def.silent:false
         - determine null
 
     - if <[chunk].object_type> != Chunk:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot remove duchy territory. Provided parameter: <[chunk]> is not a valid chunk]> def.silent:false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove duchy territory. Provided parameter: <[chunk]> is not a valid chunk]> def.silent:false
         - determine null
 
     - if <[chunk].is_in[<server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.territory]>]>:
