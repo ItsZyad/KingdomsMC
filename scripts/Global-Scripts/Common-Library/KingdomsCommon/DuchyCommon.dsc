@@ -58,7 +58,7 @@ GetDuke:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duke. Invalid duchy name provided: <[duchy]>]> def.silent:false
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.duke]>
+    - determine <server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.duke].if_null[null]>
 
 
 SetDuke:
