@@ -129,6 +129,11 @@ AddDuchyClaim:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot add duchy territory. Kingdom must have more than one core chunk to designate duchies]> def.silent:false
         - determine null
 
+    - foreach <server.flag[kingdoms.<[kingdom]>.duchies]> as:duchyData:
+        - if <[duchyData].get[territory].contains[<[chunk]>]>:
+            - run GenerateInternalError def.category:GenericError message:<element[Cannot add duchy territory. Provided chunk already belongs to a duchy.]> def.silent:false
+            - determine null
+
     - if !<[chunk].is_in[<server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.territory]>]>:
         - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.territory:->:<[chunk]>
 
