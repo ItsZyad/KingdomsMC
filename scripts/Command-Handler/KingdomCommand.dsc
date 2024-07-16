@@ -62,23 +62,24 @@ Kingdom_Command:
 
     tab complete:
     - define kingdom <player.flag[kingdom]>
+    - define args <context.raw_args.split_args>
 
-    - if <context.args.size> > 1 && <context.args.get[1]> == warp:
-        - if <context.args.get[2].is_in[allow|deny]>:
+    - if <[args].size> > 1 && <[args].get[1]> == warp:
+        - if <[args].get[2].is_in[allow|deny]>:
             - determine <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>
 
-        - else if <context.args.get[2].starts_with[kingdom<&co>]>:
+        - else if <[args].get[2].starts_with[kingdom<&co>]>:
             - define warpList <server.flag[kingdoms.<[kingdom]>.warps].keys>
             - determine <[warpList]>
 
         - define kingdomRealNames <proc[GetKingdomList].context[false]>
         - determine <list[set|list|allow|deny].include[<[kingdomRealNames].parse_tag[<list[kingdom:|<[parse_value]>].unseparated>]>]>
 
-    - else if <context.args.get[1].to_lowercase> == claim:
+    - else if <[args].get[1].to_lowercase> == claim:
         - determine <list[core|castle]>
 
-    - else if <context.args.get[1].to_lowercase> == duchy:
-        - if <context.args.size> > 1:
+    - else if <[args].get[1].to_lowercase> == duchy:
+        - if <[args].size> > 1:
             - determine <[kingdom].proc[GetKingdomDuchies]>
 
         - determine <list[create|remove|claim|unclaim]>
