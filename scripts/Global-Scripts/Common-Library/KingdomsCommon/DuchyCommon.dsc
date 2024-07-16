@@ -88,6 +88,61 @@ GetDuchyTerritory:
     - determine <server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.territory]>
 
 
+AddDuchy:
+    type: task
+    definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]
+    description:
+    - Creates a new duchy for the provided kingdom with the provided name.
+    - ---
+    - → ?[Void]
+
+    script:
+    ## Creates a new duchy for the provided kingdom with the provided name.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## duchy   : [ElementTag<String>]
+    ##
+    ## >>> ?[Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot create duchy. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine null
+
+    - if <server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot create duchy. Duchy with provided name: <[duchy]> already exists.]> def.silent:false
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.territory:<list[]>
+
+
+RemoveDuchy:
+    type: task
+    definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]
+    description:
+    - Deletes a duchy from the provided kingdom with the provided name, along with it all data associated with it.
+    - ---
+    - → ?[Void]
+
+    script:
+    ## Deletes a duchy from the provided kingdom with the provided name, along with it all data
+    ## associated with it.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## duchy   : [ElementTag<String>]
+    ##
+    ## >>> ?[Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot remove duchy. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot remove duchy. Duchy with provided name: <[duchy]> does not exist.]> def.silent:false
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>:!
+
+
 AddDuchyClaim:
     type: task
     definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]|chunk[ChunkTag]
