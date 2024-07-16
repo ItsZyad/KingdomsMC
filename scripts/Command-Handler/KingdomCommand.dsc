@@ -57,24 +57,31 @@ Kingdom_Command:
     aliases:
         - k
     tab completions:
-        1: help|claim|unclaim|balance|guards|deposit|withdraw|trade|rename|npc|warp|ideas|outline|influence
+        1: help|claim|unclaim|balance|guards|deposit|withdraw|trade|rename|npc|warp|ideas|outline|influence|duchy
         2: help
 
     tab complete:
+    - define kingdom <player.flag[kingdom]>
+
     - if <context.args.size> > 1 && <context.args.get[1]> == warp:
         - if <context.args.get[2].is_in[allow|deny]>:
             - determine <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>
 
         - else if <context.args.get[2].starts_with[kingdom<&co>]>:
-            - define kingdom <player.flag[kingdom]>
             - define warpList <server.flag[kingdoms.<[kingdom]>.warps].keys>
             - determine <[warpList]>
 
         - define kingdomRealNames <proc[GetKingdomList].context[false]>
         - determine <list[set|list|allow|deny].include[<[kingdomRealNames].parse_tag[<list[kingdom:|<[parse_value]>].unseparated>]>]>
 
-    - else if <context.args.get[1]> == claim:
+    - else if <context.args.get[1].to_lowercase> == claim:
         - determine <list[core|castle]>
+
+    - else if <context.args.get[1].to_lowercase> == duchy:
+        - if <context.args.size> > 1:
+            - determine <[kingdom].proc[GetKingdomDuchies]>
+
+        - determine <list[create|remove|claim|unclaim]>
 
     script:
     - define kingdom <player.flag[kingdom]>
@@ -158,6 +165,66 @@ Kingdom_Command:
 
         - else:
             - showfake red_stained_glass <[claimsCuboid].outline_2d[<player.location.y.add[20]>]> duration:<[persistTime]>
+
+        #------------------------------------------------------------------------------------------
+
+        Duchy:
+        - define action <[args].get[2]>
+        - define duchy null if:<[args].size.is[LESS].than[2]>
+        - define duchy <[args].get[3]>
+        - define duchy null if:<[args].size.is[LESS].than[3]>
+        - define chunk <player.location.chunk>
+
+        - if !<[duchy].is_truthy>:
+            - narrate format:callout "You must provide a name for the duchy affecting."
+            - stop
+
+        - if <[duchy]> == null:
+            - narrate format:callout "You cannot use that name in this sub-command."
+            - stop
+
+        - if !<player.proc[IsPlayerKing]> && !<player.is_op>:
+            - narrate format:callout "You cannot use the duchy sub-command if you are not king."
+            - stop
+
+        - choose <[action].to_lowercase>:
+            - case claim:
+                - if !<proc[GetClaims].context[<[kingdom]>|core].contains[<[chunk]>]>:
+                    - narrate format:callout "You cannot designate a non-core chunk as a duchy claim."
+                    - stop
+
+                - if !<[kingdom].proc[GetKingdomDuchies].contains[<[duchy]>]>:
+                    - narrate format:callout "Provided name: <[duchy].color[red]> does not belong to a valid duchy in your kingdom!"
+                    - stop
+
+                - run AddDuchyClaim def.kingdom:<[kingdom]> def.chunk:<[chunk]> def.duchy:<[duchy]>
+                - narrate format:callout "Claimed your current chunk for <[duchy].color[aqua]>"
+
+            - case unclaim:
+                - if !<[kingdom].proc[GetKingdomDuchies].contains[<[duchy]>]>:
+                    - narrate format:callout "Provided name: <[duchy].color[red]> does not belong to a valid duchy in your kingdom!"
+                    - stop
+
+                - run RemoveDuchyClaim def.kingdom:<[kingdom]> def.duchy:<[duchy]> def.chunk:<[chunk]>
+                - narrate format:callout "Unclaimed your current chunk from <[duchy].color[aqua]>. It will go back to being a normal core chunk."
+
+            - case create:
+                - run AddDuchy def.kingdom:<[kingdom]> def.duchy:<[duchy]>
+                - narrate format:callout "Successfully created a duchy with the name: <[duchy].color[aqua]>"
+                - narrate format:callout "<element[But keep in mind!].color[red].bold> You will still need to use <element[/k duchy claim <[duchy]>].color[gray]> to claim the chunk you are standing in for this duchy."
+
+            - case remove:
+                - if !<player.flag[datahold.duchies.confirmDuchyDeletion].equals[<[duchy]>].if_null[false]>:
+                    - narrate format:callout "To confirm that you would like to remove all the claims of the duchy with the name: <[duchy].color[light_purple]>, please type this command again."
+                    - flag <player> datahold.duchies.confirmDuchyDeletion:<[duchy]>
+
+                - run RemoveDuchy def.kingdom:<[kingdom]> def.duchy:<[duchy]>
+                - narrate format:callout "Successfully removed duchy with the name: <[duchy].color[aqua]> and all data associated with it."
+
+                - flag <player> datahold.duchies.confirmDuchyDeletion:!
+
+            - default:
+                - narrate format:callout "Unrecognized argument: <[action].color[red]>"
 
         #------------------------------------------------------------------------------------------
 
