@@ -61,6 +61,73 @@ GetDuke:
     - determine <server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.duke]>
 
 
+SetDuke:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]|player[PlayerTag]
+    description:
+    - Sets the provided player as the duke of the provided duchy.
+    - Will return null if the action fails.
+    - ---
+    - → ?[Void]
+
+    script:
+    ## Sets the provided player as the duke of the provided duchy.
+    ## Will return null if the action fails.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## duchy   : [ElementTag<String>]
+    ## player  : [PlayerTag]
+    ##
+    ## >>> ?[Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot set duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot set duke. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - determine null
+
+    - if <[player].object_type> != Player:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot set duke. Provided parameter: <[player]> is not a valid player.]> def.silent:false
+        - determine null
+
+    - if !<[player].is_in[<[kingdom].proc[GetMembers]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot set duke. Provided player is not a part of this kingdom.]> def.silent:false
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.duke:<[player]>
+
+
+RemoveDuke:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]
+    description:
+    - Removes the duke of the provided duchy from their role.
+    - Will return null if the action fails.
+    - ---
+    - → ?[Void]
+
+    script:
+    ## Removes the duke of the provided duchy from their role.
+    ## Will return null if the action fails.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## duchy   : [ElementTag<String>]
+    ##
+    ## >>> ?[Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot unset duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot unset duke. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.duke:!
+
+
 GetDuchyTerritory:
     type: procedure
     definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]
