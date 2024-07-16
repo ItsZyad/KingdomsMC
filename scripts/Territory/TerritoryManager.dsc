@@ -28,6 +28,8 @@ TerritoryClaim:
     ## claimingMode : [ElementTag(String)]
     ## chunk        : [ChunkTag]
     ## kingdom      : [ElementTag(String)]
+    ##
+    ## >>> [Void]
 
     - if !<[claimingMode].exists>:
         - narrate format:callout "You have not selected a claiming mode! Please use <element[/k claim core].color[red]> or <element[/k claim castle].color[red]> to use this command."
