@@ -80,9 +80,12 @@ Kingdom_Command:
 
     - else if <[args].get[1].to_lowercase> == duchy:
         - if <[args].size> > 1:
+            - if <[args].get[2].to_lowercase> == setduke:
+                - determine <[kingdom].proc[GetMembers]>
+
             - determine <[kingdom].proc[GetKingdomDuchies]>
 
-        - determine <list[create|remove|claim|unclaim]>
+        - determine <list[create|remove|claim|unclaim|setduke|removeduke]>
 
     script:
     - define kingdom <player.flag[kingdom]>
@@ -198,7 +201,11 @@ Kingdom_Command:
                     - narrate format:callout "Provided name: <[duchy].color[red]> does not belong to a valid duchy in your kingdom!"
                     - stop
 
-                - run AddDuchyClaim def.kingdom:<[kingdom]> def.chunk:<[chunk]> def.duchy:<[duchy]>
+                - run AddDuchyClaim def.kingdom:<[kingdom]> def.chunk:<[chunk]> def.duchy:<[duchy]> save:res
+
+                - if <entry[res].created_queue.determination.get[1].if_null[success]> == null:
+                    - stop
+
                 - narrate format:callout "Claimed your current chunk for <[duchy].color[aqua]>"
 
             - case unclaim:
@@ -206,11 +213,19 @@ Kingdom_Command:
                     - narrate format:callout "Provided name: <[duchy].color[red]> does not belong to a valid duchy in your kingdom!"
                     - stop
 
-                - run RemoveDuchyClaim def.kingdom:<[kingdom]> def.duchy:<[duchy]> def.chunk:<[chunk]>
+                - run RemoveDuchyClaim def.kingdom:<[kingdom]> def.duchy:<[duchy]> def.chunk:<[chunk]> save:res
+
+                - if <entry[res].created_queue.determination.get[1].if_null[success]> == null:
+                    - stop
+
                 - narrate format:callout "Unclaimed your current chunk from <[duchy].color[aqua]>. It will go back to being a normal core chunk."
 
             - case create:
-                - run AddDuchy def.kingdom:<[kingdom]> def.duchy:<[duchy]>
+                - run AddDuchy def.kingdom:<[kingdom]> def.duchy:<[duchy]> save:res
+
+                - if <entry[res].created_queue.determination.get[1].if_null[success]> == null:
+                    - stop
+
                 - narrate format:callout "Successfully created a duchy with the name: <[duchy].color[aqua]>"
                 - narrate format:callout "<element[But keep in mind!].color[red].bold> You will still need to use <element[/k duchy claim <[duchy]>].color[gray]> to claim the chunk you are standing in for this duchy."
 
@@ -219,10 +234,44 @@ Kingdom_Command:
                     - narrate format:callout "To confirm that you would like to remove all the claims of the duchy with the name: <[duchy].color[light_purple]>, please type this command again."
                     - flag <player> datahold.duchies.confirmDuchyDeletion:<[duchy]>
 
-                - run RemoveDuchy def.kingdom:<[kingdom]> def.duchy:<[duchy]>
+                - run RemoveDuchy def.kingdom:<[kingdom]> def.duchy:<[duchy]> save:res
+
+                - if <entry[res].created_queue.determination.get[1].if_null[success]> == null:
+                    - stop
+
                 - narrate format:callout "Successfully removed duchy with the name: <[duchy].color[aqua]> and all data associated with it."
 
                 - flag <player> datahold.duchies.confirmDuchyDeletion:!
+
+            # TODO: (Later) I may need to set a cooldown for both of these subcommands. I can see
+            # TODO/ them being abused quite easily.
+            - case setduke:
+                - define player <[args].get[4]>
+
+                - if !<[player].as[player].exists>:
+                    - narrate format:callout "Please provide the name of a valid player to make duke of this duchy."
+                    - stop
+
+                - run SetDuke def.kingdom:<[kingdom]> def.duchy:<[duchy]> def.player:<[player].as[player]> save:res
+
+                - if <entry[res].created_queue.determination.get[1].if_null[success]> == null:
+                    - stop
+
+                - narrate format:callout "Successfully set player: <[player].color[aqua]> as the duke of <[duchy].color[aqua]>."
+
+            - case removeduke:
+                - define player <proc[GetDuke].context[<[kingdom]>|<[duchy]>]>
+
+                - if !<[player].is_truthy>:
+                    - narrate format:callout "The provided duchy already does not have a duke!"
+                    - stop
+
+                - run RemoveDuke def.kingdom:<[kingdom]> def.duchy:<[duchy]> save:res
+
+                - if <entry[res].created_queue.determination.get[1].if_null[success]> == null:
+                    - stop
+
+                - narrate format:callout "Successfully removed player: <[player].color[aqua]> from their role as the duke of <[duchy].color[aqua]>."
 
             - default:
                 - narrate format:callout "Unrecognized argument: <[action].color[red]>"
