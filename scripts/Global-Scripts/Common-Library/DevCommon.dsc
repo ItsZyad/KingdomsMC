@@ -68,11 +68,12 @@ DefaultInternalErrorMessages:
 GenerateInternalError:
     type: task
     debug: false
-    definitions: category[ElementTag(String)]|message[?ElementTag(String) = 'An internal error has occurred.']|silent[?ElementTag(Boolean) = false]
+    definitions: category[ElementTag(String)]|message[?ElementTag(String) = 'An internal error has occurred.']|silent[?ElementTag(Boolean) = false]|formatAsError[?ElementTag(Boolean) = false]
     description:
     - Writes a given message to the debug console with the 'ERROR' type and the provided internal error code.
     - Narrates this message to the attached player if they are an have the kingdoms.admin permission or are ops when silent is provided as 'true'.
     - silent is set to 'false' by default.
+    - If the error is narrated with silent set to 'false', the message that appears in chat will not be formatted as an internal error unless 'formatAsError' is set to true.
     - ---
     - → [Void]
 
@@ -83,13 +84,19 @@ GenerateInternalError:
     ## kingdoms.admin permission or are ops when silent is provided as 'true'. silent is set to 'false'
     ## by default
     ##
-    ## category     :  [ElementTag<String>]
-    ## message      : ?[ElementTag<String>]
-    ## silent       : ?[ElementTag<Boolean>]
+    ## If the error is narrated with silent set to 'false', the message that appears in chat will
+    ## not be formatted as an internal error unless 'formatAsError' is set to true.
+    ##
+    ## category      :  [ElementTag<String>]
+    ## message       : ?[ElementTag<String>]
+    ## silent        : ?[ElementTag<Boolean>]
+    ## formatAsError : ?[ElementTag<Boolean>]
     ##
     ## >>> [Void]
 
     - define silent <[silent].if_null[false]>
+    - define formatAsError <[formatAsError].if_null[false]>
+
     - define errorType <proc[Enum].context[InternalErrorTypes.<[category]>|true]>
     - define message <[message].if_null[<script[DefaultInternalErrorMessages].data_key[errors.<[errorType]>]>]>
 
@@ -100,7 +107,11 @@ GenerateInternalError:
     - debug LOG " "
 
     - if !<[silent]>:
-        - narrate <[formattedMessage]>
+        - if !<[formatAsError]>:
+            - narrate format:warning <[message]>
+
+        - else:
+            - narrate <[formattedMessage]>
 
 
 ActionBarToggler:
