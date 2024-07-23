@@ -31,6 +31,7 @@ Help_Strings:
         unclaim: Unclaims the chunk you are standing in if it is a part of your claims. You are refunded for its full upkeep value but not its upfront value.
         balance: Shows the joint kingdom bank account.
         deposit: Adds the specified amount of money to your kingdom's balance.
+        duchy: Subcommand which handles all matters relating to the mangement of your kingdom's duchies- adding and removing them, setting dukes and managing their permissions.
         withdraw: Transfers the specified amount of money from the kingdom's balance to your personal account.
         trade: Initiates a trade with the specified player.
         rename: Renames the kingdom. <element[This command is restricted!].color[red].on_hover[Only the king can use this command with the the Game Czar's approval.]>
@@ -80,9 +81,10 @@ Kingdom_Command:
 
     - else if <[args].get[1].to_lowercase> == duchy:
         - if <[args].size> > 1:
-            - if <[args].get[2].to_lowercase> == setduke:
-                - determine <[kingdom].proc[GetMembers]>
+            - if <[args].size> > 2:
+                - determine <[kingdom].proc[GetMembers].parse_tag[<[parse_value].name>]>
 
+            - if <[args].get[2].to_lowercase> == setduke:
             - determine <[kingdom].proc[GetKingdomDuchies]>
 
         - determine <list[create|remove|claim|unclaim|setduke|removeduke]>
@@ -427,7 +429,6 @@ Kingdom_Command:
         #------------------------------------------------------------------------------------------
 
         Warp:
-
         # If the player has recently engaged in combat with another player then
         # they will not be allowed to use or set warps
         - if !<player.has_flag[combatMode]>:
