@@ -613,3 +613,25 @@ GetKingdomColor:
         - define outputColor <proc[GetColor].context[Default.<[rawKingdomColor]>].as[color]>
 
     - determine <[outputColor]>
+
+
+GetKingdomMaxDuchyCount:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]
+    description:
+    - Gets the maximum number of duchies that this kingdom can create.
+    - ---
+    - → [ElementTag(Integer)]
+
+    script:
+    ## Gets the maximum number of duchies that this kingdom can create.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Integer>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom max duchy count. Invalid kingdom code provided: <[kingdom]>]>
+        - determine 0
+
+    - determine <server.flag[kingdoms.<[kingdom]>.duchies.maxDuchies].if_null[0]>
