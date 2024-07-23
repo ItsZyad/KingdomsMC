@@ -64,7 +64,7 @@ Kingdom_Command:
 
     tab complete:
     - define kingdom <player.flag[kingdom]>
-    - define args <context.raw_args.split_args>
+    - define args <context.raw_args.split_args.if_null[<list[null]>]>
 
     - if <[args].size> > 1 && <[args].get[1]> == warp:
         - if <[args].get[2].is_in[allow|deny]>:
@@ -81,14 +81,23 @@ Kingdom_Command:
         - determine <list[core|castle]>
 
     - else if <[args].get[1].to_lowercase> == duchy:
-        - if <[args].size> > 1:
-            - if <[args].size> > 2:
-                - determine <[kingdom].proc[GetMembers].parse_tag[<[parse_value].name>]>
+        - if <[args].size> == 1:
+            - define tabCompletes <list[balance|deposit|withdraw|unclaim|tax]>
+            - define kingTabCompletes <list[create|remove|claim|setduke|removeduke|list]>
 
+            - if <player.proc[IsPlayerKing]> || <player.is_op>:
+                - define tabCompletes <[tabCompletes].include[<[kingTabCompletes]>]>
+
+            - determine <[tabCompletes].alphabetical>
+
+        - else if <[args].size> == 2:
             - if <[args].get[2].to_lowercase> == setduke:
                 - determine <[kingdom].proc[GetKingdomDuchies]>
 
-        - determine <list[create|remove|claim|unclaim|setduke|removeduke]>
+            - determine <[kingdom].proc[GetKingdomDuchies]>
+
+        - else if <[args].size> == 3:
+            - determine <[kingdom].proc[GetMembers].parse_tag[<[parse_value].name>]>
 
     - else if <[args].get[1].to_lowercase> == war:
         - if <[args].size> > 1:
@@ -192,6 +201,13 @@ Kingdom_Command:
         - define duchy null if:<[args].size.is[LESS].than[3]>
         - define chunk <player.location.chunk>
 
+        - if <[action].to_lowercase> == list:
+            - if !<player.proc[IsPlayerKing]> && !<player.is_op>:
+                - stop
+
+            - run DuchyListSubcommand def.kingdom:<[kingdom]> def.player:<player>
+            - stop
+
         - if !<[duchy].is_truthy>:
             - narrate format:callout "You must provide a name for the duchy affecting."
             - stop
@@ -200,12 +216,11 @@ Kingdom_Command:
             - narrate format:callout "You cannot use that name in this sub-command."
             - stop
 
-        - if !<player.proc[IsPlayerKing]> && !<player.is_op>:
-            - narrate format:callout "You cannot use the duchy sub-command if you are not king."
-            - stop
-
         - choose <[action].to_lowercase>:
             - case claim:
+                - if !<player.proc[IsPlayerKing]>:
+                    - stop
+
                 - if !<proc[GetClaims].context[<[kingdom]>|core].contains[<[chunk]>]>:
                     - narrate format:callout "You cannot designate a non-core chunk as a duchy claim."
                     - stop
@@ -234,6 +249,9 @@ Kingdom_Command:
                 - narrate format:callout "Unclaimed your current chunk from <[duchy].color[aqua]>. It will go back to being a normal core chunk."
 
             - case create:
+                - if !<player.proc[IsPlayerKing]>:
+                    - stop
+
                 - run AddDuchy def.kingdom:<[kingdom]> def.duchy:<[duchy]> save:res
 
                 - if <entry[res].created_queue.determination.get[1].if_null[success]> == null:
@@ -243,6 +261,9 @@ Kingdom_Command:
                 - narrate format:callout "<element[But keep in mind!].color[red].bold> You will still need to use <element[/k duchy claim <[duchy]>].color[gray]> to claim the chunk you are standing in for this duchy."
 
             - case remove:
+                - if !<player.proc[IsPlayerKing]>:
+                    - stop
+
                 - if !<player.flag[datahold.duchies.confirmDuchyDeletion].equals[<[duchy]>].if_null[false]>:
                     - narrate format:callout "To confirm that you would like to remove all the claims of the duchy with the name: <[duchy].color[light_purple]>, please type this command again."
                     - flag <player> datahold.duchies.confirmDuchyDeletion:<[duchy]>
@@ -259,6 +280,9 @@ Kingdom_Command:
             # TODO: (Later) I may need to set a cooldown for both of these subcommands. I can see
             # TODO/ them being abused quite easily.
             - case setduke:
+                - if !<player.proc[IsPlayerKing]>:
+                    - stop
+
                 - define player <[args].get[4]>
 
                 - if !<[player].as[player].exists>:
@@ -273,6 +297,9 @@ Kingdom_Command:
                 - narrate format:callout "Successfully set player: <[player].color[aqua]> as the duke of <[duchy].color[aqua]>."
 
             - case removeduke:
+                - if !<player.proc[IsPlayerKing]>:
+                    - stop
+
                 - define player <proc[GetDuke].context[<[kingdom]>|<[duchy]>]>
 
                 - if !<[player].is_truthy>:
@@ -285,6 +312,80 @@ Kingdom_Command:
                     - stop
 
                 - narrate format:callout "Successfully removed player: <[player].color[aqua]> from their role as the duke of <[duchy].color[aqua]>."
+
+            - case tax:
+                - if <[args].size> < 4:
+                    - narrate format:callout "Your duchy's current tax obligation to <[kingdom].proc[GetKingdomName]> is: <aqua><[kingdom].proc[GetDuchyTaxRate].context[<[duchy]>]>%"
+
+                - if !<player.proc[IsPlayerKing]>:
+                    - stop
+
+                - define taxRate <[args].get[4]>
+
+                - if !<[taxRate].is_decimal>:
+                    - narrate format:callout "You cannot set the duchy's tax rate to a non-numerical amount."
+                    - stop
+
+                - if <[taxRate]> > 100 || <[taxRate]> < 0:
+                    - narrate format:callout "The duchy tax rate is formatted as a percentage. Please input an amount between 0 and 100."
+                    - stop
+
+                - run SetDuchyTaxRate def.kingdom:<[kingdom]> def.duchy:<[duchy]> def.amount:<[taxRate].div[100]>
+                - narrate format:callout "Set the tax rate for this duchy to: <aqua><[taxRate]>%."
+                - narrate format:callout "The default taxation rate for duchies in your kingdom is: <green><[kingdom].proc[GetKingdomDuchies].parse_tag[<[kingdom].proc[GetDuchyTaxRate].context[<[duchy]>].if_null[0].mul[100]>].average>%"
+
+                - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+
+            - case balance:
+                - narrate format:callout "Balance for: <[duchy].color[aqua]> is: <aqua>$<[kingdom].proc[GetDuchyBalance].context[<[duchy]>].format_number>"
+
+            - case deposit:
+                - define amount <[args].get[4]>
+
+                - if !<[amount].is_decimal>:
+                    - narrate format:callout "You cannot deposit a non-numerical amount."
+                    - stop
+
+                - if <[amount]> <= 0:
+                    - narrate format:callout "You must deposit an amount greater than 0."
+                    - narrate format:callout "To take money out of your duchy's bank, use: <element[/k duchy withdraw (duchy) (amount)].color[gray]>"
+                    - stop
+
+                - if <player.money> < <[amount]>:
+                    - narrate format:callout "You do not have sufficient funds in your personal account to deposit this in your duchy's bank."
+                    - stop
+
+                - run SetDuchyBalance def.kingdom:<[kingdom]> def.duchy:<[duchy]> def.amount:<[kingdom].proc[GetDuchyBalance].context[<[duchy]>].add[<[amount]>]>
+                - money take players:<player> quantity:<[amount]>
+
+                - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+
+                - narrate format:callout "Successfully added: <element[$<[amount].format_number>].color[aqua]> to the duchy bank."
+
+            - case withdraw:
+                - define amount <[args].get[4]>
+
+                - if !<[amount].is_decimal>:
+                    - narrate format:callout "You cannot deposit a non-numerical amount."
+                    - stop
+
+                - if <[amount]> <= 0:
+                    - narrate format:callout "You must withdraw an amount greater than 0."
+                    - narrate format:callout "To put money into your duchy's bank, use: <element[/k duchy deposit (duchy) (amount)].color[gray]>"
+                    - stop
+
+                - define balance <[kingdom].proc[GetDuchyBalance].context[<[duchy]>]>
+
+                - if <[balance]> < <[amount]>:
+                    - narrate format:callout "Your duchy does not have enough funds to withdraw this amount from its bank."
+                    - stop
+
+                - run SetDuchyBalance def.kingdom:<[kingdom]> def.duchy:<[duchy]> def.amount:<[balance].sub[<[amount]>]>
+                - money give players:<player> quantity:<[amount]>
+
+                - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+
+                - narrate format:callout "Successfully removed: <element[$<[amount].format_number>].color[aqua]> from the duchy bank."
 
             - default:
                 - narrate format:callout "Unrecognized argument: <[action].color[red]>"
