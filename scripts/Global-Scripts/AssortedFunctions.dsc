@@ -108,13 +108,17 @@ SplitKeep:
     - determine <[outList]>
 
 
-ClearDatahold_Handler:
+ClearTempFlag_Handler:
     type: world
     events:
         on player quits:
         - define persistentData <player.flag[datahold.persistent]> if:<player.has_flag[datahold.persistent]>
         - flag <player> datahold:!
-        - flag <player> datahold.persistent:<[persistentData]> if:<player.has_flag[datahold.persistent]>
+        - flag <player> datahold.persistent:<[persistentData]> if:<[persistentData].exists>
+
+        - define persistentNoChat <player.flag[noChat.persistent]> if:<player.has_flag[noChat.persistent]>
+        - flag <player> noChat:!
+        - flag <player> noChat.persistent:<[persistentNoChat]> if:<[persistentNoChat].exists>
 
 
 TempSaveInventory:
