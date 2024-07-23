@@ -37,6 +37,7 @@ Help_Strings:
         rename: Renames the kingdom. <element[This command is restricted!].color[red].on_hover[Only the king can use this command with the the Game Czar's approval.]>
         npc: Use /k npc spawn to open the spawn menu for kingdom NPCs.
         warp: Takes you to your kingdom's private warp location. <red>Note that there is a 30 sec cooldown for this command.
+        war: Subcommand which handles all aspects related to waging war against other kingdoms.
         ideas: Shows your kingdom's ideas. These are a number of buffs and debuffs that apply to kingdom depending on its character and history.
         outline: You can specify either 'castle' or 'core' to show you the bounds of both of those territorial units in your kingdom.
         influence: Opens a menu which shows all the influence actions you can take to bring Fyndalin further under your control, as well as the current status of your kingdom's influence. <red>Can also be accessed using /influence
@@ -58,7 +59,7 @@ Kingdom_Command:
     aliases:
         - k
     tab completions:
-        1: help|claim|unclaim|balance|guards|deposit|withdraw|trade|rename|npc|warp|ideas|outline|influence|duchy
+        1: help|claim|unclaim|balance|guards|deposit|withdraw|trade|rename|npc|warp|ideas|outline|influence|duchy|war
         2: help
 
     tab complete:
@@ -85,9 +86,19 @@ Kingdom_Command:
                 - determine <[kingdom].proc[GetMembers].parse_tag[<[parse_value].name>]>
 
             - if <[args].get[2].to_lowercase> == setduke:
-            - determine <[kingdom].proc[GetKingdomDuchies]>
+                - determine <[kingdom].proc[GetKingdomDuchies]>
 
         - determine <list[create|remove|claim|unclaim|setduke|removeduke]>
+
+    - else if <[args].get[1].to_lowercase> == war:
+        - if <[args].size> > 1:
+            - if <[args].get[2].to_lowercase> == justify:
+                - determine <proc[GetKingdomList].context[false]>
+
+            - else if <[args].get[2].to_lowercase> == progress:
+                - determine <[kingdom].proc[GetKingdomWars]>
+
+        - determine <list[justify|progress]>
 
     script:
     - define kingdom <player.flag[kingdom]>
@@ -586,6 +597,18 @@ Kingdom_Command:
 
         - else:
             - narrate format:callout "You may not use warps, you are in <red>combat mode!"
+
+        #------------------------------------------------------------------------------------------
+
+        War:
+        - define action <[args].get[2].if_null[null]>
+
+        - choose <[action].to_lowercase>:
+            - case justify:
+                # TODO: see if there are any checks that need to be made before the player can
+                # TODO/ justify willy-nilly
+
+                - inventory open d:JustificationKingdom_Window
 
         #------------------------------------------------------------------------------------------
 
