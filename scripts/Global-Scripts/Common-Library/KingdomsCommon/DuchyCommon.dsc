@@ -10,6 +10,60 @@
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 
+IsPlayerDuke:
+    type: procedure
+    definitions: player[PlayerTag]
+    description:
+    - Returns true if the provided player is a duke of any duchy in their kingdom.
+    - ---
+    - → [ElementTag(Boolean)]
+
+    script:
+    ## Returns true if the provided player is a duke of any duchy in their kingdom.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - if <[player].object_type> != Player:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot get if player is a duke. Definition: <[player]> provided is not a valid player.]> def.silent:false
+        - determine false
+
+    - define kingdom <player.flag[kingdom]>
+
+    - determine <[kingdom].proc[GetKingdomDuchies].parse_tag[<[kingdom].proc[GetDuke].context[<[parse_value]>]>].contains[<[player]>]>
+
+
+GetPlayerDuchy:
+    type: procedure
+    definitions: player[PlayerTag]
+    description:
+    - Returns the name of the duchy that the provided player is the duke of.
+    - If the provided player is not a duke, this procedure will return null.
+    - ---
+    - → ?[ElementTag(String)]
+
+    script:
+    ## Returns the name of the duchy that the provided player is the duke of.
+    ## If the provided player is not a duke, this procedure will return null.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> ?[ElementTag<String>]
+
+    - if <[player].object_type> != Player:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot get player duchy. Definition: <[player]> provided is not a valid player.]> def.silent:false
+        - determine null
+
+    - define kingdom <player.flag[kingdom]>
+
+    - foreach <[kingdom].proc[GetKingdomDuchies]> as:duchy:
+        - if <[kingdom].proc[GetDuke].context[<[duchy]>]> == <[player]>:
+            - determine <[duchy]>
+
+    - determine null
+
+
 GetKingdomDuchies:
     type: procedure
     definitions: kingdom[ElementTag(String)]
@@ -175,11 +229,12 @@ AddDuchy:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create duchy. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
-    - if <server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
+    - if <server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy].replace[ ].with[-]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create duchy. Duchy with provided name: <[duchy]> already exists.]> def.silent:false
         - determine null
 
-    - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.territory:<list[]>
+    - flag server kingdoms.<[kingdom]>.duchies.<[duchy].replace[ ].with[-]>.territory:<list[]>
+    - flag server kingdoms.<[kingdom]>.duchies.<[duchy].replace[ ].with[-]>.name:<[duchy]>
 
 
 RemoveDuchy:
@@ -293,3 +348,159 @@ RemoveDuchyClaim:
 
     - if <[chunk].is_in[<server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.territory]>]>:
         - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.territory:<-:<[chunk]>
+
+
+GetDuchyBalance:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]
+    description:
+    - Returns the balance of the provided duchy in the provided kingdom.
+    - ---
+    - → [ElementTag(Float)]
+
+    script:
+    ## Returns the balance of the provided duchy in the provided kingdom.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## duchy   : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Float>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duchy balance. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine 0
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duchy balance. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - determine 0
+
+    - determine <server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.balance].if_null[0]>
+
+
+SetDuchyBalance:
+    type: task
+    definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]|amount[ElementTag(Float)]
+    description:
+    - Sets the balance of the provided duchy in the provided kingdom to the provided amount.
+    - Will return null if the action fails.
+    - ---
+    - → ?[Void]
+
+    script:
+    ## Sets the balance of the provided duchy in the provided kingdom to the provided amount.
+    ## Will return null if the actions fails.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## duchy   : [ElementTag<String>]
+    ## amount  : [ElementTag<Float>]
+    ##
+    ## >>> ?[Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duchy balance. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duchy balance. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - determine null
+
+    - if !<[amount].is_decimal>:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot set duchy balance. Amount provided is not a valid number.]> def.silent:false
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.balance:<[amount]>
+
+
+GetDuchyTaxRate:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]
+    description:
+    - Returns a number between 0-1 representing the tax rate placed by the overall kingdom on the provided duchy (with 1 meaning 100%).
+    - ---
+    - → [ElementTag(Float)]
+
+    script:
+    ## Returns a number between 0-1 representing the tax rate placed by the overall kingdom on the
+    ## provided duchy (with 1 meaning 100%).
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## duchy   : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Float>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine 0
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove duchy territory. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - determine 0
+
+    - determine <server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.tax].if_null[0]>
+
+
+SetDuchyTaxRate:
+    type: task
+    definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]|amount[ElementTag(Float)]
+    description:
+    - Sets the tax rate levied on the provided duchy in the provided kingdom to the given amount.
+    - Will return null if the action fails.
+    - ---
+    - → ?[Void]
+
+    script:
+    ## Sets the tax rate levied on the provided duchy in the provided kingdom to the given amount.
+    ## Will return null if the actions fails.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## duchy   : [ElementTag<String>]
+    ## amount  : [ElementTag<Float>]
+    ##
+    ## >>> ?[Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duchy tax rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duchy tax rate. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - determine null
+
+    - if !<[amount].is_decimal>:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot set duchy tax rate. Amount provided is not a valid number.]> def.silent:false
+        - determine null
+
+    - if <[amount]> > 1 || <[amount]> < 0:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot set duchy tax rate. Amount provided is not a valid percentage.]> def.silent:false
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.tax:<[amount]>
+
+
+GetDuchyDisplayName:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|duchy[ElementTag(String)]
+    description:
+    - Will return the display name associated with the provided duchy.
+    - Will return null if the provided duchy does not exist.
+    - ---
+    - → ?[ElementTag(String)]
+
+    script:
+    ## Will return the display name associated with the provided duchy.
+    ## Will return null if the provided duchy does not exist.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## duchy   : [ElementTag<String>]
+    ##
+    ## >>> ?[ElementTag<String>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duchy display name. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duchy display name. Invalid duchy name provided: <[duchy]>]> def.silent:false
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.name].if_null[<[duchy]>]>
