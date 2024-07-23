@@ -11,6 +11,7 @@
 
 IsInOwnDuchy:
     type: procedure
+    debug: false
     definitions: player[PlayerTag]
     description:
     - Returns true if the provided player is currently inside their own duchy's territory.
@@ -37,6 +38,7 @@ IsInOwnDuchy:
 
 IsInAnyDuchy:
     type: procedure
+    debug: false
     definitions: player[PlayerTag]
     description:
     - Returns true if the provided player is currently inside any of their kingdom's duchies.
@@ -61,7 +63,7 @@ IsInAnyDuchy:
 
 DoorInteractCode:
     type: task
-    #debug: false
+    debug: false
     script:
     - if <player.has_permission[kingdoms.admin.bypassclickcheck]>:
         - stop
@@ -105,6 +107,7 @@ DoorInteractCode:
 
 TerritoryHandler:
     type: world
+    debug: false
     events:
         on player right clicks *button:
         - inject DoorInteractCode
