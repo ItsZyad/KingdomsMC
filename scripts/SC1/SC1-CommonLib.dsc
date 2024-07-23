@@ -10,6 +10,29 @@
 ##ignorewarning invalid_data_line_quotes
 ## ------------------------------------------END HEADER-------------------------------------------
 
+SC1_GenerateTradeEffSidebarLine:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]
+    description:
+    - Helper proc which returns the sidebar line for trade efficiency.
+    - ---
+    - → [ElementTag(String)]
+
+    script:
+    ## Helper proc which returns the sidebar line for trade efficiency.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - define tradeEff <[kingdom].proc[GetKingdomTradeEfficiency].round_to_precision[0.001]>
+
+    - if <[tradeEff]> >= 0:
+        - determine <element[Trade Efficiency: <green>+<[tradeEff]>%]>
+
+    - determine <element[Trade Efficiency: <red><[tradeEff]>%]>
+
+
 HasSC1:
     type: procedure
     script:

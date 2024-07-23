@@ -13,8 +13,7 @@ PrestigeDegradation_Handler:
     debug: false
     events:
         on system time hourly every:24:
-        - run GetPrestigeDegradation save:prestigeScales
-        - define prestigeScales <entry[prestigeScales].created_queue.determination.get[1]>
+        - define prestigeScales <proc[GetPrestigeDegradation]>
 
         - foreach <[prestigeScales]> key:kingdom as:scale:
             - if <[scale]> > 0:
@@ -25,7 +24,7 @@ PrestigeDegradation_Handler:
 
 
 GetPrestigeDegradation:
-    type: task
+    type: procedure
     debug: false
     description:
     - Generates a set of values for each kingdom on how much prestige they should gain or lose

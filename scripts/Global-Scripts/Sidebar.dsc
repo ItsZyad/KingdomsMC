@@ -3,9 +3,14 @@
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Dec 2021
-## @Script Ver: v1.1
+## @Update 1: Jul 2024
+## **** Note: This update moved all of the heavy lifting of the sidebars out of the actual task
+## ****       script itself and into a data script containing all the lines of the different
+## ****       sidebar modes. This will likely act as a very high-functional stopgap until I figure
+## ****       out how to replicating the scrolling sidebar plugin.
 ##
-##ignorewarning invalid_data_line_quotes
+## @Script Ver: v2.0
+##
 ## ------------------------------------------END HEADER-------------------------------------------
 
 # So far this is the closest thing I will have to a dedicated script that sets people's kingdom flag
@@ -14,19 +19,98 @@ SetInitialSidebar:
     debug: false
     events:
         on player joins:
+        - if !<player.has_flag[sidebar.mode]>:
+            - flag <player> sidebar.mode:Default
+
         - ~run SidebarLoader def:<player>
 
         - if !<player.has_flag[kingdom]>:
             - narrate format:callout "<yellow><bold>WARNING: <&r>Player kingdom flag not set! Using kingdom functions may have unexpected/untested side-effects"
 
 
+GenerateUpkeepSidebarLine:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]
+    description:
+    - Helper proc which returns either the default upkeep line for the sidebar or 'Frozen!' depending on if PauseUpkeep is set.
+    - ---
+    - → [ElementTag(String)]
+
+    script:
+    ## Helper proc which returns either the default upkeep line for the sidebar or 'Frozen!'
+    ## depending on if PauseUpkeep is set.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - define totalOutpostUpkeep <server.flag[<[kingdom]>.outposts.totalUpkeep].if_null[0]>
+
+    - if !<server.has_flag[PauseUpkeep]>:
+        - determine <element[Upkeep: <yellow>$<[kingdom].proc[GetUpkeep].add[<[totalOutpostUpkeep].if_null[0]>].round_down.format_number>]>
+
+    - determine <element[Upkeep: <aqua>Frozen!]>
+
+
+GeneratePrestigeDegSidebarLine:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]
+    description:
+    - Helper proc which returns either the prestige degredation line for the default sidebar.
+    - ---
+    - → [ElementTag(String)]
+
+    script:
+    ## Helper proc which returns either the prestige degredation line for the default sidebar.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - define prestigeScales <proc[GetPrestigeDegradation]>
+
+    - if <[prestigeScales].get[<[kingdom]>]> >= 0:
+        - determine <element[Prestige Gain: <element[+<[prestigeScales].get[<[kingdom]>]>].color[green]>]>
+
+    - determine <element[Prestige Decay: <element[<[prestigeScales].get[<[kingdom]>]>].color[red]>]>
+
+
+SidebarLine_Data:
+    type: data
+    SidebarModes:
+        Default:
+            title: <element[   <[kingdomName].proc[ConvertToSkinnyLetters].color[<[kingdom].proc[GetKingdomColor]>].bold>  ]>
+            lines:
+            - <element[Balance: <yellow>$<[kingdom].proc[GetBalance].round_down.format_number>]>
+            - <proc[GenerateUpkeepSidebarLine].context[<[kingdom]>]>
+            - <element[Core Claims: <proc[GetClaims].context[<[kingdom]>|core].size.if_null[0]> / <proc[GetMaxClaims].context[<[kingdom]>|core]>]>
+            - <element[Castle Claims: <proc[GetClaims].context[<[kingdom]>|castle].size.if_null[0]> / <proc[GetMaxClaims].context[<[kingdom]>|castle]>]>
+            - <element[War Status: <[kingdom].proc[GetKingdomWarStatus].if_true[At War].if_false[At Peace].color[<[warStatusColors].get[<[kingdom].proc[GetKingdomWarStatus]>]>]>]>
+            - <element[Prestige: <[kingdom].proc[GetPrestige].round_to_precision[0.025]> / 100]>
+            - <proc[GeneratePrestigeDegSidebarLine].context[<[kingdom]>]>
+            - <element[Outpost Count: <[kingdom].proc[GetOutposts].size.if_null[0]>]>
+            - <element[Duchy Count: <[kingdom].proc[GetKingdomDuchies].size.if_null[0]>]>
+
+        Duchy:
+            title: <element[   <[duchy].proc[ConvertToSkinnyLetters].bold.color[aqua]>   ]>
+            lines:
+            - <element[Duke: <green><[kingdom].proc[GetDuke].context[<[duchy]>].name>]>
+            - <element[Balance: <yellow>$<[kingdom].proc[GetDuchyBalance].context[<[duchy]>].round_to_precision[0.01].format_number>]>
+            - <element[Tax Rate: <yellow><[kingdom].proc[GetDuchyTaxRate].context[<[duchy]>].mul[100].round_to_precision[0.01].format_number>% / week]>
+
+        Scenario-1:
+            title: <element[<blue><bold>   Scenario 1   ]>
+            lines:
+            - <proc[SC1_GenerateTradeEffSidebarLine].context[<[kingdom]>]>
+
+
 SidebarLoader:
     type: task
     debug: false
-    definitions: target[ListTag(PlayerTag)]|changeSBState[?ElementTag(Boolean) = true]
+    definitions: target[ListTag(PlayerTag)]|overrideHiddenSidebar[?ElementTag(Boolean) = true]
     description:
     - Sets the Kingdoms sidebar for a player or list of players, drawing on all the relevant information pertaining to their kingdom.
-    - If a player has set their sidebar to 'hide', changeSBState can be set to false and their sidebar update will be skipped.
+    - If a player has set their sidebar to 'hide', overrideHiddenSidebar can be set to false and their sidebar update will be skipped.
     - ---
     - → [Void]
 
@@ -34,11 +118,11 @@ SidebarLoader:
     ## Sets the Kingdoms sidebar for a player or list of players, drawing on all the relevant
     ## information pertaining to their kingdom.
     ##
-    ## If a player has set their sidebar to 'hide', changeSBState can be set to false and their
-    ## sidebar update will be skipped.
+    ## If a player has set their sidebar to 'hide', overrideHiddenSidebar can be set to false and
+    ## their sidebar update will be skipped.
     ##
-    ## target        :  [ListTag(PlayerTag)]
-    ## changeSBState : ?[ElementTag(Boolean)]
+    ## target                :  [ListTag(PlayerTag)]
+    ## overrideHiddenSidebar : ?[ElementTag(Boolean)]
     ##
     ## >>> [Void]
 
@@ -46,83 +130,46 @@ SidebarLoader:
         true: <red><bold>
         false: <green>
 
-    - define changeSBState <[changeSBState].if_null[true]>
+    - define overrideHiddenSidebar <[overrideHiddenSidebar].if_null[true]>
     - define target <[target].as[list].deduplicate.filter_tag[<[filter_value].is_online>]>
 
     - foreach <[target]> as:player:
-        - if !<[player].sidebar_lines.exists> && !<[changeSBState]>:
+        - if !<[player].sidebar_lines.exists> && !<[overrideHiddenSidebar]>:
             - foreach next
 
-        - if <[player].has_flag[hideSidebar]>:
+        - if <[player].has_flag[sidebar.hide]>:
             - foreach next
 
-        - if <[player].is_online> && <[player].has_flag[kingdom]>:
+        - if !<[player].is_online>:
+            - foreach next
 
-            # Initialize and set Balance line
+        - if <[player].has_flag[kingdom]>:
             - define kingdom <[player].flag[kingdom]>
             - define kingdomName <proc[GetKingdomName].context[<[kingdom]>]>
+            - define sidebarMode <[player].flag[sidebar.mode]>
+
+            - if <[sidebarMode]> == Duchy:
+                - if <[player].proc[IsPlayerDuke]>:
+                    - define duchy <[player].proc[GetPlayerDuchy]>
+
+                - else:
+                    - define sidebarMode Default
+
+            - define sidebarData <script[SidebarLine_Data].data_key[SidebarModes.<[sidebarMode]>]>
 
             - sidebar remove players:<[player]>
+            - sidebar set title:<[sidebarData].get[title].parsed> players:<[player]>
+            - sidebar add values:<element[<&sp>].repeat[30]> start:99
 
-            # TODO: fix this as a part of the upkeep rework.
-            - define totalOutpostUpkeep <server.flag[<[kingdom]>.outposts.totalUpkeep].if_null[0]>
-            - sidebar set "title:<bold> <[kingdomName].proc[ConvertToSkinnyLetters].color[<[kingdom].proc[GetKingdomColor]>]>  " players:<[player]>
+            - foreach <[sidebarData].get[lines]> as:line:
+                - sidebar add values:<&sp><[line].parsed> players:<[player]>
 
-            - sidebar add "values:<&r>|<&sp>Balance: <yellow>$<[kingdom].proc[GetBalance].round_down.format_number>" players:<[player]>
-
-            # Set Upkeep Line
-            - if !<server.has_flag[PauseUpkeep]>:
-                - sidebar add "values:<&sp>Upkeep: <yellow>$<[kingdom].proc[GetUpkeep].add[<[totalOutpostUpkeep].if_null[0]>].round_down.format_number>" players:<[player]>
-
-            - else:
-                - sidebar add "values:<&sp>Upkeep: <aqua>Frozen!" players:<[player]>
-
-            - if <server.flag[kingdoms.<[kingdom]>.powerstruggle.influenceBonuses.bonusTax].exists>:
-                - sidebar add "values:<&sp>Fyndalin Tax Bonus: <green>$<server.flag[kingdoms.<[kingdom]>.powerstruggle.influenceBonuses.bonusTax].format_number>" players:<[player]>
-
-            # Set Core Claim amount line
-            - sidebar add "values:<&sp>Core Claims: <proc[GetClaims].context[<[kingdom]>|core].size.if_null[0]> / <proc[GetMaxClaims].context[<[kingdom]>|core]>" players:<[player]>
-
-            # Set Castle Territory line
-            - sidebar add "values:<&sp>Castle Claims: <proc[GetClaims].context[<[kingdom]>|castle].size.if_null[0]> / <proc[GetMaxClaims].context[<[kingdom]>|castle]>" players:<[player]>
-
-            # Set War Status Line
-            - sidebar add "values:<&sp>War Status: <[kingdom].proc[GetKingdomWarStatus].if_true[At War].if_false[At Peace].color[<[warStatusColors].get[<[kingdom].proc[GetKingdomWarStatus]>]>]>" players:<[player]>
-
-            # Set Outpost Count Line
-            - sidebar add "values:<&sp>Outpost Count: <[kingdom].proc[GetOutposts].size.if_null[0]>" players:<[player]>
-
-            # Set Prestige Line
-            - sidebar add "values:<&sp>Prestige: <[kingdom].proc[GetPrestige].round_to_precision[0.025]> / 100" players:<[player]>
-
-            # Set Prestige Degradation Line
-            - ~run GetPrestigeDegradation save:prestigeScales
-            - define prestigeScales <entry[prestigeScales].created_queue.determination.get[1]>
-
-            - if <[prestigeScales].get[<[kingdom]>]> >= 0:
-                - sidebar add "values:<&sp>Prestige Gain: <element[+<[prestigeScales].get[<[kingdom]>]>].color[green]>"
-
-            - else:
-                - sidebar add "values:<&sp>Prestige Decay: <element[<[prestigeScales].get[<[kingdom]>]>].color[red]>"
-
-            # Separator Line
-            - sidebar add values:<element[<&sp>].repeat[30]> players:<[player]>
-
-            - define tradeEff <[kingdom].proc[GetKingdomTradeEfficiency].round_to_precision[0.001]>
-
-            - if <[tradeEff]> >= 0:
-                - sidebar add "values:<&sp>Trade Efficiency: <green>+<[tradeEff]>%"
-
-            - else:
-                - sidebar add "value:<&sp>Trade Efficiency: <red><[tradeEff]>%"
-
-            # Separator Line
-            - sidebar add values:<element[<&sp>].repeat[30]> players:<[player]>
+            - sidebar add values:<&sp>
 
         - else:
             - sidebar set title:<bold><gray>KINGDOMLESS
 
-            - sidebar add values:<&sp>
+            - sidebar add values:<&sp> start:99
             - sidebar add "values:Balance: <gray>$####"
             - sidebar add "values:Upkeep: <gray>$####"
             - sidebar add "values:Core Claims: ##/##"
@@ -135,18 +182,32 @@ SidebarLoader:
 
 ToggleSidebar_Command:
     type: command
-    description: "command for managing the Kingdoms sidebar"
+    description: command for managing the Kingdoms sidebar
     usage: /sidebar
     name: sidebar
     tab completions:
-        1: hide|show
+        1: hide|show|mode
+
+    tab complete:
+    - define args <context.raw_args.to_lowercase.split_args>
+
+    - if <[args].get[1]> == mode:
+        - determine <script[SidebarLine_Data].data_key[SidebarModes].keys>
 
     script:
-    - if <context.raw_args> == hide:
-        - flag <player> hideSidebar
+    - define args <context.raw_args.to_lowercase.split_args>
+
+    - if <[args].get[1]> == hide:
+        - flag <player> sidebar.hide
         - sidebar remove
 
-    - else if <context.raw_args> == show:
-        - flag <player> hideSidebar:!
-        - sidebar remove
-        - ~run SidebarLoader def:<player>|true
+    - else if <[args].get[1]> == show:
+        - flag <player> sidebar.hide:!
+        - ~run SidebarLoader def.target:<player> def.overrideHiddenSidebar:true
+
+    - else if <[args].get[1]> == mode:
+        - define mode <[args].get[2].to_titlecase.if_null[null]>
+
+        - if <[mode].is_truthy>:
+            - flag <player> sidebar.mode:<[mode]>
+            - execute as_player "sidebar show"
