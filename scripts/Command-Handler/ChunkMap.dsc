@@ -14,18 +14,16 @@ ChunkMap:
     - define playerChunk <player.location.chunk>
     - define chunkList <list[]>
     # - define allClaims <server.flag[kingdoms.claimInfo.allClaims]>
-    - define allClaims <proc[GetAllClaims]>
-    - define kingdomList <proc[GetKingdomList]>
 
     - repeat 10 from:-5 as:zChunk:
         - repeat 19 from:-9 as:xChunk:
             - define currentChunk <[playerChunk].add[<[xChunk]>,<[zChunk]>]>
 
-            - if <[allClaims].contains[<[currentChunk]>]>:
-                - foreach <[kingdomList]> as:kingdom:
+            - if <proc[GetAllClaims].contains[<[currentChunk]>]>:
+                - foreach <proc[GetKingdomList]> as:kingdom:
                     # - define kingdomTerritory <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
-                    - define kingdomTerritory <proc[GetClaims]>
-                    - define kingdomColor <proc[GetKingdomColor].context[<[kingdom]>]>
+                    - define kingdomTerritory <[kingdom].proc[GetClaims]>
+                    - define kingdomColor <[kingdom].proc[GetKingdomColor]>
 
                     - if <[currentChunk]> == <[playerChunk]> && <[kingdomTerritory].contains[<[currentChunk]>]>:
                         - define chunkList:->:<element[P].color[<[kingdomColor]>]>
