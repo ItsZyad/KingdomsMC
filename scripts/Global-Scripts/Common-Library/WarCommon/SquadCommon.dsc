@@ -419,12 +419,13 @@ CreateSquadReference:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create squad. Invalid kingdom code provided: <[kingdom]>]>
         - stop
 
-    - if <proc[GetSMLocation].context[<[SMLocation]>|<[kingdom]>]> == null:
+    - if !<[SMLocation].has_flag[squadManager]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create squad. Provided parameter: <[SMLocation].color[red]> is not a valid squad manager location!]>
         - stop
 
-    - if !<[squadComp].object_type> != Map:
+    - if <[squadComp].object_type> != Map:
         - run GenerateInternalError def.category:TypeError def.message:<element[Cannot create squad. Provided parameter: <[squadComp]> is not of type: MapTag]>
+        - stop
 
     - define barrackID <[SMLocation].xyz.replace_text[,]>
     - define squadLimitLevel <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.levels.squadLimitLevel]>
