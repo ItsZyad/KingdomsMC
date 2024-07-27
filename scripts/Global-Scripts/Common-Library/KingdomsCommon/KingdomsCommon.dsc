@@ -67,6 +67,35 @@ GetKingdomList:
     - determine <[kingdomRealNames]>
 
 
+GetKingdomCode:
+    type: procedure
+    definitions: kingdomName[ElementTag(String)]
+    description:
+    - Takes either the short or long name of a kingdom and returns its kingdom code.
+    - Will return null if the provided kingdom name is invalid.
+    - ---
+    - → ?[ElementTag(String)]
+
+    script:
+    ## Takes either the short or long name of a kingdom and returns its kingdom code.
+    ##
+    ## Will return null if the provided kingdom name is invalid.
+    ##
+    ## kingdomName : [ElementTag<String>]
+    ##
+    ## >>> ?[ElementTag<String>]
+
+    - define kingdomRealNames <script[KingdomRealNames].data_key[]>
+
+    - if <[kingdomName].is_in[<[kingdomRealNames].get[ShortNames].values>]>:
+        - determine <[kingdomRealNames].get[ShortNames].invert.get[<[kingdomName]>]>
+
+    - else if <[kingdomName].is_in[<[kingdomRealNames].get[Names].values>]>:
+        - determine <[kingdomRealNames].get[Names].invert.get[<[kingdomName]>]>
+
+    - determine null
+
+
 # TODO: Change name to 'IsValidKingdomCode'
 ValidateKingdomCode:
     type: procedure
