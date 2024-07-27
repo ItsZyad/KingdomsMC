@@ -706,6 +706,23 @@ Kingdom_Command:
 
         - choose <[action].to_lowercase>:
             - case justify:
+                - if <[args].get[3].exists> && <[args].get[3].to_lowercase> == cancel:
+                    - define target <[args].get[4]>
+                    - define targetKingdomCode <[target].proc[GetKingdomCode]>
+
+                    - if <[targetKingdomCode]> == null:
+                        - narrate format:callout "Unrecognized kingdom name: <[target].color[red]>. Please try again."
+                        - stop
+
+                    - if <player.has_flag[datahold.war.cancelJustification]>:
+                        - run CancelJustification def.kingdom:<[kingdom]> def.targetKingdom:<[targetKingdomCode]> save:result
+
+                        - if <entry[result].created_queue.determination.get[1].is_truthy>:
+                            - narrate format:callout "Cancelled justification against: <[target].color[aqua]>. The peace shall remain for now."
+                            - narrate <n>
+                            - wait 1s
+                            - narrate format:callout "<gray><italic>All war represents a failure of diplomacy. ~ Tony Benn"
+
                 # TODO: see if there are any checks that need to be made before the player can
                 # TODO/ justify willy-nilly
 
