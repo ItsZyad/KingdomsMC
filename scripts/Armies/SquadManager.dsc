@@ -252,6 +252,11 @@ SquadManager_Handler:
 
         - if <[barracksArea].is_within[<[coreClaimsCuboid]>]> || <[withinOutpost]> || <player.is_op>:
             - flag <context.location> squadManager:<[squadManagerData]>
+
+            # Running Recalc. task without path generates the barracks area and adds to the main
+            # kingdoms flag the corresponding cuboid
+            - run RecalculateSquadManagerAOE def.barracksArea:<[barracksArea]> def.SMLocation:<context.location> def.player:<player>
+
             - define bedCount <proc[CountBedsInSquadManagerArea].context[<context.location>]>
 
             # Station count equation:
@@ -260,10 +265,7 @@ SquadManager_Handler:
 
             - flag <context.location> squadManager.levels.stationCapacity:<[stationCapacity]>
 
-            # Running Recalc. task without path generates the barracks area and adds to the main
-            # kingdoms flag the corresponding cuboid
-            - run RecalculateSquadManagerAOE def.barracksArea:<[barracksArea]> def.SMLocation:<context.location> def.player:<player>
-
+            # Note: future configurables
             - if !<server.has_flag[PauseUpkeep]>:
                 - run AddUpkeep def.kingdom:<[kingdom]> def.amount:500
                 - run SubBalance def.kingdom:<[kingdom]> def.amount:2000
