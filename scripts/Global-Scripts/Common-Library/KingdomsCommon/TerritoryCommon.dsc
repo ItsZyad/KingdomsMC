@@ -249,6 +249,36 @@ GetOutposts:
     - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].parse_value_tag[<[parse_value].include[area=<cuboid[<[parse_value].get[cornerone].world.name>,<[parse_value].get[cornerone].simple.split[,].remove[last].separated_by[,]>,<[parse_value].get[cornertwo].simple.split[,].remove[last].separated_by[,]>]>].exclude[cornerone|cornertwo]>]>
 
 
+GetOutpostSize:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns the number of blocks on just one y-level of the provided outpost's cuboid area.
+    - Will return null if either the kingdom or the outpost provided are invalid.
+    - ---
+    - → ?[ElementTag(Integer)]
+
+    script:
+    ## Returns the number of blocks on just one y-level of the provided outpost's cuboid area.
+    ##
+    ## Will return null if either the kingdom or the outpost provided are invalid.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## outpost : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Integer>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost size. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost size. Invalid outpost name provided: <[outpost]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.size]>
+
+
 GetAllOutposts:
     type: procedure
     description:
