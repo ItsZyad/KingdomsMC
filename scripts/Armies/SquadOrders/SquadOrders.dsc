@@ -56,6 +56,10 @@ SquadAttackSquadOrder:
     ##
     ## >>> [Void]
 
+    - if !<[kingdom].proc[IsAtWarWithKingdom].context[<[enemyKingdom]>]>:
+        - narrate format:callout "You are not at war with this kingdom!"
+        - stop
+
     - run GetSquadInfo def.kingdom:<[kingdom]> def.squadName:<[squadName]> save:squadInfo
     - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
     - define fullNPCList <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]>
@@ -152,6 +156,10 @@ SquadAttackAll_Procedure:
         - determine passively false
         - execute as_server "sentinel forgive --id <[context].as[npc].id>" silent
 
+    - if !<[context].flag[kingdom].proc[IsAtWarWithKingdom].context[<[entity].flag[soldier.kingdom]>]>:
+        - determine passively false
+        - execute as_server "sentinel forgive --id <[context].as[npc].id>" silent
+
     - else if <[entity].flag[soldier.kingdom].is_in[<[enemyKingdoms]>]>:
         - determine true
 
@@ -193,6 +201,7 @@ SquadAttackMonsters_Procedure:
 
 SoldierCombat_Handler:
     type: world
+    debug: false
     events:
         on npc dies:
         - if <context.entity.traits.contains[sentinel]> && <context.entity.has_flag[soldier]>:
