@@ -8,6 +8,61 @@
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 
+## REGULAR TERRITORY ##############################################################################
+
+IsPlayerInCore:
+    type: procedure
+    definitions: player[PlayerTag]
+    description:
+    - Checks if a player is in their own kingdom's core claims.
+    - ---
+    - → [ElementTag(Boolean)]
+
+    script:
+    ## Checks if a player is in their own kingdom's core claims.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - if !<[player].has_flag[kingdom]>:
+        - determine false
+
+    - define kingdom <[player].flag[kingdom]>
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - determine false
+
+    - determine <[player].location.chunk.is_in[<proc[GetClaims].context[<[kingdom]>|core]>]>
+
+
+IsPlayerInCastle:
+    type: procedure
+    definitions: player[PlayerTag]
+    description:
+    - Checks if a player is in their own castle claims.
+    - ---
+    - → [ElementTag(Boolean)]
+
+    script:
+    ## Checks if a player is in their own castle claims.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - if !<[player].has_flag[kingdom]>:
+        - determine false
+
+    - define kingdom <[player].flag[kingdom]>
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - determine false
+
+    - determine <[player].location.chunk.is_in[<proc[GetClaims].context[<[kingdom]>|castle]>]>
+
 
 GetAllClaims:
     type: procedure
@@ -221,6 +276,36 @@ GetMaxClaims:
         - default:
             - determine <server.flag[kingdoms.<[kingdom]>.claims.castleMax].if_null[0].add[<server.flag[kingdoms.<[kingdom]>.claims.coreMax].if_null[0]>]>
 
+## OUTPOST TERRITORY ##############################################################################
+
+GetAllOutposts:
+    type: procedure
+    description:
+    - Generates a MapTag representing the outpost information of every kingdom.
+    - ---
+    -     → [MapTag(CuboidTag;
+    -               ElementTag(Integer);
+    -               ElementTag(Float);
+    -               ElementTag(String)
+    -       )]
+
+    script:
+    ## Generates a MapTag representing the outpost information of every kingdom.
+    ##
+    ## >>> [MapTag<CuboidTag;
+    ##             ElementTag<Integer>;
+    ##             ElementTag<Float>;
+    ##             ElementTag<String>
+    ##      >]
+
+    - define kingdomList <proc[GetKingdomList]>
+    - define outpostMap <map[]>
+
+    - foreach <[kingdomList]> as:kingdom:
+        - define outpostMap.<[kingdom]>:<proc[GetOutposts].context[<[kingdom]>]>
+
+    - determine <[outpostMap]>
+
 
 GetOutposts:
     type: procedure
@@ -279,87 +364,69 @@ GetOutpostSize:
     - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.size]>
 
 
-GetAllOutposts:
+GetOutpostArea:
     type: procedure
+    definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
-    - Generates a MapTag representing the outpost information of every kingdom.
+    - Returns the CuboidTag which designates the provided outpost's area.
+    - Returns null if the action fails.
     - ---
-    -     → [MapTag(CuboidTag;
-    -               ElementTag(Integer);
-    -               ElementTag(Float);
-    -               ElementTag(String)
-    -       )]
+    - → ?[CuboidTag]
 
     script:
-    ## Generates a MapTag representing the outpost information of every kingdom.
+    ## Returns the CuboidTag which designates the provided outpost's area.
     ##
-    ## >>> [MapTag<CuboidTag;
-    ##             ElementTag<Integer>;
-    ##             ElementTag<Float>;
-    ##             ElementTag<String>
-    ##      >]
-
-    - define kingdomList <proc[GetKingdomList]>
-    - define outpostMap <map[]>
-
-    - foreach <[kingdomList]> as:kingdom:
-        - define outpostMap.<[kingdom]>:<proc[GetOutposts].context[<[kingdom]>]>
-
-    - determine <[outpostMap]>
-
-
-IsPlayerInCore:
-    type: procedure
-    definitions: player[PlayerTag]
-    description:
-    - Checks if a player is in their own kingdom's core claims.
-    - ---
-    - → [ElementTag(Boolean)]
-
-    script:
-    ## Checks if a player is in their own kingdom's core claims.
+    ## Returns null if the action fails.
     ##
-    ## player : [PlayerTag]
+    ## kingdom : [ElementTag<String>]
+    ## outpost : [ElementTag<String>]
     ##
-    ## >>> [ElementTag<Boolean>]
-
-    - if !<[player].has_flag[kingdom]>:
-        - determine false
-
-    - define kingdom <[player].flag[kingdom]>
+    ## >>> ?[CuboidTag]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
-        - determine false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost area. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
 
-    - determine <[player].location.chunk.is_in[<proc[GetClaims].context[<[kingdom]>|core]>]>
+    - if !<server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost area. Invalid outpost name provided: <[outpost]>]>
+        - determine null
+
+    - define cornerOne <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.cornerone]>
+    - define cornerTwo <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.cornertwo]>
+    - define world <[cornerOne].world>
+    - define cuboid <cuboid[<[world].name>,<[cornerOne].xyz>,<[cornerTwo].xyz>]>
+
+    - determine <[cuboid]>
 
 
-IsPlayerInCastle:
+GetOutpostUpkeep:
     type: procedure
-    definitions: player[PlayerTag]
+    definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
-    - Checks if a player is in their own castle claims.
+    - Returns the daily upkeep of the provided outpost.
+    - Returns null if the action fails.
     - ---
-    - → [ElementTag(Boolean)]
+    - → ?[ElementTag(Float)]
 
     script:
-    ## Checks if a player is in their own castle claims.
+    ## Returns the daily upkeep of the provided outpost.
     ##
-    ## player : [PlayerTag]
+    ## Returns null if the action fails.
     ##
-    ## >>> [ElementTag<Boolean>]
-
-    - if !<[player].has_flag[kingdom]>:
-        - determine false
-
-    - define kingdom <[player].flag[kingdom]>
+    ## kingdom : [ElementTag<String>]
+    ## outpost : [ElementTag<String>]
+    ##
+    ## >>> ?[ElementTag<Float>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
-        - determine false
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost upkeep. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
 
-    - determine <[player].location.chunk.is_in[<proc[GetClaims].context[<[kingdom]>|castle]>]>
+    - if !<server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost upkeep. Invalid outpost name provided: <[outpost]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.upkeep]>
 
 
 PlayerInWhichOutpost:
@@ -367,11 +434,14 @@ PlayerInWhichOutpost:
     definitions: player[PlayerTag]
     description:
     - Checks if a player is in one of their own kingdom's outposts.
+    - Returns null if the action fails.
     - ---
     - → ?[ElementTag(String)]
 
     script:
     ## Checks if a player is in one of their own kingdom's outposts.
+    ##
+    ## Returns null if the action fails.
     ##
     ## player : [PlayerTag]
     ##
