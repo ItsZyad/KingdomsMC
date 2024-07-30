@@ -56,12 +56,12 @@ ExitSquadControls_Item:
 
 SquadMoveTool_Item:
     type: item
-    material: blaze_rod
-    display name: <gold><bold>Move Order
-    enchantments:
-    - sharpness:1
+    material: tipped_arrow
+    display name: <white><bold>Move Order
     mechanisms:
-        hides: enchants
+        potion_effects:
+        - [type=INVISIBILITY]
+        hides: ALL
 
 
 SquadAttackAllTool_Item:
@@ -98,6 +98,16 @@ SquadClearAllAttacksTool_Item:
     type: item
     material: spectral_arrow
     display name: <element[Clear All Attack Orders].color[gold].bold>
+    mechanisms:
+        hides: ALL
+
+
+SquadOccupyTool_Item:
+    type: item
+    material: stick
+    display name: <element[Occupy Chunk/Outpost].color[<proc[GetColor].context[Default.Brown]>]>
+    enchantments:
+    - sharpness:1
     mechanisms:
         hides: ALL
 
@@ -272,6 +282,14 @@ SquadOptions_Handler:
         - define squadLeader <[squadInfo].get[squadLeader]>
         - define displayName <[squadInfo].get[displayName]>
 
+        # If the squad was occupying to a chunk and then moved to a different chunk.
+        - if <[squadLeader].has_flag[datahold.war.occupying]> && <[squadLeader].flag[datahold.war.occupying.chunk].contains[<[location]>]>:
+            - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[squadLeader]>
+            - run CancelChunkOccupation def.kingdom:<[kingdom]> def.targetKingdom:<[squadLeader].flag[datahold.war.occupying.target]> def.squadLeader:<[squadLeader]> def.chunk:<[squadLeader].flag[datahold.war.occupying.chunk]>
+            - run CancelOutpostOccupation def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.outpost:<[squadLeader].flag[datahold.war.occupying.outpost]> if:<[squadLeader].has_flag[datahold.war.occupying.outpost]>
+            - run CancelOutpostReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[squadLeader].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.outpost:<[squadLeader].flag[datahold.war.occupying.outpost]> if:<[squadLeader].has_flag[datahold.war.occupying.outpost]>
+            - run CancelChunkReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[squadLeader].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.chunk:<[squadLeader].flag[datahold.war.occupying.chunk]> if:<[squadLeader].has_flag[datahold.war.occupying.chunk]>
+
         - define npcsPerRow <player.flag[datahold.armies.npcsPerRow].if_null[3]>
         - define lineLength <player.flag[datahold.armies.lineLength].div[2].if_null[6]>
 
@@ -283,10 +301,19 @@ SquadOptions_Handler:
 
         - define kingdom <player.flag[kingdom]>
         - define squadInfo <player.flag[datahold.squadInfo]>
+        - define squadName <[squadInfo].get[name]>
         - define npcList <[squadInfo].get[npcList]>
         - define squadLeader <[squadInfo].get[squadLeader]>
         - define pointTwo <player.flag[datahold.armies.drawingFormation.pointTwo]>
         - define pointOne <player.flag[datahold.armies.drawingFormation.pointOne]>
+
+        # If the squad was occupying to a chunk and then moved to a different chunk.
+        - if <[squadLeader].has_flag[datahold.war.occupying]> && (<[squadLeader].flag[datahold.war.occupying.chunk].contains[<[pointOne]>]> || <[squadLeader].flag[datahold.war.occupying.chunk].contains[<[pointTwo]>]>):
+            - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[squadLeader]>
+            - run CancelChunkOccupation def.kingdom:<[kingdom]> def.targetKingdom:<[squadLeader].flag[datahold.war.occupying.target]> def.squadLeader:<[squadLeader]> def.chunk:<[squadLeader].flag[datahold.war.occupying.chunk]>
+            - run CancelOutpostOccupation def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.outpost:<[squadLeader].flag[datahold.war.occupying.outpost]> if:<[squadLeader].has_flag[datahold.war.occupying.outpost]>
+            - run CancelOutpostReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[squadLeader].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.outpost:<[squadLeader].flag[datahold.war.occupying.outpost]> if:<[squadLeader].has_flag[datahold.war.occupying.outpost]>
+            - run CancelChunkReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[squadLeader].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.chunk:<[squadLeader].flag[datahold.war.occupying.chunk]> if:<[squadLeader].has_flag[datahold.war.occupying.chunk]>
 
         - run DrawLineFormationWalk def.npcList:<[npcList]> def.soldierSpacing:3 def.squadLeader:<[squadLeader]> def.player:<player> def.pointOne:<[pointOne]> def.pointTwo:<[pointTwo]>
 
@@ -294,6 +321,79 @@ SquadOptions_Handler:
 
         - run CreateParticleLine path:ClearParticleLineFlag def.flagName:formationLine
         - flag <player> datahold.armies.drawingFormation:!
+
+        on player right clicks block with:SquadOccupyTool_Item:
+        - determine passively cancelled
+
+        - define squadInfo <player.flag[datahold.squadInfo]>
+        - define squadLeader <[squadInfo].get[squadLeader]>
+        - define kingdom <[squadLeader].flag[soldier.kingdom]>
+
+        - if !<[kingdom].proc[GetKingdomWarStatus]>:
+            - narrate format:callout "You cannot occupy this chunk or outpost! Your kingdom is not at war."
+            - stop
+
+        - define chunk <[squadLeader].location.chunk>
+
+        - if <[chunk].is_in[<[kingdom].proc[GetClaims]>]>:
+            - foreach <[kingdom].proc[GetKingdomWars]> as:war:
+                - if <[kingdom].proc[GetAllKingdomLostChunks].context[<[war]>].contains[<[chunk]>]>:
+                    - define claimDuration <duration[5m]>
+                    - narrate format:callout "Your troops have started reclaiming this chunk. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
+
+                    - adjust <[squadLeader]> hologram_line_height:0.25
+
+                    - run ReclaimChunk def.kingdom:<[kingdom]> def.targetKingdom:<proc[GetChunkOccupier].context[<[kingdom]>|<[war]>|<[chunk]>]> def.squadLeader:<[squadLeader]> def.chunk:<[chunk]> def.delay:<[claimDuration]>
+                    - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[claimDuration]>
+                    - stop
+
+        - else if <[kingdom].proc[GetOutposts].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].size> > 0:
+            - run ReclaimOutpost def.kingdom:<[kingdom]> def.outpost:<[kingdom].proc[GetOutposts].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].keys.get[1]> def.squadName:<[squadInfo].get[name]> save:delay
+            - define claimDuration <entry[delay].created_queue.determination.get[1]>
+
+            - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[claimDuration]>
+
+            - narrate format:callout "Your troops have started reclaiming this chunk. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
+            - stop
+
+        - define kingdomsAtWar <proc[GetKingdomList].filter_tag[<proc[IsAtWarWithKingdom].context[<[kingdom]>|<[filter_value]>]>]>
+
+        - foreach <[kingdomsAtWar]>:
+            - if <[value].proc[GetClaims].contains[<[chunk]>]>:
+                - define claimDuration <duration[5m]>
+                - narrate format:callout "Your troops have started occupying this chunk. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
+                - run OccupyChunk def.kingdom:<[kingdom]> def.targetKingdom:<[value]> def.chunk:<[chunk]> def.squadLeader:<[squadLeader]> def.delay:<[claimDuration]>
+
+                - adjust <[squadLeader]> hologram_line_height:0.25
+                - flag <[squadLeader]> datahold.war.occupying.chunk:<[chunk]>
+                - flag <[squadLeader]> datahold.war.occupying.target:<[value]>
+
+                - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[claimDuration]>
+                - stop
+
+            - define outpostData <[value].proc[GetOutposts].parse_value_tag[<[parse_value].include[name=<[parse_key]>]>].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].values.get[1]>
+
+            - if <[outpostData].is_truthy>:
+                - define squadLeaders <[kingdom].proc[GetKingdomSquads].parse_value_tag[<[parse_value].get[squadLeader]>].values>
+                - define otherOccupyingSquads <list[]>
+
+                - flag <[squadLeader]> datahold.war.occupying.outpost:<[outpostData].get[name]>
+
+                - foreach <[squadLeaders]> as:leader:
+                    - if <[leader].has_flag[datahold.war.occupying.outpost]> && <[leader].flag[datahold.war.occupying.outpost]> == <[outpostData].get[name]>:
+                        - define otherOccupyingSquads:->:<[leader].flag[soldier.squad]>
+
+                # - define baseClaimDuration <duration[<[outpostData].get[size].div[256].round_up.mul[5]>m]>
+                # - define claimDuration <duration[<[baseClaimDuration].in_minutes.mul[<[otherOccupyingSquads].size.if_null[1]>]>m]>
+
+                - run OccupyOutpost def.kingdom:<[kingdom]> def.targetKingdom:<[value]> def.outpost:<[outpostData].get[name]> def.squadName:<[squadLeader].flag[soldier.squad]> save:claimDuration
+                - define claimDuration <entry[claimDuration].created_queue.determination.get[1]>
+
+                - if !<[claimDuration].is_truthy>:
+                    - stop
+
+                - narrate format:callout "Your troops have started occupying this outpost. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
+                - narrate format:callout "<italic>Note: You may move in additional squads to occupy outposts faster."
 
         ## EXITS ORDERS
         on player clicks block with:ExitSquadControls_Item:
@@ -316,6 +416,64 @@ SquadOptions_Handler:
 
         on player drops ExitSquadControls_Item:
         - determine cancelled
+
+
+ChunkOccupationVisualizer:
+    type: task
+    debug: false
+    definitions: squadLeader[NPCTag]|occupationDuration[DurationTag]
+    description:
+    - Will display a small progress bar as a hologram above the head of the provided squad leader indicating how long until the chunk is fully occupied.
+    - ---
+    - → [Void]
+
+    script:
+    ## Will display a small progress bar as a hologram above the head of the provided squad leader
+    ## indicating how long until the chunk is fully occupied.
+    ##
+    ## squadLeader          : [NPCTag]
+    ## occupationDuration   : [DurationTag]
+    ##
+    ## >>> [Void]
+
+    - if <[squadLeader].object_type> != Npc:
+        - run GenerateInternalError def.type:TypeError def.message:<element[Unable to set squad leader hologram. Provided definition: <[squadLeader].color[red]> is not of type: NPCTag]>
+        - stop
+
+    - if !<[squadLeader].has_flag[soldier]>:
+        - run GenerateInternalError def.type:GenericError def.message:<element[Unable to set squad leader hologram. Npc with provided ID: <[squadLeader].id.color[red]> is not member of any squad.]>
+        - stop
+
+    - if <[occupationDuration].object_type> != Duration:
+        - run GenerateInternalError def.type:GenericError def.message:<element[Unable to set squad leader hologram. Provided definition: <[occupationDuration].color[red]> is not of type: DurationTag.]>
+        - stop
+
+    - define startTime <util.time_now>
+    - inject ChunkOccupationVisualizer path:Visualizer_Helper
+
+    Visualizer_Helper:
+    - define maxPercentage <[occupationDuration].in_seconds>
+    - define currentPercentage <util.time_now.duration_since[<[startTime]>].in_seconds.div[<[maxPercentage]>].mul[100].if_null[0]>
+    - define progressGraphic <list[]>
+
+    - if <[currentPercentage]> >= 100:
+        - adjust <[squadLeader]> hologram_lines:<map[text=<element[<&2>Chunk Occupation Complete!]>;duration=<duration[15s]>]>
+        - stop
+
+    - repeat <[currentPercentage].div[5].round>:
+        - define progressGraphic:->:█
+
+    - repeat <element[20].sub[<[currentPercentage].div[5]>].round>:
+        - define progressGraphic:->:░
+
+    - adjust <[squadLeader]> hologram_lines:<list[<[progressGraphic].unseparated>|<[currentPercentage].round_to_precision[0.1]>% Occupied]>
+
+    - runlater ChunkOccupationVisualizer path:Visualizer_Helper id:<[squadLeader]>_occupation_visualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[occupationDuration]> def.startTime:<[startTime]> delay:5s
+
+    CancelVisualization:
+    - adjust system cancel_runlater:<[squadLeader]>_occupation_visualizer
+    - adjust <[squadLeader]> hologram_lines:<map[text=<element[<&4>Chunk Occupation Interrupted!]>;duration=<duration[15s]>]>
+    - stop
 
 
 SoldierParticleGenerator:
