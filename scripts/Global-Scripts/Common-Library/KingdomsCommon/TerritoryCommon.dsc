@@ -116,6 +116,8 @@ GetClaims:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
+    - define type <[type].if_null[corecastle]>
+
     - choose <[type]>:
         - case castle:
             - determine <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>]>
