@@ -40,7 +40,11 @@ __________________________________________
     - Fixed a small bug which blocked players from chatting after using the outpost claiming command.
     - Fixed bug which prevented the player from giving squad orders after renaming it in certain instances.
     - Fixed a never seen bug which could cause players seeking to switch kingdoms to change sidebars while still remaining in the same kingdom technically.
-    - Optimized sidebar code. Updates should happen almost instantly now, fixing a rare but known issue where it would choke on certain values leading to obscenely long update times.
+    - Temporary data attached to the player now gets auto-wiped whenever the player leaves the server as a precaution to prevent bugs caused by inconsistent player states and de-syncs.
+    - Fixed bug which caused the chunkmap to spit out a bunch of code garble under some exceptional circumstances.
+    - Fixed an almost comical amount of bugs with the outpost manager (It was a wonder that it ever worked at all).
+        * I'm just gonna leave the commit link here to show how absurdly error-ridden this module was: (https://github.com/ItsZyad/KingdomsMC/commit/2fcb375fb8dc40249871a50bf05ec10ca034dbbc) (this was live code for 3 FUCKING YEARS).
+    - Fixed a bug where squad managers were not capable of calculating the number of beds in their AOE until someone broke or placed down a bed.
 
     SMALL ADDITIONS:
     - Added a new formation walk tool to the squads system: Drawable formation lines. These allow the commander of a squad to determine the exact size of the formation using a special wand.
@@ -48,11 +52,19 @@ __________________________________________
     - Added new soldier type: Archer.
     - Using the regular squad formation walk tool after the line formation tool will make it remember the previous formation.
     - Sidebar kingdom name font size has been significantly reduced. There should no longer be massive sidebars that take up half of your screen.
+    - Significantly improved error-logging for core functions. If something goes wrong, the game should now spell out *exactly* what's wrong (at the cost of being slightly more obnoxious).
+    - Did a ground-up re-write of the sidebar code (which was still a relic of Alpha 2). It now loads new data almost instantly. Additionally, I've introduced a new sub-command to the sidebar command - '/sidebar mode <mode>' - which allows you to cycle through different "pages" of the sidebar, which now display data on different grouped aspects of your kingdom (e.g. 'Default' Data, Duchy Data, Scenario-specific data).
 
     LARGE ADDITIONS:
     - Miner NPCs have been reworked. They now make use of world-wide heat maps for different resources that mimic real life patterns of resource presence.
         * I.e. some regions will be really rich in certain resources while really poor in others, further encouraging trade between kingdoms.
     - Kingdoms can now send each other mail via the /letter command directly to each others' mailboxes.
+    - Introduced the first version of the Duchies mechanic which allows kingdoms to segment their territory into duchies that can then be ruled by different members within that kingdom designated by its leader as dukes.
+        * Duchies will be subject to different territory permissions within their kingdoms that allow only their duke and the king to break blocks/interact with the world within them.
+        * Duchy banks will also be separate from the overall kingdom bank (which will now be largely reliant on a tax levvied on duchies)
+    - Added war justification mechanics. You can't just go and kill random kingdoms' squads now.
+        + Alongside this, I also added a proper occupation system so that players can keep track of how much territory they've stolen off other kingdoms during wars.
+    
 
 Scenario 1.0.0 :: 2-JUL-2024 -> 31-JUL-2024;
 __________________________________________
@@ -61,6 +73,10 @@ __________________________________________
 
     LARGE ADDITIONS:
     - Added food-population mechanics + Food fullfillment and information window via /food.
+    - Introduced river trade tacker mechanic which scales the amount of trade that can be conducted with Fyndalin based on how open the Vexell river is to trade.
+    - Introduced trade mechanic which allows both kingdoms to trade with (the off-map) Fyndalin Empire at relatively fixed prices.
+    - Added a kingdom-specific mechanic just for Jalerad which automatically runs an election for it whenever no king is on the throne for longer than an in-game week.
+
 
 Known Bugs;
 __________________________________________
