@@ -62,7 +62,7 @@ SquadSelectionGUI:
 
     - define __player <[player]>
     - define kingdom <player.flag[kingdom]>
-    - define squadList <proc[GetKingdomSquads].context[<[kingdom]>].keys>
+    - define squadList <proc[GetKingdomSquads].context[<[kingdom]>].keys.if_null[<list[]>]>
     - define itemList <list[]>
 
     - if <[squadList].size.if_null[0]> == 0:
