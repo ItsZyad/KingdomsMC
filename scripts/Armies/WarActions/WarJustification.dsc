@@ -209,6 +209,10 @@ WarJustification_Handler:
         - define targetKingdom <context.item.flag[kingdom]>
         - flag <player> datahold.war.justification.target:<[targetKingdom]>
 
+        - if <player.flag[kingdom].proc[IsAtWarWithKingdom].context[<[targetKingdom]>]>:
+            - narrate format:callout "You cannot justify on a kingdom that you're already at war with!"
+            - stop
+
         - inventory open d:JustificationClaimType_Window
 
         # TODO: There need to be other conditions that allow kingdoms to declare on others' castles
