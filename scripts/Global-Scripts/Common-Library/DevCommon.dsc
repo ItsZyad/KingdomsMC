@@ -161,6 +161,7 @@ Actionbar_Handler:
 
 Enum:
     type: procedure
+    debug: false
     definitions: enumKey[ElementTag(String)]|useDefault[?ElementTag(Boolean) = false]
     description:
     - Gets the data from the specified enum key. enum keys are dot-operated, meaning that the key: 'TerritoryType.Core' will get the Core constant inside the TerritoryType enum.
