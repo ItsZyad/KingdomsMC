@@ -127,7 +127,7 @@ SidebarLoader:
     ## >>> [Void]
 
     - definemap warStatusColors:
-        true: <red><bold>
+        true: <red>
         false: <green>
 
     - define overrideHiddenSidebar <[overrideHiddenSidebar].if_null[true]>
