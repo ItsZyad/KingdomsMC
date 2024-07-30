@@ -216,6 +216,12 @@ SoldierCombat_Handler:
             - if <[soldier].flag[soldier.isSquadLeader].if_null[false]>:
                 - flag <[soldier]> datahold.armies.particles:!
 
+                - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[soldier]>
+                - run CancelChunkOccupation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadLeader:<[soldier]> def.chunk:<[soldier].flag[datahold.war.occupying.chunk]> if:<[soldier].has_flag[datahold.war.occupying.chunk]>
+                - run CancelOutpostOccupation def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.outpost:<[soldier].flag[datahold.war.occupying.outpost]> if:<[soldier].has_flag[datahold.war.occupying.outpost]>
+                - run CancelOutpostReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.outpost:<[soldier].flag[datahold.war.occupying.outpost]> if:<[soldier].has_flag[datahold.war.occupying.outpost]>
+                - run CancelChunkReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.chunk:<[soldier].flag[datahold.war.occupying.chunk]> if:<[soldier].has_flag[datahold.war.occupying.chunk]>
+
                 # Last soldier is killed - delete squad
                 - if <[npcList].size> == 0:
                     - run DeleteSquad def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.squadName:<[squadName]>
