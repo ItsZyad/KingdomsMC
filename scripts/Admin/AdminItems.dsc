@@ -55,3 +55,17 @@ NetherKey_Item:
         - shimmers in the sunlight
     mechanisms:
         custom_model_data: 123456
+
+
+ChunkClaim_Item:
+    type: item
+    material: blaze_rod
+    display name: <gold><bold>Claiming Wand
+
+
+ChunkClaim_Handler:
+    type: world
+    events:
+        on player clicks block with:ChunkClaim_Item:
+        - if <player.is_op> || <player.has_permission[kingdoms.admin.claimingWand]>:
+            - execute as_player "k claim core"
