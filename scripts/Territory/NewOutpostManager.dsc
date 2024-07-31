@@ -114,7 +114,7 @@ Outpost_Command:
                 - else:
                     - narrate format:callout "There is no outpost by the name: <red><[name]>"
 
-                - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+                - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
             - else:
                 - narrate format:callout "Are you sure you would like to delete this outpost?"
@@ -281,7 +281,7 @@ OutpostWand_Handler:
             - narrate format:callout "Cancelled outpost creation."
 
             - run LoadTempInventory def:<player>
-            - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+            - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
             - flag <player> outpostCost:!
             - flag <player> cornerOneDefined:!
@@ -340,7 +340,7 @@ OutpostWand_Handler:
                 - narrate format:callout "Changes reverted."
 
         - run LoadTempInventory def:<player>
-        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+        - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         - flag <player> outpostCost:!
         - flag <player> cornerOneDefined:!

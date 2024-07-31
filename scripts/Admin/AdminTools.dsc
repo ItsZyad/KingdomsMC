@@ -231,7 +231,7 @@ KingdomSwitcher_Command:
             - flag player kingdom:<context.args.get[1]>
             - narrate format:admincallout "you are now flagged as: <player.flag[kingdom]>"
 
-        - run SidebarLoader def:<player>
+        - ~run SidebarLoader def:<player>
 
     - else:
         - narrate format:admincallout "That is not a valid kingdom"

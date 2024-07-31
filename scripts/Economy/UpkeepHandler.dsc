@@ -29,7 +29,7 @@ KingdomUpkeepHandler:
 
         - narrate targets:<server.online_players> format:callout "Daily upkeep has been collected from all Kingdom banks."
 
-        - run SidebarLoader def.target:<server.online_players>
+        - ~run SidebarLoader def.target:<server.online_players>
 
 
 NegativeBalanceAlert:

@@ -615,7 +615,7 @@ DeclareWar:
 
     - flag server kingdoms.wars.<[warID]>:<[warMap]>
 
-    - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<[targetKingdom].proc[GetMembers]>].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<[targetKingdom].proc[GetMembers]>].include[<server.online_ops>]>
 
 
 OccupyChunk:

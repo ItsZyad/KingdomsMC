@@ -143,7 +143,7 @@ CalculateRNPCPrice:
     - flag server kingdoms.<[kingdom]>.balance:-:<[truePrice]>
     - flag server kingdoms.<[kingdom]>.npcTotal:++
 
-    - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
 
 RNPCWindow_Handler:
@@ -290,7 +290,7 @@ RNPCWindow_Handler:
         - else:
             - narrate format:callout "There is not enough money in your kingdom's bank to get that resource NPC!"
 
-        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+        - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         on player clicks in RNPCSpawn_Window:
         - determine passively cancelled
@@ -481,7 +481,7 @@ RNPCInfo_Handler:
         - remove <[npc]>
         - inventory close
 
-        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+        - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         on player clicks CancelDeleteRNPC_Item in DeleteConfirm_Window:
         - inventory close

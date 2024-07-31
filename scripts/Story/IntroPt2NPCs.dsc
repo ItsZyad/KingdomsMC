@@ -145,7 +145,7 @@ IntroTwoNPCs_HelpAccepted2:
         - define questName "A Sailor's Story"
         - define questDesc "<list[Go to the Half Cut Glass tavern|Speak to the captain]>"
         - flag <[target]> quests:->:<map[name=<[questName]>;desc=<[questDesc]>;expires=null;icon=book;status=active]>
-        - run SidebarLoader def:<player>
+        - ~run SidebarLoader def:<player>
 
     - else if <[HelpAcceptedType]> == 3:
         - narrate format:npctalk "Anytime, buddy"

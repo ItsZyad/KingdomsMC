@@ -213,7 +213,7 @@ SetBalance:
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.balance:<[amount]>
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 AddBalance:
@@ -242,7 +242,7 @@ AddBalance:
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.balance:+:<[amount]>
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 SubBalance:
@@ -271,7 +271,7 @@ SubBalance:
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.balance:-:<[amount]>
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 GetUpkeep:
@@ -323,7 +323,7 @@ SetUpkeep:
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.upkeep:<[amount]>
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 AddUpkeep:
@@ -352,7 +352,7 @@ AddUpkeep:
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.upkeep:+:<[amount]>
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 SubUpkeep:
@@ -381,7 +381,7 @@ SubUpkeep:
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.upkeep:-:<[amount]>
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 GetPrestige:
@@ -437,7 +437,7 @@ SetPrestige:
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.prestige:<[amount]>
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 AddPrestige:
@@ -472,7 +472,7 @@ AddPrestige:
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.prestige:+:<[amount]>
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 SubPrestige:
@@ -507,7 +507,7 @@ SubPrestige:
         - determine cancelled
 
     - flag server kingdoms.<[kingdom]>.prestige:-:<[amount]>
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
 
 
 GetDescription:

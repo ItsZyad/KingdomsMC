@@ -334,7 +334,7 @@ Kingdom_Command:
                 - narrate format:callout "Set the tax rate for this duchy to: <aqua><[taxRate]>%."
                 - narrate format:callout "The default taxation rate for duchies in your kingdom is: <green><[kingdom].proc[GetKingdomDuchies].parse_tag[<[kingdom].proc[GetDuchyTaxRate].context[<[duchy]>].if_null[0].mul[100]>].average>%"
 
-                - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+                - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
             - case balance:
                 - narrate format:callout "Balance for: <[duchy].color[aqua]> is: <aqua>$<[kingdom].proc[GetDuchyBalance].context[<[duchy]>].format_number>"
@@ -358,7 +358,7 @@ Kingdom_Command:
                 - run SetDuchyBalance def.kingdom:<[kingdom]> def.duchy:<[duchy]> def.amount:<[kingdom].proc[GetDuchyBalance].context[<[duchy]>].add[<[amount]>]>
                 - money take players:<player> quantity:<[amount]>
 
-                - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+                - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
                 - narrate format:callout "Successfully added: <element[$<[amount].format_number>].color[aqua]> to the duchy bank."
 
@@ -383,7 +383,7 @@ Kingdom_Command:
                 - run SetDuchyBalance def.kingdom:<[kingdom]> def.duchy:<[duchy]> def.amount:<[balance].sub[<[amount]>]>
                 - money give players:<player> quantity:<[amount]>
 
-                - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+                - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
                 - narrate format:callout "Successfully removed: <element[$<[amount].format_number>].color[aqua]> from the duchy bank."
 
@@ -423,7 +423,7 @@ Kingdom_Command:
 
         - narrate format:callout "Unclaimed chunk: <element[<player.location.chunk.x>, <player.location.chunk.z>].color[red]>"
 
-        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+        - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         #------------------------------------------------------------------------------------------
 
@@ -458,7 +458,7 @@ Kingdom_Command:
             - if <[kingdom].proc[GetBalance].is[OR_MORE].than[0]>:
                 - flag server indebtedKingdoms.<player.flag[kingdom]>:0
 
-        - run SidebarLoader def.target:<proc[GetMembers].context[<[kingdom]>].include[<server.online_ops>]>
+        - ~run SidebarLoader def.target:<proc[GetMembers].context[<[kingdom]>].include[<server.online_ops>]>
 
         #------------------------------------------------------------------------------------------
 
@@ -483,7 +483,7 @@ Kingdom_Command:
         - else:
             - narrate format:callout "You do not have sufficient funds in your kingdom to withdraw"
 
-        - run SidebarLoader def.target:<proc[GetMembers].context[<[kingdom]>].include[<server.online_ops>]>
+        - ~run SidebarLoader def.target:<proc[GetMembers].context[<[kingdom]>].include[<server.online_ops>]>
 
         #------------------------------------------------------------------------------------------
 
@@ -494,7 +494,7 @@ Kingdom_Command:
 
             - narrate format:debug <context.raw_args.split[rename].get[2]>
 
-        - run SidebarLoader def.target:<proc[GetMembers].context[<[kingdom]>].include[<server.online_ops>]>
+        - ~run SidebarLoader def.target:<proc[GetMembers].context[<[kingdom]>].include[<server.online_ops>]>
 
         - else:
             - narrate format:callout "This command requires permission from the server owner to perform!"
