@@ -33,13 +33,79 @@ SC1_PopulationData:
         baseFoodReserves: 27000
 
 
-SC1_Population_Handler:
+SC1_EndConditionMessage:
+    type: task
+    definitions: playerList[ListTag(PlayerTag)]|loseCause[ElementTag(String)]
+    description:
+    - Will send out a message to the players provided that their kingdom has lost the game for the reason provided under 'loseCause'.
+    - ---
+    - → [Void]
+
+    script:
+    - define kingdom <[playerList].get[1].flag[kingdom]>
+
+    - if <[loseCause]> == food:
+        - foreach <[playerList]> as:player:
+            - narrate <n> targets:<[player]>
+            - narrate <n> targets:<[player]>
+            - narrate <element[After 3 long months of starvation and famine, the peasants in your kingdom decided enough was enough and initiated a revolt against you and government.]> targets:<[player]>
+            - narrate <element[Owing to your failure - as the ruling class - to provide a sufficiently stable food supply, the revolters decided to banish you to the wilderness after storming your palace.]> targets:<[player]>
+            - narrate <n> targets:<[player]>
+            - narrate <element[GAME OVER.].bold.color[red]> targets:<[player]>
+            - narrate <n> targets:<[player]>
+            - narrate <n> targets:<[player]>
+
+    - if <server.has_flag[kingdoms.gameWinner]>:
+        - foreach <server.flag[kingdoms.gameWinner].proc[GetMembers]> as:player:
+            - narrate <n> targets:<[player]>
+            - narrate <n> targets:<[player]>
+            - narrate <element[After many trials and tribulations, your kingdom has emerged as the clear victor in the struggle for supremacy between the kingdoms and states of the region.]> targets:<[player]>
+            - narrate <element[While the future is unlikely to be free of hardships and challenges. You and your people have proven your resilience, hardiness, and tough spirit.]> targets:<[player]>
+            - narrate <n> targets:<[player]>
+            - narrate <element[YOU WIN.].bold.color[green]> targets:<[player]>
+            - narrate <n> targets:<[player]>
+            - narrate <n> targets:<[player]>
+
+
+SC1_Food_Handler:
     type: world
     enabled: false
     events:
         after time 23:
-        - run SC1_PopulationGrowthTick
-        - run SC1_FoodTick
+        - define worldDay <context.world.time.full.in_days.round>
+
+        - foreach <proc[GetKingdomList]> as:kingdom:
+            - if <server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.starvingMonths]> > 3:
+                - flag server PauseUpkeep
+                - gamerule <context.world> doDaylightCycle false
+                - gamerule <context.world> doFireTick false
+                - gamerule <context.world> doWeatherCycle false
+
+                - flag server kingdoms.gameLosers:->:<[kingdom]>
+
+                - if <proc[GetKingdomList].exclude[<server.flag[kingdoms.gameLosers]>].size> == 1:
+                    - flag server kingdoms.gameWinner:<proc[GetKingdomList].exclude[<server.flag[kingdoms.gameLosers]>].get[1]>
+
+                - run AffectOfflinePlayers def.playerList:<[kingdom].proc[GetMembers]> def.scriptName:SC1_EndConditionMessage def.otherDefs:<map[loseCause=food]>
+
+        - if <[worldDay].mod[30]> == 0:
+            - run SC1_PopulationGrowthTick
+            - run SC1_FoodTick
+
+        on player joins priority:2:
+        - define kingdom <player.flag[kingdom]>
+
+        - if !<[kingdom].is_in[<server.flag[datahold.scenario-1.playersNotSeenFoodMsg].keys.if_null[<list[]>]>]>:
+            - stop
+
+        - if !<player.is_in[<server.flag[datahold.scenario-1.playersNotSeenFoodMsg.<[kingdom]>].if_null[<list[]>]>]>:
+            - stop
+
+        - narrate format:callout targets:<player> "Your kingdom was unable to fully satisfy its citizens food demand this month, while you were offline. This is month #<server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.starvingMonths].if_null[0]> of your deficit. If your kingdom goes 3 months with an active food deficit, your people will revolt and attempt to overthrow you!"
+        - flag server datahold.scenario-1.playersNotSeenFoodMsg.<[kingdom]>:<-:<player>
+
+        - if <server.flag[datahold.scenario-1.playersNotSeenFoodMsg.<[kingdom]>].is_empty>:
+            - flag server datahold.scenario-1.playersNotSeenFoodMsg.<[kingdom]>:!
 
 
 SC1_Food_Command:
@@ -78,9 +144,18 @@ SC1_FoodTick:
         - stop
 
     - foreach <proc[GetKingdomList]> as:kingdom:
-        - define foodConsumption <proc[SC1_FoodFullfillmentGetter].context[<[kingdom]>]>
+        - define foodConsumption <[kingdom].proc[SC1_FoodFullfillmentGetter]>
+        - define currFood <[kingdom].proc[GetKingdomFoodReserves]>
 
-        - narrate format:debug <[foodConsumption].round.format_number.color[red]>u
+        - run SetKingdomFoodReserves def.kingdom:<[kingdom]> def.amount:<[currFood].sub[<[foodConsumption]>]>
+        - define currFood <[kingdom].proc[GetKingdomFoodReserves]>
+
+        - if <[currFood]> < 0:
+            - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.starvingMonths:++
+            - narrate format:callout targets:<[kingdom].proc[GetMembers]> "Your kingdom was unable to fully satisfy its citizens food demand this month. This is month #<server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.starvingMonths].if_null[0]> of your deficit. If your kingdom goes 3 months with an active food deficit, your people will revolt and attempt to overthrow you!"
+
+            - define offlineMembers <[kingdom].proc[GetMembers].exclude[<server.online_players>]>
+            - flag server datahold.scenario-1.playersNotSeenFoodMsg.<[kingdom]>:<[offlineMembers]> if:<[offlineMembers].is_empty.not>
 
 
 SC1_NextFoodTickCalculator:
@@ -112,6 +187,7 @@ SC1_FoodFullfillmentGetter:
     - define allSquads <[kingdom].proc[GetKingdomSquads]>
     - define civilianPopulation <[population]>
 
+    # Military food consumption.
     - if <[SMCount]> > 0:
         - define civilianPopulation:-:<[SMCount].mul[100]>
 
@@ -120,7 +196,7 @@ SC1_FoodFullfillmentGetter:
             - define manpower <proc[GetSquadManpower].context[<[kingdom]>|<[squadName]>]>
             - define civilianPopulation:-:<[manpower]>
 
-    # Civilian food consumption
+    # Civilian food consumption.
     - define foodConsumption <[civilianPopulation].mul[5].mul[<util.random.decimal[0.94].to[1.06]>]>
     - define foodConsumption <[foodConsumption].add[<[population].sub[<[civilianPopulation]>].mul[7]>]>
 
@@ -255,10 +331,15 @@ SC1_FoodManager_Handler:
         - define inputContents <context.inventory.list_contents.get[1].to[45]>
         - define foodPoints <[inputContents].proc[SC1_CalculateFoodPoints]>
 
+        # Remove all the food items from the interface and add up the food point total.
         - foreach <context.inventory.list_contents> as:item:
             - if <[item].material.name> == air:
                 - foreach next
 
+            # This is not a recursive task because (to my knowledge) you can't have an item with an
+            # inventory inside another item with an inventory.
+            #
+            # Although this may change with the new backpack feature they're adding...
             - if <[item].has_inventory>:
                 - define outerIndex <[loop_index]>
 
