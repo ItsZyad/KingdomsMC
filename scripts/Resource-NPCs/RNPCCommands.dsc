@@ -100,7 +100,7 @@ ShowRNPCPrices:
     definitions: spawnType
     script:
     - define basePrice <script[RNPCBasePrices].data_key[<[spawnType]>]>
-    - define invPrestige <server.flag[kingdoms.<player.flag[kingdom]>.prestige].sub[100].abs>
+    - define invPrestige <player.flag[kingdom].proc[GetPrestige].sub[100].abs>
     - define gradient 0.1543221
     - define k 6.31
 
@@ -143,17 +143,16 @@ CalculateRNPCPrice:
     - flag server kingdoms.<[kingdom]>.balance:-:<[truePrice]>
     - flag server kingdoms.<[kingdom]>.npcTotal:++
 
-    - run SidebarLoader def.target:<server.flag[kingdoms.<[player].flag[kingdom]>.members].include[<server.online_ops>]>
+    - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
 
 RNPCWindow_Handler:
     type: world
     events:
-
         on player clicks Spawn* in RNPCSpawn_Window:
         - define kingdom <player.flag[kingdom]>
         - define basePrice <script[RNPCBasePrices].data_key[<context.item.flag[spawnType]>]>
-        - define invPrestige <server.flag[kingdoms.<[kingdom]>.prestige].sub[100].abs>
+        - define invPrestige <[kingdom].proc[GetPrestige].sub[100].abs>
         - define gradient 0.1543221
         - define k 6.31
 
@@ -172,19 +171,19 @@ RNPCWindow_Handler:
 
         # If the kingdom bank has enough money to buy an NPC with the price modified by the
         # prestige value
-        - if <server.flag[kingdoms.<[kingdom]>.balance].is[OR_MORE].than[<[truePrice]>]>:
+        - if <[kingdom].proc[GetBalance].is[OR_MORE].than[<[truePrice]>]>:
 
             # Deduct amount from kingdom balance and add to NPC total
             - define nameType <context.item.display.split[Spawn<&sp>a<&sp>].get[2]>
-            - define prestige <server.flag[kingdoms.<[kingdom]>.prestige]>
+            - define prestige <[kingdom].proc[GetPrestige]>
             - define NPCOutpostMod 1|1
             - define specType null
 
             # Find if the player is currently standing in an outpost that their kingdom owns,
             # if so, define values for the outpost's specialization type and how much of a modifier
             # should be applied
-            - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
-                - if <cuboid[<[value]>].contains[<player.location>]>:
+            - foreach <[kingdom].proc[GetOutposts].keys>:
+                - if <[kingdom].proc[GetOutpostArea].context[<[value]>].contains[<player.location>]>:
                     - if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[value]>.specType]>:
                         - define specType <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[value]>.specType]>
 
@@ -271,7 +270,7 @@ RNPCWindow_Handler:
             ## If spawned NPC is a guard type
 
             - else if <context.item.flag[spawnType]> == guard:
-                - define isInCastleLoc <server.flag[kingdoms.<[kingdom]>.claims.castle].contains[<player.location.chunk>]>
+                - define isInCastleLoc <[kingdom].proc[GetClaims].context[castle].contains[<player.location.chunk>]>
 
                 - if <[isInCastleLoc]>:
                     - run GuardSetup def:<player>
@@ -291,7 +290,7 @@ RNPCWindow_Handler:
         - else:
             - narrate format:callout "There is not enough money in your kingdom's bank to get that resource NPC!"
 
-        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         on player clicks in RNPCSpawn_Window:
         - determine passively cancelled
@@ -433,7 +432,7 @@ RNPCInfo_Handler:
 
             - teleport <player.flag[currNPC].as[npc]> <context.location>
 
-            - define prestige <server.flag[kingdoms.<player.flag[kingdom]>.prestige]>
+            - define prestige <player.flag[kingdom].proc[GetPrestige]>
 
             - choose <player.flag[currNPC].as[npc].flag[RNPC]>:
                 - case miners:
@@ -466,7 +465,7 @@ RNPCInfo_Handler:
 
         # Refund code:
         # Equation: mult = log(prestige + 18) - 1.25
-        - define prestige <server.flag[kingdoms.<[kingdom]>.prestige]>
+        - define prestige <[kingdom].proc[GetPrestige]>
         - define refundMultiplier <[prestige].add[18].log[10].sub[1.25]>
         - define npcType <[npc].flag[type].if_null[guard]>
         - define npcCost <script[RNPCBasePrices].data_key[<[npcType]>]>
@@ -482,7 +481,7 @@ RNPCInfo_Handler:
         - remove <[npc]>
         - inventory close
 
-        - run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         on player clicks CancelDeleteRNPC_Item in DeleteConfirm_Window:
         - inventory close
