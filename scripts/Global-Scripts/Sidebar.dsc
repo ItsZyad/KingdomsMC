@@ -30,6 +30,7 @@ SetInitialSidebar:
 
 GenerateUpkeepSidebarLine:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Helper proc which returns either the default upkeep line for the sidebar or 'Frozen!' depending on if PauseUpkeep is set.
@@ -54,6 +55,7 @@ GenerateUpkeepSidebarLine:
 
 GeneratePrestigeDegSidebarLine:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Helper proc which returns either the prestige degredation line for the default sidebar.
@@ -182,6 +184,7 @@ SidebarLoader:
 
 ToggleSidebar_Command:
     type: command
+    debug: false
     description: command for managing the Kingdoms sidebar
     usage: /sidebar
     name: sidebar
