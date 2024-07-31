@@ -13,7 +13,7 @@ StuntedCropGrowth_Handler:
     type: world
     debug: false
     events:
-        on block grows:
+        on block grows priority:-2:
         - if <server.has_flag[PreGameStart]>:
             - stop
 
