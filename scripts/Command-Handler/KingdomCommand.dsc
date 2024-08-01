@@ -82,7 +82,7 @@ Kingdom_Command:
 
     - else if <[args].get[1].to_lowercase> == duchy:
         - if <[args].size> == 1:
-            - define tabCompletes <list[balance|deposit|withdraw|unclaim|tax]>
+            - define tabCompletes <list[balance|deposit|withdraw|unclaim|tax|outline]>
             - define kingTabCompletes <list[create|remove|claim|setduke|removeduke|list]>
 
             - if <player.proc[IsPlayerKing]> || <player.is_op>:
@@ -386,6 +386,29 @@ Kingdom_Command:
                 - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
                 - narrate format:callout "Successfully removed: <element[$<[amount].format_number>].color[aqua]> from the duchy bank."
+
+            - case outline:
+                - define duration <[args].get[4].replace[duration:].if_null[20s]>
+
+                - if <[duration].is[OR_MORE].than[1]> && <[duration].is[OR_LESS].than[120]>:
+                    - define persistTime <[duration]>
+
+                - else:
+                    - narrate format:callout "Invalid duration! Please ensure that outline durations are between 1s and 120s."
+                    - determine cancelled
+
+                - define duration <[duration].as[duration]>
+                - define claims <[kingdom].proc[GetDuchyTerritory].context[<[duchy]>]>
+                - define claimCuboid <[claims].get[1].cuboid>
+
+                - foreach <[claims].remove[1]> as:claim:
+                    - define claimCuboid <[claimCuboid].add_member[<[claim].cuboid>]>
+
+                - if <player.is_flying>:
+                    - showfake green_stained_glass <[claimCuboid].outline_2d[<player.location.y.sub[20]>]> duration:<[duration]>
+
+                - else:
+                    - showfake red_stained_glass <[claimCuboid].outline_2d[<player.location.y.add[20]>]> duration:<[duration]>
 
             - default:
                 - narrate format:callout "Unrecognized argument: <[action].color[red]>"
