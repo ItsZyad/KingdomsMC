@@ -33,3 +33,6 @@ SC1_FlagCheck_Handler:
         - if !<player.flag[kingdom].is_in[jalerad|talpenhern]> && !<player.is_op>:
             - run AddMember def.kingdom:jalerad def.member:<player>
             - ~run SidebarLoader def.target:<player>
+
+            - execute as_player "k warp"
+            - inventory clear destination:<player.inventory>
