@@ -17,8 +17,8 @@
 RiverTradeEfficiencyImpact:
     type: data
     Impacts:
-        talpenhern: 0.15
-        jalerad: 0.85
+        talpenhern: 0.45
+        jalerad: 0.75
 
 
 SetRiverEmptyState:
@@ -120,7 +120,12 @@ RecalculateTradeEfficiency:
 
     - foreach <proc[GetKingdomList]> as:kingdom:
         - define kingdomImpact <script[RiverTradeEfficiencyImpact].data_key[Impacts.<[kingdom]>]>
-        - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.tradeEfficiency:<[proportion].mul[<[kingdomImpact]>]>
+        - define adjustedProportion <element[<element[<[proportion].abs>].mul[<[kingdomImpact]>]>].power[0.68]>
+
+        - if <[proportion]> < 0:
+            - define adjustedProportion <[adjustedProportion].proc[Invert]>
+
+        - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.tradeEfficiency:<[adjustedProportion]>
 
 
 TradeEfficiencyUpdate_Handler:
