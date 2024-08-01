@@ -215,13 +215,13 @@ items:
     base: '72.86'
     supplyProb: '0.9247'
   raw_iron_block:
-    base: '109.30'
+    base: '136.8'
     supplyProb: '0.8871'
   raw_copper_block:
     base: '84.95'
     supplyProb: '0.9122'
   raw_gold_block:
-    base: '364.32'
+    base: '396'
     supplyProb: '0.6236'
   amethyst_block:
     base: '34.92'
@@ -2282,7 +2282,7 @@ items:
     amountMod: '1.5'
     govCap: '2000'
   raw_iron:
-    base: '13.20'
+    base: '15.20'
     supplyProb: '0.5678'
   iron_ingot:
     base: '18.48'
