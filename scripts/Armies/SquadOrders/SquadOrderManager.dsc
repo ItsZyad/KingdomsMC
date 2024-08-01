@@ -397,6 +397,12 @@ SquadOptions_Handler:
                 - narrate format:callout "Your troops have started occupying this outpost. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
                 - narrate format:callout "<italic>Note: You may move in additional squads to occupy outposts faster."
 
+        ## PREVENT WARPING WITH SQUAD TOOLS
+        on warp command:
+        - if <player.has_flag[datahold.armies.squadTools]>:
+            - determine passively cancelled
+            - narrate format:callout "You cannot warp while using army/squad tools. Please exit the squad interface before warping."
+
         ## EXITS ORDERS
         on player clicks block with:ExitSquadControls_Item:
         - flag <player> datahold.squadInfo:!
