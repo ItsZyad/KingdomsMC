@@ -25,7 +25,7 @@ FyndalinTrade_Command:
 FyndalinTrade_BuildingBlocks_Item:
     type: item
     material: stone_bricks
-    display name: <&0>Building Blocks
+    display name: Building Blocks
 
 
 FyndalinTrade_Organics_Item:
