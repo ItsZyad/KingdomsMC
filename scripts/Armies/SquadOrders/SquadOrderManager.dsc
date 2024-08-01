@@ -323,6 +323,8 @@ SquadOptions_Handler:
         - flag <player> datahold.armies.drawingFormation:!
 
         on player right clicks block with:SquadOccupyTool_Item:
+        - ratelimit <player> 2t
+
         - determine passively cancelled
 
         - define squadInfo <player.flag[datahold.squadInfo]>
@@ -356,9 +358,11 @@ SquadOptions_Handler:
             - narrate format:callout "Your troops have started reclaiming this chunk. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
             - stop
 
-        - define kingdomsAtWar <proc[GetKingdomList].filter_tag[<proc[IsAtWarWithKingdom].context[<[kingdom]>|<[filter_value]>]>]>
+        - define kingdomsAtWar <proc[GetKingdomList].exclude[<[kingdom]>].filter_tag[<proc[IsAtWarWithKingdom].context[<[kingdom]>|<[filter_value]>]>]>
 
         - foreach <[kingdomsAtWar]>:
+            - define outpostData <[value].proc[GetOutposts].parse_value_tag[<[parse_value].include[name=<[parse_key]>]>].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].values.get[1]>
+
             - if <[value].proc[GetClaims].contains[<[chunk]>]>:
                 - define claimDuration <duration[5m]>
                 - narrate format:callout "Your troops have started occupying this chunk. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
@@ -371,9 +375,7 @@ SquadOptions_Handler:
                 - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[claimDuration]>
                 - stop
 
-            - define outpostData <[value].proc[GetOutposts].parse_value_tag[<[parse_value].include[name=<[parse_key]>]>].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].values.get[1]>
-
-            - if <[outpostData].is_truthy>:
+            - else if <[outpostData].is_truthy>:
                 - define squadLeaders <[kingdom].proc[GetKingdomSquads].parse_value_tag[<[parse_value].get[squadLeader]>].values>
                 - define otherOccupyingSquads <list[]>
 
