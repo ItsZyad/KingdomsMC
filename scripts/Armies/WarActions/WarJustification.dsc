@@ -17,6 +17,7 @@ IronicAntiWarQuotes:
     - No enterprise is more likely to succeed than one concealed from the enemy until it is ripe for execution. ~ Niccolò Machiavelli
     - As long as there are sovereign nations possessing great power, war is inevitable. ~ Albert Einstein
     - The more you sweat in peace, the less you bleed in war. ~ Norman Schwarzkopf
+    - All war represents a failure of diplomacy. ~ Tony Benn
 
 
 GetIronicWarQuote:
