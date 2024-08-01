@@ -490,7 +490,7 @@ CalculateSquadUpkeep:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot calculate squad upkeep. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - if !<[squadComp].object_type> != Map:
+    - if <[squadComp].object_type> != Map:
         - run GenerateInternalError def.category:TypeError def.message:<element[Cannot calculate squad upkeep. Provided parameter: <[squadComp]> is not of type: MapTag]>
         - determine null
 
@@ -547,9 +547,10 @@ GiveSquadTools:
     - give SquadAttackAllTool_Item
     - give SquadAttackTool_Item
     - give SquadAttackMonstersTool_Item
-    - inventory set slot:9 origin:ExitSquadControls_Item
-    - inventory set slot:8 origin:MiscOrders_Item
-    - inventory set slot:7 origin:SquadClearAllAttacksTool_Item
+    - give SquadOccupyTool_Item
+    - give SquadClearAllAttacksTool_Item
+    - give MiscOrders_Item
+    - give ExitSquadControls_Item
     - adjust <player> item_slot:1
 
 
