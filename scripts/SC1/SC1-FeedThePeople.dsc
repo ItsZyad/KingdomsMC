@@ -71,6 +71,10 @@ SC1_Food_Handler:
     type: world
     enabled: false
     events:
+        after time 0:
+        - define onlinePlayersToday <server.flag[kingdoms.scenario-1.onlinePlayersToday].if_null[<list[]>]>
+        - flag server kingdoms.scenario-1.onlinePlayersToday:!
+
         after time 23:
         - define worldDay <context.world.time.full.in_days.round>
 
@@ -94,6 +98,8 @@ SC1_Food_Handler:
 
         on player joins priority:2:
         - define kingdom <player.flag[kingdom]>
+        - flag server kingdoms.scenario-1.onlinePlayersToday:->:<player>
+        - flag server kingdoms.scenario-1.onlinePlayersToday:<server.flag[kingdoms.scenario-1.onlinePlayersToday].deduplicate>
 
         - if !<[kingdom].is_in[<server.flag[datahold.scenario-1.playersNotSeenFoodMsg].keys.if_null[<list[]>]>]>:
             - stop
@@ -124,6 +130,9 @@ SC1_PopulationGrowthTick:
     type: task
     script:
     - define daysPassed <context.world.time.full.in_days.round>
+
+    - if <server.flag[kingdoms.scenario-1.onlinePlayersToday].is_empty>:
+        - stop
 
     - if <[daysPassed].mod[30]> == 0:
         - foreach <proc[GetKingdomList]> as:kingdom:
