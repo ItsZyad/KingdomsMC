@@ -17,7 +17,7 @@ AdminTools_Command:
     description: Umbrella command for all things kingdoms admin.
     permission: kingdoms.admin
     tab completions:
-        1: id|influence|loans|purgeflag|seeflag|buildplayerlists
+        1: id|influence|loans|purgeflag|seeflag|buildplayerlists|dynmap
 
     tab complete:
     - define mostFlags <list[]>
@@ -125,12 +125,33 @@ AdminTools_Command:
                     - else if <[object]> == player:
                         - determine <player.list_flags>
 
+        - case dynmap:
+            - define args <context.raw_args.to_lowercase.split_args>
+
+            - choose <[args].get[2].if_null[null]>:
+                - case generate:
+                    - if <[args].size> >= 3:
+                        - if <[args].get[4].if_null[null]> == duchy:
+                            - determine <[args].get[3].proc[GetKingdomDuchies].include[all]>
+
+                        - else if <[args].size> >= 4:
+                            - determine <list[]>
+
+                        - else:
+                            - determine <list[main|duchy|all]>
+
+                    - if <[args].size> >= 2:
+                        - determine <proc[GetKingdomList].include[all]>
+
+            - determine <list[generate|refresh]>
+
     script:
-    - define args <context.raw_args.split_args.get[1]>
+    - define args <context.raw_args.split_args>
+    - define subcommand <[args].get[1]>
 
     # ---------------------- START SHORT SUBCOMMANDS ----------------------#
 
-    - choose <[args]>:
+    - choose <[subcommand]>:
         - case id:
             - if <player.has_flag[AdminTools.id]>:
                 - flag player AdminTools.id:!
@@ -157,24 +178,90 @@ AdminTools_Command:
                 - else:
                     - narrate format:admincallout "No kingdom found for: <[value].name>"
 
-    # ---------------------- START INJECTED SUBCOMMANDS ----------------------#
+        - case dynmap:
+            - define action <[args].get[2].to_lowercase>
 
-        # - case purgeflag:
-        #     - define purgeTarget <[args].get[2]>
-        #     - define flagTargets <[args].get[3].split[,]>
+            - if !<[action].is_truthy>:
+                - narrate format:admincallout "You must provide an argument to this subcommand."
+                - stop
 
-        #     - clickable save:confirm_purge until:30s usages:1:
-        #         - narrate format:admincallout "Starting flag purge..."
-        #         - run PurgeFlags_Subcommand def.player:<[purgeTarget]> def.flag:<[flagTargets]>
+            - if <[action]> == generate:
+                - define kingdom <[args].get[3].to_lowercase>
+                - define territoryType <[args].get[4].to_lowercase>
 
-        #     - clickable save:cancel_purge until:30s usages:1:
-        #         - narrate format:admincallout "Action cancelled!"
-        #         - determine cancelled
+                - if !<[territoryType].is_truthy>:
+                    - narrate format:admincallout "You must specify a territory type to generate."
+                    - stop
 
-        #     - narrate format:admincallout "Please confirm that you wish to clear the following flags:"
-        #     - narrate <[flagTargets].comma_separated>
-        #     - narrate format:admincallout "From the following players:"
-        #     - narrate <[purgeTarget].comma_separated>
+                - if <[kingdom]> == all:
+                    - foreach <proc[GetKingdomList]>:
+                        - run GenerateDynmapCorners def.chunks:<[value].proc[GetClaims]> save:corners
+                        - define corners <entry[corners].created_queue.determination.get[1]>
+
+                        - flag <player.location.world> dynmap.cache.<[value]>.main.cornerList:<[corners]>
+
+                        - foreach <[value].proc[GetKingdomDuchies]> as:duchy:
+                            - run GenerateDynmapCorners def.chunks:<[value].proc[GetDuchyTerritory].context[<[duchy]>]> save:corners
+                            - define corners <entry[corners].created_queue.determination.get[1]>
+
+                            - flag <player.location.world> dynmap.cache.<[value]>.duchies.<[duchy]>.cornerList:<[corners]>
+
+                    - narrate format:admincallout "Territory generation complete. Use <element[/kadmin dynmap refresh].color[gray]> to see any changes reflected onto the dynmap."
+                    - stop
+
+                - else if !<[kingdom].proc[ValidateKingdomCode]>:
+                    - narrate format:admincallout "You must specify a valid kingdom for which to generate dynmap data."
+                    - stop
+
+                - if <[territoryType]> == main:
+                    - narrate format:admincallout "Generating dynmap data for territory type: <[territoryType].color[aqua]> for kingdom: <[kingdom].color[aqua]>..."
+                    - run GenerateDynmapCorners def.chunks:<[kingdom].proc[GetClaims]> save:corners
+                    - define corners <entry[corners].created_queue.determination.get[1]>
+
+                    - flag <player.location.world> dynmap.cache.<[kingdom]>.main.cornerList:<[corners]>
+
+                - else if <[territoryType]> == duchy:
+                    - define duchy <[args].get[5].to_lowercase>
+
+                    - if <[duchy]> == all:
+                        - foreach <[kingdom].proc[GetKingdomDuchies]>:
+                            - run GenerateDynmapCorners def.chunks:<[kingdom].proc[GetDuchyTerritory].context[<[value]>]> save:corners
+                            - define corners <entry[corners].created_queue.determination.get[1]>
+
+                            - flag <player.location.world> dynmap.cache.<[kingdom]>.duchies.<[value]>.cornerList:<[corners]>
+
+                    - if !<[duchy].is_truthy>:
+                        - narrate format:admincallout "You must specify the name of the duchy that you want to generate dynmap data for."
+                        - stop
+
+                    - narrate format:admincallout "Generating dynmap data for territory type: <[territoryType].color[aqua]> for duchy: <[duchy].color[aqua]> in kingdom: <[kingdom].color[aqua]>..."
+                    - run GenerateDynmapCorners def.chunks:<[kingdom].proc[GetDuchyTerritory].context[<[duchy]>]> save:corners
+                    - define corners <entry[corners].created_queue.determination.get[1]>
+
+                    - flag <player.location.world> dynmap.cache.<[kingdom]>.duchies.<[duchy]>.cornerList:<[corners]>
+
+                - else if <[territoryType]> == all:
+                    - run GenerateDynmapCorners def.chunks:<[kingdom].proc[GetClaims]> save:corners
+                    - define corners <entry[corners].created_queue.determination.get[1]>
+
+                    - flag <player.location.world> dynmap.cache.<[kingdom]>.main.cornerList:<[corners]>
+
+                    - foreach <[kingdom].proc[GetKingdomDuchies]>:
+                        - run GenerateDynmapCorners def.chunks:<[kingdom].proc[GetDuchyTerritory].context[<[value]>]> save:corners
+                        - define corners <entry[corners].created_queue.determination.get[1]>
+
+                        - flag <player.location.world> dynmap.cache.<[kingdom]>.duchies.<[value]>.cornerList:<[corners]>
+
+                - narrate format:admincallout "Territory generation complete. Use <element[/kadmin dynmap refresh].color[gray]> to see any changes reflected onto the dynmap."
+
+            - else if <[action]> == refresh:
+                - narrate format:admincallout "Refreshing dynmap to latest data..."
+                - run DynmapTask
+
+                - narrate format:admincallout "Refresh complete."
+
+            - else:
+                - narrate <element[<[action].if_null[null].color[red]> is an unrecognized action. Please enter a valid action.]>
 
         - case seeflag:
             - if <player.is_op> || <player.has_permission[kingdoms.developer]>:
