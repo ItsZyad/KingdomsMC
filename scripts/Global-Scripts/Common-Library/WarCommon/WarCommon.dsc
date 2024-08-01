@@ -198,7 +198,7 @@ GetWarParticipants:
     - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
         - determine <list[]>
 
-    - determine <[warID].proc[GetWarRetaliators].include[<[warID].proc[GetWarRetaliators]>]>
+    - determine <[warID].proc[GetWarBelligerents].include[<[warID].proc[GetWarRetaliators]>]>
 
 
 GetWarStartDate:
