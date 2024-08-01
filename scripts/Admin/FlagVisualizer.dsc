@@ -83,7 +83,7 @@ FlagVisualizer_Recur:
             - determine passively <element[i<&at><[flag].material.name>].color[aqua]>
 
         - case Location:
-            - determine passively <element[l<&at>].color[gray]><[flag].simple.split[,].remove[last].separated_by[<element[,].color[gray]>]><element[<&at>].color[gray]><[flag].world.name>
+            - determine passively <element[l<&at>].color[gray]><[flag].round_to_precision[0.0001].xyz.split[,].separated_by[<element[,].color[gray]>]><element[<&at>].color[gray]><[flag].world.name>
 
         - case Chunk:
             - define cornerOne <[flag].cuboid.corners.get[1].simple.split[,].remove[last].remove[2].separated_by[, ]>
