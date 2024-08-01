@@ -112,14 +112,20 @@ CalculateObstructionRate:
     - determine <[proportion]>
 
 
+RecalculateTradeEfficiency:
+    type: task
+    script:
+    - run CalculateObstructionRate save:proportion
+    - define proportion <entry[proportion].created_queue.determination.get[1]>
+
+    - foreach <proc[GetKingdomList]> as:kingdom:
+        - define kingdomImpact <script[RiverTradeEfficiencyImpact].data_key[Impacts.<[kingdom]>]>
+        - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.tradeEfficiency:<[proportion].mul[<[kingdomImpact]>]>
+
+
 TradeEfficiencyUpdate_Handler:
     type: world
     debug: false
     events:
         on time 0:
-        - run CalculateObstructionRate save:proportion
-        - define proportion <entry[proportion].created_queue.determination.get[1]>
-
-        - foreach <proc[GetKingdomList]> as:kingdom:
-            - define kingdomImpact <script[RiverTradeEfficiencyImpact].data_key[Impacts.<[kingdom]>]>
-            - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.tradeEfficiency:<[proportion].mul[<[kingdomImpact]>]>
+        - inject RecalculateTradeEfficiency
