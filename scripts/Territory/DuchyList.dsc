@@ -38,7 +38,7 @@ DuchyListSubcommand:
     - foreach <[duchyList]> as:duchy:
         - definemap lore:
             1: <element[Name: <[kingdom].proc[GetDuchyDisplayName].context[<[duchy]>].color[aqua]>]>
-            2: <element[Duke: <[kingdom].proc[GetDuke].context[<[duchy]>].name.color[green]>]>
+            2: <element[Duke: <[kingdom].proc[GetDuke].context[<[duchy]>].name.color[green].if_null[<element[None].color[gray]>]>]>
             3: <element[Balance: <element[$<[kingdom].proc[GetDuchyBalance].context[<[duchy]>].format_number>].color[white]>]>
             4: <element[Royal Rate: <element[<[kingdom].proc[GetDuchyTaxRate].context[<[duchy]>].mul[100].format_number>%].color[white]>]>
 
