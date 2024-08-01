@@ -35,17 +35,17 @@ SC1_PopulationData:
 
 SC1_EndConditionMessage:
     type: task
-    definitions: playerList[ListTag(PlayerTag)]|loseCause[ElementTag(String)]
+    definitions: __playerList[ListTag(PlayerTag)]|loseCause[ElementTag(String)]
     description:
     - Will send out a message to the players provided that their kingdom has lost the game for the reason provided under 'loseCause'.
     - ---
     - → [Void]
 
     script:
-    - define kingdom <[playerList].get[1].flag[kingdom]>
+    - define kingdom <[__playerList].get[1].flag[kingdom]>
 
     - if <[loseCause]> == food:
-        - foreach <[playerList]> as:player:
+        - foreach <[__playerList]> as:player:
             - narrate <n> targets:<[player]>
             - narrate <n> targets:<[player]>
             - narrate <element[After 3 long months of starvation and famine, the peasants in your kingdom decided enough was enough and initiated a revolt against you and government.]> targets:<[player]>
