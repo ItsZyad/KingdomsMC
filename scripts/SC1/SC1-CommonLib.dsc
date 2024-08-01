@@ -25,7 +25,7 @@ SC1_GenerateTradeEffSidebarLine:
     ##
     ## >>> [ElementTag<String>]
 
-    - define tradeEff <[kingdom].proc[GetKingdomTradeEfficiency].round_to_precision[0.001]>
+    - define tradeEff <[kingdom].proc[GetKingdomTradeEfficiency].round_to_precision[0.001].mul[100]>
 
     - if <[tradeEff]> >= 0:
         - determine <element[Trade Efficiency: <green>+<[tradeEff]>%]>
