@@ -66,14 +66,22 @@ OpenFyndalinTradeWindowCategory:
     - define tradeMap <server.flag[kingdoms.scenario-1.trade.itemMap]>
     - flag <[player]> datahold.scenario-1.fyndalinTrade.category:<[category]>
 
+    - define tradeEfficiency <player.flag[kingdom].proc[GetKingdomTradeEfficiency]>
     - define itemList <list[]>
 
     - foreach <[tradeMap].get[<[category]>]> as:itemData key:itemName:
         - define item <item[<[itemName]>]>
-        - define amount <[itemData].get[amount]>
-        - define price <[itemData].get[price]>
+        - define amount <[itemData].get[amount].mul[<[tradeEfficiency]>].round>
+        - define price <[itemData].get[price].mul[<element[1].sub[<[tradeEfficiency]>].abs>]>
 
-        - adjust def:item lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00].if_null[null]>].color[red]>|<element[Quantity: ].bold><[amount].color[green]>
+        - definemap lore:
+            1: <element[Price: ].bold><element[$<[price].format_number[#,##0.00].if_null[null]>].color[red]>
+            2: <element[Quantity: ].bold><[amount].color[green]>
+            3: <element[(<[tradeEfficiency].mul[100].round_to_precision[0.01]>%) River Blockage Modifier].color[red].italicize>
+            4: <element[This decreases the quantity of goods from].color[gray].italicize>
+            5: <element[Fyndalin, as well as increasing the price.].color[gray].italicize>
+
+        - adjust def:item lore:<[lore].values>
 
         - define itemList:->:<[item]>
 
@@ -103,9 +111,10 @@ FyndalinTrade_Handler:
         - if <context.slot> == -998 || <context.item.material.name> == air:
             - determine cancelled
 
+        - define tradeEfficiency <player.flag[kingdom].proc[GetKingdomTradeEfficiency]>
         - define category <player.flag[datahold.scenario-1.fyndalinTrade.category]>
-        - define amount <server.flag[kingdoms.scenario-1.trade.itemMap.<[category]>.<context.item.material.name>.amount]>
-        - define price <server.flag[kingdoms.scenario-1.trade.itemMap.<[category]>.<context.item.material.name>.price]>
+        - define amount <server.flag[kingdoms.scenario-1.trade.itemMap.<[category]>.<context.item.material.name>.amount].mul[<[tradeEfficiency]>].round>
+        - define price <server.flag[kingdoms.scenario-1.trade.itemMap.<[category]>.<context.item.material.name>.price].mul[<element[1].sub[<[tradeEfficiency]>].abs>]>
 
         # If player shift clicks, buy 10 of the item instead of just 1
         - if <context.click> == SHIFT_LEFT:
