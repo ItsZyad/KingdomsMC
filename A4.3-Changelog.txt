@@ -29,7 +29,7 @@ __________________________________________
     - Retired '/k castleclaim' and '/k coreclaim' commands in favor of a unified '/k claim' command. (I also took this opportunity to slightly improve the performance of the claiming code).
     - Introduced environment-variable crop growth. Different factors such as biome humidity, temperature, overall climate, and altitude will affect crop growth rates, forcing more specialization between kingdoms.
 
-Alpha 0.4.3 :: 15-MAY-2024 -> 31-JUL-2024;
+Alpha 0.4.3 :: 15-MAY-2024 -> 01-AUG-2024;
 __________________________________________
     BUG FIXES / PERFORMANCE:
     - [Technical] All Kingdoms builds from now on will target 1.20.x
@@ -45,6 +45,8 @@ __________________________________________
     - Fixed an almost comical amount of bugs with the outpost manager (It was a wonder that it ever worked at all).
         * I'm just gonna leave the commit link here to show how absurdly error-ridden this module was: (https://github.com/ItsZyad/KingdomsMC/commit/2fcb375fb8dc40249871a50bf05ec10ca034dbbc) (this was live code for 3 FUCKING YEARS).
     - Fixed a bug where squad managers were not capable of calculating the number of beds in their AOE until someone broke or placed down a bed.
+    - Fixed a bug which caused squad manager upkeeps to be calculated as zero all the time.
+    - Players will now no longer be able to warp while using squad tools.
 
     SMALL ADDITIONS:
     - Added a new formation walk tool to the squads system: Drawable formation lines. These allow the commander of a squad to determine the exact size of the formation using a special wand.
@@ -54,6 +56,7 @@ __________________________________________
     - Sidebar kingdom name font size has been significantly reduced. There should no longer be massive sidebars that take up half of your screen.
     - Significantly improved error-logging for core functions. If something goes wrong, the game should now spell out *exactly* what's wrong (at the cost of being slightly more obnoxious).
     - Did a ground-up re-write of the sidebar code (which was still a relic of Alpha 2). It now loads new data almost instantly. Additionally, I've introduced a new sub-command to the sidebar command - '/sidebar mode <mode>' - which allows you to cycle through different "pages" of the sidebar, which now display data on different grouped aspects of your kingdom (e.g. 'Default' Data, Duchy Data, Scenario-specific data).
+    - Rewrote the Kingdom-Dynmap integration to add a whole load of new features like proper coloring for each kingdom's territory and support for duchies. Additionally, this fixed a lot of longstanding bugs to do with incorrect usages of Dynmap's API.
 
     LARGE ADDITIONS:
     - Miner NPCs have been reworked. They now make use of world-wide heat maps for different resources that mimic real life patterns of resource presence.
@@ -66,7 +69,7 @@ __________________________________________
         + Alongside this, I also added a proper occupation system so that players can keep track of how much territory they've stolen off other kingdoms during wars.
     
 
-Scenario 1.0.0 :: 2-JUL-2024 -> 31-JUL-2024;
+Scenario 1.0.0 :: 2-JUL-2024 -> 01-AUG-2024;
 __________________________________________
     SMALL ADDITIONS:
     - Slowed crop growth to 35% of vanilla crop growth rate.
