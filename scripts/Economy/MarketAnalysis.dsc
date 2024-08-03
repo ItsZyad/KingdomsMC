@@ -43,6 +43,9 @@ SellAnalysisGenerator:
     ## howdya like my eight inch d....
     ## ..ocstring? ;)))
 
+    - if !<server.has_flag[economy.markets.<[market]>.sellData]>:
+        - determine null
+
     - define sellData <server.flag[economy.markets.<[market]>.sellData]>
     - define marketAnalysis <map[]>
 
@@ -111,6 +114,9 @@ PurchaseAnalysisGenerator:
     ##             >;
     ##         >
     ##     >]
+
+    - if !<server.has_flag[economy.markets.<[market]>.buyData]>:
+        - determine null
 
     - define marketDemand <server.flag[economy.markets.<[market]>.buyData]>
     - define marketAnalysis <map[]>
@@ -184,9 +190,9 @@ OldMarketDataRecorder:
         - run SellAnalysisGenerator def.market:<[market]> save:sellAnalysis
         - define sellAnalysis <entry[sellAnalysis].created_queue.determination.get[1]>
 
-        - definemap marketAnalysis:
-            buyAnalysis: <[buyAnalysis]>
-            sellAnalysis: <[sellAnalysis]>
+        - define marketAnalysis <map[]>
+        - define marketAnalysis.buyAnalysis:<[buyAnalysis]> if:<[buyAnalysis].is_truthy>
+        - define marketAnalysis.sellAnalysis:<[sellAnalysis]> if:<[sellAnalysis].is_truthy>
 
         - define allMarketsMap.<[market]>.items:<[marketAnalysis]>
         - define allMarketsMap.<[market]>:<[allMarketsMap].get[<[market]>].include[<[marketAnalysis].get_subset[totalValue|totalAmount]>]>

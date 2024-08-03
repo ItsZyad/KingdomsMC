@@ -200,7 +200,7 @@ MerchantPurchaseDecider:
     - else:
         - define sortedItemDemand <list[]>
 
-    - run flagvisualizer def.flag:<[sortedItemDemand].parse_tag[<[parse_value].get[1]>]> def.flagName:SID
+    # - run flagvisualizer def.flag:<[sortedItemDemand].parse_tag[<[parse_value].get[1]>]> def.flagName:SID
 
     - foreach <[biasControlledItems].random[<[biasControlledItems].size>]> as:item:
         - define availableSupply <server.flag[economy.markets.<[marketName]>.supplyMap.current.<[item].get[name]>].if_null[0]>
@@ -289,7 +289,7 @@ MerchantPurchaseDecider:
             - flag <[merchant]> merchantData.supply.<[item].get[name]>.price:<[item].get[base]>
             - flag server economy.markets.<[marketName]>.supplyMap.current.<[item].get[name]>:-:<[reasonablePurchaseAmount].round>
 
-    - run flagvisualizer def.flag:<[biasControlledItems]>
+    # - run flagvisualizer def.flag:<[biasControlledItems]>
     - flag <[merchant]> cachedInterface:!
 
     CalculateItemPurchaseAmount:
@@ -412,17 +412,28 @@ MerchantSellDecider:
 
         - define allocations.<[item]>:<[alloc]>
 
-        - flag <[merchant]> merchantData.sellData.items.<[key]>.alloc:<[alloc]>
-        - flag <[merchant]> merchantData.sellData.items.<[key]>.spent:0
-        - flag <[merchant]> merchantData.sellData.items.<[key]>.price:<[sellPrice]>
+        - flag <[merchant]> merchantData.sellData.items.<[item]>.alloc:<[alloc]>
+        - flag <[merchant]> merchantData.sellData.items.<[item]>.spent:0
+        - flag <[merchant]> merchantData.sellData.items.<[item]>.price:<[sellPrice]>
 
-    - run flagvisualizer def.flag:<[allocations]> def.flagName:allocations
+    - foreach <[merchant].flag[merchantData.supply]> key:item as:itemData:
+        - if <[item].is_in[<[sellEffectors].keys>]>:
+            - foreach next
+
+        - define buyPrice <[itemData].get[price]>
+        - define sellPrice <[buyPrice].mul[<element[1].sub[<[sBias].div[3]>]>].round_up_to_precision[0.05]>
+        - define supplyRatio <[itemData].get[quantity].div[<[totalSupply]>]>
+        - define allocations.<[item]>:<[merchant].flag[merchantData.balance].mul[<[supplyRatio]>].round>
+
+        - flag <[merchant]> merchantData.sellData.items.<[item]>.alloc:<[merchant].flag[merchantData.balance].mul[<[supplyRatio]>].round>
+        - flag <[merchant]> merchantData.sellData.items.<[item]>.spent:0
+        - flag <[merchant]> merchantData.sellData.items.<[item]>.price:<[sellPrice]>
 
     FindItemTrend:
     - define itemTrends <map[]>
 
     - foreach <[sellAnalyses]> key:day as:data:
-        - foreach <[data]> key:item as:itemData:
+        - foreach <[data].get[items]> key:item as:itemData:
             - define itemTrends.<[item]>.SARList:->:<[itemData].get[saleToAmountRatio]>
             - define itemTrends.<[item]>.totalAmountItem:+:<[itemData].get[totalAmountItem]>
             - define itemTrends.<[item]>.totalValueItem:+:<[itemData].get[totalValueItem]>
@@ -433,11 +444,9 @@ MerchantSellDecider:
         - define itemTrends.<[key]>.totalFluctuation:0
 
         - foreach <[value].get[SARList]> as:currSAR:
-            - define itemTrends.<[key]>.totalFluctuation:+:<[value].get[SARList].get[<[loop_index].sub[1]>].if_null[<[currSAR]>].sub[<[currSAR]>].abs>
+            - define itemTrends.<[key]>.totalFluctuation:+:<[value].get[SARList].get[<[loop_index].sub[1]>].if_null[<[currSAR].sub[<[currSAR]>].abs>]>
 
         - define itemTrends.<[key]>.averageSAR:<[value].get[SARList].average>
-
-    - run flagvisualizer def.flag:<[itemTrends]> def.flagName:trends
 
 
 MarketSubTickPriceAdjuster:
@@ -467,13 +476,13 @@ MarketSubTickPriceAdjuster:
         - run PurchaseAnalysisGenerator def.market:<[marketName]> save:buyAnalysis
         - define buyAnalysis <entry[buyAnalysis].created_queue.determination.get[1]>
 
-    - if !<[buyAnalysis].exists>:
+    - if !<[buyAnalysis].is_truthy>:
         - define validMerchants <server.flag[economy.markets.<[marketName]>.merchants].filter_tag[<[filter_value].flag[merchantData.supply].keys.contains[<[sellAnalysis].get[items].keys>]>].parse_tag[<[parse_value].as[npc]>]>
         - inject <script.name> path:AnalyzeSellDataOnly
 
         - determine <[sellAnalysis].get[items].keys>
 
-    - else if !<[sellAnalysis].exists>:
+    - else if !<[sellAnalysis].is_truthy>:
         - define validMerchants <server.flag[economy.markets.<[marketName]>.merchants].filter_tag[<[filter_value].flag[merchantData.supply].keys.contains[<[buyAnalysis].get[items].keys>]>].parse_tag[<[parse_value].as[npc]>]>
         - inject <script.name> path:AnalyzeBuyDataOnly
 
@@ -593,14 +602,14 @@ MarketTick:
         - flag server economy.markets.<[marketName]>.supplyMap.current:<[supply]>
 
         - foreach <[merchants]> as:merchant:
-            - define balance <[merc].flag[merchantData.balance]>
-            - define wealth <[merc].flag[merchantData.wealth]>
+            - define balance <[merchant].flag[merchantData.balance]>
+            - define wealth <[merchant].flag[merchantData.wealth]>
 
             # Note: future configurable(?)
             # How much of the merchant's wealth should be earned back by them each week? As of
             # now I'm settled on 1/4 of wealth returned weekly to simulate a monthly paycheck.
-            - flag <[merc]> merchantData.balance:<[wealth].div[4]> if:<[balance].exists.not>
-            - flag <[merc]> merchantData.balance:<[wealth].div[4].add[<[balance]>]> if:<[balance].exists>
+            - flag <[merchant]> merchantData.balance:<[wealth].div[4]> if:<[balance].exists.not>
+            - flag <[merchant]> merchantData.balance:<[wealth].div[4].add[<[balance]>]> if:<[balance].exists>
 
             - run AssignPurchaseStrategy def.merchant:<[merchant]>
             - run MerchantPurchaseDecider def.marketName:<[marketName]> def.merchant:<[merchant]>
