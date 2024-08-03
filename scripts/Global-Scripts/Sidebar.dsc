@@ -22,7 +22,7 @@ SetInitialSidebar:
         - if !<player.has_flag[sidebar.mode]>:
             - flag <player> sidebar.mode:Default
 
-        - ~run SidebarLoader def:<player>
+        - ~run SidebarLoader def.target:<list[<player>]>
 
         - if !<player.has_flag[kingdom]>:
             - narrate format:callout "<yellow><bold>WARNING: <&r>Player kingdom flag not set! Using kingdom functions may have unexpected/untested side-effects"
@@ -161,12 +161,12 @@ SidebarLoader:
 
             - sidebar remove players:<[player]>
             - sidebar set title:<[sidebarData].get[title].parsed> players:<[player]>
-            - sidebar add values:<element[<&sp>].repeat[30]> start:99
+            - sidebar add values:<element[<&sp>].repeat[30]> players:<[player]> start:99
 
             - foreach <[sidebarData].get[lines]> as:line:
                 - sidebar add values:<&sp><[line].parsed> players:<[player]>
 
-            - sidebar add values:<&sp>
+            - sidebar add values:<&sp> players:<[player]>
 
         - else:
             - sidebar set title:<bold><gray>KINGDOMLESS
