@@ -113,7 +113,7 @@ Kingdoms_Command:
     script:
     - if <context.args.get[1]> == version:
         - yaml load:../Kingdoms/config.yml id:config
-        - narrate format:callout <element[Kingdoms Version: <yaml[config].read[General.version].color[aqua]>]>
+        - narrate format:callout <element[Kingdoms Version: <yaml[config].read[General.version].color[aqua]>]><element[ <&dq><yaml[config].read[General.version-name]><&dq>].color[red]>
         - yaml unload id:config
 
     - else if <context.args.get[1]> == about:
