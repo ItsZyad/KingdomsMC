@@ -11,25 +11,19 @@
 SupplyAmountCalculator:
     type: task
     debug: false
-    definitions: marketSize|spawnChance
+    definitions: marketSize
     script:
-    - yaml load:economy_data/price-info.yml id:prices
-    - define rawItems <yaml[prices].read[price_info.items]>
-    - define globalMod <yaml[prices].read[price_info.global_supply_mod].if_null[1]>
+    - yaml load:economy_data/worth.yml id:worth
+    - define rawItems <server.flag[economy.itemCategories].values.parse_tag[<[parse_value].get[items]>].combine>
     - define marketSize <[marketSize].round.if_null[1].mul[5]>
-    - define spawnChance <[spawnChance].if_null[<util.random.decimal[0].to[1]>]>
     - define spawnChances <map[]>
 
-    - foreach <[rawItems]> as:group key:groupName:
-        - foreach <[group]> as:item key:itemName:
-            - define supplyProb <[item].get[supply_prob].if_null[<util.random.decimal[0].to[1]>]>
+    - foreach <[rawItems]> as:itemName:
+        - define supplyMod <yaml[worth].read[items.<[itemName]>.supplyProb]>
+        - define amountMod <yaml[worth].read[items.<[itemName]>.amountMod].if_null[1]>
+        - define supplyAmount <util.random.int[1].to[128].mul[<[supplyMod]>].mul[<[marketSize]>].mul[<[amountMod]>].round_up>
+        - define spawnChances.<[itemName]>:<[supplyAmount]>
 
-            - if <[supplyProb]> <= <[spawnChance]>:
-                - define probabilityDiff <[spawnChance].sub[<[supplyProb]>]>
-                - define amountMod <[item].get[amount_mod].if_null[1]>
-                - define supplyAmount <util.random.int[1].to[128].mul[<[supplyProb]>].mul[<[probabilityDiff].add[1]>].mul[<[amountMod]>].mul[<[marketSize]>].round>
-                - define spawnChances.<[itemName]>:<[supplyAmount].mul[<[globalMod]>]>
-
-    - yaml id:prices unload
+    - yaml id:worth unload
     - run FlagVisualizer def.flag:<[spawnChances]> def.flagName:SpawnChances
     - determine <[spawnChances]>
