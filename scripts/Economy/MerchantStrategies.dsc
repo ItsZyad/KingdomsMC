@@ -14,11 +14,11 @@ MerchantStrategy_Qualifiers:
             # The extent to which the merchant will want to spend all of their money/allowance
             # A value closer to 1 will mean the merchant will spend more.
             spendBias:
-                min: 0.6
+                min: 0.535
             # How much of each item the merchant will want to buy. A value closer to 1 will
             # make the merchant want to maximize the amount of items to buy.
             quantityBias:
-                is: 0.40
+                is: 0.45
                 tolerance: 0.7
         Buy_Cheap:
             balance:
