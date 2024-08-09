@@ -209,6 +209,64 @@ AddKingdomPopulationGrowth:
     - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.popGrowth:<[newAmount]>
 
 
+GetKingdomFoodConsumption:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]
+    description:
+    - Gets the provided kingdom's total food consumption.
+    - Will set it if its associated flag does not exist.
+    - ---
+    - → ?[ElementTag(Integer)]
+
+    script:
+    ## Gets the provided kingdom's total food consumption.
+    ##
+    ## Will set it if its associated flag does not exist.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> ?[ElementTag<Integer>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot get kingdom food consumption rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine null
+
+    - if !<server.has_flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.consumption]>:
+        - determine <[kingdom].proc[SC1_FoodFullfillmentGetter]>
+
+    - determine <server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.consumption]>
+
+
+SetKingdomFoodConsumption:
+    type: task
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]
+    description:
+    - Sets the provided amount as the kingdom's maximum food consumption.
+    - Will return null if the action fails.
+    - ---
+    - → ?[Void]
+
+    script:
+    ## Sets the provided amount as the kingdom's maximum food consumption.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## amount  : [ElementTag<Float>]
+    ##
+    ## >>> ?[Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom food consumption rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
+        - determine null
+
+    - if !<[amount].is_decimal>:
+        - run GenerateInternalError def.category:ValueError def.message:<element[[PACK/SC1] Cannot set kingdom food consumption rate. Invalid amount specified: <[amount].bold>. Amount must be a number.]>
+        - determine null
+
+    - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.consumption:<[amount]>
+
+
 GetKingdomFoodReserves:
     type: procedure
     debug: false
