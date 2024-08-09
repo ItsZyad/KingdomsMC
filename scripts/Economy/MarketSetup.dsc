@@ -412,29 +412,40 @@ MerchantWealthSelector_Handler:
         - define merchant <player.flag[merchantRef]>
         - flag <player> merchantRef:!
         - define wealth <context.item.flag[wealth].if_null[normal]>
+        - define spec <[merchant].flag[merchantData.spec]>
+
+        - yaml load:economy_data/worth.yml id:worth
+        - define itemValues <yaml[worth].read[items]>
+        - yaml id:worth unload
+
+        - define averageCategoryPrice <server.flag[economy.itemCategories.<[spec]>.items].parse_tag[<[itemValues].get[<[parse_value]>].get[base]>].highest.mul[0.75].mul[<server.flag[economy.itemCategories.<[spec]>.items].size>]>
+
         ## NOTE: To be used only until I have a dynamic way of generating average wealth values
         ## based on current market values and economic situation of the kingdoms.
         - definemap wealthMatrix:
-            low: 3000
-            normal: 5000
-            high: 8000
-            very_high: 13500
-        - define wealthList <[wealthMatrix].to_pair_lists>
+            low: <[averageCategoryPrice].mul[0.65]>
+            normal: <[averageCategoryPrice]>
+            high: <[averageCategoryPrice].mul[1.35]>
+            very_high: <[averageCategoryPrice].mul[1.55]>
+            stupidly_high: <[averageCategoryPrice].mul[1.8]>
+
+        - define wealthList <[wealthMatrix].values>
         - define wealthIndex <[wealthMatrix].keys.find[<[wealth]>]>
+
         # Selects a random value between the level lower than the merchant's selected wealth level
         # and the level higher. Example if the merchant's wealth level is 'normal' then the true
         # wealth level will be somewhere between 3000 and 8000.
-        - define merchantWealth <util.random.int[<[wealthList].get[<[wealthIndex].sub[1].if_null[0]>].get[2]>].to[<[wealthList].get[<[wealthIndex].add[1]>].get[2].if_null[16000]>]>
+        - define merchantWealth <util.random.int[<[wealthList].get[<[wealthIndex].if_null[0]>].round>].to[<[wealthList].get[<[wealthIndex].add[1]>].round>]>
         - flag <[merchant]> merchantData.wealth:<[merchantWealth]>
         - flag <[merchant]> merchantData.balance:<[merchantWealth]>
 
         # QBias Calculation:
         # q = ((wealth + 1000) ^ 2 / 10000 ^ 2) - 0.01
         - define qBias <element[<[merchantWealth].add[1000]>].power[2].div[<element[10000].power[2]>].sub[0.01]>
-        - define qBias 0.99 if:<[qBias].is[OR_MORE].than[1]>
+        - define qBias 0.9 if:<[qBias].is[OR_MORE].than[1]>
         - flag <[merchant]> merchantData.quantityBias:<[qBias]>
 
-        - narrate format:admincallout "Merchant wealth is: $<[merchantWealth].color[aqua].bold>"
+        - narrate format:admincallout "Merchant wealth is: <aqua><bold>$<[merchantWealth].format_number>"
         - run LoadTempInventory def.player:<player>
 
         - inventory close
