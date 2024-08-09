@@ -144,7 +144,7 @@ TerritoryHandler:
         - define castleCore <[belligerentKingdom].proc[GetClaims]>
 
         - foreach <[castleCore]>:
-            - if <[value].cuboid.contains[<context.entity.location>]>:
+            - if <[value]> == <context.location.chunk>:
                 - determine cancelled
 
         - foreach <[kingdom].proc[GetOutposts].keys>:
@@ -155,29 +155,33 @@ TerritoryHandler:
         - if !<proc[GetAllClaims].contains[<context.location.chunk>]>:
             - stop
 
-        - if !<player.has_flag[kingdom]>:
-            - determine cancelled
-
         - define kingdom <player.flag[kingdom]>
 
-        - if <player.has_permission[kingdoms.admin.bypassrc]>:
+        # - if <player.has_permission[kingdoms.admin.bypassrc]>:
+        #     - stop
+
+        - if <player.proc[IsInOwnDuchy]>:
             - stop
+
+        - if <player.proc[IsInAnyDuchy]>:
+            # TODO: Insert logic for checking if the player has been allowed by the duke to use
+            # TODO/ their land.
+            - determine cancelled
 
         - define castleCore <[kingdom].proc[GetClaims]>
         - define inOwnTerritory false
 
         - foreach <[castleCore]>:
-            - if <[value].cuboid.contains[<context.location>]>:
+            - if <[value]> == <context.location.chunk>:
                 - define inOwnTerritory true
                 - foreach stop
 
         - if !<[inOwnTerritory]>:
-            - determine cancelled
+            - foreach <[kingdom].proc[GetOutposts]> key:outpost:
+                - if <[kingdom].proc[GetOutpostArea].context[<[outpost]>].players.contains[<player>]>:
+                    - stop
 
-        - else:
-            - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
-                - if <cuboid[<[value]>].players.contains[<player>]>:
-                    - determine cancelled
+            - determine cancelled
 
         on player places block:
         - if <player.has_permission[kingdoms.admin.bypassrc]>:
