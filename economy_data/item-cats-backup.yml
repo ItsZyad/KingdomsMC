@@ -3,6 +3,10 @@ redstone:
     - redstone_ore
     - deepslate_redstone_ore
     - redstone
+    - piston
+    - sticky_piston
+    - hopper
+    - observer
     icon: redstone_block
 food:
     icon: apple
@@ -116,6 +120,7 @@ organics:
     - bone
     - bone_meal
     - sweet_berries
+    - slime_ball
 building_blocks:
     icon: bricks
     items:
@@ -324,24 +329,6 @@ tools:
 ores:
     icon: coal
     items:
-    - deepslate_coal_ore
-    - iron_ore
-    - deepslate_iron_ore
-    - copper_ore
-    - deepslate_copper_ore
-    - gold_ore
-    - deepslate_gold_ore
-    - redstone_ore
-    - deepslate_redstone_ore
-    - emerald_ore
-    - deepslate_emerald_ore
-    - lapis_ore
-    - deepslate_lapis_ore
-    - diamond_ore
-    - deepslate_diamond_ore
-    - raw_iron_block
-    - raw_copper_block
-    - raw_gold_block
     - amethyst_block
     - scute
     - coal
