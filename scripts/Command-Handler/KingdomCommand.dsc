@@ -13,7 +13,7 @@
 ## ****       /k and /ks command handlers. All of the subcommand should be found in their respecti-
 ## ****       -ve files under this folder.
 ##
-## @Script Ver: v3.1
+## @Script Ver: v3.2
 ##
 #- Note #1: The coreclaim/castleclaim system is just odd. Perhaps now is time to modernize it and
 #-          implement something like a wand that lets you claim chunks, or some sort of a visual
@@ -66,24 +66,24 @@ Kingdom_Command:
     - define kingdom <player.flag[kingdom]>
     - define args <context.raw_args.split_args.if_null[<list[null]>]>
 
-    - if <[args].size> > 1 && <[args].get[1]> == warp:
-        - if <[args].get[2].is_in[allow|deny]>:
+    - if <[args].size> >= 1 && <[args].get[1]> == warp:
+        - if <[args].get[2].is_in[allow|deny].if_null[false]>:
             - determine <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>
 
-        - else if <[args].get[2].starts_with[kingdom<&co>]>:
+        - else if <[args].get[2].starts_with[kingdom<&co>].if_null[false]> && <server.flag[kingdoms.<[args].get[2].split[<&co>].get[2]>.openWarp].contains[<[kingdom]>]>:
             - define warpList <server.flag[kingdoms.<[kingdom]>.warps].keys>
             - determine <[warpList]>
 
-        - define kingdomRealNames <proc[GetKingdomList].context[false]>
-        - determine <list[set|list|allow|deny].include[<[kingdomRealNames].parse_tag[<list[kingdom:|<[parse_value]>].unseparated>]>]>
+        - define kingdomRealNames <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>
+        - determine <list[set|remove|list|allow|deny].include[<server.flag[kingdoms.<[kingdom]>.warps].keys>].include[<[kingdomRealNames].parse_tag[<list[kingdom:|<[parse_value]>].unseparated>]>]>
 
     - else if <[args].get[1].to_lowercase> == claim:
         - determine <list[core|castle]>
 
     - else if <[args].get[1].to_lowercase> == duchy:
         - if <[args].size> == 1:
-            - define tabCompletes <list[balance|deposit|withdraw|unclaim|tax|outline]>
-            - define kingTabCompletes <list[create|remove|claim|setduke|removeduke|list]>
+            - define tabCompletes <list[balance|deposit|withdraw|unclaim|tax|outline|list]>
+            - define kingTabCompletes <list[create|remove|claim|setduke|removeduke]>
 
             - if <player.proc[IsPlayerKing]> || <player.is_op>:
                 - define tabCompletes <[tabCompletes].include[<[kingTabCompletes]>]>
@@ -202,9 +202,6 @@ Kingdom_Command:
         - define chunk <player.location.chunk>
 
         - if <[action].to_lowercase> == list:
-            - if !<player.proc[IsPlayerKing]> && !<player.is_op>:
-                - stop
-
             - run DuchyListSubcommand def.kingdom:<[kingdom]> def.player:<player>
             - stop
 
@@ -258,7 +255,7 @@ Kingdom_Command:
                     - stop
 
                 - narrate format:callout "Successfully created a duchy with the name: <[duchy].color[aqua]>"
-                - narrate format:callout "<element[But keep in mind!].color[red].bold> You will still need to use <element[/k duchy claim <[duchy]>].color[gray]> to claim the chunk you are standing in for this duchy."
+                - narrate format:callout "<element[But keep in mind!].color[red].bold> You will still need to use <element[/k duchy claim <&dq><[duchy]><&dq>].color[gray]> to claim the chunk you are standing in for this duchy."
 
             - case remove:
                 - if !<player.proc[IsPlayerKing]>:
@@ -564,163 +561,7 @@ Kingdom_Command:
         #------------------------------------------------------------------------------------------
 
         Warp:
-        # If the player has recently engaged in combat with another player then
-        # they will not be allowed to use or set warps
-        - if !<player.has_flag[combatMode]>:
-
-            # If the player specifies any parameter for the command
-            - define param <context.args.get[2].if_null[main]>
-
-            #- narrate format:debug <[param]>
-
-            - if <[param]> == set:
-                #- if <player.has_permission[kingdom.setwarp]> || <player.is_op>:
-
-                # If the player does not specify a specific warp name the game will assume
-                # they are trying to reset their main castle spawn.
-                - define warpName <context.raw_args.split_args.get[3].if_null[main]>
-                - define castle <proc[GetClaims].context[<[kingdom]>|castle].as[list]>
-                - define core <proc[GetClaims].context[<[kingdom]>|core].as[list]>
-                - define castleCore <[core].include[<[castle]>].exclude[0]>
-                - define outpostAreas <proc[GetOutposts].context[<[kingdom]>].values.parse_tag[<[parse_value].get[area]>]>
-                - define inWhichOutpostAreas <[outpostAreas].filter_tag[<[parse_value].contains[<player.location>]>]>
-
-                - if <[warpName]> == main:
-                    - if <[castle].contains[<player.location.chunk>]>:
-
-                        - clickable save:confirm_warp until:1m usages:1:
-                            - flag server kingdoms.<[kingdom]>.warps.main:<player.location.center>
-                            - narrate format:callout "Warp location has been set to: <aqua><player.location.round.xyz>"
-
-                        - clickable save:decline_warp until:1m usages:1:
-                            - narrate format:callout "Cancelled warp creation."
-                            - clickable cancel:<entry[confirm_warp].id>
-
-                        - narrate format:callout "Not specifying a name for the warp will change your main kingdom warp. Are you sure you would like to do this?"
-                        - narrate format:callout "<element[YES].bold.underline.on_click[<entry[confirm_warp].command>]> / <element[NO].bold.underline.on_click[<entry[decline_warp].command>]>"
-
-                    - else:
-                        - narrate format:callout "You must place your kingdom's main warp location inside your castle territory!"
-
-                - else:
-                    - if <[castleCore].contains[<player.location.chunk>]> || <[inWhichOutpostAreas].size> > 0:
-                        - flag server kingdoms.<[kingdom]>.warps.<[warpName]>:<player.location.center>
-
-                    - else:
-                        - narrate format:callout "Regular kingdom warps must be within castle, core, or outpost territory"
-
-                #- else:
-                #    - narrate format:callout "You do not have sufficient power in the kingdom to carry out this command! Ask your king or their second-in-command to carry out this action."
-
-            - else if <[param].starts_with[kingdom<&co>]>:
-                - define chosenKingdomRN <[param].split[<&co>].get[2]>
-                - define warpName <context.args.get[3].if_null[main]>
-                - define kingdomRealNames <proc[GetKingdomList].context[false]>
-                - define chosenKingdomCN <script[KingdomRealNames].data_key[ShortNames].invert.get[<[chosenKingdomRN]>]>
-
-                - if <[chosenKingdomRN]> == <[kingdom].proc[GetKingdomShortName]>:
-                    - narrate format:callout "You do not need to specify the kingdom when teleporting to your own warps."
-                    - determine cancelled
-
-                - if <[chosenKingdomRN].is_in[<[kingdomRealNames]>]>:
-                    - if <server.flag[kingdoms.<[chosenKingdomCN]>.openWarp].contains[<[kingdom]>]>:
-                        - if <server.flag[kingdoms.<[chosenKingdomCN]>.warps.<[warpName]>].exists>:
-                            - define warpLoc <server.flag[kingdoms.<[chosenKingdomCN]>.warps.<[warpName]>]>
-                            - narrate format:callout "Warping in 3 seconds..."
-                            - chunkload add <[warpLoc].chunk> duration:1m
-
-                            - wait 3s
-
-                            - teleport <player> <[warpLoc]>
-
-                        - else:
-                            - narrate format:callout "Unknown warp. Ensure that the chosen kingdom has a warp with this name."
-
-                    - else:
-                        - narrate format:callout "The kingdom specified has not opened its warps to you."
-
-                - else:
-                    - narrate format:callout "Invalid kingdom name."
-
-            - else if <[param]> == list:
-                - if !<server.flag[kingdoms.<[kingdom]>.warps].as[list].get[1].exists>:
-                    - narrate format:callout "Your kingdom doesn't have any warps! Consider setting a private castle warp by standing in the desired warp location and typing <aqua>/k warp set"
-
-                - else:
-                    - foreach <server.flag[kingdoms.<[kingdom]>.warps].to_pair_lists> as:warp:
-                        - narrate "<green>--<&gt> <[warp].get[1].color[aqua].bold><&co> <[warp].get[2].round.simple>"
-
-            - else if <[param]> == deny:
-                - define kingdomCodeName <script[KingdomRealNames].data_key[ShortNames].invert.get[<context.args.get[3]>]>
-                - if <server.flag[kingdoms.<[kingdom]>.openWarp].contains[<[kingdomCodeName]>]>:
-                    - flag server kingdoms.<[kingdom]>.openWarp:<-:<[kingdomCodeName]>
-                    - narrate format:callout "Removed kingdom: <context.args.get[3].color[red].bold> from your warp whitelist!"
-
-                - else:
-                    - narrate format:callout "That kingdom was already not on your kingdom's warp whitelist."
-
-            - else if <[param]> == allow:
-                - define kingdomRealNames <proc[GetKingdomList].context[false]>
-                - define kingdomCodeNames <proc[GetKingdomList]>
-
-                - if !<context.args.get[3].exists>:
-                    - define openWarp <server.flag[kingdoms.<[kingdom]>.openWarp]>
-
-                    - if <[openWarp].size.if_null[0]> == 0:
-                        - narrate format:callout "Your kingdom has its warps closed to all kingdoms"
-
-                    - else:
-                        - narrate format:callout "Kingdoms that can access your warps:<n><server.flag[kingdoms.<[kingdom]>.openWarp].parse_tag[<proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>].separated_by[<n>]>"
-
-                - else if <[kingdomRealNames].contains[<context.args.get[3]>]>:
-                    - define index <[kingdomRealNames].find[<context.args.get[3]>]>
-
-                    - if <[kingdomCodeNames].get[<[index]>]> != <[kingdom]>:
-                        - define codeNameChosenKingdom <[kingdomCodeNames].get[<[index]>]>
-                        - flag server kingdoms.<[kingdom]>.openWarp:->:<[codeNameChosenKingdom]>
-                        - flag server kingdoms.<[kingdom]>.openWarp:<server.flag[kingdoms.<[kingdom]>.openWarp].deduplicate>
-                        - narrate format:callout "Now allowing members of: <context.args.get[3].color[red].bold> to warp to your kingdom."
-
-                    - else:
-                        - narrate format:callout "Please specify a kingdom other than your own"
-
-            - else:
-                - define warpArea <[param]>
-
-                - if !<server.flag[kingdoms.<[kingdom]>.warps.<[param]>]>:
-                    - clickable save:confirm_warp usages:1 until:1m:
-                        - narrate format:callout "Warping in 3 seconds..."
-                        - chunkload add <server.flag[kingdoms.<[kingdom]>.warps.<[warpArea]>].chunk> duration:1m
-
-                        - wait 3s
-
-                        - teleport <player> <server.flag[kingdoms.<[kingdom]>.warps.<[warpArea]>]>
-
-                        - clickable cancel:<entry[decline_warp].id>
-
-                    - clickable save:decline_warp usages:1 until:1m:
-                        - narrate format:callout "Cancelled warp creation."
-                        - clickable cancel:<entry[confirm_warp].id>
-
-                    - define warpArea main
-                    - narrate format:callout "Not specifying a name for the warp will take you to your kingdom's main warp. Do you want to do this?"
-                    - narrate format:callout "<element[YES].bold.underline.on_click[<entry[confirm_warp].command>]> / <element[NO].bold.underline.on_click[<entry[decline_warp].command>]>"
-
-                - else if <server.flag[kingdoms.<[kingdom]>.warps]> != null:
-                    - narrate format:callout "Warping in 3 seconds..."
-                    #- narrate format:debug <[kingdom]>
-                    #- chunkload add <server.flag[kingdoms.<[kingdom]>.warps.main].chunk> duration:1m
-
-                    - wait 3s
-
-                    - teleport <player> <server.flag[kingdoms.<[kingdom]>.warps.main]>
-                    #- narrate format:debug <server.flag[kingdoms.<[kingdom]>.warps]>
-
-                - else:
-                    - narrate format:callout "Your kingdom does not currently have a warp location. You may want to speak to your king about this."
-
-        - else:
-            - narrate format:callout "You may not use warps, you are in <red>combat mode!"
+        - inject KingdomWarp_Subcommand
 
         #------------------------------------------------------------------------------------------
 
@@ -746,10 +587,13 @@ Kingdom_Command:
                             - wait 1s
                             - narrate format:callout "<gray><italic>All war represents a failure of diplomacy. ~ Tony Benn"
 
+                - inventory open d:JustificationKingdom_Window
+
+            - case surrender:
+                - narrate WIP
+
                 # TODO: see if there are any checks that need to be made before the player can
                 # TODO/ justify willy-nilly
-
-                - inventory open d:JustificationKingdom_Window
 
         #------------------------------------------------------------------------------------------
 
@@ -804,3 +648,162 @@ Kingdom_Command:
             - flag <player> guardListPage:1
             - flag <player> kingdomGuardItems:<[paginatedGuardList]>
             - inventory open d:KingdomGuardList_Window
+
+
+KingdomWarp_Subcommand:
+    type: task
+    script:
+        # If the player has recently engaged in combat with another player then
+        # they will not be allowed to use or set warps
+        - if <player.has_flag[combatMode]>:
+            - narrate format:callout "You may not use warps, you are in <red>combat mode!"
+
+        # If the player specifies any parameter for the command
+        - define param <context.args.get[2].if_null[main]>
+        - define validParams <list[set|remove|kingdom<&co>|list|allow|deny]>
+
+        - if <[param]> == set:
+            # If the player does not specify a specific warp name the game will assume
+            # they are trying to reset their main castle spawn.
+            - define warpName <context.raw_args.split_args.get[3].if_null[main]>
+
+            - if <[warpName].is_in[<[validParams]>]>:
+                - narrate format:callout "<[warpName].color[red]> is a reserved word and cannot be used to name a warp. Try another name."
+                - stop
+
+            - define castle <proc[GetClaims].context[<[kingdom]>|castle].as[list]>
+            - define core <proc[GetClaims].context[<[kingdom]>|core].as[list]>
+            - define castleCore <[core].include[<[castle]>].exclude[0]>
+            - define outpostAreas <[kingdom].proc[GetOutposts].values.parse_tag[<[parse_value].get[area]>]>
+            - define inWhichOutpostAreas <[outpostAreas].filter_tag[<[parse_value].contains[<player.location>]>]>
+
+            - if <[warpName]> != main:
+                - if <[castleCore].contains[<player.location.chunk>]> || <[inWhichOutpostAreas].size> > 0:
+                    - flag server kingdoms.<[kingdom]>.warps.<[warpName]>:<player.location.center>
+
+                - else:
+                    - narrate format:callout "Regular kingdom warps must be within castle, core, or outpost territory"
+
+                - stop
+
+            - if !<[castle].contains[<player.location.chunk>]>:
+                - narrate format:callout "You must place your kingdom's main warp location inside your castle territory!"
+                - stop
+
+            - clickable save:confirm_warp until:1m usages:1:
+                - flag server kingdoms.<[kingdom]>.warps.main:<player.location.center>
+                - narrate format:callout "Warp location has been set to: <aqua><player.location.round.xyz>"
+
+            - clickable save:decline_warp until:1m usages:1:
+                - narrate format:callout "Cancelled warp creation."
+                - clickable cancel:<entry[confirm_warp].id>
+
+            - narrate format:callout "Not specifying a name for the warp will change your main kingdom warp. Are you sure you would like to do this?"
+            - narrate format:callout "<element[YES].bold.underline.on_click[<entry[confirm_warp].command>]> / <element[NO].bold.underline.on_click[<entry[decline_warp].command>]>"
+
+        - else if <[param]> == remove:
+            - if <context.raw_args.split_args.size> < 3:
+                - narrate format:callout "You must provide a name for the warp you wish to remove."
+                - stop
+
+            - define warpName <context.raw_args.split_args.get[3]>
+
+            - if !<server.has_flag[kingdoms.<[kingdom]>.warps.<[warpName]>]>:
+                - narrate format:callout "Your kingdom does not seem to have a warp by that name."
+                - stop
+
+            - flag server kingdoms.<[kingdom]>.warps.<[warpName]>:!
+            - narrate format:callout "Removed warp with the name: <[warpName].color[aqua]>"
+
+        - else if <[param].starts_with[kingdom<&co>]>:
+            - define chosenKingdomRN <[param].split[<&co>].get[2]>
+            - define warpName <context.args.get[3].if_null[main]>
+            - define kingdomRealNames <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>
+            - define chosenKingdomCN <script[KingdomRealNames].data_key[ShortNames].invert.get[<[chosenKingdomRN]>]>
+
+            - if <[chosenKingdomRN]> == <[kingdom].proc[GetKingdomShortName]>:
+                - narrate format:callout "You do not need to specify the kingdom when teleporting to your own warps."
+                - determine cancelled
+
+            - if !<[chosenKingdomRN].is_in[<[kingdomRealNames]>]>:
+                - narrate format:callout "Invalid kingdom name."
+                - stop
+
+            - if !<server.flag[kingdoms.<[chosenKingdomCN]>.openWarp].contains[<[kingdom]>]>:
+                - narrate format:callout "The kingdom specified has not opened its warps to you."
+                - stop
+
+            - if !<server.flag[kingdoms.<[chosenKingdomCN]>.warps.<[warpName]>].exists>:
+                - narrate format:callout "Unknown warp. Ensure that the chosen kingdom has a warp with this name."
+                - stop
+
+            - define warpLoc <server.flag[kingdoms.<[chosenKingdomCN]>.warps.<[warpName]>]>
+            - narrate format:callout "Warping in 3 seconds..."
+            - chunkload add <[warpLoc].chunk> duration:1m
+
+            - wait 3s
+
+            - teleport <player> <[warpLoc]>
+
+        - else if <[param]> == list:
+            - if !<server.flag[kingdoms.<[kingdom]>.warps].as[list].get[1].exists>:
+                - narrate format:callout "Your kingdom doesn't have any warps! Consider setting a private castle warp by standing in the desired warp location and typing <aqua>/k warp set"
+                - stop
+
+            - foreach <server.flag[kingdoms.<[kingdom]>.warps].to_pair_lists> as:warp:
+                - narrate "<green>--<&gt> <[warp].get[1].color[aqua].bold><&co> <[warp].get[2].round.simple>"
+
+        - else if <[param]> == deny:
+            - define kingdomCodeName <script[KingdomRealNames].data_key[ShortNames].invert.get[<context.args.get[3]>]>
+
+            - if !<server.flag[kingdoms.<[kingdom]>.openWarp].contains[<[kingdomCodeName]>]>:
+                - narrate format:callout "That kingdom was already not on your kingdom's warp whitelist."
+                - stop
+
+            - flag server kingdoms.<[kingdom]>.openWarp:<-:<[kingdomCodeName]>
+            - narrate format:callout "Removed kingdom: <context.args.get[3].color[red].bold> from your warp whitelist!"
+
+        - else if <[param]> == allow:
+            - define kingdomRealNames <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>
+            - define kingdomCodeNames <proc[GetKingdomList]>
+
+            - if !<context.args.get[3].exists>:
+                - define openWarp <server.flag[kingdoms.<[kingdom]>.openWarp]>
+
+                - if <[openWarp].size.if_null[0]> == 0:
+                    - narrate format:callout "Your kingdom has its warps closed to all kingdoms"
+
+                - else:
+                    - narrate format:callout "Kingdoms that can access your warps:<n><server.flag[kingdoms.<[kingdom]>.openWarp].parse_tag[<proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>].separated_by[<n>]>"
+
+            - else if <[kingdomRealNames].contains[<context.args.get[3]>]>:
+                - define index <[kingdomRealNames].find[<context.args.get[3]>]>
+
+                - if <[kingdomCodeNames].get[<[index]>]> != <[kingdom]>:
+                    - define codeNameChosenKingdom <[kingdomCodeNames].get[<[index]>]>
+                    - flag server kingdoms.<[kingdom]>.openWarp:->:<[codeNameChosenKingdom]>
+                    - flag server kingdoms.<[kingdom]>.openWarp:<server.flag[kingdoms.<[kingdom]>.openWarp].deduplicate>
+                    - narrate format:callout "Now allowing members of: <context.args.get[3].color[red].bold> to warp to your kingdom."
+
+                - else:
+                    - narrate format:callout "Please specify a kingdom other than your own"
+
+        - else:
+            - if <server.has_flag[kingdoms.<[kingdom]>.warps.<[param]>]>:
+                - narrate format:callout "Warping in 3 seconds..."
+                - chunkload add <server.flag[kingdoms.<[kingdom]>.warps.<[param]>].chunk> duration:1m
+
+                - wait 3s
+
+                - teleport <player> <server.flag[kingdoms.<[kingdom]>.warps.<[param]>]>
+
+            - else if <server.has_flag[kingdoms.<[kingdom]>.warps]>:
+                - narrate format:callout "Warping in 3 seconds..."
+                - chunkload add <server.flag[kingdoms.<[kingdom]>.warps.main].chunk> duration:1m
+
+                - wait 3s
+
+                - teleport <player> <server.flag[kingdoms.<[kingdom]>.warps.main]>
+
+            - else:
+                - narrate format:callout "Your kingdom does not currently have a warp location. You may want to speak to your king about this."
