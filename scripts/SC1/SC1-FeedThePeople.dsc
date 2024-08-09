@@ -92,7 +92,7 @@ SC1_Food_Handler:
 
                 - run AffectOfflinePlayers def.playerList:<[kingdom].proc[GetMembers]> def.scriptName:SC1_EndConditionMessage def.otherDefs:<map[loseCause=food]>
 
-        - if <[worldDay].mod[30]> == 0:
+        - if <[worldDay].mod[90]> == 0:
             - run SC1_PopulationGrowthTick
             - run SC1_FoodTick
 
@@ -153,7 +153,12 @@ SC1_FoodTick:
         - stop
 
     - foreach <proc[GetKingdomList]> as:kingdom:
-        - define foodConsumption <[kingdom].proc[SC1_FoodFullfillmentGetter]>
+        - define foodConsumption <[kingdom].proc[GetKingdomFoodConsumption]>
+
+        - if !<[foodConsumption].is_truthy>:
+            - run SetKingdomFoodReserves def.kingdom:<[kingdom]> def.amount:<[kingdom].proc[SC1_FoodFullfillmentGetter]>
+            - define foodConsumption <[kingdom].proc[GetKingdomFoodConsumption]>
+
         - define currFood <[kingdom].proc[GetKingdomFoodReserves]>
 
         - run SetKingdomFoodReserves def.kingdom:<[kingdom]> def.amount:<[currFood].sub[<[foodConsumption]>]>
@@ -165,6 +170,9 @@ SC1_FoodTick:
 
             - define offlineMembers <[kingdom].proc[GetMembers].exclude[<server.online_players>]>
             - flag server datahold.scenario-1.playersNotSeenFoodMsg.<[kingdom]>:<[offlineMembers]> if:<[offlineMembers].is_empty.not>
+
+        - else:
+            - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.starvingMonths:0
 
 
 SC1_NextFoodTickCalculator:
@@ -206,8 +214,8 @@ SC1_FoodFullfillmentGetter:
             - define civilianPopulation:-:<[manpower]>
 
     # Civilian food consumption.
-    - define foodConsumption <[civilianPopulation].mul[5].mul[<util.random.decimal[0.94].to[1.06]>]>
-    - define foodConsumption <[foodConsumption].add[<[population].sub[<[civilianPopulation]>].mul[7]>]>
+    - define foodConsumption <[civilianPopulation].mul[1.5].mul[<util.random.decimal[0.94].to[1.06]>]>
+    - define foodConsumption <[foodConsumption].add[<[population].sub[<[civilianPopulation]>].mul[5]>]>
 
     - determine <[foodConsumption]>
 
@@ -315,6 +323,9 @@ SC1_FoodManager_Handler:
         - define world <player.location.world>
         - define kingdom <player.flag[kingdom]>
 
+        - if !<[kingdom].proc[GetKingdomFoodConsumption].is_truthy>:
+            - run SetKingdomFoodConsumption def.kingdom:<[kingdom]> def.amount:<[kingdom].proc[SC1_FoodFullfillmentGetter]>
+
         - define foodInfoItemSlot <context.inventory.find_item[SC1_FoodManagerInfo_Item]>
         - define nextTickItemSlot <context.inventory.find_item[SC1_NextFoodTick_Item]>
         - define foodFullfillmentSlot <context.inventory.find_item[SC1_FoodReserves_Item]>
@@ -322,7 +333,7 @@ SC1_FoodManager_Handler:
 
         - inventory adjust slot:<[foodInfoItemSlot]> d:<context.inventory> lore:<[kingdom].proc[GetKingdomShortName]>
         - inventory adjust slot:<[nextTickItemSlot]> d:<context.inventory> lore:<white><element[Progress to next food tick:]>|<proc[SC1_NextFoodTickCalculator].context[<[world]>]>
-        - inventory adjust slot:<[foodFullfillmentSlot]> d:<context.inventory> lore:<element[Current food fullfillment:]>|<element[<[kingdom].proc[GetKingdomFoodReserves].round.format_number.color[aqua]> / <[kingdom].proc[SC1_FoodFullfillmentGetter].round.format_number.color[blue]>]>
+        - inventory adjust slot:<[foodFullfillmentSlot]> d:<context.inventory> lore:<element[Current food fullfillment:]>|<element[<[kingdom].proc[GetKingdomFoodReserves].round.format_number.color[aqua]> / <[kingdom].proc[GetKingdomFoodConsumption].round.format_number.color[blue]>]>
         - inventory adjust slot:<[currentPopItemSlot]> d:<context.inventory> lore:<element[<[kingdom].proc[GetKingdomPopulation].format_number.color[aqua]> citizens]>
 
         on player clicks SC1_AddFood_Item in SC1_FoodManager_Window:
