@@ -71,7 +71,7 @@ OpenFyndalinTradeWindowCategory:
 
     - foreach <[tradeMap].get[<[category]>]> as:itemData key:itemName:
         - define item <item[<[itemName]>]>
-        - define amount <[itemData].get[amount].mul[<[tradeEfficiency]>].round>
+        - define amount <[itemData].get[amount].mul[<element[1].sub[<[tradeEfficiency]>].round>]>
         - define price <[itemData].get[price].mul[<element[1].sub[<[tradeEfficiency]>].abs>]>
 
         - definemap lore:
@@ -86,7 +86,7 @@ OpenFyndalinTradeWindowCategory:
         - define itemList:->:<[item]>
 
     - flag server datahold.scenario-1.fyndalinTrade.playersViewing.<[category]>:->:<[player]>
-    - run PaginatedInterface def.itemList:<[itemList]> def.player:<[player]> def.page:1 def.title:<element[Trade With Fyndalin]>
+    - run PaginatedInterface def.itemList:<[itemList]> def.player:<[player]> def.page:1 def.title:<element[Trade With Fyndalin]> def.flag:fyndalinTrade
 
 
 FyndalinTrade_Handler:
@@ -113,7 +113,7 @@ FyndalinTrade_Handler:
 
         - define tradeEfficiency <player.flag[kingdom].proc[GetKingdomTradeEfficiency]>
         - define category <player.flag[datahold.scenario-1.fyndalinTrade.category]>
-        - define amount <server.flag[kingdoms.scenario-1.trade.itemMap.<[category]>.<context.item.material.name>.amount].mul[<[tradeEfficiency]>].round>
+        - define amount <server.flag[kingdoms.scenario-1.trade.itemMap.<[category]>.<context.item.material.name>.amount].mul[<element[1].sub[<[tradeEfficiency]>]>].round>
         - define price <server.flag[kingdoms.scenario-1.trade.itemMap.<[category]>.<context.item.material.name>.price].mul[<element[1].sub[<[tradeEfficiency]>].abs>]>
 
         # If player shift clicks, buy 10 of the item instead of just 1
@@ -155,7 +155,7 @@ FyndalinTrade_Handler:
         - else:
             - narrate format:callout "There is not enough of this item to buy."
 
-        on custom event id:PaginatedInvClose:
+        on custom event id:PaginatedInvClose flagged:fyndalinTrade:
         - define category <player.flag[datahold.scenario-1.fyndalinTrade.category]>
         - flag server datahold.scenario-1.fyndalinTrade.playersViewing.<[category]>:<-:<player>
 
