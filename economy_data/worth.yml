@@ -1888,17 +1888,17 @@ items:
     amountMod: '1'
     govCap: '150'
   piston:
-    base: '30.35'
+    base: '70'
     supplyProb: '0.65'
     amountMod: '1'
     govCap: '370'
   sticky_piston:
-    base: '40.94'
+    base: '95'
     supplyProb: '0.62'
     amountMod: '1'
     govCap: '400'
   slime_block:
-    base: '91.08'
+    base: '4100'
     supplyProb: '0.45'
     amountMod: '0.5'
     govCap: '6500'
@@ -1906,7 +1906,7 @@ items:
     base: '16.49'
     supplyProb: '0.46'
   observer:
-    base: '29.85'
+    base: '275.5'
     supplyProb: '0.49'
     amountMod: '1'
     govCap: '950'
@@ -2694,7 +2694,7 @@ items:
     amountMod: '1'
     govCap: '63'
   slime_ball:
-    base: '11'
+    base: '450'
     supplyProb: '0.11'
     amountMod: '1'
     govCap: '70'
