@@ -81,7 +81,7 @@ KingdomGuardList_Handler:
 
         - if <[kingdomBalance]> >= <[respawnCost]>:
             - flag server kingdoms.<[kingdom]>.balance:-:<[respawnCost]>
-            - ~run SidebarLoader def:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+            - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
             - narrate format:callout "Respawned castle guard at their previously defined anchor position!"
 
         - else:
