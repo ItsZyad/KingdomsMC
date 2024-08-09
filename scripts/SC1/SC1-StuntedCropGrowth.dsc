@@ -30,7 +30,7 @@ SC1_FlagCheck_Handler:
     type: world
     events:
         on player joins:
-        - if !<player.flag[kingdom].is_in[jalerad|talpenhern]> && !<player.is_op>:
+        - if !<player.flag[kingdom].if_null[null].is_in[jalerad|talpenhern]> && !<player.is_op>:
             - run AddMember def.kingdom:jalerad def.member:<player>
             - ~run SidebarLoader def.target:<player>
 
