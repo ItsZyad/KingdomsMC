@@ -196,12 +196,12 @@ MinerItemGenerator:
 
         - give <[item]> to:<[npc].inventory> quantity:<[amount]>
 
-        - flag <[npc]> Level:+:<script[MineExperienceGain].data_key[XP.<[item]>].mul[<[amount].div[350].round_to_precision[0.01]>]>
-
         - if <[npc].flag[Level].round> >= 100:
             - foreach next
 
         - define prevBaseLevel <[npc].flag[Level].round_down>
+
+        - flag <[npc]> Level:+:<script[MineExperienceGain].data_key[XP.<[item]>].mul[<[amount].div[350].round_to_precision[0.01]>]>
 
         - if <[npc].flag[Level].round_down> == <[prevBaseLevel]>:
             - foreach next
