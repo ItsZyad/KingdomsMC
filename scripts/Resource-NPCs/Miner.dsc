@@ -224,7 +224,7 @@ MinerItemGenerator:
                 octaveScale: 1.11
             obsidian:
                 octaveAmp: 2.3
-                octaveScale: 1.5
+                octaveScale: 1.09
             andesite:
                 octaveAmp: 0.97
                 octaveScale: 1.05
