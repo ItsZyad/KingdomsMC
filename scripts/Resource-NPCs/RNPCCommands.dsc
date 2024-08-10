@@ -352,7 +352,7 @@ CurrentLevel_Item:
     lore:
     - "<&r><dark_purple>Lvl :: <player.flag[currNPC].flag[Level].round_down>"
     - ""
-    - "<white>Output Bonus: <blue><npc.flag[outputMod].mul[100].round><&pc>"
+    - "<white>Output Bonus: <blue><player.flag[currNPC].flag[outputMod].mul[100].round_to_precision[0.01]><&pc>"
 
 
 ShowRNPCAOE_Item:
