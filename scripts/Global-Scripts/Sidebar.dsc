@@ -104,6 +104,12 @@ SidebarLine_Data:
             title: <element[<blue><bold>   Scenario 1   ]>
             lines:
             - <proc[SC1_GenerateTradeEffSidebarLine].context[<[kingdom]>]>
+            - <element[<&sp>]>
+            - <element[Alliance Influences<&co>].bold.color[aqua]>
+            - <element[AT-Rumek<&co> ]><server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.Alliance-Town-1].if_null[0].mul[100].round_to_precision[0.01]><&pc>
+            - <element[AT-Kandon<&co> ]><server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.Alliance-Town-2].if_null[0].mul[100].round_to_precision[0.01]><&pc>
+            - <element[AT-Rugoss<&co> ]><server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.Alliance-Town-3].if_null[0].mul[100].round_to_precision[0.01]><&pc>
+            - <element[AT-Bremlek<&co> ]><server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.Alliance-Town-4].if_null[0].mul[100].round_to_precision[0.01]><&pc>
 
 
 SidebarLoader:

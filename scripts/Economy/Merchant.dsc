@@ -85,6 +85,16 @@ RunMerchantInterface:
         - flag <[item]> quantity:<[quantity]>
         - flag <[item]> price:<[price]>
 
+        - define kingdom <player.flag[kingdom]>
+        - define marketName <[merchant].flag[merchantData.linkedMarket]>
+
+        - if <server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>].if_null[0]> > 0:
+            - define influenceAmountMod <element[1].sub[<server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>].mul[0.45]>]>
+            - flag <[item]> price:<[price].mul[<[influenceAmountMod]>]>
+
+            - adjust def:item lore:<element[<element[Price: ].bold><element[$<[price].format_number[#,##0.00].if_null[null]>]>].strikethrough.color[red]>|<element[Price: ].bold><element[$<[price].mul[<[influenceAmountMod]>].format_number[#,##0.00].if_null[null]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>|<element[Price modified due to influence.].color[gray].italicize>
+
+        - else:
         - adjust def:item lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00].if_null[null]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>
 
         - if <[lastWeekAvg].is_decimal>:
@@ -121,10 +131,18 @@ KMerchantWindow_Handler:
                     - define price <[value].get[price]>
                     - flag <[item]> price:<[price]>
 
+                    - define marketName <[merchant].flag[merchantData.linkedMarket]>
+
+                    - if <server.flag[kingdoms.scenario-1.kingdomList.<player.flag[kingdom]>.influence.markets.<[marketName]>].if_null[0]> > 0:
+                        - define influenceAmountMod <element[1].add[<server.flag[kingdoms.scenario-1.kingdomList.<player.flag[kingdom]>.influence.markets.<[marketName]>].mul[0.35]>]>
+                        - flag <[item]> price:<[price].mul[<[influenceAmountMod]>]>
+                        - adjust def:item lore:<element[<element[Going Price: ].bold><element[$<[price].format_number[#,##0.00]>]>].strikethrough.color[red]>|<element[Going Price: ].bold><element[$<[price].mul[<[influenceAmountMod]>].format_number[#,##0.00]>].color[red]>
+
+                    - else:
                     - adjust def:item lore:<element[Going Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>
 
-                    - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
-                        - adjust def:item lore:<[item].lore.include[<&sp>|<italic><element[Alloc: ].color[white]><[value].get[alloc].color[aqua]>|<element[Spent: ].color[white]><[value].get[spent].color[aqua]>]>
+                    # - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
+                    - adjust def:item lore:<[item].lore.include[<&sp>|<italic><element[Alloc: ].color[white]><[value].get[alloc].format_number.color[aqua]>|<element[Spent: ].color[white]><[value].get[spent].format_number.color[aqua]>]>
 
                     # - inventory adjust d:<[target].open_inventory> slot:<context.slot> "lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>" player:<[target]>
 
@@ -161,6 +179,7 @@ KMerchantWindow_Handler:
             - determine cancelled
 
         - define merchant <player.flag[dataHold.interactingMerchant]>
+        - define marketName <[merchant].flag[merchantData.linkedMarket]>
         - define quantity <[merchant].flag[merchantData.supply.<context.item.material.name>.quantity]>
         - define price <context.item.flag[price]>
         - define market <[merchant].flag[merchantData.linkedMarket]>
@@ -202,6 +221,12 @@ KMerchantWindow_Handler:
 
                     - narrate format:callout "Bought <[purchaseAmount].color[aqua]> of <[selectedItem].material.name.color[white].italicize> for: <red>$<[price].mul[<[purchaseAmount]>].format_number[#,##0.0]>"
                     - run TransactionRecorder def.price:<[price]> def.item:<context.item.material.name> def.amount:<[purchaseAmount]> def.merchant:<[merchant]> def.player:<player> def.market:<[market]>
+
+                    - if <server.has_flag[kingdoms.scenario-1.kingdomList.<player.flag[kingdom]>.influence.promises.<[marketName]>]>:
+                        - flag server kingdoms.scenario-1.kingdomList.<player.flag[kingdom]>.influence.tradeVolume.<[marketName]>:+:<[price].mul[<[purchaseAmount]>]>
+
+                        - if <server.flag[kingdoms.scenario-1.kingdomList.<player.flag[kingdom]>.influence.tradeVolume.<[marketName]>]> >= <server.flag[kingdoms.scenario-1.kingdomList.<player.flag[kingdom]>.influence.promises.<[marketName]>.amount]>:
+                            - run SC1_FinishTradePromise def.kingdom:<player.flag[kingdom]> def.marketName:<[marketName]>
 
                 - else:
                     # Clicking outside the window returns -998 for some reason
