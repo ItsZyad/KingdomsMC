@@ -20,15 +20,6 @@ SC1_AllianceTownInfluence_Command:
         - inventory open d:SC1_AllianceTownInfluence_Interface
 
 
-SC1_AllianceTownNames:
-    type: data
-    Names:
-        Alliance-Town-1: Rumek
-        Alliance-Town-2: Kandon
-        Alliance-Town-3: Rugoss
-        Alliance-Town-4: Bremlek
-
-
 SC1_AllianceTownInfluence_Interface:
     type: inventory
     inventory: chest

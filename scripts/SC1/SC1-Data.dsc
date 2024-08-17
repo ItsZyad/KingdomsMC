@@ -123,3 +123,12 @@ TradableItems_Data:
                     salmon: 150
                     brown_mushroom: 300
                     red_mushroom: 200
+
+
+SC1_AllianceTownNames:
+    type: data
+    Names:
+        Alliance-Town-1: Rumek
+        Alliance-Town-2: Kandon
+        Alliance-Town-3: Rugoss
+        Alliance-Town-4: Bremlek
