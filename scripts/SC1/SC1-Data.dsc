@@ -132,3 +132,52 @@ SC1_AllianceTownNames:
         Alliance-Town-2: Kandon
         Alliance-Town-3: Rugoss
         Alliance-Town-4: Bremlek
+
+
+SC1_WeaponData:
+    type: data
+    Amounts:
+        stone_sword: 50
+        stone_axe: 35
+        iron_sword: 20
+        iron_axe: 15
+        diamond_sword: 5
+        diamond_axe: 3
+        bow: 20
+        crossbow: 15
+        arrow: 100
+        iron_helmet: 7
+        iron_chestplate: 7
+        iron_leggings: 7
+        iron_boots: 7
+        golden_helmet: 5
+        golden_chestplate: 5
+        golden_leggings: 5
+        golden_boots: 5
+        diamond_helmet: 3
+        diamond_chestplate: 3
+        diamond_leggings: 3
+        diamond_boots: 3
+
+    Rewards:
+        stone_sword: 0.002
+        stone_axe: 0.001
+        iron_sword: 0.005
+        iron_axe: 0.004
+        diamond_sword: 0.009
+        diamond_axe: 0.008
+        bow: 0.003
+        crossbow: 0.004
+        arrow: 0.001
+        iron_helmet: 0.005
+        iron_chestplate: 0.008
+        iron_leggings: 0.007
+        iron_boots: 0.004
+        golden_helmet: 0.008
+        golden_chestplate: 0.011
+        golden_leggings: 0.01
+        golden_boots: 0.007
+        diamond_helmet: 0.01
+        diamond_chestplate: 0.013
+        diamond_leggings: 0.009
+        diamond_boots: 0.007
