@@ -64,7 +64,7 @@ SC1_Bribe_Handler:
             - flag server kingdoms.<[value]>.scenario-1.influence.markets.<[marketName]>:-:<[bribeInfluence].div[4]>
             - flag server kingdoms.<[value]>.scenario-1.influence.markets.<[marketName]>:0 if:<server.flag[kingdoms.<[value]>.scenario-1.influence.markets.<[marketName]>].is[LESS].than[0]>
 
-        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+        - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         - flag <player> noChat.scenario-1.influence.bribe:!
         - flag <player> datahold.scenario-1.influence:!

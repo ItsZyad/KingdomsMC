@@ -103,7 +103,7 @@ SC1_FinishTradePromise:
         - run SC1_CancelTradePromise def.kingdom:<[kingdom]> def.marketName:<[marketName]>
 
         - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.tradeVolume.<[marketName]>:!
-        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+        - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
         - stop
 
     - define promiseInfluence <element[10000].div[<element[<[promiseAmount].add[26000]>]>].proc[Invert].add[<element[10000].div[26000]>]>
@@ -118,7 +118,7 @@ SC1_FinishTradePromise:
         - flag server kingdoms.<[value]>.scenario-1.influence.markets.<[marketName]>:0 if:<server.flag[kingdoms.<[value]>.scenario-1.influence.markets.<[marketName]>].is[LESS].than[0]>
 
     - adjust system cancel_runlater:<[kingdom]>_<script[SC1_AllianceTownNames].data_key[Names.<[marketName]>]>
-    - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
 
 SC1_InformPlayerOfFailedPromise:
@@ -152,7 +152,7 @@ SC1_CancelTradePromise:
     - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.tradeVolume.<[marketName]>:!
 
     - adjust system cancel_runlater:<[kingdom]>_<script[SC1_AllianceTownNames].data_key[Names.<[marketName]>]>
-    - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
 
 SC1_PromiseTracker_Command:
