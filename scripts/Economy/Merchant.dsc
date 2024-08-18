@@ -38,15 +38,7 @@ KMerchant_Assignment:
 
         - flag <player> dataHold.interactingMerchant:<npc>
         - flag <npc> dataHold.interactingPlayers:->:<player>
-
-        - if <npc.has_flag[cachedInterface]>:
-            - define interactingPlayers <npc.flag[dataHold.interactingPlayers]>
-            - define itemList <npc.flag[cachedInterface]>
-            - define title "Buy Menu"
-            - inject RunMerchantInterface path:OpenInterface
-
-        - else:
-            - run RunMerchantInterface def.merchant:<npc> def.player:<player>
+        - run RunMerchantInterface def.merchant:<npc> def.player:<player>
 
         - flag <player> dataHold.merchantMode:buy
 
@@ -95,7 +87,7 @@ RunMerchantInterface:
             - adjust def:item lore:<element[<element[Price: ].bold><element[$<[price].format_number[#,##0.00].if_null[null]>]>].strikethrough.color[red]>|<element[Price: ].bold><element[$<[price].mul[<[influenceAmountMod]>].format_number[#,##0.00].if_null[null]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>|<element[Price modified due to influence.].color[gray].italicize>
 
         - else:
-        - adjust def:item lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00].if_null[null]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>
+            - adjust def:item lore:<element[Price: ].bold><element[$<[price].format_number[#,##0.00].if_null[null]>].color[red]>|<element[Quantity: ].bold><[quantity].color[green]>
 
         - if <[lastWeekAvg].is_decimal>:
             - define percentageDiff <element[<[price].sub[<[lastWeekAvg]>]>].div[<[lastWeekAvg]>].round_to_precision[0.01].mul[100]>
@@ -139,7 +131,7 @@ KMerchantWindow_Handler:
                         - adjust def:item lore:<element[<element[Going Price: ].bold><element[$<[price].format_number[#,##0.00]>]>].strikethrough.color[red]>|<element[Going Price: ].bold><element[$<[price].mul[<[influenceAmountMod]>].format_number[#,##0.00]>].color[red]>
 
                     - else:
-                    - adjust def:item lore:<element[Going Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>
+                        - adjust def:item lore:<element[Going Price: ].bold><element[$<[price].format_number[#,##0.00]>].color[red]>
 
                     # - if <player.is_op> || <player.has_permission[kingdoms.admin]>:
                     - adjust def:item lore:<[item].lore.include[<&sp>|<italic><element[Alloc: ].color[white]><[value].get[alloc].format_number.color[aqua]>|<element[Spent: ].color[white]><[value].get[spent].format_number.color[aqua]>]>
@@ -162,14 +154,7 @@ KMerchantWindow_Handler:
 
         # SWITCHING BACK TO BUY MODE
         - else:
-            - if <[merchant].has_flag[cachedInterface]>:
-                - define title "Buy Menu"
-                - define itemList <[merchant].flag[cachedInterface]>
-                - inject RunMerchantInterface path:OpenInterface
-
-            - else:
-                - run RunMerchantInterface def.merchant:<[merchant]> def.player:<player>
-
+            - run RunMerchantInterface def.merchant:<[merchant]> def.player:<player>
             - flag <player> dataHold.merchantMode:buy
 
         on player clicks in PaginatedInterface_Window flagged:dataHold.interactingMerchant priority:1:
@@ -296,9 +281,6 @@ KMerchantWindow_Handler:
         - if <player.open_inventory> == <player.inventory>:
             - define inventoryContents <context.inventory.list_contents>
             - define merchant <player.flag[dataHold.interactingMerchant]>
-
-            - if <player.flag[dataHold.merchantMode]> == buy:
-                - flag <[merchant]> cachedInterface:<[inventoryContents].get[1].to[<[inventoryContents].size.sub[9]>]>
 
             - flag <[merchant]> dataHold.interactingPlayers:<-:<player>
             - flag <player> dataHold.merchantMode:!
