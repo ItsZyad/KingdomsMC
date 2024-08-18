@@ -250,7 +250,7 @@ SquadManager_Handler:
                 - define withinOutpost false
                 - foreach stop
 
-        - if <[barracksArea].is_within[<[coreClaimsCuboid]>]> || <[withinOutpost]> || <player.is_op>:
+        - if <[barracksArea].is_within[<[coreClaimsCuboid]>]> || <[withinOutpost]> || <player.proc[IsInOwnDuchy]> || <player.is_op>:
             - flag <context.location> squadManager:<[squadManagerData]>
 
             # Running Recalc. task without path generates the barracks area and adds to the main
