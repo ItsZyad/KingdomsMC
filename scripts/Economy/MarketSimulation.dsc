@@ -186,7 +186,7 @@ MerchantPurchaseDecider:
 
     - define biasControlledItems <[beforeThresholdItems].include[<[afterThresholdItems]>]>
     - define originalBalance <[merchant].flag[merchantData.balance]>
-    - define originalSpendableBalance <[balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
+    - define originalSpendableBalance <[balance].mul[<util.random.decimal[<[sBias]>].to[1]>].mul[0.5]>
 
     # Duplicate items as per the chosen strategy's iterations value
     - repeat <[strategyLoopIter].sub[1]>:
@@ -366,12 +366,14 @@ MerchantSellDecider:
     - define sellAnalyses <[pastData].parse_value_tag[<[parse_value].deep_get[<[marketName]>.items.sellAnalysis]>].if_null[null]>
 
     - if !<server.has_flag[economy.markets.<[marketName]>.sellData]> || <[sellAnalyses]> == null:
+        - define average <[merchant].flag[merchantData.supply].parse_value_tag[<[parse_value].get[price]>].values.average>
+
         - foreach <[merchant].flag[merchantData.supply]> key:item as:itemData:
             - define buyPrice <[itemData].get[price]>
             - define sellPrice <[buyPrice].mul[<element[1].sub[<[sBias].div[3]>]>].round_up_to_precision[0.05]>
             - define supplyRatio <[itemData].get[quantity].div[<[totalSupply]>]>
 
-            - flag <[merchant]> merchantData.sellData.items.<[item]>.alloc:<[merchant].flag[merchantData.balance].mul[<[supplyRatio]>].round>
+            - flag <[merchant]> merchantData.sellData.items.<[item]>.alloc:<[merchant].flag[merchantData.balance].mul[<[supplyRatio]>].mul[<[sellPrice].div[<[average]>]>].round_up>
             - flag <[merchant]> merchantData.sellData.items.<[item]>.spent:0
             - flag <[merchant]> merchantData.sellData.items.<[item]>.price:<[sellPrice]>
 
@@ -387,7 +389,8 @@ MerchantSellDecider:
         - inject <script.name> path:AnalyzeTrends
 
     AnalyzeTrends:
-    - define spendableBalance <[merchant].flag[merchantData.balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
+    # - define spendableBalance <[merchant].flag[merchantData.balance].mul[<util.random.decimal[<[sBias]>].to[1]>]>
+    - define spendableBalance <[merchant].flag[merchantData.balance]>
     - define sellEffectors <map[]>
     - define allocations <map[]>
 
@@ -416,6 +419,8 @@ MerchantSellDecider:
         - flag <[merchant]> merchantData.sellData.items.<[item]>.spent:0
         - flag <[merchant]> merchantData.sellData.items.<[item]>.price:<[sellPrice]>
 
+    - define average <[merchant].flag[merchantData.supply].parse_value_tag[<[parse_value].get[price]>].values.average>
+
     - foreach <[merchant].flag[merchantData.supply]> key:item as:itemData:
         - if <[item].is_in[<[sellEffectors].keys>]>:
             - foreach next
@@ -423,9 +428,9 @@ MerchantSellDecider:
         - define buyPrice <[itemData].get[price]>
         - define sellPrice <[buyPrice].mul[<element[1].sub[<[sBias].div[3]>]>].round_up_to_precision[0.05]>
         - define supplyRatio <[itemData].get[quantity].div[<[totalSupply]>]>
-        - define allocations.<[item]>:<[merchant].flag[merchantData.balance].mul[<[supplyRatio]>].round>
+        - define allocations.<[item]>:<[merchant].flag[merchantData.balance].mul[<[supplyRatio]>].mul[<[sellPrice].div[<[average]>]>].round>
 
-        - flag <[merchant]> merchantData.sellData.items.<[item]>.alloc:<[merchant].flag[merchantData.balance].mul[<[supplyRatio]>].round>
+        - flag <[merchant]> merchantData.sellData.items.<[item]>.alloc:<[merchant].flag[merchantData.balance].mul[<[supplyRatio]>].mul[<[sellPrice].div[<[average]>]>].round>
         - flag <[merchant]> merchantData.sellData.items.<[item]>.spent:0
         - flag <[merchant]> merchantData.sellData.items.<[item]>.price:<[sellPrice]>
 
@@ -589,13 +594,13 @@ MarketSubTick:
 MarketTick:
     type: task
     script:
-    - run OldMarketDataRecorder
+    # - run OldMarketDataRecorder
 
     - foreach <server.flag[economy.markets]> key:marketName as:market:
         - define merchants <[market].get[merchants]>
         - define merchantAmount <[merchants].size.mul[1.5].round_up>
 
-        - run SupplyAmountCalculator def.marketSize:<[merchantAmount]> def.spawnChance:1 save:supplyAmount
+        - run SupplyAmountCalculator def.marketSize:<[merchantAmount].mul[1.5].round> def.spawnChance:1 save:supplyAmount
         - define supply <entry[supplyAmount].created_queue.determination.get[1]>
 
         - flag server economy.markets.<[marketName]>.supplyMap.original:<[supply]>
@@ -608,8 +613,11 @@ MarketTick:
             # Note: future configurable(?)
             # How much of the merchant's wealth should be earned back by them each week? As of
             # now I'm settled on 1/4 of wealth returned weekly to simulate a monthly paycheck.
-            - flag <[merchant]> merchantData.balance:<[wealth].div[4]> if:<[balance].exists.not>
-            - flag <[merchant]> merchantData.balance:<[wealth].div[4].add[<[balance]>]> if:<[balance].exists>
+            - if !<[balance].exists> || <[balance].is[MORE].than[<[wealth].mul[2]>]>:
+                - flag <[merchant]> merchantData.balance:<[wealth]>
+
+            - else:
+                - flag <[merchant]> merchantData.balance:+:<[wealth].mul[0.77]> if:<[balance].exists>
 
             - run AssignPurchaseStrategy def.merchant:<[merchant]>
             - run MerchantPurchaseDecider def.marketName:<[marketName]> def.merchant:<[merchant]>
@@ -630,8 +638,8 @@ MarketTick_Handler:
     type: world
     enabled: false
     events:
-        on system time minutely every:140:
+        on system time minutely every:60:
         - run MarketSubTick
 
-        on system time minutely every:560:
+        on system time minutely every:120:
         - run MarketTick
