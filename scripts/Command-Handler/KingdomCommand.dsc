@@ -534,12 +534,8 @@ Kingdom_Command:
         # kingdom's territory
 
         - if !<[isInClaimedLoc]>:
-            - foreach <server.flag[kingdoms.<[kingdom]>.outposts].keys.exclude[totalUpkeep]>:
-                - define cornerOne <server.flag[kingdoms.<[kingdom]>.<[value]>.cornerOne].with_y[255]>
-                - define cornerTwo <server.flag[kingdoms.<[kingdom]>.<[value]>.cornerTwo].with_y[0]>
-                - define outpostCuboid <cuboid[<player.location.world.name>,<[cornerOne].xyz>,<[cornerTwo].xyz>]>
-
-                - if <[outpostCuboid].contains[<player.location>]>:
+            - foreach <[kingdom].proc[GetOutposts]>:
+                - if <[value].get[area].contains[<player.location>]>:
                     - define isInClaimedLoc true
 
         # Gives the player an info message if they've never opened
