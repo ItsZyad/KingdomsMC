@@ -163,7 +163,7 @@ AffectOfflinePlayers:
     description:
     - Divides the provided playerList def into two lists- one containing online players, and the other offline players.
     - It will then run the script with the provided name twice- once with the list of online players, and again each time one of the offline players joins.
-    - In all cases, the definitions will be passed in under the name 'playerList'.
+    - In all cases, the definitions will be passed in under the name '_playerList'.
     - ---
     - → [Void]
 
@@ -174,7 +174,7 @@ AffectOfflinePlayers:
     ## It will then run the script with the provided name twice- once with the list of online
     ## players, and again each time one of the offline players joins.
     ##
-    ## In all cases, the definitions will be passed in under the name 'playerList'.
+    ## In all cases, the definitions will be passed in under the name '_playerList'.
     ##
     ## playerList : [ListTag<PlayerTag>]
     ## scriptName : [ElementTag<String>]
