@@ -418,16 +418,16 @@ MerchantWealthSelector_Handler:
         - define itemValues <yaml[worth].read[items]>
         - yaml id:worth unload
 
-        - define averageCategoryPrice <server.flag[economy.itemCategories.<[spec]>.items].parse_tag[<[itemValues].get[<[parse_value]>].get[base]>].highest.mul[0.75].mul[<server.flag[economy.itemCategories.<[spec]>.items].size>]>
+        - define averageCategoryPrice <server.flag[economy.itemCategories.<[spec]>.items].parse_tag[<[itemValues].get[<[parse_value]>].get[base]>].highest.mul[<server.flag[economy.itemCategories.<[spec]>.items].size>]>
 
         ## NOTE: To be used only until I have a dynamic way of generating average wealth values
         ## based on current market values and economic situation of the kingdoms.
         - definemap wealthMatrix:
-            low: <[averageCategoryPrice].mul[0.65]>
+            low: <[averageCategoryPrice].mul[0.75]>
             normal: <[averageCategoryPrice]>
-            high: <[averageCategoryPrice].mul[1.35]>
-            very_high: <[averageCategoryPrice].mul[1.55]>
-            stupidly_high: <[averageCategoryPrice].mul[1.8]>
+            high: <[averageCategoryPrice].mul[1.45]>
+            very_high: <[averageCategoryPrice].mul[1.65]>
+            stupidly_high: <[averageCategoryPrice].mul[1.9]>
 
         - define wealthList <[wealthMatrix].values>
         - define wealthIndex <[wealthMatrix].keys.find[<[wealth]>]>
