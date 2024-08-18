@@ -176,8 +176,9 @@ SC1_WeaponTrade_Handler:
             - if <[itemsRemoved]> >= <[tradeAmount]>:
                 - foreach stop
 
-        - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<player.flag[datahold.scenario-1.influence.marketName]>:+:<[tradeReward]>
-        - flag server kingdoms.scenario-1.influence.weaponLists.<player.flag[datahold.scenario-1.influence.marketName]>.<[selectedWeapon]>:-:<[tradeAmount]>
+        - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>:+:<[tradeReward]>
+        - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>:1 if:<server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>].is[MORE].than[1]>
+        - flag server kingdoms.scenario-1.influence.weaponLists.<[marketName]>.<[selectedWeapon]>:-:<[tradeAmount]>
 
         - narrate format:callout <element[<[marketName].color[aqua]> has successfully recieved the shipment. Your kingdom may send this alliance town shipments again in another 6 hours.]>
 

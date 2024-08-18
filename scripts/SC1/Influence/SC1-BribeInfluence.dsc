@@ -43,7 +43,7 @@ SC1_Bribe_Handler:
             - determine cancelled
 
         - define kingdom <player.flag[kingdom]>
-        - define marketName <player.flag[datahold.scenario-1.influence.marketName]>
+        - define marketName <script[SC1_AllianceTownNames].data_key[Names.<player.flag[datahold.scenario-1.influence.marketName]>]>
 
         - if <[kingdom].proc[GetBalance]> < <[bribeAmount]>:
             - narrate format:callout <element[Your kingdom does not have enough money to disburse a <&dq>gift<&dq> to this alliance town.]>
@@ -56,6 +56,7 @@ SC1_Bribe_Handler:
         - run SubBalance def.kingdom:<[kingdom]> def.amount:<[bribeAmount]>
 
         - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>:+:<[bribeInfluence]>
+        - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>:1 if:<server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>].is[MORE].than[1]>
         - flag server influenceCooldown.bribe.<[kingdom]> expire:12h
 
         - narrate format:callout <element[An envoy has been sent containing the funds. Please wait <server.flag_expiration[influenceCooldown.bribe.<[kingdom]>].from_now.formatted.color[aqua]> before sending another to <element[any].bold> alliance.]>

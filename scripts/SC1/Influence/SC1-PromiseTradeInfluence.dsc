@@ -111,6 +111,7 @@ SC1_FinishTradePromise:
 
     - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.promises.<[marketName]>:!
     - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>:+:<[promiseInfluence]>
+    - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>:1 if:<server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.markets.<[marketName]>].is[MORE].than[1]>
     - flag server kingdoms.scenario-1.kingdomList.<[kingdom]>.influence.tradeVolume.<[marketName]>:!
 
     - foreach <proc[GetKingdomList].exclude[<[kingdom]>]>:
