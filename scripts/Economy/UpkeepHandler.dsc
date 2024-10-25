@@ -17,8 +17,8 @@ KingdomUpkeepHandler:
         - define kingdomList <proc[GetKingdomList]>
 
         - foreach <[kingdomList]> as:kingdom:
-            - flag server kingdoms.<[kingdom]>.balance:-:<[kingdom].proc[GetUpkeep]>
-            - flag server kingdoms.<[kingdom]>.balance:-:<server.flag[kingdoms.<[kingdom]>.outposts.totalUpkeep]>
+            - run SubBalance def.kingdom:<[kingdom]> def.amount:<[kingdom].proc[GetUpkeep]>
+            - run SubBalance def.kingdom:<[kingdom]> def.amount:<server.flag[kingdoms.<[kingdom]>.outposts.totalUpkeep]>
 
             - if <server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax].exists>:
                 - flag server kingdoms.<[kingdom]>.balance:+:<server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax]>
