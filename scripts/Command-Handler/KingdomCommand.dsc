@@ -424,16 +424,13 @@ Kingdom_Command:
         #------------------------------------------------------------------------------------------
 
         Unclaim:
-        # - define coreCastle <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
         - define coreCastle <[kingdom].proc[GetClaims].if_null[<list[]>]>
 
         - if !<player.location.chunk.is_in[<[coreCastle]>]>:
             - narrate format:callout "This chunk is not in your claims."
             - determine cancelled
 
-        - flag server kingdoms.<[kingdom]>.claims.core:<-:<player.location.chunk>
-        - flag server kingdoms.<[kingdom]>.claims.castle:<-:<player.location.chunk>
-        - flag server kingdoms.claimInfo.allClaims:<-:<player.location.chunk>
+        - run RemoveClaim def.kingdom:<[kingdom]> def.chunk:<player.location.chunk>
 
         - if <proc[GetClaims].context[<[kingdom]>|core].size> <= 20:
             - run SubUpkeep def.kingdom:<[kingdom]> def.amount:5
@@ -462,7 +459,7 @@ Kingdom_Command:
         - define amount <context.args.get[2]>
 
         - if <player.money.is[OR_MORE].than[<[amount]>]>:
-            - flag server kingdoms.<player.flag[kingdom]>.balance:+:<[amount]>
+            - run AddBalance def.kingdom:<[kingdom]> def.amount:<[amount]>
             - money take from:<player> quantity:<[amount]>
 
             - narrate format:callout "Successfully deposited: <red>$<[amount].as_money>"
@@ -496,7 +493,7 @@ Kingdom_Command:
 
         - else if <[kingdom].proc[GetBalance].is[OR_MORE].than[<[amount]>]>:
             - money give to:<player> quantity:<[amount]>
-            - flag server kingdoms.<[kingdom]>.balance:-:<[amount]>
+            - run SubBalance def.kingdom:<[kingdom]> def.amount:<[amount]>
 
             - narrate format:callout "Successfully withdrawn: <red>$<[amount].as_money>"
 
