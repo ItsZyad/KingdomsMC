@@ -13,14 +13,6 @@
 ##
 ## ---------------------------END HEADER----------------------------
 
-WaitTime_CISK:
-    type: procedure
-    debug: false
-    definitions: text|multiplier
-    script:
-    - determine <[text].split[<&sp>].size.div[1.5].div[<[multiplier]>]>
-
-
 #TODO: Make var handler change every script so that error messages reflect correctly
 
 RequiredKeys_CISK:
@@ -31,22 +23,30 @@ RequiredKeys_CISK:
         - questIcon
 
 
+WaitTime_CISK:
+    type: procedure
+    debug: false
+    definitions: text[ElementTag(String)]|multiplier[ElementTag(Float)]
+    script:
+    - determine <[text].split[<&sp>].size.div[1.5].div[<[multiplier]>]>
+
+
 MainParser_CISK:
     type: task
     debug: false
-    definitions: file|schema|handler|npc|player
+    definitions: file[ElementTag(String)]|schema[ElementTag(String)]|handler[ElementTag(String)]|npc[NPCTag]|player[PlayerTag]
     script:
     - yaml load:quest_schemas/<[file]> id:ciskFile
     - define questRaw <yaml[ciskFile].read[<[schema]>]>
-    - define questKeyList <[questRaw].list_keys>
+    - define questKeyList <[questRaw].keys>
     - define foundRequiredKeys <list[]>
 
     - foreach <script[RequiredKeys_CISK].data_key[top]>:
         - if <[questKeyList].contains[<[value]>]>:
             - define foundRequiredKeys:->:<[value]>
 
-    # Turn the required key checker into its own script so it can be
-    # run everytime the parser enters a new level in YAML structure.
+    # Turn the required key checker into its own script so it can be run everytime the parser
+    # enters a new level in YAML structure.
 
     - if !<script[RequiredKeys_CISK].data_key[top].size.equals[<[foundRequiredKeys].size>]>:
         - define missingKeys <script[RequiredKeys_CISK].data_key[top].exclude[<[foundRequiredKeys]>]>
@@ -74,41 +74,21 @@ MainParser_CISK:
     - foreach <list[<[npc]>|<[player]>]> as:dataTarget:
         - foreach <[dataTarget].flag[KQuests.data]>:
             - if !<[value].keys.contains[persistent]>:
-                # - narrate format:debug <[key]>
                 - flag <[dataTarget]> KQuests.data.<[key]>:!
 
 
 SpeechHandler_CISK:
     type: task
     debug: false
-    InitializeVars:
-    - define hasBroken <[hasBroken].if_null[false]>
-    - define interactionAmounts <[npc].flag[playerInteractions].get[<[player]>]>
-
-    # Checks if the default interaction handler should be initiated
-    - define interactionKeys <[handlerBlock].keys.exclude[def]>
-    - define mostInteraction <[interactionKeys].last>
-    - define interactionAmounts def if:<[interactionAmounts].is[MORE].than[<[mostInteraction]>]>
-    - define interactionAmounts <[interactionsAmounts].if_null[0]>
-    - define currentBlock <[handlerBlock].get[<[interactionAmounts]>].if_null[<[handlerBlock]>]>
-
-    - if !<[currentBlock].exists>:
-        - define errMsg "Handler: <[handler]> is missing default case."
-        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[currentBlock]> def.message:<[errMsg]>
-
-    - define talkSpeed <[currentBlock].get[talkSpeed].if_null[1]>
-    - define shouldEngage <[currentBlock].get[blockingInteraction].if_null[false]>
-    - define speech <[currentBlock].get[actions]>
-
     script:
     ## Defs carried from MAINPARSER_CISK:
     ## file, schema, handler, npc, player
 
     ## Vars carried from MAINPARSER_CISK:
-    ## handlerBlock, key, ...
+    ## handlerBlock, ...
 
-    # Reminder to self: When passing in player defined branches, pass the player branch
-    # not the parent one named 'branches'
+    # Reminder to self: When passing in player defined branches, pass the player branch not the
+    # parent one named 'branches'
 
     - if <[shouldEngage]> && !<[npc].engaged>:
         - engage
@@ -174,9 +154,29 @@ SpeechHandler_CISK:
         #- flag <[npc]> playerInteractions.<[player]>:++
         - disengage
 
+    InitializeVars:
+    - define hasBroken <[hasBroken].if_null[false]>
+    - define interactionAmounts <[npc].flag[playerInteractions].get[<[player]>]>
+
+    # Checks if the default interaction handler should be initiated
+    - define interactionKeys <[handlerBlock].keys.exclude[def]>
+    - define mostInteraction <[interactionKeys].last>
+    - define interactionAmounts def if:<[interactionAmounts].is[MORE].than[<[mostInteraction]>]>
+    - define interactionAmounts <[interactionsAmounts].if_null[0]>
+    - define currentBlock <[handlerBlock].get[<[interactionAmounts]>].if_null[<[handlerBlock]>]>
+
+    - if !<[currentBlock].exists>:
+        - define errMsg "Handler: <[handler]> is missing default case."
+        - run WriteCiskError def.file:<[file]> def.schema:<[schema]> def.currentBlock:<[currentBlock]> def.message:<[errMsg]>
+
+    - define talkSpeed <[currentBlock].get[talkSpeed].if_null[1]>
+    - define shouldEngage <[currentBlock].get[blockingInteraction].if_null[false]>
+    - define speech <[currentBlock].get[actions]>
+
 
 OptionsHandler_CISK:
     type: task
+    debug: false
     script:
     ## Defs carried from MAINPARSER_CISK:
     ## file, schema, handler, npc, player
@@ -213,6 +213,7 @@ OptionsHandler_CISK:
 
 ConditionalHandler_CISK:
     type: task
+    debug: false
     script:
     ## Defs carried from MAINPARSER_CISK:
     ## file, schema, handler, npc, player
@@ -259,6 +260,7 @@ ConditionalHandler_CISK:
 
 DataHandler_CISK:
     type: task
+    debug: false
     script:
     ## Defs carried from MAINPARSER_CISK:
     ## file, schema, handler, npc, player
@@ -303,6 +305,7 @@ DataHandler_CISK:
 
 RepeatHandler_CISK:
     type: task
+    debug: false
     script:
     ## Defs carried from MAINPARSER_CISK:
     ## file, schema, handler, npc, player
@@ -330,6 +333,7 @@ RepeatHandler_CISK:
 
 RandomizationHandler_CISK:
     type: task
+    debug: false
     script:
     ## Defs carried from MAINPARSER_CISK:
     ## file, schema, handler, npc, player
@@ -347,7 +351,8 @@ RandomizationHandler_CISK:
 
 WriteCiskError:
     type: task
-    definitions: file|schema|currentBlock|message
+    debug: false
+    definitions: file[ElementTag(String)]|schema[ElementTag(String)]|currentBlock[ElementTag(String)]|message[ElementTag(String)]
     script:
     - narrate <n>
     - if !<[currentBlock].exists>:

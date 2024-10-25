@@ -11,7 +11,7 @@
 GenerateRecursiveStructures_CISK:
     type: task
     debug: false
-    definitions: splitted
+    definitions: splitted[ListTag(ElementTag(String))]
     DEBUG_GenerateSplittedList:
     - define text <element[<&lt>state get player health<&gt>]>
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
@@ -51,7 +51,7 @@ GenerateRecursiveStructures_CISK:
 CommandMapGenerator_CISK:
     type: task
     debug: false
-    definitions: splitted
+    definitions: splitted[ListTag(ElementTag(String))]
     DEBUG_GenerateSplittedList:
     - define text "<element[<&lt>state get player:<&lt>dataget t:player n:ref<&gt> location<&gt>]>"
     - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
@@ -110,15 +110,6 @@ CommandMapGenerator_CISK:
 CommandDelegator_CISK:
     type: task
     debug: false
-    GetRecursiveStructure:
-    - if <[splitted].exists>:
-        - run GenerateRecursiveStructures_CISK def.splitted:<[splitted]> save:line
-
-    - else:
-        - run GenerateRecursiveStructures_CISK save:line
-
-    - define line <entry[line].created_queue.determination.get[1]>
-
     script:
     - inject <script.name> path:GetRecursiveStructure if:<[commandMap].exists.not>
     - define evaluatedLine <list[]>
@@ -139,21 +130,22 @@ CommandDelegator_CISK:
         - else:
             - define evaluatedLine:->:<[token]>
 
-    # - narrate format:debug <red>EVAL_LINE:<[evaluatedLine]>
     - determine <[evaluatedLine]>
+
+    GetRecursiveStructure:
+    - if <[splitted].exists>:
+        - run GenerateRecursiveStructures_CISK def.splitted:<[splitted]> save:line
+
+    - else:
+        - run GenerateRecursiveStructures_CISK save:line
+
+    - define line <entry[line].created_queue.determination.get[1]>
 
 
 CommandMapEvaluator_CISK:
     type: task
     debug: false
     definitions: commandMap|commandScript
-    GenerateAttributeShorthands:
-    - define attrSubs <map[]>
-
-    - foreach <[commandScript].data_key[commandData.attributeSubs]> as:subList key:key:
-        - foreach <[subList].as[list]> as:sub:
-            - define attrSubs.<[sub]>:<[key]>
-
     script:
     - define commandName <[commandMap].get[name]>
     - define commandScript <[commandScript].if_null[<script[<[commandName]>Command_CISK]>]>
@@ -185,11 +177,18 @@ CommandMapEvaluator_CISK:
 
     - inject <[commandScript].name> path:PostEvaluationCode
 
+    GenerateAttributeShorthands:
+    - define attrSubs <map[]>
+
+    - foreach <[commandScript].data_key[commandData.attributeSubs]> as:subList key:key:
+        - foreach <[subList].as[list]> as:sub:
+            - define attrSubs.<[sub]>:<[key]>
+
 
 ProduceFlaggableObject_CISK:
     type: task
     debug: false
-    definitions: text
+    definitions: text[ElementTag(String)]
     script:
     - choose <[text]>:
         - case player:
@@ -209,16 +208,17 @@ ProduceFlaggableObject_CISK:
 # <wait 3.5>
 WaitCommand_CISK:
     type: task
-    PostEvaluationCode:
-    - flag <[player]> KQuests.temp.wait.amount:<[waitAmount].round_to_precision[0.01]>
-    - flag <[player]> KQuests.temp.wait.override:true if:<[waitOverride].exists.and[<[waitOverride].equals[true]>]>
-
+    debug: false
     script:
     - if <[attrVal].div[2].exists>:
         - define waitAmount <[attrVal]>
 
     - else if <[attrVal]> == override:
         - define waitOverride true
+
+    PostEvaluationCode:
+    - flag <[player]> KQuests.temp.wait.amount:<[waitAmount].round_to_precision[0.01]>
+    - flag <[player]> KQuests.temp.wait.override:true if:<[waitOverride].exists.and[<[waitOverride].equals[true]>]>
 
 
 # Example Usage:
@@ -232,14 +232,6 @@ DatagetCommand_CISK:
             target: t|tr
             name: n
 
-    PostEvaluationCode:
-    - run ProduceFlaggableObject_CISK def.text:<[dataTarget]> save:realTarget
-
-    - define realTarget <entry[realTarget].created_queue.determination.get[1]>
-    - define data <[realTarget].flag[KQuests.data.<[dataName]>.value]>
-
-    - determine <[data]>
-
     script:
     - choose <[attrKey]>:
         - case target:
@@ -247,6 +239,14 @@ DatagetCommand_CISK:
 
         - case name:
             - define dataName <[attrVal]>
+
+    PostEvaluationCode:
+    - run ProduceFlaggableObject_CISK def.text:<[dataTarget]> save:realTarget
+
+    - define realTarget <entry[realTarget].created_queue.determination.get[1]>
+    - define data <[realTarget].flag[KQuests.data.<[dataName]>.value]>
+
+    - determine <[data]>
 
 
 # Example Usage:
@@ -261,14 +261,6 @@ DatastoreCommand_CISK:
             target: t|tr
             name: n
             value: v
-
-    PostEvaluationCode:
-    - run ProduceFlaggableObject_CISK def.text:<[dataTarget]> save:realTarget
-    - define realTarget <entry[realTarget].created_queue.determination.get[1]>
-    - flag <[realTarget]> KQuests.data.<[dataName]>.value:<[dataValue]>
-    - flag <[realTarget]> KQuests.data.<[dataName]>.persistent:true if:<[dataPersistent].if_null[false].equals[true]>
-
-    # TODO: Add error check for this... And all of these commands for that fact.
 
     script:
     - choose <[attrKey]>:
@@ -285,15 +277,23 @@ DatastoreCommand_CISK:
             - if <[attrVal]> == persistent:
                 - define dataPersistent true
 
+    PostEvaluationCode:
+    - run ProduceFlaggableObject_CISK def.text:<[dataTarget]> save:realTarget
+    - define realTarget <entry[realTarget].created_queue.determination.get[1]>
+    - flag <[realTarget]> KQuests.data.<[dataName]>.value:<[dataValue]>
+    - flag <[realTarget]> KQuests.data.<[dataName]>.persistent:true if:<[dataPersistent].if_null[false].equals[true]>
+
+    # TODO: Add error check for this... And all of these commands for that fact.
+
 
 BreakCommand_CISK:
     type: task
     debug: false
-    PostEvalutionCode:
-    - determine cancelled
-
     script:
     - flag <[player]> KQuests.temp.hasBroken
+
+    PostEvalutionCode:
+    - determine cancelled
 
 
 # Example Usage:
@@ -301,6 +301,10 @@ BreakCommand_CISK:
 GotoCommand_CISK:
     type: task
     debug: false
+    script:
+    - if <[attrKey]> == null:
+        - define gotoBranch <[attrVal]>
+
     PostEvaluationCode:
     - define playerDefinedBlock <yaml[ciskFile].read[<[schema]>.branches.<[gotoBranch]>]>
     - define currentBlock_orig <[currentBlock]>
@@ -313,10 +317,6 @@ GotoCommand_CISK:
     - define currentHandler <[currentBlock_orig]>
     - determine cancelled
 
-    script:
-    - if <[attrKey]> == null:
-        - define gotoBranch <[attrVal]>
-
 
 # Example Usage:
 # <give i:stick as_drop q:10>
@@ -328,6 +328,18 @@ GiveCommand_CISK:
         attributeSubs:
             item: i
             quantity: q
+
+    script:
+    - choose <[attrKey]>:
+        - case item:
+            - define giveItem <[attrVal]>
+
+        - case quantity:
+            - define giveQuantity <[attrVal]>
+
+        - default:
+            - if <[attrVal].is_in[as_drop|to_inv]>:
+                - define giveType <[attrVal]>
 
     PostEvaluationCode:
     - if <[giveItem]> == exp:
@@ -342,18 +354,6 @@ GiveCommand_CISK:
         - else:
             - give <[giveItem]> quantity:<[giveQuantity]> to:<[player].inventory>
 
-    script:
-    - choose <[attrKey]>:
-        - case item:
-            - define giveItem <[attrVal]>
-
-        - case quantity:
-            - define giveQuantity <[attrVal]>
-
-        - default:
-            - if <[attrVal].is_in[as_drop|to_inv]>:
-                - define giveType <[attrVal]>
-
 
 # Example Usage:
 # <state get player name>
@@ -367,14 +367,6 @@ StateCommand_CISK:
             item: i
             player: p
             npc: n
-
-    PostEvaluationCode:
-    # - narrate format:debug S_ACT:<[stateAction]>
-    # - narrate format:debug S_TAR:<[stateTarget]>
-    # - narrate format:debug S_MEC:<[stateMechanism]>
-    # - narrate format:debug S_MES:<[stateMechanismSet].if_null[N/A]>
-
-    - inject StateCommandMechanisms_CISK
 
     script:
     - choose <[attrKey]>:
@@ -406,6 +398,14 @@ StateCommand_CISK:
                 - else:
                     - define stateTarget <map[<[attrKey]>=self]>
 
+    PostEvaluationCode:
+    # - narrate format:debug S_ACT:<[stateAction]>
+    # - narrate format:debug S_TAR:<[stateTarget]>
+    # - narrate format:debug S_MEC:<[stateMechanism]>
+    # - narrate format:debug S_MES:<[stateMechanismSet].if_null[N/A]>
+
+    - inject StateCommandMechanisms_CISK
+
 
 # Example Usage:
 # <anchor set l:140,64,320 n:test>
@@ -414,6 +414,7 @@ StateCommand_CISK:
 # <anchor get n:test>
 AnchorCommand_CISK:
     type: task
+    debug: false
     description:
     - CISK COMMAND - Sets or removes an anchor location for the attached NPC to walk to
     - Note: Users can ommit the y coordinates. Parser will automatically find the y of that loc.
@@ -426,6 +427,18 @@ AnchorCommand_CISK:
         attributeSubs:
             location: l
             name: n
+
+    script:
+    - choose <[attrKey]>:
+        - case location:
+            - define anchorLocationRaw <[attrVal].split[,]>
+
+        - case name:
+            - define anchorName <[attrVal]>
+
+        - case null:
+            - if !<[anchorMode].exists>:
+                - define anchorMode <[attrVal]>
 
     PostEvaluationCode:
     - if !<[anchorName].exists>:
@@ -448,22 +461,11 @@ AnchorCommand_CISK:
             - if <[npc].has_flag[KQuests.anchors.<[anchorName]>]>:
                 - flag <npc> KQuests.anchors.<[anchorName]>:!
 
-    script:
-    - choose <[attrKey]>:
-        - case location:
-            - define anchorLocationRaw <[attrVal].split[,]>
-
-        - case name:
-            - define anchorName <[attrVal]>
-
-        - case null:
-            - if !<[anchorMode].exists>:
-                - define anchorMode <[attrVal]>
-
 
 IncompleteLocationGeneratorHelper_CISK:
     type: procedure
-    definitions: locationRaw[(ListTag) Anticipated Format: [x,z]]
+    debug: false
+    definitions: locationRaw[ListTag]
     script:
     - define locationChunk <location[<[locationRaw].x>,64,<[locationRaw]>].chunk>
     - define XZLocationList <[locationChunk].surface_blocks.parse_tag[<[parse_value].x>,<[parse_value].z>]>
@@ -477,6 +479,7 @@ IncompleteLocationGeneratorHelper_CISK:
 # <walk t:npc anchor:ANCHOR_NAME>
 WalkCommand_CISK:
     type: task
+    debug: false
     description:
     - CISK COMMAND - Walks an NPC to a specified location
     - Note: Will use Kingdoms walk which teleports the specified entity the last couple blocks due to Minecraft pathfinding failing
@@ -487,6 +490,23 @@ WalkCommand_CISK:
     commandData:
         attributeSubs:
             target: t|tr
+
+    script:
+    - choose <[attrKey]>:
+        - case target:
+            - define walkTarget <[attrVal]>
+
+        - case to:
+            - define walkLocationRaw <[attrVal].split[,]>
+
+        - case anchor:
+            - define anchorName <[attrVal]>
+
+        - default:
+            - if <[attrKey].is_in[forward|backward|left|right]>:
+                - definemap relativeLocation:
+                    distance: <[attrVal]>
+                    direction: <[attrKey]>
 
     PostEvaluationCode:
     # TODO: Add checks to this
@@ -523,26 +543,10 @@ WalkCommand_CISK:
     - else:
         - ~run NPCWalkHelper_CISK def.target:<[realTarget]> def.location:<[realLocation]>
 
-    script:
-    - choose <[attrKey]>:
-        - case target:
-            - define walkTarget <[attrVal]>
-
-        - case to:
-            - define walkLocationRaw <[attrVal].split[,]>
-
-        - case anchor:
-            - define anchorName <[attrVal]>
-
-        - default:
-            - if <[attrKey].is_in[forward|backward|left|right]>:
-                - definemap relativeLocation:
-                    distance: <[attrVal]>
-                    direction: <[attrKey]>
-
 
 NPCWalkHelper_CISK:
     type: task
+    debug: false
     definitions: target|location
     script:
     - walk <[target]> <[location]> auto_range
@@ -559,6 +563,10 @@ RunCommand_CISK:
     - Example Usage<&co>
     - <&lt>run SampleTaskScript<&gt>
 
+    script:
+    - define scriptName <[attrVal]>
+    - foreach stop
+
     PostEvaluationCode:
     - if <util.scripts.contains[s<&at><[scriptName]>]>:
         - definemap contextData:
@@ -570,21 +578,21 @@ RunCommand_CISK:
     - else:
         - run GenerateInternalError def.silent:true def.category:GenericError def.message:<element[Unable to run script: <[scriptName]> within quest schema. Maybe a task script by that name does not exist?]>
 
-    script:
-    - define scriptName <[attrVal]>
-    - foreach stop
-
 
 # Example Usage:
 # <add 3 5>
 # <add <state get player health> 10>
 AddCommand_CISK:
     type: task
+    debug: false
     description:
     - CISK COMMAND - Adds two numbers together
     - Example Usage<&co>
     - <&lt>add 3 5<&gt>
     - <&lt>add <&lt>state get player health<&gt> 10<&gt>
+
+    script:
+    - define operands:->:<[attrVal]>
 
     PreEvaluationCode:
     - define operands <list[]>
@@ -595,20 +603,20 @@ AddCommand_CISK:
     - if <[operands].unseparated.add[1].exists>:
         - determine <[operands].get[1].add[<[operands].get[2]>]>
 
-    script:
-    - define operands:->:<[attrVal]>
-
-
 # Example Usage:
 # <sub 3 5>
 # <sub <state get player health> 10>
 SubCommand_CISK:
     type: task
+    debug: false
     description:
     - CISK COMMAND - Subtracts the first number from the second
     - Example Usage<&co>
     - <&lt>sub 3 5<&gt>
     - <&lt>sub <&lt>state get player health<&gt> 10<&gt>
+
+    script:
+    - define operands:->:<[attrKey]>
 
     PreEvaluationCode:
     - define operands <list[]>
@@ -617,20 +625,21 @@ SubCommand_CISK:
     - if <[operands].unseparated.sub[1].exists>:
         - determine <[operands].get[1].sub[<[operands].get[2]>]>
 
-    script:
-    - define operands:->:<[attrKey]>
-
 
 # Example Usage:
 # <mul 3 5>
 # <mul <state get player health> 10>
 MulCommand_CISK:
     type: task
+    debug: false
     description:
     - CISK COMMAND - Multiplies two numbers together
     - Example Usage<&co>
     - <&lt>mul 3 5<&gt>
     - <&lt>mul <&lt>state get player health<&gt> 10<&gt>
+
+    script:
+    - define operands:->:<[attrKey]>
 
     PreEvaluationCode:
     - define operands <list[]>
@@ -639,20 +648,21 @@ MulCommand_CISK:
     - if <[operands].unseparated.mul[1].exists>:
         - determine <[operands].get[1].mul[<[operands].get[2]>]>
 
-    script:
-    - define operands:->:<[attrKey]>
-
 
 # Example Usage:
 # <div 3 5>
 # <div <state get player health> 10>
 DivCommand_CISK:
     type: task
+    debug: false
     description:
     - CISK COMMAND - Divides the first number by the second
     - Example Usage<&co>
     - <&lt>div 3 5<&gt>
     - <&lt>div <&lt>state get player health<&gt> 10<&gt>
+
+    script:
+    - define operands:->:<[attrKey]>
 
     PreEvaluationCode:
     - define operands <list[]>
@@ -660,6 +670,3 @@ DivCommand_CISK:
     PostEvaluationCode:
     - if <[operands].unseparated.div[1].exists>:
         - determine <[operands].get[1].div[<[operands].get[2]>]>
-
-    script:
-    - define operands:->:<[attrKey]>

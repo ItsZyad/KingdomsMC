@@ -11,10 +11,12 @@
 
 LocationType_CISK:
     type: procedure
-    definitions: rawLoc|player
+    debug: false
+    definitions: rawLoc[ElementTag(String)]|player[PlayerTag]
     description:
-    - Converts CISK-format locations to Denizen and back
+    - Converts CISK-format locations to Denizen and back.
     - (Type cast for rawLoc is dynamic)
+
     script:
     # CISK -> DENZ
     - if <[rawLoc].object_type.to_uppercase> != LOCATION:
