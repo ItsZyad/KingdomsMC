@@ -20,9 +20,6 @@ KingdomUpkeepHandler:
             - run SubBalance def.kingdom:<[kingdom]> def.amount:<[kingdom].proc[GetUpkeep]>
             - run SubBalance def.kingdom:<[kingdom]> def.amount:<server.flag[kingdoms.<[kingdom]>.outposts.totalUpkeep]>
 
-            - if <server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax].exists>:
-                - flag server kingdoms.<[kingdom]>.balance:+:<server.flag[<[kingdom]>].deep_get[influenceBonuses.bonusTax]>
-
             - if <[kingdom].proc[GetBalance].is[LESS].than[0]>:
                 - define days <server.flag[indebtedKingdoms].get[<[kingdom]>].add[1].if_null[1]>
                 - flag server indebtedKingdoms.<[kingdom]>:<[days]>
