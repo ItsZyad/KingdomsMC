@@ -174,6 +174,45 @@ AddClaim:
     - flag server kingdoms.<[kingdom]>.claims.castle:<server.flag[kingdoms.<[kingdom]>.claims.castle].deduplicate>
 
 
+RemoveClaim:
+    type: task
+    definitions: kingdom[ElementTag(String)]|chunk[ElementTag(String)]
+    description:
+    - Removes the provided chunk from the claims of the provided kingdom.
+    - Returns null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Removes the provided chunk from the claims of the provided kingdom.
+    ##
+    ## Returns null if the action fails.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## chunk   : [ChunkTag]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if <[chunk].object_type.to_lowercase> != chunk:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot add claim. Must be of type <&sq>Chunk<&sq>, type recieved: <[chunk].object_type>]>
+        - determine null
+
+    - flag server kingdoms.claimInfo.allClaims:->:<[chunk]>
+
+    - if <server.flag[kingdoms.<[kingdom]>.claims.core].contains[<[chunk]>]>:
+        - flag server kingdoms.<[kingdom]>.claims.core:->:<[chunk]>
+        - flag server kingdoms.<[kingdom]>.claims.core:<server.flag[kingdoms.<[kingdom]>.claims.core].deduplicate>
+
+        - determine cancelled
+
+    - flag server kingdoms.<[kingdom]>.claims.castle:->:<[chunk]>
+    - flag server kingdoms.<[kingdom]>.claims.castle:<server.flag[kingdoms.<[kingdom]>.claims.castle].deduplicate>
+
+
 GetClaimsCuboid:
     type: procedure
     definitions: kingdom[ElementTag(String)]|type[?ElementTag(String)]
