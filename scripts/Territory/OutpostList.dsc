@@ -4,31 +4,10 @@
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Nov 2021
-## @Script Ver: v1.0
+## @Updated: Oct 2024
+## @Script Ver: v2.0
 ##
-##ignorewarning invalid_data_line_quotes
-## ----------------END HEADER-----------------
-
-Old_OutpostManager_Command:
-    type: command
-    usage: /old_outposts
-    name: old_outposts
-    description: "Displays all the outposts currently maintained by your kingdom [CURRENTLY BROKEN]"
-    permission: kingdoms.admin
-    script:
-        - define kingdom <player.flag[kingdom]>
-
-        - narrate format:admincallout "THIS COMMAND IS DEPRECATED AND NO LONGER WORKS. ONLY USE FOR DEBUG PURPOSES!"
-        - narrate format:callout "Current Outposts for the <[kingdom]> kingdom"
-
-        - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
-            - narrate "- <[value]>"
-
-            - define cornerOne <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].values.get[<[loop_index]>].get[cornerOne]>
-            - define cornerTwo <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].values.get[<[loop_index]>].get[cornerTwo]>
-
-            - narrate "    X : <[cornerOne].x.round> | Y : <[cornerOne].y.round> | Z : <[cornerOne].z.round>"
-            - narrate "    X : <[cornerTwo].x.round> | Y : <[cornerTwo].y.round> | Z : <[cornerTwo].z.round>"
+## ------------------------------------------END HEADER-------------------------------------------
 
 # GET Skull_skins at https://minecraft-heads.com/custom-heads/blocks/1655-oak-log (log example)
 # and grab first part of the skin Base64 from 1.13 setblock code and second part from 'value'
@@ -50,7 +29,7 @@ OutpostList_GUI:
 MiningSpec_Item:
     type: item
     material: player_head
-    display name: "<gray><bold>Mining Outpost"
+    display name: <gray><bold>Mining Outpost
     mechanisms:
         skull_skin: d9ce127a-ffcc-451a-98dc-fb05edebba06|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzYxYzU3OTc0ZjEwMmQzZGViM2M1M2Q0MmZkZTkwOWU5YjM5Y2NiYzdmNzc2ZTI3NzU3NWEwMmQ1MWExOTk5ZSJ9fX0=
 
@@ -58,7 +37,7 @@ MiningSpec_Item:
 FarmingSpec_Item:
     type: item
     material: player_head
-    display name: "<green><bold>Farming Outpost"
+    display name: <green><bold>Farming Outpost
     mechanisms:
         skull_skin: 30939add-08ae-41b5-802f-d55a546c9a06|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2FhNTk2NmExNDcyNDQ1MDRjYzU2ZWY2ZWZkMmQyZjQ0NzM4YjhmMDNkOTNhNjE3NjZhZjNmYzQ0ODdmOTgwYiJ9fX0=
 
@@ -66,7 +45,7 @@ FarmingSpec_Item:
 LoggingSpec_Item:
     type: item
     material: player_head
-    display name: "<bold><element[Logging Outpost].color[#743e3e]>"
+    display name: <bold><element[Logging Outpost].color[#743e3e]>
     mechanisms:
         skull_skin: 1f77726e-867b-4a66-8015-1ed701753de0|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNmQyZTMxMDg3OWE2NDUwYWY1NjI1YmNkNDUwOTNkZDdlNWQ4ZjgyN2NjYmZlYWM2OWM4MTUzNzc2ODQwNmIifX19
 
@@ -74,7 +53,7 @@ LoggingSpec_Item:
 Unspec_Item:
     type: item
     material: player_head
-    display name: "<white><bold>Unspecialized Outpost"
+    display name: <white><bold>Unspecialized Outpost
     mechanisms:
         skull_skin: bcccae77-0ac7-4cd0-8126-c900727c2223|eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDljMTgzMmU0ZWY1YzRhZDljNTE5ZDE5NGIxOTg1MDMwZDI1NzkxNDMzNGFhZjI3NDVjOWRmZDYxMWQ2ZDYxZCJ9fX0=
 
@@ -87,74 +66,50 @@ SpecTypeToItem:
     none: Unspec_Item
 
 
-OutpostList_Command:
+OutpostList:
     type: task
-    subpaths:
-        OutpostGUI_Init:
-        - define kingdom <player.flag[kingdom]>
-        - define rawOutpostList <list[]>
-
-        - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList]> as:currentOutpost:
-            - narrate format:debug <[currentOutpost]>
-
-            - define cornerOne <[currentOutpost].get[cornerone].xyz>
-            - define cornerTwo <[currentOutpost].get[cornertwo].xyz>
-            - define name <[currentOutpost].get[name]>
-            - define size <[currentOutpost].get[size]>
-            - define upkeep <[currentOutpost].get[upkeep]>
-            - define spec <[currentOutpost].get[specType]>
-            - define outpostBlock <item[Unspec_Item]>
-
-            - flag <[outpostBlock]> name:<[name]>
-
-            # No specialization is represented by the tag being non-existant
-            - if <[currentOutpost].get[specType].exists>:
-                - define SpecKey <script[SpecTypeToItem].data_key[<[spec]>]>
-                - define outpostBlock <item[<[SpecKey]>]>
-
-            - define lore "<&r>Name: <green><[name]>|<&r>Corner One: <blue><[cornerOne]>|<&r>Corner Two: <blue><[cornerTwo]>|<&r>Size: <blue><[size]>|<&r>Upkeep: <red>$<[upkeep]>"
-            - adjust def:outpostBlock lore:<[lore]>
-
-            - define rawOutpostList:->:<[outpostBlock]>
-
-        - if <[rawOutpostList].size.is[MORE].than[<player.flag[OutpostGUIPage].sub[1].mul[27]>]>:
-            - run Paginate_Task def.itemArray:<[rawOutpostList]> def.itemsPerPage:27 def.page:<player.flag[OutpostGUIPage]> save:paginate
-            - flag <player> outpostList:<entry[paginate].created_queue.determination.get[1]>
-
-        ResetOutpostPageFlag:
-        - if !<player.has_flag[outpostGUIPage]>:
-            - flag <player> outpostGUIPage:1
-
-        OutpostGUI_Show:
-        - inventory open d:OutpostList_GUI
-        - flag <player> outpostList:!
-
-        OutpostGUI_NextPage:
-        - inject OutpostList_Command.subpaths.ResetOutpostPageFlag
-        - flag <player> OutpostGUIPage:+:1
-        - inject OutpostList_Command.subpaths.OutpostGUI_Init
-
-        OutpostGUI_PrevPage:
-        - inject OutpostList_Command.subpaths.ResetOutpostPageFlag
-        - flag <player> OutpostGUIPage:-:1
-        - inject OutpostList_Command.subpaths.OutpostGUI_Init
+    debug: false
+    definitions: player[PlayerTag]
+    description:
+    - Displays the outpost list GUI for the provided player.
+    - ---
+    - → [Void]
 
     script:
-    - inject OutpostList_Command.subpaths.ResetOutpostPageFlag
-    - inject OutpostList_Command.subpaths.OutpostGUI_Init
-    - inject OutpostList_Command.subpaths.OutpostGUI_Show
+    ## Displays the outpost list GUI for the provided player.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [Void]
 
+    - define kingdom <[player].flag[kingdom]>
+    - define rawOutpostList <list[]>
 
-OutpostList_Handler:
-    type: world
-    events:
-        on player clicks Page_Forward in OutpostList_GUI:
-        - inject OutpostList_Command.subpaths.OutpostGUI_NextPage
+    - foreach <[kingdom].proc[GetOutposts].keys> as:outpostName:
+        - define area <proc[GetOutpostArea].context[<[kingdom]>|<[outpostName]>]>
+        - define name <proc[GetOutpostDisplayName].context[<[kingdom]>|<[outpostName]>]>
+        - define length <proc[GetOutpostArea].context[<[kingdom]>|<[outpostName]>].size.x>
+        - define width <proc[GetOutpostArea].context[<[kingdom]>|<[outpostName]>].size.z>
+        - define upkeep <proc[GetOutpostUpkeep].context[<[kingdom]>|<[outpostName]>]>
+        - define outpostBlock <item[Unspec_Item]>
+        - flag <[outpostBlock]> name:<[name]>
 
-        on player closes OutpostList_GUI:
-        - flag <player> outpostGUIPage:!
+        # TODO: Figure out what I'm gonna do with outpost specs.
+        # - define spec <[currentOutpost].get[specType]>
 
-        on player clicks Unspec_Item in OutpostList_GUI:
-        # Little bit of cheeky data passing
-        - flag <player> outpostToBeSpeced:<context.item.flag[name]>
-        - inventory open d:OutpostSpec_Window
+        # No specialization is represented by the tag being non-existant
+        # - if <[currentOutpost].get[specType].exists>:
+        #     - define SpecKey <script[SpecTypeToItem].data_key[<[spec]>]>
+        #     - define outpostBlock <item[<[SpecKey]>]>
+
+        - definemap lore:
+            1: <element[Name: ]><[name].color[green]>
+            2: <element[Area: <[area].corners.first.xyz.color[blue]> <element[-<&gt>].color[gray]> <[area].corners.last.xyz.color[blue]>]>
+            3: <element[Dimensions: <[length].color[aqua]> x <[width].color[aqua]>]>
+            4: <element[Upkeep: <red>$<[upkeep].format_number>]>
+
+        - adjust def:outpostBlock lore:<[lore].values>
+
+        - define rawOutpostList:->:<[outpostBlock]>
+
+    - run PaginatedInterface def.itemList:<[rawOutpostList]> def.page:1 def.player:<[player]> def.title:<element[Outpost List]>

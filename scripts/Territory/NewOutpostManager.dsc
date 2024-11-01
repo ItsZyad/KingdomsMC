@@ -6,7 +6,9 @@
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jul 2021
-## @Script Ver: v1.1
+## @Update 1: Jul 2024
+## @Update 2: Oct 2024
+## @Script Ver: v1.2
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 
@@ -40,9 +42,7 @@ Outpost_Command:
     #------------------------------------------------------------------------------------------------------------------------
 
     - if <context.args.get[1]> == list:
-        - inject OutpostList_Command.subpaths.ResetOutpostPageFlag
-        - inject OutpostList_Command.subpaths.OutpostGUI_Init
-        - inject OutpostList_Command.subpaths.OutpostGUI_Show
+        - run OutpostList def.player:<player>
 
     #------------------------------------------------------------------------------------------------------------------------
 
@@ -79,12 +79,7 @@ Outpost_Command:
     #------------------------------------------------------------------------------------------------------------------------
 
     - else if <context.args.get[1]> == cancel:
-        - flag <player> outpostCost:!
-        - flag <player> cornerOneDefined:!
-        - flag <player> cornerTwoDefined:!
-        - flag <player> canNameOutpost:!
-        - flag <player> size:!
-        - flag <player> redefiningOutpost:!
+        - flag <player> datahold.outpost:!
 
         # Give the player their blocks back
         - run LoadTempInventory def:<player>
@@ -92,38 +87,36 @@ Outpost_Command:
     #------------------------------------------------------------------------------------------------------------------------
 
     - else if <context.args.get[1]> == delete:
-        - if <player.has_permission[kingdoms.outpost.delete]>:
+        - if !<player.has_permission[kingdoms.outpost.delete]>:
+            - narrate format:callout "You do not have sufficient permissions to delete an outpost! This must be performed by a higher-ranking member of your kingdom."
+            - determine cancelled
 
-            - if <player.has_flag[confirmOutpostDeletion]> && <context.args.get[2]> == confirm:
-                - define name <proc[OutpostNameEscaper].context[<context.args.get[3].to[last].space_separated>]>
-                - define kingdom <player.flag[kingdom]>
+        - if <player.has_flag[confirmOutpostDeletion]> && <context.args.get[2]> == confirm:
+            - define name <proc[OutpostNameEscaper].context[<context.args.get[3].to[last].space_separated>]>
+            - define kingdom <player.flag[kingdom]>
 
-                # Clear outpost name if it exists under the player's kingdom
-                - if <server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>]>:
-                    - flag server kingdoms.<[kingdom]>.balance:+:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>.upkeep].mul[0.45]>
+            # Clear outpost name if it exists under the player's kingdom
+            - if !<server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>]>:
+                - narrate format:callout "There is no outpost by the name: <red><[name]>"
+                - determine cancelled
 
-                    - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[name]>:!
-                    - flag server kingdoms.outpostInfo.allOutposts.<[name]>:!
+            - run AddBalance def.kingdom:<[kingdom]> def.amount:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>.upkeep].mul[0.45]>
 
-                    #TODO: Make it clear the relevant amount of upkeep from the kingdom total
+            - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[name]>:!
+            - flag server kingdoms.outpostInfo.allOutposts.<[name]>:!
 
-                    - note remove as:<[name]>
-                    - narrate format:callout "Successfully deleted outpost by the name <[name]>"
-                    - narrate format:callout "45<&pc> of your outpost's usual daily upkeep has been returned to your kingdom."
+            # TODO: Make it clear the relevant amount of upkeep from the kingdom total
 
-                - else:
-                    - narrate format:callout "There is no outpost by the name: <red><[name]>"
+            - note remove as:<[name]>
+            - narrate format:callout "Successfully deleted outpost by the name <[name]>"
+            - narrate format:callout "45<&pc> of your outpost's usual daily upkeep has been returned to your kingdom."
 
-                - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
-
-            - else:
-                - narrate format:callout "Are you sure you would like to delete this outpost?"
-                - narrate format:callout "Please type <element[outpost delete confirm <&lt>name<&gt>].color[red]> to confirm."
-                - flag <player> confirmOutpostDeletion expire:10m
+            - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
         - else:
-            - narrate format:callout "You do not have sufficient permissions to delete an outpost! This must be performed by a higher-ranking member of your kingdom."
-
+            - narrate format:callout "Are you sure you would like to delete this outpost?"
+            - narrate format:callout "Please type <element[outpost delete confirm <&lt>name<&gt>].color[red]> to confirm."
+            - flag <player> confirmOutpostDeletion expire:10m
 
     #------------------------------------------------------------------------------------------------------------------------
 
@@ -140,13 +133,13 @@ Outpost_Command:
             - narrate format:callout "You must specify a name for the outpost being redefined"
 
         - define kingdom <player.flag[kingdom]>
-        - define name <context.args.get[2].to[last]>
+        - define name <context.args.get[2].to[last].space_separated.trim>
 
         - if <server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>]>:
             - run TempSaveInventory def:<player>
             - give to:<player.inventory> slot:<player.held_item_slot> OutpostWand_Item
 
-            - flag <player> redefiningOutpost:<[name]>
+            - flag <player> datahold.outpost.redefiningOutpost:<[name]>
 
             - narrate format:callout "Use the outpost wand in your hotbar to redefine this outpost by clicking the intended corner blocks with it."
 
@@ -166,19 +159,19 @@ OutpostWand_Handler:
     type: world
     events:
         on player clicks block with:OutpostWand_Item:
-        - if !<player.has_flag[cornerOneDefined]>:
+        - if !<player.has_flag[datahold.outpost.cornerOneDefined]>:
             - ratelimit <player> 1s
 
             # First corner selection and flagging player with its location
-            - flag <player> cornerOneDefined:<context.location>
+            - flag <player> datahold.outpost.cornerOneDefined:<context.location>
             - narrate format:callout "Please select the second corner of the outpost"
 
             - stop
 
         - define kingdom <player.flag[kingdom]>
-        - define cornerOne <player.flag[cornerOneDefined]>
+        - define cornerOne <player.flag[datahold.outpost.cornerOneDefined]>
         - define cornerTwo <context.location>
-        - flag <player> cornerTwoDefined:<[cornerTwo]>
+        - flag <player> datahold.outpost.cornerTwoDefined:<[cornerTwo]>
 
         # Note: future configurable.
         - define minCastleDistance 250
@@ -192,10 +185,8 @@ OutpostWand_Handler:
             - define chunkCenter <[value].cuboid.center>
             - define outpostDistance <[currOutpostSelection].center.distance[<[chunkCenter]>]>
 
-            - narrate format:debug D:<[outpostDistance]>
-
             - if <[outpostDistance].is[OR_LESS].than[<[minCastleDistance]>]>:
-                - flag <player> cornerOneDefined:!
+                - flag <player> datahold.outpost.cornerOneDefined:!
 
                 # Give error message and return the player's inventory
                 - narrate format:callout "Your outpost is too close to another kingdom's territory!"
@@ -206,75 +197,75 @@ OutpostWand_Handler:
 
         - define outpostList <server.flag[kingdoms.outpostInfo.allOutposts].to_pair_lists.if_null[<list[]>]>
 
-        - if <player.has_flag[redefiningOutpost]>:
-            - define outpostList <server.flag[kingdoms.outpostInfo.allOutposts].if_null[<map[]>].to_pair_lists.exclude[<list[<player.flag[redefiningOutpost]>|<[kingdom]>]>].if_null[<list[]>]>
+        - if <player.has_flag[datahold.outpost.redefiningOutpost]>:
+            - define outpostList <proc[GetAllOutposts]>
 
-        - foreach <[outpostList]>:
+        - foreach <[outpostList]> key:outpostName as:outpost:
+            - if <[outpostName]> == <player.flag[datahold.outpost.redefiningOutpost].replace[ ].with[-]>:
+                - foreach next
 
-            # Definitions for the loop outpost's kingdom,corners,name,world
-            - define outpostKingdom <[value].get[2]>
-            - define outpostName <[value].get[1]>
-            - define outpostCornerOne <server.flag[kingdoms.<[outpostKingdom]>.outposts.outpostList.<[outpostName]>.cornerone]>
-            - define outpostCornerTwo <server.flag[kingdoms.<[outpostKingdom]>.outposts.outpostList.<[outpostName]>.cornertwo]>
-            - define outpostWorld <server.flag[kingdoms.<[outpostKingdom]>.outposts.outpostList.<[outpostName]>.cornerone].world>
+            - define outpostKingdom <[outpost].get[kingdom]>
+            - define outpostWorld <proc[GetOutpostArea].context[<[kingdom]>|<[outpostName]>].world>
 
-            # Put together the loop outpost as a cuboid object and check if it overlaps with
-            # the player's current selection
-            - define otherOutpost <cuboid[<[outpostWorld].name>,<[outpostCornerOne].x>,0,<[outpostCornerOne].z>,<[outpostCornerTwo].x>,255,<[outpostCornerTwo].z>]>
+            # Put together the loop outpost as a cuboid object and check if it overlaps with the
+            # player's current selection
+            - define otherOutpostArea <proc[GetOutpostArea].context[<[outpostKingdom]>|<[outpostName]>]>
 
             # If the outpost overlaps with another outpost from any kingdom then cancel the
             # player's selection and return their inventory
-            - if <[otherOutpost].intersects[<[currOutpostSelection]>]>:
-                - flag <player> cornerOneDefined:!
-                - flag <player> cornerTwoDefined:!
+            - if <[otherOutpostArea].intersects[<[currOutpostSelection]>]>:
+                - flag <player> datahold.outpost.cornerOneDefined:!
+                - flag <player> datahold.outpost.cornerTwoDefined:!
 
                 - narrate format:callout "This selection overlaps with another outpost. Please select another location"
 
                 - run LoadTempInventory def:<player>
                 - foreach stop
 
-        - if <player.has_flag[cornerOneDefined]> && <player.has_flag[cornerTwoDefined]>:
-            - define diffX <player.flag[cornerOneDefined].x.sub[<player.flag[cornerTwoDefined].x>].abs>
-            - define diffZ <player.flag[cornerOneDefined].z.sub[<player.flag[cornerTwoDefined].z>].abs>
+        - if <player.has_flag[datahold.outpost.cornerOneDefined]> && <player.has_flag[datahold.outpost.cornerTwoDefined]>:
+            - define diffX <player.flag[datahold.outpost.cornerOneDefined].x.sub[<player.flag[datahold.outpost.cornerTwoDefined].x>].abs>
+            - define diffZ <player.flag[datahold.outpost.cornerOneDefined].z.sub[<player.flag[datahold.outpost.cornerTwoDefined].z>].abs>
             - define size <[diffX].mul[<[diffZ]>]>
 
-            # TODO: Move all flag calls to KAPI file
             # Note: Future configurable.
-            - if <[size].is[OR_LESS].than[<server.flag[kingdoms.<[kingdom]>.outposts.maxSize].if_null[5000]>]>:
-                - define outpostCost <[size].mul[<server.flag[kingdoms.<[kingdom]>.outposts.costMultiplier].if_null[1]>].round>
+            - if <[size].is[LESS].than[<[kingdom].proc[GetKingdomOutpostMaxSize]>]>:
+                - narrate format:callout "Outpost exceeds maximum size of: <red><[kingdom].proc[GetKingdomOutpostMaxSize]><&6>! Attempted claim size of: <red><[size]>"
 
-                - if <[kingdom].proc[GetBalance].is[OR_MORE].than[<[outpostCost]>]>:
-                    - if !<player.has_flag[redefiningOutpost]>:
-                        - flag <player> noChat.outposts.definingOutpost
-                        - flag <player> canNameOutpost
+                - flag <player> datahold.outpost.cornerOneDefined:!
+                - flag <player> datahold.outpost.cornerTwoDefined:!
 
-                        - narrate format:callout "Please type in chat the name you would like to give this outpost (or type 'cancel'):"
+                - determine cancelled
 
-                    - else:
-                        - flag <player> noChat.outposts.definingOutpost
-                        - flag <player> outpostAlreadyNamed
+            - define outpostCost <[size].mul[<server.flag[kingdoms.<[kingdom]>.outposts.costMultiplier].if_null[1]>].round>
 
-                        - narrate format:callout "Are you sure you would like to redefine this outpost to these specifications? (yes/no)"
+            - if <[kingdom].proc[GetBalance].is[LESS].than[<[outpostCost]>]>:
+                - narrate format:callout "This selection costs <element[$<[outpostCost].as_money>].color[red]> to claim. You do not have sufficient funds to claim it."
 
-                    - flag <player> outpostCost:<[outpostCost]>
-                    - flag <player> size:<[size]>
+                - flag <player> datahold.outpost.cornerOneDefined:!
+                - flag <player> datahold.outpost.cornerTwoDefined:!
 
-                - else:
-                    - narrate format:callout "This selection costs <element[$<[outpostCost].as_money>].color[red]> to claim. You do not have sufficient funds to claim it."
+                - determine cancelled
 
-                    - flag <player> cornerOneDefined:!
-                    - flag <player> cornerTwoDefined:!
+            - if <player.has_flag[datahold.outpost.redefiningOutpost]>:
+                - flag <player> noChat.outposts.definingOutpost
+                - flag <player> datahold.outpost.outpostAlreadyNamed
 
-            - else:
-                - narrate format:callout "Outpost exceeds maximum size of: <red><server.flag[kingdoms.<[kingdom]>.outposts.maxSize].if_null[5000]><&6>! Attempted claim size of: <red><[size]>"
+                - narrate format:callout "Are you sure you would like to redefine this outpost to these specifications? (yes/no)"
 
-                - flag <player> cornerOneDefined:!
-                - flag <player> cornerTwoDefined:!
+                - determine cancelled
+
+            - flag <player> noChat.outposts.definingOutpost
+            - flag <player> datahold.outpost.canNameOutpost
+
+            - narrate format:callout "Please type in chat the name you would like to give this outpost (or type 'cancel'):"
+
+            - flag <player> datahold.outpost.outpostCost:<[outpostCost]>
+            - flag <player> datahold.outpost.size:<[size]>
 
         on player chats flagged:noChat.outposts.definingOutpost:
-        - define posOne <player.flag[cornerOneDefined]>
-        - define posTwo <player.flag[cornerTwoDefined]>
-        - define outpostCost <player.flag[outpostCost]>
+        - define posOne <player.flag[datahold.outpost.cornerOneDefined]>
+        - define posTwo <player.flag[datahold.outpost.cornerTwoDefined]>
+        - define outpostCost <player.flag[datahold.outpost.outpostCost]>
         - define kingdom <player.flag[kingdom]>
 
         - if <context.message.to_lowercase> == cancel:
@@ -283,57 +274,29 @@ OutpostWand_Handler:
             - run LoadTempInventory def:<player>
             - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
-            - flag <player> outpostCost:!
-            - flag <player> cornerOneDefined:!
-            - flag <player> cornerTwoDefined:!
-            - flag <player> canNameOutpost:!
-            - flag <player> size:!
-            - flag <player> redefiningOutpost:!
-            - flag <player> outpostAlreadyNamed:!
+            - flag <player> datahold.outpost:!
 
             - determine cancelled
 
-        - if <player.has_flag[canNameOutpost]>:
+        - if <player.has_flag[datahold.outpost.canNameOutpost]>:
             - if !<server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<context.message>]>:
-                - note <cuboid[<player.world.name>,<[PosOne].as[location].x>,0,<[PosOne].as[location].z>,<[PosTwo].as[location].x>,255,<[PosTwo].as[location].z>]> as:<context.message>
                 - define escapedName <proc[OutpostNameEscaper].context[<context.message>]>
 
-                - flag server kingdoms.outpostInfo.allOutposts.<[escapedName]>:<[kingdom]>
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornerone:<[PosOne].as[location].with_y[0]>
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornertwo:<[PosTwo].as[location].with_y[255]>
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size:<player.flag[size].round>
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.upkeep:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size].mul[<server.flag[kingdoms.<[kingdom]>.outposts.upkeepMultiplier].if_null[1]>].round>
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.name:<context.message>
-
-                - flag server kingdoms.<[kingdom]>.outposts.totalupkeep:+:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.upkeep].if_null[0]>
-                - flag server kingdoms.<[kingdom]>.balance:-:<[outpostCost]>
-                - flag server kingdoms.<[kingdom]>.upkeep:+:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.upkeep].if_null[0]>
-
+                - run CreateOutpost def.kingdom:<[kingdom]> def.cornerList:<list[<[posOne]>|<[posTwo]>]> def.outpostName:<context.message>
                 - narrate format:callout "Claimed outpst by the name: <context.message.color[red]>! Use <element[/outpost list].color[aqua]> to see outpost info."
 
             - else:
                 - narrate format:callout "There is already an outpost by this name! Use <red>/outpost redefine <&6>or <red>/outpost rename to change an existing outpost"
 
-        - else if <player.has_flag[outpostAlreadyNamed]>:
+        - else if <player.has_flag[datahold.outpost.outpostAlreadyNamed]>:
             - if <context.message.to_lowercase> == yes:
-                - define outpostName <player.flag[redefiningOutpost]>
-                - note <cuboid[<player.world.name>,<[PosOne].as[location].x>,0,<[PosOne].as[location].z>,<[PosTwo].as[location].x>,255,<[PosTwo].as[location].z>]> as:<context.message>
+                - define outpostName <player.flag[datahold.outpost.redefiningOutpost]>
+                - define newArea <cuboid[<player.world.name>,<[PosOne].as[location].x>,0,<[PosOne].as[location].z>,<[PosTwo].as[location].x>,255,<[PosTwo].as[location].z>]>
+                - define escapedName <proc[OutpostNameEscaper].context[<[outpostName]>]>
 
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornerone:<[PosOne].as[location].with_y[0]>
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.cornertwo:<[PosTwo].as[location].with_y[255]>
-                - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size:<player.flag[size].round>
+                - run SetOutpostArea def.kingdom:<[kingdom]> def.outpost:<[escapedName]> def.newArea:<[newArea]>
 
-                - define newUpkeep <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpostName]>.size].mul[<server.flag[kingdoms.<[kingdom]>.outposts.upkeepMultiplier].if_null[1]>].round>
-                - define oldUpkeep <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpostName]>.upkeep]>
-
-                - flag server <[kingdom]>.outposts.outpostList.<[outpostName]>.upkeep:<[newUpkeep]>
-
-                - define upkeepDiff <[newUpkeep].sub[<[newUpkeep]>].abs>
-
-                - flag server kingdoms.<[kingdom]>.outposts.totalupkeep:+:<[upkeepDiff]>
-                - flag server kingdoms.<[kingdom]>.upkeep:+:<[upkeepDiff]>
                 - flag <player> outpostAlreadyNames:!
-
                 - narrate format:callout "Successfully made changes to outpost: <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpostName]>.name].color[red]>!"
 
             - else:
@@ -342,13 +305,7 @@ OutpostWand_Handler:
         - run LoadTempInventory def:<player>
         - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
-        - flag <player> outpostCost:!
-        - flag <player> cornerOneDefined:!
-        - flag <player> cornerTwoDefined:!
-        - flag <player> canNameOutpost:!
-        - flag <player> size:!
-        - flag <player> redefiningOutpost:!
-        - flag <player> outpostAlreadyNamed:!
+        - flag <player> datahold.outpost:!
         - flag <player> noChat.outposts.definingOutpost:!
 
         - determine cancelled
