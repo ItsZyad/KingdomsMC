@@ -40,7 +40,6 @@ Help_Strings:
         war: Subcommand which handles all aspects related to waging war against other kingdoms.
         ideas: Shows your kingdom's ideas. These are a number of buffs and debuffs that apply to kingdom depending on its character and history.
         outline: You can specify either 'castle' or 'core' to show you the bounds of both of those territorial units in your kingdom.
-        influence: Opens a menu which shows all the influence actions you can take to bring Fyndalin further under your control, as well as the current status of your kingdom's influence. <red>Can also be accessed using /influence
         guards: Will open your kingdom's guard window which will show all your guard NPCs, their location, status, and other information.
         help: That's so meta...
 
@@ -480,18 +479,9 @@ Kingdom_Command:
         #------------------------------------------------------------------------------------------
 
         Withdraw:
-        - define offerWorth null
-
-        - foreach <server.flag[fyndalin].get[loanOffers]>:
-            - if <[value].get[kingdom]> == <[kingdom]>:
-                - define offerWorth <[value].get[amount]>
-
         - define amount <context.args.get[2]>
 
-        - if <[kingdom].proc[GetBalance].sub[<[amount]>].is[LESS].than[<[offerWorth].if_null[0]>]>:
-            - narrate format:callout "Your kingdom has an active loan offer to Fyndalin worth: $<[offerWorth]>. You may not withdraw an amount that would place you below that amount until the offer is resolved."
-
-        - else if <[kingdom].proc[GetBalance].is[OR_MORE].than[<[amount]>]>:
+        - if <[kingdom].proc[GetBalance].is[OR_MORE].than[<[amount]>]>:
             - money give to:<player> quantity:<[amount]>
             - run SubBalance def.kingdom:<[kingdom]> def.amount:<[amount]>
 
