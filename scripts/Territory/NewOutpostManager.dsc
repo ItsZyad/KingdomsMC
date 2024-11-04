@@ -8,7 +8,7 @@
 ## @Date: Jul 2021
 ## @Update 1: Jul 2024
 ## @Update 2: Oct 2024
-## @Script Ver: v1.2
+## @Script Ver: v1.3
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 
@@ -96,18 +96,12 @@ Outpost_Command:
             - define kingdom <player.flag[kingdom]>
 
             # Clear outpost name if it exists under the player's kingdom
-            - if !<server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>]>:
+            - if !<proc[DoesOutpostExist].context[<[kingdom]>|<[name]>]>:
                 - narrate format:callout "There is no outpost by the name: <red><[name]>"
                 - determine cancelled
 
-            - run AddBalance def.kingdom:<[kingdom]> def.amount:<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>.upkeep].mul[0.45]>
+            - run RemoveOutpost def.kingdom:<[kingdom]> def.outpost:<[name]>
 
-            - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[name]>:!
-            - flag server kingdoms.outpostInfo.allOutposts.<[name]>:!
-
-            # TODO: Make it clear the relevant amount of upkeep from the kingdom total
-
-            - note remove as:<[name]>
             - narrate format:callout "Successfully deleted outpost by the name <[name]>"
             - narrate format:callout "45<&pc> of your outpost's usual daily upkeep has been returned to your kingdom."
 
@@ -135,7 +129,7 @@ Outpost_Command:
         - define kingdom <player.flag[kingdom]>
         - define name <context.args.get[2].to[last].space_separated.trim>
 
-        - if <server.has_flag[kingdoms.<[kingdom]>.outposts.outpostList.<[name]>]>:
+        - if <proc[DoesOutpostExist].context[<[kingdom]>|<[name]>]>:
             - run TempSaveInventory def:<player>
             - give to:<player.inventory> slot:<player.held_item_slot> OutpostWand_Item
 
@@ -146,8 +140,6 @@ Outpost_Command:
         - else:
             - narrate format:callout "There exists no outpost by the name: <red><[name]>"
 
-
-##############################################################################
 
 OutpostWand_Item:
     type: item
@@ -195,10 +187,7 @@ OutpostWand_Handler:
 
                 - stop
 
-        - define outpostList <server.flag[kingdoms.outpostInfo.allOutposts].to_pair_lists.if_null[<list[]>]>
-
-        - if <player.has_flag[datahold.outpost.redefiningOutpost]>:
-            - define outpostList <proc[GetAllOutposts]>
+        - define outpostList <proc[GetAllOutposts]>
 
         - foreach <[outpostList]> key:outpostName as:outpost:
             - if <[outpostName]> == <player.flag[datahold.outpost.redefiningOutpost].replace[ ].with[-]>:
@@ -297,7 +286,7 @@ OutpostWand_Handler:
                 - run SetOutpostArea def.kingdom:<[kingdom]> def.outpost:<[escapedName]> def.newArea:<[newArea]>
 
                 - flag <player> outpostAlreadyNames:!
-                - narrate format:callout "Successfully made changes to outpost: <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpostName]>.name].color[red]>!"
+                - narrate format:callout "Successfully made changes to outpost: <proc[GetOutpostDisplayName].context[<[kingdom]>|<[outpostName]>].color[red]>!"
 
             - else:
                 - narrate format:callout "Changes reverted."
@@ -311,34 +300,52 @@ OutpostWand_Handler:
         - determine cancelled
 
 
-##############################################################################
-
-OutpostHandler:
+OutpostEntry_Handler:
     type: world
     debug: false
     events:
         on player enters area:
-        - if <script.queues.size.is[MORE].than[1]>:
-            - queue clear <script.queues.get[1]>
+        - define outpostHandlerQueue <util.queues.parse_tag[<[parse_value].script.name.equals[<script.name>]>].get[1].if_null[null]>
 
-        - if <server.has_flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>]>:
-            - define whichKingdom <server.flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>]>
+        - if <[outpostHandlerQueue]> != null:
+            - queue stop <[outpostHandlerQueue]>
 
-            - if <[whichKingdom]> == <player.flag[kingdom]>:
-                - repeat 3:
-                    - actionbar "You are now entering the outpost: <context.area.split[@].get[2].color[<proc[GetKingdomColor].context[<[whichKingdom]>]>]>"
-                    - wait 1s
+        - narrate format:debug <context.area>
 
-            - else:
-                - repeat 3:
-                    - actionbar "You are now entering a <server.flag[kingdoms.outpostInfo.allOutposts.<context.area.split[@].get[2]>].color[<proc[GetKingdomColor].context[<[whichKingdom]>]>]> outpost"
-                    - wait 1s
+        - if !<context.area.note_name.starts_with[outpost]>:
+            - stop
+
+        - define kingdom <player.flag[kingdom]>
+        - define outpost <context.area.note_name.split[_].get[2]>
+        - define outpostExists false
+        - define whichKingdom null
+
+        - foreach <proc[GetKingdomList]>:
+            - if <proc[DoesOutpostExist].context[<[value]>|<[outpost]>]>:
+                - define outpostExists true
+                - define whichKingdom <[value]>
+
+        - if !<[outpostExists]>:
+            - stop
+
+        - if <[whichKingdom]> == <[kingdom]>:
+            - repeat 3:
+                - actionbar "You are now entering the outpost: <[outpost].color[<proc[GetKingdomColor].context[<[whichKingdom]>]>]>"
+                - wait 1s
 
         on player exits area:
-        - if <script.queues.size.is[MORE].than[1]>:
-            - queue clear <script.queues.get[1]>
+        - define outpostHandlerQueue <util.queues.parse_tag[<[parse_value].script.name.equals[<script.name>]>].get[1].if_null[null]>
 
-        - if <server.has_flag[kingdoms.outpostinfo.allOutposts.<context.area.split[@].get[2]>]>:
+        - if <[outpostHandlerQueue]> != null:
+            - queue stop <[outpostHandlerQueue]>
+
+        - if !<context.area.note_name.starts_with[outpost]>:
+            - stop
+
+        - define kingdom <player.flag[kingdom]>
+        - define outpost <context.area.note_name.split[_].get[2]>
+
+        - if <proc[DoesOutpostExist].context[<[kingdom]>|<[outpost]>]>:
             - repeat 3:
                 - actionbar "<red>Leaving outpost"
                 - wait 1s
