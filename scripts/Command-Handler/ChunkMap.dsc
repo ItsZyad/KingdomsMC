@@ -13,7 +13,6 @@ ChunkMap:
     script:
     - define playerChunk <player.location.chunk>
     - define chunkList <list[]>
-    # - define allClaims <server.flag[kingdoms.claimInfo.allClaims]>
 
     - repeat 10 from:-5 as:zChunk:
         - repeat 19 from:-9 as:xChunk:
@@ -21,7 +20,6 @@ ChunkMap:
 
             - if <proc[GetAllClaims].contains[<[currentChunk]>]>:
                 - foreach <proc[GetKingdomList]> as:kingdom:
-                    # - define kingdomTerritory <server.flag[kingdoms.<[kingdom]>.claims.castle].include[<server.flag[kingdoms.<[kingdom]>.claims.core]>]>
                     - define kingdomTerritory <[kingdom].proc[GetClaims]>
                     - define kingdomColor <[kingdom].proc[GetKingdomColor]>
 

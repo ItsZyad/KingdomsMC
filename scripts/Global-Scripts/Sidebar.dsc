@@ -45,7 +45,7 @@ GenerateUpkeepSidebarLine:
     ##
     ## >>> [ElementTag<String>]
 
-    - define totalOutpostUpkeep <server.flag[<[kingdom]>.outposts.totalUpkeep].if_null[0]>
+    - define totalOutpostUpkeep <[kingdom].proc[GetTotalOutpostUpkeep]>
 
     - if !<server.has_flag[PauseUpkeep]>:
         - determine <element[Upkeep: <yellow>$<[kingdom].proc[GetUpkeep].add[<[totalOutpostUpkeep].if_null[0]>].round_down.format_number>]>

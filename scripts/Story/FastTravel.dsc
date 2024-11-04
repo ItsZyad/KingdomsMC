@@ -10,7 +10,7 @@ FastTravel:
         - define allOtherClaims <list[]>
 
         - foreach <[allKingdoms].exclude[<[kingdom]>]> as:currkingdom:
-            - define territory <server.flag[kingdoms.<[currKingdom]>.claims.castle].include[<server.flag[kingdoms.<[currKingdom]>.claims.core]>]>
+            - define territory <[kingdom].proc[GetClaims]>
 
         - define isPlayerInOtherClaims <[territory].contains[<player.location.chunk>]>
 
