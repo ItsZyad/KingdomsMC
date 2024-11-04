@@ -149,6 +149,37 @@ GetOutpostSize:
     - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.size]>
 
 
+GetOutpostNote:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns a cuboid representing the noted area of the provided outpost in the provided kingdom.
+    - Will return null if the action fails.
+    - ---
+    - → ?[CuboidTag]
+
+    script:
+    ## Returns a cuboid representing the noted area of the provided outpost in the provided
+    ## kingdom.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## outpost : [ElementTag<String>]
+    ##
+    ## >>> ?[CuboidTag]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost note. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<proc[DoesOutpostExist].context[<[kingdom]>|<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost note. Invalid outpost name provided: <[outpost]>]>
+        - determine null
+
+    - determine <cuboid[<server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.noteName]>].if_null[null]>
+
+
 GetOutpostArea:
     type: procedure
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
