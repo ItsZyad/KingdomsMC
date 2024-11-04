@@ -494,7 +494,6 @@ CreateOutpost:
 
     - note <[outpostArea]> as:<[noteName]>
 
-    - flag server kingdoms.outpostInfo.allOutposts.<[escapedName]>:<[kingdom]>
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.area:<[outpostArea]>
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.noteName:<[noteName]>
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size:<[size].round>
@@ -534,7 +533,7 @@ RemoveOutpost:
 
     - determine passively <proc[GetOutposts].context[<[kingdom]>|<[outpost]>].values.get[1]>
 
-    - note as:outpost_<[outpost]> remove
+    - note as:<proc[GetOutpostNote].context[<[kingdom]>|<[outpost]>].note_name> remove
 
     - run SubUpkeep def.kingdom:<[kingdom]> def.amount:<proc[GetOutpostUpkeep].context[<[kingdom]>|<[outpost]>]>
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>:!
