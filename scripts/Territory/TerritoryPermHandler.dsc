@@ -5,7 +5,7 @@
 ## @Date: Jun 2021
 ## @Update 1: Oct 2023
 ## @Update 2: Jun 2024
-## @Script Ver: v3.0
+## @Script Ver: v3.1
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 
@@ -147,23 +147,20 @@ TerritoryHandler:
             - if <[value]> == <context.location.chunk>:
                 - determine cancelled
 
-        - foreach <[kingdom].proc[GetOutposts].keys>:
-            - if <cuboid[<[value]>].players.contains[<player>]>:
+        - foreach <[kingdom].proc[GetOutposts]>:
+            - if <[value].get[area].contains[<player.location>]>:
                 - determine cancelled
 
         on player empties bucket:
-        - if !<proc[GetAllClaims].contains[<context.location.chunk>]>:
-            - stop
-
         - define kingdom <player.flag[kingdom]>
 
         # - if <player.has_permission[kingdoms.admin.bypassrc]>:
         #     - stop
 
-        - if <player.proc[IsInOwnDuchy]>:
-            - stop
-
         - if <player.proc[IsInAnyDuchy]>:
+            - if <player.proc[IsInOwnDuchy]>:
+                - stop
+
             # TODO: Insert logic for checking if the player has been allowed by the duke to use
             # TODO/ their land.
             - determine cancelled
@@ -183,11 +180,11 @@ TerritoryHandler:
 
             - determine cancelled
 
-        on player places block:
-        - if <player.has_permission[kingdoms.admin.bypassrc]>:
+        - if !<proc[GetAllClaims].contains[<context.location.chunk>]>:
             - stop
 
-        - if !<proc[GetAllClaims].contains[<context.location.chunk>]>:
+        on player places block:
+        - if <player.has_permission[kingdoms.admin.bypassrc]>:
             - stop
 
         - if !<player.has_flag[kingdom]>:
@@ -196,10 +193,10 @@ TerritoryHandler:
         - define kingdom <player.flag[kingdom]>
         - define castleCore <[kingdom].proc[GetClaims]>
 
-        - if <player.proc[IsInOwnDuchy]>:
-            - stop
-
         - if <player.proc[IsInAnyDuchy]>:
+            - if <player.proc[IsInOwnDuchy]>:
+                - stop
+
             # TODO: Insert logic for checking if the player has been allowed by the duke to use
             # TODO/ their land.
             - determine cancelled
@@ -218,10 +215,13 @@ TerritoryHandler:
 
                 - determine cancelled
 
-        - else if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size.if_null[0]> != 0:
-            - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
-                - if <cuboid[<[value]>].players.contains[<player>]>:
+        - if <[kingdom].proc[GetOutposts].size.if_null[0]> != 0:
+            - foreach <[kingdom].proc[GetOutposts]>:
+                - if <[value].get[area].contains[<player.location>]>:
                     - stop
+
+        - if !<proc[GetAllClaims].contains[<context.location.chunk>]>:
+            - stop
 
         - determine cancelled
 
@@ -229,19 +229,16 @@ TerritoryHandler:
         - if <player.has_permission[kingdoms.admin.bypassrc]>:
             - stop
 
-        - if !<proc[GetAllClaims].contains[<context.location.chunk>]>:
-            - stop
-
         - if !<player.has_flag[kingdom]>:
             - determine cancelled
 
         - define kingdom <player.flag[kingdom]>
         - define castleCore <[kingdom].proc[GetClaims]>
 
-        - if <player.proc[IsInOwnDuchy]>:
-            - stop
-
         - if <player.proc[IsInAnyDuchy]>:
+            - if <player.proc[IsInOwnDuchy]>:
+                - stop
+
             # TODO: Insert logic for checking if the player has been allowed by the duke to use
             # TODO/ their land.
             - determine cancelled
@@ -260,10 +257,13 @@ TerritoryHandler:
 
                 - determine cancelled
 
-        - else if <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys.size.if_null[0]> != 0:
-            - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].keys>:
-                - if <cuboid[<[value]>].players.contains[<player>]>:
+        - if <[kingdom].proc[GetOutposts].size.if_null[0]> != 0:
+            - foreach <[kingdom].proc[GetOutposts]>:
+                - if <[value].get[area].contains[<player.location>]>:
                     - stop
+
+        - if !<proc[GetAllClaims].contains[<context.location.chunk>]>:
+            - stop
 
         - determine cancelled
 
