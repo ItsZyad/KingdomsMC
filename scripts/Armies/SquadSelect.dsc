@@ -530,8 +530,10 @@ SpawnNewSoldiers:
         - flag <[soldier]> soldier.kingdom:<[kingdom]>
         - flag <[soldier]> soldier.type:<[type]>
         - flag <[soldier]> soldier.isSquadLeader:<[isSquadLeader]>
-
         - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:->:<[soldier]>
+
+        # This has evaded me for too long...
+        - adjust <[soldier]> distance_margin:0
 
         # Special case for squad leader;
         - if <[value]> == 1:
