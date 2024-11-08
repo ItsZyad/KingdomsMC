@@ -175,6 +175,9 @@ ChessForward:
     - if <[adjustedLocation].direction.contains[west]>:
         - define adjustedLocation <[adjustedLocation].add[<[amount].proc[Invert]>,0,0]>
 
+    - if <[round]>:
+        - define adjustedLocation <[adjustedLocation].proc[RoundCoordinates]>
+
     - determine <[adjustedLocation]>
 
 
@@ -289,6 +292,9 @@ ChessRight:
 
     - if <[adjustedLocation].direction.contains[west]>:
         - define adjustedLocation <[adjustedLocation].add[0,0,<[amount].proc[Invert]>]>
+
+    - if <[round]>:
+        - define adjustedLocation <[adjustedLocation].proc[RoundCoordinates]>
 
     - determine <[adjustedLocation]>
 
