@@ -385,11 +385,11 @@ GetOutpostOccupiers:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost occupiers. Invalid kingdom code provided: <[kingdom].color[red]>.]>
         - determine null
 
-    - if !<proc[GetAllOutposts].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
+    - if !<proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost occupiers. There is no outpost by the name: <[outpost].color[red]>.]>
         - determine null
 
-    - define targetKingdom <proc[GetAllOutposts].filter_tag[<[filter_value].contains[<[outpost]>]>].keys.get[1]>
+    - define targetKingdom <proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].keys.get[1]>
     - define warID <[kingdom].proc[GetKingdomWars].filter_tag[<[filter_value].proc[GetWarRetaliators].contains[<[targetKingdom]>]>].get[1]>
 
     - if !<[warID].is_truthy>:
@@ -834,7 +834,7 @@ OccupyOutpost:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot occupy outpost. Invalid kingdom code provided: <[kingdom].color[red]>.]>
         - determine null
 
-    - if !<proc[GetAllOutposts].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
+    - if !<proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot occupy outpost. There is no outpost by the name: <[outpost].color[red]>.]>
         - determine null
 
@@ -907,11 +907,11 @@ CancelOutpostOccupation:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[GetAllOutposts].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
+    - if !<proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot cancel outpost occupation. There is no outpost by the name: <[outpost].color[red]>.]>
         - determine null
 
-    - define targetKingdom <proc[GetAllOutposts].filter_tag[<[filter_value].contains[<[outpost]>]>].keys.get[1]>
+    - define targetKingdom <proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].keys.get[1]>
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot cancel outpost occupation. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
@@ -955,7 +955,7 @@ ReclaimOutpost:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot reclaim outpost. Invalid kingdom code provided: <[kingdom].color[red]>.]>
         - determine null
 
-    - if !<proc[GetAllOutposts].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
+    - if !<proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot reclaim outpost. There is no outpost by the name: <[outpost].color[red]>.]>
         - determine null
 
@@ -1050,7 +1050,7 @@ CancelOutpostReclamation:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[GetAllOutposts].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
+    - if !<proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot cancel outpost reclamation. There is no outpost by the name: <[outpost].color[red]>.]>
         - determine null
 
