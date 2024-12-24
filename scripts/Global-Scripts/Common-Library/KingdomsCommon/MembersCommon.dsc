@@ -56,7 +56,7 @@ AddMember:
 
     - flag <[player]> kingdom:<[kingdom]>
     - flag server kingdoms.<[kingdom]>.members:->:<[player]>
-    - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+    - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
 
 RemoveMember:
@@ -85,7 +85,7 @@ RemoveMember:
 
     - if <proc[GetMembers].context[<[kingdom]>].contains[<[player]>]>:
         - flag server kingdoms.<[kingdom]>.members:<-:<[player]>
-        - ~run SidebarLoader def.target:<server.flag[kingdoms.<[kingdom]>.members].include[<server.online_ops>]>
+        - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
 
 GetAllMembers:
