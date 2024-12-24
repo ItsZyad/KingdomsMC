@@ -140,7 +140,7 @@ CalculateRNPCPrice:
     definitions: truePrice|player
     script:
     - define kingdom <player.flag[kingdom]>
-    - flag server kingdoms.<[kingdom]>.balance:-:<[truePrice]>
+    - run SubBalance def.kingdom:<[kingdom]> def.amount:<[truePrice]>
     - flag server kingdoms.<[kingdom]>.npcTotal:++
 
     - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
@@ -475,7 +475,7 @@ RNPCInfo_Handler:
 
         # Remove all references of NPC from YAML files
         - flag server kingdoms.<[kingdom]>.npcTotal:--
-        - flag server kingdoms.<[kingdom]>.balance:+:<[refund].round>
+        - run AddBalance def.kingdom:<[kingdom]> def.amount:<[refund].round>
         - flag server kingdoms.<[kingdom]>.RNPCs.<script[RNPCLandTypeRef].data_key[<[npc].nickname.split[<&sp>::].get[1]>]>.<[npc].id>:!
 
         - remove <[npc]>
