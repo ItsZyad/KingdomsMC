@@ -205,6 +205,9 @@ SquadOptions_Handler:
             - determine cancelled
 
         - define kingdom <player.flag[kingdom]>
+
+        # TODO(High): Replace all of these player.flag[datahold.squadInfo] with actual KAPI calls.
+        # TODO/ You shouldn't need to juggle a flag around just to access basic squad information.
         - define squadInfo <player.flag[datahold.squadInfo]>
         - define squadName <[squadInfo].get[name]>
         - define squadLeader <[squadInfo].get[squadLeader]>
@@ -308,7 +311,7 @@ SquadOptions_Handler:
         - define pointOne <player.flag[datahold.armies.drawingFormation.pointOne]>
 
         # If the squad was occupying to a chunk and then moved to a different chunk.
-        - if <[squadLeader].has_flag[datahold.war.occupying]> && (<[squadLeader].flag[datahold.war.occupying.chunk].contains[<[pointOne]>]> || <[squadLeader].flag[datahold.war.occupying.chunk].contains[<[pointTwo]>]>):
+        - if <[squadLeader].has_flag[datahold.war.occupying.chunk]> && (<[squadLeader].flag[datahold.war.occupying.chunk].contains[<[pointOne]>]> || <[squadLeader].flag[datahold.war.occupying.chunk].contains[<[pointTwo]>]>):
             - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[squadLeader]>
             - run CancelChunkOccupation def.kingdom:<[kingdom]> def.targetKingdom:<[squadLeader].flag[datahold.war.occupying.target]> def.squadLeader:<[squadLeader]> def.chunk:<[squadLeader].flag[datahold.war.occupying.chunk]>
             - run CancelOutpostOccupation def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.outpost:<[squadLeader].flag[datahold.war.occupying.outpost]> if:<[squadLeader].has_flag[datahold.war.occupying.outpost]>
@@ -361,12 +364,15 @@ SquadOptions_Handler:
         - define kingdomsAtWar <proc[GetKingdomList].exclude[<[kingdom]>].filter_tag[<proc[IsAtWarWithKingdom].context[<[kingdom]>|<[filter_value]>]>]>
 
         - foreach <[kingdomsAtWar]>:
-            - define outpostData <[value].proc[GetOutposts].parse_value_tag[<[parse_value].include[name=<[parse_key]>]>].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].values.get[1]>
+            - define outpostData <[value].proc[GetOutposts].parse_value_tag[<[parse_value].include[name=<[parse_key]>]>].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].values.get[1].if_null[null]>
 
             - if <[value].proc[GetClaims].contains[<[chunk]>]>:
                 - define claimDuration <duration[5m]>
                 - narrate format:callout "Your troops have started occupying this chunk. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
-                - run OccupyChunk def.kingdom:<[kingdom]> def.targetKingdom:<[value]> def.chunk:<[chunk]> def.squadLeader:<[squadLeader]> def.delay:<[claimDuration]>
+                - run OccupyChunk def.kingdom:<[kingdom]> def.targetKingdom:<[value]> def.chunk:<[chunk]> def.squadLeader:<[squadLeader]> def.delay:<[claimDuration]> save:result
+
+                - if !<entry[result].created_queue.determination.get[1].is_truthy>:
+                    - stop
 
                 - adjust <[squadLeader]> hologram_line_height:0.25
                 - flag <[squadLeader]> datahold.war.occupying.chunk:<[chunk]>
@@ -375,7 +381,7 @@ SquadOptions_Handler:
                 - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[claimDuration]>
                 - stop
 
-            - else if <[outpostData].is_truthy>:
+            - else if <[outpostData].is_truthy> && !<[outpostData].is_empty>:
                 - define squadLeaders <[kingdom].proc[GetKingdomSquads].parse_value_tag[<[parse_value].get[squadLeader]>].values>
                 - define otherOccupyingSquads <list[]>
 
@@ -391,11 +397,13 @@ SquadOptions_Handler:
                 - run OccupyOutpost def.kingdom:<[kingdom]> def.targetKingdom:<[value]> def.outpost:<[outpostData].get[name]> def.squadName:<[squadLeader].flag[soldier.squad]> save:claimDuration
                 - define claimDuration <entry[claimDuration].created_queue.determination.get[1]>
 
-                - if !<[claimDuration].is_truthy>:
+                - if !<[claimDuration].is_truthy> || <[claimDuration]> == null:
                     - stop
 
                 - narrate format:callout "Your troops have started occupying this outpost. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
                 - narrate format:callout "<italic>Note: You may move in additional squads to occupy outposts faster."
+
+            - narrate format:callout <element[Failed to claim chunk!].color[red]><element[ This chunk is a part of the wilderness, and cannot be occupied during a war.]>
 
         ## PREVENT WARPING WITH SQUAD TOOLS
         on warp command:
