@@ -3,7 +3,7 @@
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jun 2023
-## @Script Ver: v1.0
+## @Script Ver: v1.1
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 
@@ -376,26 +376,25 @@ SquadManagerUpgrade_Handler:
 
         ## Player Upgrades SM
         on player clicks *Inactive_Item in SquadManagerUpgrade_Subwindow:
-        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - define kingdom <player.flag[kingdom]>
+        - define SMID <player.flag[datahold.armies.squadManagerLocation].proc[GenerateSMID]>
         - define chosenLevel <context.item.flag[upgradeInfo.level]>
-        - define currentLevel <[SMLocation].flag[squadManager.levels.AOELevel]>
+        - define currentLevel <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.levels.AOELevel]>
 
         - if <[chosenLevel].sub[<[currentLevel]>]> > 1:
             - narrate format:callout "You cannot select that level yet!"
             - determine cancelled
 
-        - define kingdom <player.flag[kingdom]>
         - define kingdomBalance <proc[GetBalance].context[<[kingdom]>]>
 
         - if <context.item.flag[upgradeInfo.cost]> > <[kingdomBalance]>:
             - narrate format:callout "Your kingdom does not have enough funds to purchase this upgrade!"
             - determine cancelled
 
-        - flag <[SMLocation]> squadManager.levels.<player.flag[datahold.armies.upgradingSM.typeToPath]>:<[chosenLevel]>
+        - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.levels.<player.flag[datahold.armies.upgradingSM.typeToPath]>:<[chosenLevel]>
 
         - run SubBalance def.kingdom:<[kingdom]> def.amount:<context.item.flag[upgradeInfo.cost]>
         - run AddUpkeep def.kingdom:<[kingdom]> def.amount:<context.item.flag[upgradeInfo.upkeepAdd]>
-        - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
 
         - define itemName <context.item.script.name>
         - define activeItem <element[<[itemName].split[Inactive].get[1]>active_item].as[item]>

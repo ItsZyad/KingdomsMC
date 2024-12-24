@@ -5,7 +5,7 @@
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Original Scripts: Jun 2023
 ## @Date: Oct 2023
-## @Script Ver: v0.1
+## @Script Ver: v1.0
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 
@@ -135,8 +135,12 @@ GetSquadLeader:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad leader. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
+    - if !<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader].exists>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad leader.]>
+        - determine null
+
     - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad by name: <[squadName]>]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad leader. No squad by name: <[squadName].color[red]> exists.]>
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader].if_null[null]>
@@ -190,6 +194,36 @@ GetSquadName:
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].filter_tag[<[filter_value].get[ID].equals[<[ID]>]>].get[1].get[name].if_null[null]>
+
+
+GetSquadUpkeep:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    description:
+    - Gets the upkeep for the squad with the given name and kingdom.
+    - Will return null if the action fails.
+    - ---
+    - → ?[ElementTag(Float)]
+
+    script:
+    ## Gets the upkeep for the squad with the given name and kingdom.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> ?[ElementTag<Float>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad upkeep. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad upkeep. No squad with the name: <[squadName].color[red]> exists in <[kingdom].color[aqua]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.upkeep].if_null[1]>
 
 
 GetSquadDisplayName:
@@ -271,17 +305,96 @@ GetSquadEquipment:
 
     - define equipment <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.standardEquipment].if_null[<map[]>]>
     - define equipment.hotbar <list[]> if:<[equipment].get[hotbar].exists.not>
+    - define equipment.hotbar <[equipment].get[hotbar].parse_tag[<[parse_value].as[item]>]>
 
     - determine <[equipment]>
 
 
+GetSquadStation:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    description:
+    - Returns the location of the squad manager that the given squad is stationed in. If the squad does not exist, the procedure will return null.
+    - Will return null if the action fails.
+    - ---
+    - → ?[LocationTag]
+
+    script:
+    ## Returns the location of the squad manager that the given squad is stationed in.
+    ## If the squad does not exist, the procedure will return null.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> ?[LocationTag]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad station location. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad station location. Provided kingdom: <[kingdom].color[aqua]> does not have a squad with the name: <[squadName]>]>
+        - determine null
+
+    - foreach <server.flag[kingdoms.<[kingdom]>.armies.barracks]> as:barrackInfo key:barrack:
+        - if <[barrackInfo].get[stationedSquads].contains[<[squadName]>]>:
+            - determine <[barrackInfo].get[location]>
+
+    - determine null
+
+
 ############################################# SETTERS #############################################
+
+SetSquadLeader:
+    type: task
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|npc[NPCTag]
+    description:
+    - Sets the provided NPC as the squad leader of the provided squad.
+    - Will return null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Sets the provided NPC as the squad leader of the provided squad.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ## npc       : [NPCTag]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad leader. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad leader. Provided kingdom: <[kingdom].color[aqua]> does not have a squad with the name: <[squadName]>]>
+        - determine null
+
+    - if !<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList].contains[<[npc]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad leader. Provided NPC: <[npc].color[red]> is not actually a member of the provided squad: <[squadName].color[aqua]>]>
+        - determine null
+
+    - if <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader]> == <[npc]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad leader. Provided NPC: <[npc].color[red]> is already the squad leader.]>
+        - determine null
+
+    - define existingSquadLeader <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>
+
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList:->:<[existingSquadLeader]> if:<[existingSquadLeader].equals[null].not>
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader:<[npc]>
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList:<-:<[npc]> if:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList].contains[<[npc]>]>
+    - flag <[npc]> soldier.isSquadLeader:true
 
 
 # TODO: It needs to be standard across KAPI for setters to return whether they were successful.
 RenameSquad:
     type: task
-    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|newName[ElementTag(String)]|SMLocation[?LocationTag]
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|newName[ElementTag(String)]
     description:
     - Renames the squad with the provided name to a new name. Will return true if the action was successful.
     - ---
@@ -293,7 +406,6 @@ RenameSquad:
     ## kingdom    :  [ElementTag<String>]
     ## squadName  :  [ElementTag<String>]
     ## newName    :  [ElementTag<String>]
-    ## SMLocation : ?[LocationTag]
     ##
     ## >>> [ElementTag<Boolean>]
 
@@ -303,9 +415,6 @@ RenameSquad:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot rename squad. Invalid kingdom code provided: <[kingdom]>]>
         - determine false
 
-    - if !<[SMLocation].exists>:
-        - define SMLocation <server.flag[kingdoms.<[kingdom]>.armies.barracks].filter_tag[<[filter_value].get[stationedSquads].contains[<[squadName]>]>].get[1]>
-
     - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad by name: <[squadName]>]>
         - determine false
@@ -314,22 +423,21 @@ RenameSquad:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot rename squad: <[squadName]> to: <[newInternalName]>. Squad with that name already exists]>
         - determine false
 
-    - define squadInfo <[SMLocation].flag[squadManager.squads.squadList.<[squadName]>]>
+    - define squadInfo <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
     - define squadInfo <[squadInfo].with[name].as[<[newInternalName]>].with[displayName].as[<[newName]>]>
 
-    - flag <[SMLocation]> squadManager.squads.squadList.<[newInternalName]>:<[squadInfo]>
-    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>:!
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[newInternalName]>:<[squadInfo]>
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>:!
 
     - foreach <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]> as:soldier:
         - flag <[soldier]> soldier.squad:<[newInternalName]>
 
-    - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
     - determine true
 
 
 DeleteSquad:
     type: task
-    definitions: SMLocation[LocationTag]|kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Removes the provided squad from all flag structures that contain it as well as the actual NPCs that comprise it.
     - ---
@@ -339,7 +447,6 @@ DeleteSquad:
     ## Removes the provided squad from all flag structures that contain it as well as the actual
     ## NPCs that comprise it.
     ##
-    ## SMLocation   : [LocationTag]
     ## kingdom      : [ElementTag<String>]
     ## squadName    : [ElementTag<String>]
     ##
@@ -349,17 +456,19 @@ DeleteSquad:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot delete squad. Invalid kingdom code provided: <[kingdom]>]>
         - stop
 
-    - if <proc[GetSMLocation].context[<[SMLocation]>|<[kingdom]>]> == null:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot delete squad. Provided parameter: <[SMLocation].color[red]> is not a valid squad manager location!]>
+    - define squadSMLocation <proc[GetSquadStation].context[<[kingdom]>|<[squadName]>]>
+
+    - if <[squadSMLocation]> == null:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot delete squad. Provided parameter: <[squadSMLocation].color[red]> is not a valid squad manager location!]>
         - stop
 
-    - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
+    - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList]>
 
     - if <[npcList].size> > 0:
         - foreach <[npcList]> as:soldier:
             - remove <[soldier]>
 
-    - run DeleteSquadReference def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.squadName:<[squadName]>
+    - run DeleteSquadReference def.SMLocation:<[squadSMLocation]> def.kingdom:<[kingdom]> def.squadName:<[squadName]>
 
 
 DeleteSquadReference:
@@ -383,16 +492,14 @@ DeleteSquadReference:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot delete squad. Invalid kingdom code provided: <[kingdom]>]>
         - stop
 
-    - if <proc[GetSMLocation].context[<[SMLocation]>|<[kingdom]>]> == null:
+    - if !<[SMLocation].has_flag[squadManager]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot delete squad. Provided parameter: <[SMLocation].color[red]> is not a valid squad manager location!]>
         - stop
 
-    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>:!
-    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>:!
+    - define SMID <[SMLocation].proc[GenerateSMID]>
 
-    - foreach <server.flag[kingdoms.<[kingdom]>.armies.barracks]> as:barrack:
-        - if <[barrack].get[stationedSquads].contains[<[squadName]>]>:
-            - flag server kingdoms.<[kingdom]>.armies.barracks.<[key]>.stationedSquads:<-:<[squadName]>
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.stationedSquads:<-:<[squadName]>
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>:!
 
 
 CreateSquadReference:
@@ -427,7 +534,7 @@ CreateSquadReference:
         - run GenerateInternalError def.category:TypeError def.message:<element[Cannot create squad. Provided parameter: <[squadComp]> is not of type: MapTag]>
         - stop
 
-    - define barrackID <[SMLocation].xyz.replace_text[,]>
+    - define barrackID <[SMLocation].proc[GenerateSMID]>
     - define squadLimitLevel <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.levels.squadLimitLevel]>
     - define squadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[squadLimitLevel]>.value]>
 
@@ -457,11 +564,8 @@ CreateSquadReference:
             boots: <item[leather_boots].with_flag[defaultArmor]>
             hotbar: <[hotbar]>
 
-    - flag <[SMLocation]> squadManager.squads.squadList.<[internalName]>:<[squadMap]>
-    - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]>
-
-    - if <player.exists>:
-        - narrate format:callout "Created squad with name: <[displayName]>"
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[internalName]>:<[squadMap]>
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.stationedSquads:->:<[internalName]>
 
     # Note: future configurable
     data:
@@ -585,7 +689,7 @@ GetSquadInfo:
     type: task
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
-    - @Deprecated [Phase-out]
+    - @Deprecated [Broken]
     - <&sp>
     - Gets the full squad information of a given squad under the given kingdom.
     - ---

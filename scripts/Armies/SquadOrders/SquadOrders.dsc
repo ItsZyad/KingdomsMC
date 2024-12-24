@@ -4,7 +4,7 @@
 ##
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Jul 2023
-## @Script Ver: v1.0
+## @Script Ver: v1.1
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 
@@ -155,8 +155,9 @@ SquadAttackAll_Procedure:
     - if !<[entity].has_flag[soldier]>:
         - determine passively false
         - execute as_server "sentinel forgive --id <[context].as[npc].id>" silent
+        - stop
 
-    - if !<[context].flag[kingdom].proc[IsAtWarWithKingdom].context[<[entity].flag[soldier.kingdom]>]>:
+    - if !<[context].flag[soldier.kingdom].proc[IsAtWarWithKingdom].context[<[entity].flag[soldier.kingdom]>]>:
         - determine passively false
         - execute as_server "sentinel forgive --id <[context].as[npc].id>" silent
 
@@ -204,37 +205,37 @@ SoldierCombat_Handler:
     debug: false
     events:
         on npc dies:
-        - if <context.entity.traits.contains[sentinel]> && <context.entity.has_flag[soldier]>:
-            - define soldier <context.entity>
-            - define kingdom <[soldier].flag[soldier.kingdom]>
-            - define squadName <[soldier].flag[soldier.squad]>
-            - define SMLocation <proc[GetSquadSMLocation].context[<[kingdom]>|<[squadName]>]>
+        - if !(<context.entity.traits.contains[sentinel]> && <context.entity.has_flag[soldier]>):
+            - stop
 
-            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<-:<[soldier]>
-            - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
+        - define soldier <context.entity>
+        - define kingdom <[soldier].flag[soldier.kingdom]>
+        - define squadName <[soldier].flag[soldier.squad]>
+        - define SMLocation <proc[GetSquadSMLocation].context[<[kingdom]>|<[squadName]>]>
 
-            - if <[soldier].flag[soldier.isSquadLeader].if_null[false]>:
-                - flag <[soldier]> datahold.armies.particles:!
+        - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList:<-:<[soldier]>
+        - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
 
-                - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[soldier]>
-                - run CancelChunkOccupation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadLeader:<[soldier]> def.chunk:<[soldier].flag[datahold.war.occupying.chunk]> if:<[soldier].has_flag[datahold.war.occupying.chunk]>
-                - run CancelOutpostOccupation def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.outpost:<[soldier].flag[datahold.war.occupying.outpost]> if:<[soldier].has_flag[datahold.war.occupying.outpost]>
-                - run CancelOutpostReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.outpost:<[soldier].flag[datahold.war.occupying.outpost]> if:<[soldier].has_flag[datahold.war.occupying.outpost]>
-                - run CancelChunkReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.chunk:<[soldier].flag[datahold.war.occupying.chunk]> if:<[soldier].has_flag[datahold.war.occupying.chunk]>
+        - if !<[soldier].flag[soldier.isSquadLeader].if_null[false]>:
+            - stop
 
-                # Last soldier is killed - delete squad
-                - if <[npcList].size> == 0:
-                    - run DeleteSquad def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]> def.squadName:<[squadName]>
+        - flag <[soldier]> datahold.armies.particles:!
 
-                # Promote a soldier to become squad leader
-                - else:
-                    - define firstSoldier <[npcList].first>
-                    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.squadLeader:<[firstSoldier]>
-                    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<-:<[firstSoldier]>
-                    - flag <[firstSoldier]> soldier.isSquadLeader:true
+        - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[soldier]>
+        - run CancelChunkOccupation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadLeader:<[soldier]> def.chunk:<[soldier].flag[datahold.war.occupying.chunk]> if:<[soldier].has_flag[datahold.war.occupying.chunk]>
+        - run CancelOutpostOccupation def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.outpost:<[soldier].flag[datahold.war.occupying.outpost]> if:<[soldier].has_flag[datahold.war.occupying.outpost]>
+        - run CancelOutpostReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.outpost:<[soldier].flag[datahold.war.occupying.outpost]> if:<[soldier].has_flag[datahold.war.occupying.outpost]>
+        - run CancelChunkReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.chunk:<[soldier].flag[datahold.war.occupying.chunk]> if:<[soldier].has_flag[datahold.war.occupying.chunk]>
 
-                    - rename "&4Squad Leader" t:<[firstSoldier].as[npc]>
-                    - assignment set to:<[firstSoldier]> script:SoldierManager_Assignment
-                    - run SoldierParticleGenerator def.npcList:<[npcList]> def.squadLeader:<[firstSoldier]> def.orderType:attackAll
+        # Last soldier is killed - delete squad
+        - if <[npcList].size> == 0:
+            - run DeleteSquad def.kingdom:<[kingdom]> def.squadName:<[squadName]>
 
-            - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
+        # Promote a soldier to become squad leader
+        - else:
+            - define firstSoldier <[npcList].first>
+            - run SetSquadLeader def.kingdom:<[kingdom]> def.npc:<[firstSoldier]> def.squadName:<[squadName]>
+
+            - rename "&4Squad Leader" t:<[firstSoldier].as[npc]>
+            - assignment set to:<[firstSoldier]> script:SoldierManager_Assignment
+            - run SoldierParticleGenerator def.npcList:<[npcList]> def.squadLeader:<[firstSoldier]> def.orderType:attackAll

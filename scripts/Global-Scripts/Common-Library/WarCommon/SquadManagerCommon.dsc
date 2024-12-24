@@ -5,7 +5,7 @@
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Original Scripts: Jun 2023
 ## @Date: Oct 2023
-## @Script Ver: v0.2
+## @Script Ver: v1.1
 ##
 ## ----------------END HEADER-----------------
 
@@ -24,7 +24,7 @@ GenerateSMID:
     ##
     ## >>> [ElementTag<Integer>]
 
-    - if !<[location].object_type> != Location:
+    - if <[location].object_type> != Location:
         - run GenerateInternalError def.category:TypeError def.message:<element[Cannot generate a SMID. Provided parameter: <[location].color[red]> is not of type: LocationTag.]>
         - determine null
 
@@ -72,7 +72,68 @@ GetSMName:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.name].if_null[null]>
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.name].if_null[null]>
+
+
+SetSMName:
+    type: task
+    definitions: SMLocation[LocationTag]|newName[ElementTag(String)]
+    description:
+    - Sets the internal name of the squad manager with the provided location.
+    - Returns null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Sets the internal name of the squad manager with the provided location.
+    ## Returns null if the action fails.
+    ##
+    ## SMLocation : [LocationTag]
+    ## newName    : [ElementTag(String)]
+    ##
+    ## >>> [Void]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad manager name. Provided parameter: <[SMLocation]> has no flag: <element[squadManager].color[red]>.]>
+        - determine null
+
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+
+    - if <server.flag[kingdoms.<[kingdom]>.armies.barracks].parse_value_tag[<[parse_value].get[name]>].values.contains[<[newName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad manager name. Name provided: <[newName].color[red]> is already used by another SM.]>
+        - determine null
+
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.name:<[newName]>
+
+
+GetSMUpkeep:
+    type: procedure
+    definitions: SMLocation[LocationTag]
+    description:
+    - Gets the upkeep of the given squad manager.
+    - ---
+    - → ?[ElementTag(String)]
+
+    script:
+    ## Gets the upkeep of the given squad manager.
+    ##
+    ## SMLocation : [LocationTag]
+    ##
+    ## >>> ?[ElementTag<String>]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad manager upkeep. Provided parameter: <[SMLocation]> has no flag: <element[squadManager].color[red]>.]>
+        - determine null
+
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.upkeep].if_null[1]>
 
 
 GetSMKingdom:
@@ -114,7 +175,9 @@ GetMaxSMAOESize:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - define AOELevel <[SMLocation].flag[squadManager.levels.AOELevel]>
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+    - define AOELevel <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.levels.AOELevel]>
 
     - determine <script[SquadManagerUpgrade_Data].data_key[levels.AOE.<[AOELevel]>.value]>
 
@@ -137,10 +200,11 @@ GetSquadLimit:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - define squadLevel <[SMLocation].flag[squadManager.levels.squadLimitLevel].if_null[0]>
-    - define squadLimit <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[squadLevel]>.value]>
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+    - define squadLevel <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.levels.squadLimitLevel].if_null[0]>
 
-    - determine <[squadLimit]>
+    - determine <script[SquadManagerUpgrade_Data].data_key[levels.SquadAmount.<[squadLevel]>.value]>
 
 
 GetMaxSquadSize:
@@ -161,10 +225,11 @@ GetMaxSquadSize:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - define squadSizeLevel <[SMLocation].flag[squadManager.levels.squadSizeLevel].if_null[0]>
-    - define maxSquadSize <script[SquadManagerUpgrade_Data].data_key[levels.SquadSize.<[squadSizeLevel]>.value]>
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+    - define squadSizeLevel <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.levels.squadSizeLevel].if_null[0]>
 
-    - determine <[maxSquadSize]>
+    - determine <script[SquadManagerUpgrade_Data].data_key[levels.SquadSize.<[squadSizeLevel]>.value]>
 
 
 GetStationingCapacity:
@@ -185,7 +250,49 @@ GetStationingCapacity:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.levels.stationCapacity].if_null[1]>
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.levels.stationCapacity].if_null[1]>
+
+
+CalculateSMStationingCapacity:
+    type: procedure
+    definitions: bedCount[ElementTag(Integer)]
+    script:
+    # Station count equation:
+    # s = round(sqrt(b) * b ^ 0.7)
+
+    - determine <[bedCount].sqrt.mul[<[bedCount].power[0.7]>].round>
+
+
+SetStationingCapacity:
+    type: task
+    definitions: SMLocation[LocationTag]|newCapacity[ElementTag(Integer)]
+    description:
+    - Changes the maximum size of squads that can be stationed in the SM at the given location.
+    - Returns null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Changes the maximum size of squads that can be stationed in the SM at the given location.
+    ##
+    ## Returns null if the action fails.
+    ##
+    ## SMLocation  : [LocationTag]
+    ## newCapacity : [ElementTag<Integer>]
+    ##
+    ## >>> [Void]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set SM station capacity. Provided location: <[SMLocation].color[red]> is not a valid squad manager.]>
+        - determine null
+
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.levels.stationCapacity:<[newCapacity]>
 
 
 GetSMAOESize:
@@ -206,7 +313,10 @@ GetSMAOESize:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.AOESize].if_null[null]>
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.AOESize].if_null[null]>
 
 
 GetSMArea:
@@ -225,9 +335,81 @@ GetSMArea:
     ## >>> ?[CuboidTag]
 
     - if !<[SMLocation].has_flag[squadManager]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get SM area. Provided location: <[SMLocation].color[red]> is not a valid squad manager.]>
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.area].if_null[null]>
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.area].if_null[null]>
+
+
+GenerateSMArea:
+    type: procedure
+    definitions: SMLocation[LocationTag]|AOE[ElementTag(Integer)]
+    description:
+    - Returns the cuboid representing the area of effect of a squad manager.
+    - Will return null if the action fails.
+    - ---
+    - → ?[CuboidTag]
+
+    script:
+    ## Returns the cuboid representing the area of effect of a squad manager.
+    ## Will return null if the action fails.
+    ##
+    ## SMLocation : [LocationTag]
+    ## AOE        : [ElementTag<Integer>]
+    ##
+    ## >>> ?[CuboidTag]
+
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+    - define AOEHalf <[AOE].div[2].round_up>
+    - define topCorner <[SMLocation].add[<[AOEHalf]>,<[AOEHalf]>,<[AOEHalf]>]>
+    - define bottomCorner <[SMLocation].sub[<[AOEHalf]>,<[AOEHalf]>,<[AOEHalf]>]>
+
+    - determine <cuboid[<[topCorner].world.name>,<[topCorner].xyz>,<[bottomCorner].xyz>]>
+
+
+SetSMArea:
+    type: task
+    definitions: SMLocation[LocationTag]|AOE[ElementTag(Integer)]|bypassMaxAOE[ElementTag(Boolean) = false]
+    description:
+    - Sets the area of effect for squad manager at the provided location to the provided AOE value.
+    - If the player sets bypassMaxAOE to true, the task will not check if the provided AOE value is larger than the maximum allowable value for the given SM
+    - Will return null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Sets the area of effect for squad manager at the provided location to the provided AOE value.
+    ## If the player sets bypassMaxAOE to true, the task will not check if the provided AOE value
+    ## is larger than the maximum allowable value for the given SM.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## SMLocation   :  [LocationTag]
+    ## AOE          :  [ElementTag<Integer>]
+    ## bypassMaxAOE : ?[ElementTag<Boolean>]
+    ##
+    ## >>> [Void]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set SM area. Provided location: <[SMLocation].color[red]> is not a valid squad manager.]>
+        - determine null
+
+    - define maxAOESize <proc[GetMaxSMAOESize].context[<[SMLocation]>]>
+    - define maxAOESize <element[99999]> if:<[bypassMaxAOE]>
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - if <[AOE]> > <[maxAOESize]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set SM area. Provided AOE: <[AOE].color[red]> is larger than the maximum valid size define for this squad manager.]>
+        - determine null
+
+    - define barracksArea <proc[GenerateSMArea].context[<[SMLocation]>|<[AOE]>]>
+
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.AOE:<[AOE]>
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.area:<[barracksArea]>
 
 
 GetSMArmoryLocations:
@@ -248,7 +430,76 @@ GetSMArmoryLocations:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.armories].if_null[<list[]>]>
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.armories].if_null[<list[]>]>
+
+
+AddSMArmoryLocation:
+    type: task
+    definitions: SMLocation[LocationTag]|newArmory[LocationTag]
+    description:
+    - Adds a new location to the list of armories associated with the SM at the provided location.
+    - Will return null if the action fails. Specifically, the task will return null if the location provided does not have an inventory.
+    - ---
+    - → [Void]
+
+    script:
+    ## Adds a new location to the list of armories associated with the SM at the provided location.
+    ## Will return null if the action fails. Specifically, the task will return null if the location provided does not have an inventory.
+    ##
+    ## SMLocation   :  [LocationTag]
+    ## newArmory    :  [LocationTag]
+    ##
+    ## >>> [Void]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add an armory to SM. Provided location: <[SMLocation].color[red]> is not a valid squad manager.]>
+        - determine null
+
+    - if !<[newArmory].has_inventory>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add an armory to SM. Provided location: <[newArmory].color[red]> does not have an inventory, thus cannot be used as an armory.]>
+        - determine null
+
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.armories:->:<[newArmory]>
+
+
+RemoveSMArmoryLocation:
+    type: task
+    definitions: SMLocation[LocationTag]|armory[LocationTag]
+    description:
+    - Removes a location from the list of armories associated with the SM at the provided location.
+    - Will return null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Removes a location from the list of armories associated with the SM at the provided location.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## SMLocation   :  [LocationTag]
+    ## armory       :  [LocationTag]
+    ##
+    ## >>> [Void]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove an armory from SM. Provided location: <[SMLocation].color[red]> is not a valid squad manager.]>
+        - determine null
+
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+    - define armories <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.armories]>
+
+    - if !<[armory].is_in[<[armories]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove an armory from SM. Provided location: <[armory].color[red]> is not an existing armory.]>
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.armories:<-:<[armory]>
 
 
 GetSMSquads:
@@ -269,7 +520,15 @@ GetSMSquads:
     - if !<[SMLocation].has_flag[squadManager]>:
         - determine null
 
-    - determine <[SMLocation].flag[squadManager.squads.squadList].if_null[<list[]>]>
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+    - define stationedSquads <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.stationedSquads].if_null[<list[]>]>
+    - define squadMap <map[]>
+
+    - foreach <server.flag[kingdoms.<[kingdom]>.armies.squads].if_null[<list[]>]> key:squadName:
+        - define squadMap.<[squadName]>:<[value]> if:<[squadName].is_in[<[stationedSquads]>]>
+
+    - determine <[squadMap]>
 
 
 GetSquadSMLocation:

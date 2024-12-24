@@ -4,7 +4,7 @@
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Sep 2022
 ## @Updated: Jul 2023
-## @Script Ver: v2.0
+## @Script Ver: v2.1
 ##
 ##ignorewarning invalid_data_line_quotes
 ## ------------------------------------------END HEADER-------------------------------------------
@@ -205,8 +205,8 @@ SquadSelection_Handler:
         - define hasSpawned <proc[HasSquadSpawned].context[<[kingdom]>|<[squadName]>]>
 
         - if <[hasSpawned]>:
-            - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList]>
-            - define squadLeader <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.squadLeader]>
+            - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
+            - define squadLeader <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>
             - define currentlySpawned <[squadLeader].as[npc].is_spawned>
 
             - if <[currentlySpawned]>:
@@ -223,6 +223,7 @@ SquadSelection_Handler:
                     - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
 
                     # TODO: Unfuck this.
+                    # (6-month later note): I actually have no idea what this is referring to...
                     - run GiveSquadTools def.player:<player>
 
                     - spawn <[npcList].include[<[squadLeader]>]> <[spawnLocation]>
@@ -258,13 +259,6 @@ SquadSelection_Handler:
 
             - run RenameSquad def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.newName:<context.message> def.SMLocation:<[SMLocation]> save:rename
             - define renameSuccessful <entry[rename].created_queue.determination.get[1]>
-            # - define squadInfo <[SMLocation].flag[squadManager.squads.squadList.<[squadName]>]>
-            # - define squadInfo <[squadInfo].with[name].as[<[newInternalName]>].with[displayName].as[<context.message>]>
-
-            # - flag <[SMLocation]> squadManager.squads.squadList.<[newInternalName]>:<[squadInfo]>
-            # - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>:!
-
-            # - run WriteArmyDataToKingdom def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]>
 
             - if <[renameSuccessful]>:
                 - narrate format:callout "Renamed <[squadName].replace[-].with[ ].color[gray]> to: <context.message.color[red]>."
@@ -317,8 +311,7 @@ SquadSelection_Handler:
             - inventory set d:<context.inventory> origin:<context.cursor_item> slot:<context.slot>
             # - define hotbarItems <[SMLocation].flag[squadManager.standardEquipment.hotbar].if_null[<list[]>]>
             - define hotbarItems <proc[GetSquadEquipment].context[<[kingdom]>|<[squadName]>].get[hotbar]>
-            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.standardEquipment.hotbar:<[hotbarItems].remove[<[hotbarSlots].find[<context.slot>]>].include[<context.cursor_item>]>
-            - run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[kingdom]>
+            - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.standardEquipment.hotbar:<[hotbarItems].remove[<[hotbarSlots].find[<context.slot>]>].include[<context.cursor_item>]>
 
         - else if <[armorSlots].contains[<context.slot>]>:
             - define cursorItem <context.cursor_item>
@@ -328,7 +321,7 @@ SquadSelection_Handler:
             - define cursorItemType <context.item.material.name.split[_].get[2]>
 
             - if <[cursorItemType]> == <[armorType]>:
-                - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.standardEquipment.<[armorType]>:<[cursorItem]>
+                - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.standardEquipment.<[armorType]>:<[cursorItem]>
                 - inventory set d:<context.inventory> origin:<[cursorItem]> slot:<context.slot>
 
         ## REMOVE ITEM IN EQUIPMENT WINDOW
@@ -340,7 +333,7 @@ SquadSelection_Handler:
         - if <[hotbarSlots].contains[<context.slot>]>:
             - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
             - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
-            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.standardEquipment.hotbar:<-:<context.item>
+            - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.standardEquipment.hotbar:<-:<context.item>
 
             - inventory set d:<context.inventory> origin:air slot:<context.slot>
 
@@ -350,7 +343,7 @@ SquadSelection_Handler:
             - define armorType <context.item.material.name.split[_].get[2]>
             - inventory set d:<context.inventory> origin:air slot:<context.slot>
 
-            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.standardEquipment.<[armorType]>:<item[air]>
+            - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.standardEquipment.<[armorType]>:<item[air]>
 
         ## CLOSES EQUIPMENT WINDOW
         on player closes SquadEquipment_Window:
@@ -475,11 +468,10 @@ SpawnSquadNPCs:
 
     - flag <player> datahold.squadInfo.npcList:<[soldierList].remove[1]>
     - flag <player> datahold.squadInfo.squadLeader:<[soldierList].get[1]>
-    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.hasSpawned:true
-    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:<[soldierList].remove[1]>
-    - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.sentinelSquad:<[kingdom]>_<[squadName]>
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.hasSpawned:true
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList:<[soldierList].remove[1]>
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.sentinelSquad:<[kingdom]>_<[squadName]>
 
-    - ~run WriteArmyDataToKingdom def.SMLocation:<[SMLocation]> def.kingdom:<[player].flag[kingdom]>
     - run GiveSquadTools def.player:<player>
 
 
@@ -530,14 +522,14 @@ SpawnNewSoldiers:
         - flag <[soldier]> soldier.kingdom:<[kingdom]>
         - flag <[soldier]> soldier.type:<[type]>
         - flag <[soldier]> soldier.isSquadLeader:<[isSquadLeader]>
-        - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.npcList:->:<[soldier]>
+        - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList:->:<[soldier]>
 
         # This has evaded me for too long...
         - adjust <[soldier]> distance_margin:0
 
         # Special case for squad leader;
         - if <[value]> == 1:
-            - flag <[SMLocation]> squadManager.squads.squadList.<[squadName]>.squadLeader:<[soldier]>
+            - run SetSquadLeader def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.npc:<[solider]>
             - assignment set to:<[soldier]> script:SoldierManager_Assignment
 
         # General configurations;
