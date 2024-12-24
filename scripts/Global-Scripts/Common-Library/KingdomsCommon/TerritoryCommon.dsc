@@ -259,17 +259,22 @@ GetClaimsCuboid:
 
 GetClaimsPolygon:
     type: procedure
-    definitions: kingdom[ElementTag(String)]|world[WorldTag]
+    definitions: kingdom[ElementTag(String)]|world[WorldTag]|type[?ElementTag(String)]
     description:
     - Returns a polygon created of all the chunks consisting a kingdom's core/castle claims.
+    - Optionally, a type can be specificed to filter either core or castle claims. By default the type is set to include both.
     - ---
     - → ?[PolygonTag]
 
     script:
     ## Returns a polygon created of all the chunks consisting a kingdom's core/castle claims.
     ##
-    ## kingdom : [ElementTag<String>]
-    ## world   : [WorldTag]
+    ## Optionally, a type can be specificed to filter either core or castle claims. By default the
+    ## type is set to include both.
+    ##
+    ## kingdom :  [ElementTag<String>]
+    ## world   :  [WorldTag]
+    ## type    : ?[ElementTag<String>]
     ##
     ## >>> ?[PolygonTag]
 
@@ -277,13 +282,12 @@ GetClaimsPolygon:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - if <[world].has_flag[dynmap.cache.<[kingdom]>.cornerList]>:
-        - define formattedCornerList <[world].flag[dynmap.cache.<[kingdom]>.cornerList].parse_tag[<[parse_value].x>,<[parse_value].z>]>
-        - determine <polygon[<[world].name>,0,255,<[formattedCornerList]>]>
+    - define type <[type].if_null[corecastle]>
 
-    # TODO: make it fire the dynmap polygon generator when a permanent name is decided upon
+    - run GenerateDynmapCorners def.chunks:<[kingdom].proc[GetClaims].context[<[type]>]> save:corners
+    - define formattedCornerList <entry[corners].created_queue.determination.get[1].parse_tag[<[parse_value].x>,<[parse_value].z>].separated_by[,]>
 
-    - determine null
+    - determine <polygon[<[world].name>,0,255,<[formattedCornerList]>]>
 
 
 GetMaxClaims:
