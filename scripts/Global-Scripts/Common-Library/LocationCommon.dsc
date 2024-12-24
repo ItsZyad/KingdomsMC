@@ -348,3 +348,46 @@ ChessLeft:
     - define round <[round].if_null[true]>
 
     - determine <[location].proc[ChessRight].context[<[amount].proc[Invert]>|<[round]>]>
+
+
+ContainsAllLocations:
+    type: procedure
+    definitions: area[AreaObject]|locationList[ListTag(LocationTag)]
+    description:
+    - Returns true if and only if the provided area contains every single location in the provided location list.
+    - Will return null if the action fails.
+    - ---
+    - → ?[ElementTag(Boolean)]
+
+    script:
+    ## Returns true if and only if the provided area contains every single location in the provided
+    ## location list.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## area         : [AreaObject]
+    ## locationList : [ListTag<LocationTag>]
+    ##
+    ## >>> ?[ElementTag<Boolean>]
+
+    - define locationList <queue.definition_map.exclude[raw_context].values.get[3].to[last].if_null[<list[]>].insert[<[locationList]>].at[1]>
+
+    - debug LOG <[locationList]>
+
+    - if !<[locationList].get[1].exists> && !<[locationList].is_empty>:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot check area contains. Provided parameter: <[locationList].color[red]> is not a list.]>
+        - determine null
+
+    - if !<[locationList].get[1].xyz.exists>:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot check area contains. LocationList contains non-location values.]>
+        - determine null
+
+    - if !<[area].object_type.is_in[Polygon|Cuboid|Ellipsoid]>:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot check area contains. Provided parameter: <[area].color[red]> is not of type: AreaObject.]>
+        - determine null
+
+    - foreach <[locationList]> as:loc:
+        - if !<[area].contains[<[loc]>]>:
+            - determine false
+
+    - determine true
