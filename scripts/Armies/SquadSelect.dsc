@@ -529,7 +529,7 @@ SpawnNewSoldiers:
 
         # Special case for squad leader;
         - if <[value]> == 1:
-            - run SetSquadLeader def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.npc:<[solider]>
+            - run SetSquadLeader def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.npc:<[soldier]>
             - assignment set to:<[soldier]> script:SoldierManager_Assignment
 
         # General configurations;
