@@ -226,10 +226,10 @@ SquadOptions_Handler:
             - run FindClickedSquad def.location:<player.cursor_on[100]> def.kingdom:<[kingdom]> def.range:10 save:enemySquadInfo
             - define enemySquadInfo <entry[enemySquadInfo].created_queue.determination.get[1]>
 
-            - narrate format:callout "Attacking Squad: <[enemySquadInfo].get[name].color[red]> from: <[enemySquadInfo].get[kingdom].color[red]>"
+            - narrate format:callout "Attacking Squad: <[enemySquadInfo].get[squadName].color[red]> from: <[enemySquadInfo].get[kingdom].color[red]>"
 
             - run SquadRemoveAllOrders def.kingdom:<[kingdom]> def.squadName:<[squadName]>
-            - run SquadAttackSquadOrder def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.enemyKingdom:<[enemySquadInfo].get[squadLeader].flag[soldier.kingdom]> def.enemySquadName:<[enemySquadInfo].get[name]>
+            - run SquadAttackSquadOrder def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.enemyKingdom:<proc[GetSquadLeader].context[<[enemySquadInfo].get[kingdom]>|<[enemySquadInfo].get[squadName]>].flag[soldier.kingdom]> def.enemySquadName:<[enemySquadInfo].get[squadName]>
             - run SoldierParticleGenerator def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.orderType:attackSquad
 
         ## ATTACK ORDER: MONSTERS
@@ -548,17 +548,7 @@ SquadEquipmentChecker:
     # Loop through all squad soldiers with squad leader coming first to give them priority for
     # equipment
     - foreach <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].insert[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>].at[1]> as:soldier:
-
-        # Compare the armor and equipment that the soldier has against the standard equipment
-        - define soldierArmor <[soldier].equipment>
-        - define standardArmor <[standardEquipment].exclude[hotbar].values>
-        - define missingEquipment <list[]>
-        - define soldierHotbar <[soldier].inventory.list_contents.get[1].to[9].if_null[<list[]>].sort_by_value[material.name]>
-        - define standardHotbar <[standardEquipment].get[hotbar].sort_by_value[material.name]>
-
-        - if <[standardArmor]> != <[soldierArmor]> || <[soldierHotbar]> != <[standardHotbar]>::
-            - define missingEquipment <[missingEquipment].include[<[standardArmor].exclude[<[soldierArmor]>]>]>
-            - define missingEquipment <[missingEquipment].include[<[standardHotbar].exclude[<[soldierHotbar]>]>]>
+        - define missingEquipment <[soldier].proc[GetSoldierMissingStandardEquipment]>
 
         #...Skip soldier if their equipment needs are met
         - if <[missingEquipment].is_empty>:
@@ -589,8 +579,7 @@ FindClickedSquad:
     - if <[nearbyEnemySoldiers].size> == 0:
         - determine <map[]>
 
-    - run GetSquadInfo def.kingdom:<[nearbySoldiers].get[1].flag[soldier.kingdom]> def.squadName:<[nearbySoldiers].get[1].flag[soldier.squad]> save:squadInfo
-    - determine <entry[squadInfo].created_queue.determination.get[1]>
+    - determine <map[squadName=<[nearbySoldiers].get[1].flag[soldier.squad]>;kingdom=<[nearbySoldiers].get[1].flag[soldier.kingdom]>]>
 
 
 DEBUG_ClearSquadEquipment:
@@ -598,9 +587,7 @@ DEBUG_ClearSquadEquipment:
     enabled: false
     definitions: squadName|kingdom
     script:
-    - run GetSquadInfo def.squadName:<[squadName]> def.kingdom:<[kingdom]> save:squadInfo
-    - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
-    - define npcList <[squadInfo].get[npcList]>
+    - define npcList <proc[GetAllSquadNPCs].context[<[kingdom]>|<[squadName]>]>
 
     - foreach <[npcList]> as:soldier:
         - equip <[soldier]> boots:air

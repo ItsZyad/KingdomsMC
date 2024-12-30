@@ -27,13 +27,10 @@ SquadAttackAllOrder:
     ##
     ## >>> [Void]
 
-    - run GetSquadInfo def.kingdom:<[kingdom]> def.squadName:<[squadName]> save:squadInfo
-    - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
-
     # Note: make a configurable (in-game) which allows players to adjust (on the fly) whether the
     #       squad leader should join battle with their squad?
 
-    - foreach <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]> as:soldier:
+    - foreach <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]> as:soldier:
         - execute as_server "sentinel addtarget denizen_proc:SquadAttackAll_Procedure:<[soldier]> --id <[soldier].id>" silent
 
 
@@ -60,13 +57,8 @@ SquadAttackSquadOrder:
         - narrate format:callout "You are not at war with this kingdom!"
         - stop
 
-    - run GetSquadInfo def.kingdom:<[kingdom]> def.squadName:<[squadName]> save:squadInfo
-    - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
-    - define fullNPCList <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]>
-
-    - run GetSquadInfo def.kingdom:<[enemyKingdom]> def.squadName:<[enemySquadName]> save:enemySquadInfo
-    - define enemySquadInfo <entry[enemySquadInfo].created_queue.determination.get[1]>
-    - define enemySquadSentinelName <[enemySquadInfo].get[sentinelSquad]>
+    - define fullNPCList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]>
+    - define enemySquadSentinelName <proc[GetSquadSentinelName].context[<[kingdom]>|<[squadName]>]>
 
     - foreach <[fullNPCList]> as:soldier:
         - execute as_server "sentinel addtarget squad:<[enemySquadSentinelName]> --id <[soldier].id>" silent
@@ -110,10 +102,7 @@ SquadRemoveAllOrders:
     ##
     ## >>> [Void]
 
-    - run GetSquadInfo def.kingdom:<[kingdom]> def.squadName:<[squadName]> save:squadInfo
-    - define squadInfo <entry[squadInfo].created_queue.determination.get[1]>
-
-    - foreach <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]> as:soldier:
+    - foreach <proc[GetAllSquadNPCs].context[<[kingdom]>|<[squadName]>]> as:soldier:
         - define proceduralTargets <[soldier].sentinel.targets.filter_tag[<[filter_value].starts_with[denizen_proc]>]>
         - define squadTargets <[soldier].sentinel.targets.filter_tag[<[filter_value].starts_with[squad]>]>
 

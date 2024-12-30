@@ -25,6 +25,10 @@ GetKingdomSquadManagers:
     ##
     ## >>> [MapTag]
 
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom squad managers. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
     - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks].if_null[<map[]>]>
 
 
@@ -42,6 +46,10 @@ GetKingdomSquads:
     ## kingdom : [ElementTag<String>]
     ##
     ## >>> [ListTag<MapTag>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom squads. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].if_null[<list[]>]>
 
@@ -62,7 +70,7 @@ GetMaxAllowedSMs:
     ## >>> [ElementTag<Integer>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError message:<element[Cannot get SM Location. Invalid kingdom code provided: <[kingdom]>]>
+        - run GenerateInternalError def.category:GenericError message:<element[Cannot get SM Location. Invalid kingdom code provided: <[kingdom].color[red]>]>
         - determine null
 
     # Note: future configurable(?)

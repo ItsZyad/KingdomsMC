@@ -533,7 +533,7 @@ SquadManager_Handler:
         - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
 
         - if <context.location.has_inventory>:
-            - if <[SMLocation].flag[squadManager.armories].contains[<context.location>]>:
+            - if <[SMLocation].proc[GetSMArmoryLocations].contains[<context.location>]>:
                 - run AddSMArmoryLocation def.SMLocation:<[SMLocation]> def.newArmory:<context.location>
                 - determine cancelled
 
@@ -571,14 +571,14 @@ SquadManager_Handler:
             - flag <player> datahold.armies.showArmories:!
 
         - else:
-            - define squadManagerData <player.flag[datahold.armies.squadManagerData]>
+            - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
 
-            - if !<[squadManagerData].contains[armories]>:
+            - if <[SMLocation].proc[GetSMArmoryLocations].size> == 0:
                 - narrate format:callout "You have not set any armories for these barracks yet!"
                 - determine cancelled
 
             - flag <player> datahold.armies.showArmories expire:1h
-            - run ShowArmoriesAOE def.player:<player> def.locationList:<[squadManagerData].get[armories]>
+            - run ShowArmoriesAOE def.player:<player> def.locationList:<[SMLocation].proc[GetSMArmoryLocations]>
             - inventory set slot:<context.slot> o:HideArmoryLocations_Item d:<context.inventory>
             - inventory close
 

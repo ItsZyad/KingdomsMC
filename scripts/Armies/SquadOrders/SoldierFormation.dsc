@@ -171,6 +171,7 @@ DrawLineFormationWalk:
         - define formationLine <[pointOne].points_between[<[pointTwo]>].include[<[pointOne]>|<[pointTwo]>]>
 
 
+# TODO: Check if this is even necessary now that I've discovered that distance_margin is a thing...
 FormationWalkFix_Handler:
     type: world
     debug: false

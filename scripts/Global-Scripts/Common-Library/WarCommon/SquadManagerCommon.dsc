@@ -127,13 +127,52 @@ GetSMUpkeep:
     ## >>> ?[ElementTag<String>]
 
     - if !<[SMLocation].has_flag[squadManager]>:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad manager upkeep. Provided parameter: <[SMLocation]> has no flag: <element[squadManager].color[red]>.]>
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad manager upkeep. Provided parameter: <[SMLocation].color[aqua]> has no flag: <element[squadManager].color[red]>.]>
         - determine null
 
     - define kingdom <[SMLocation].flag[squadManager.kingdom]>
     - define SMID <[SMLocation].proc[GenerateSMID]>
 
     - determine <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.upkeep].if_null[1]>
+
+
+SetSMUpkeep:
+    type: task
+    definitions: SMLocation[LocationTag]|amount[ElementTag(Float)]
+    description:
+    - Sets the upkeep of the given squad manager to the provided value.
+    - Note: this task does not actually calculate the upkeep that the given SM *should* have. It just uses the value passed in.
+    - Will return null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Sets the upkeep of the given squad manager to the provided value.
+    ## Note: this task does not actually calculate the upkeep that the given SM *should* have. It just uses the value passed in.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## SMLocation : [LocationTag]
+    ## amount     : [ElementTag<Float>]
+    ##
+    ## >>> [Void]
+
+    - if !<[SMLocation].has_flag[squadManager]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad manager upkeep. Provided parameter: <[SMLocation].color[aqua]> has no flag: <element[squadManager].color[red]>.]>
+        - determine null
+
+    - if !<[amount].is_decimal>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad manager upkeep. Provided value: <[amount].color[red]> is not an actual decimal]>
+        - determine null
+
+    - if <[amount]> < 0:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad manager upkeep to a value below 0]>
+        - determine null
+
+    - define kingdom <[SMLocation].flag[squadManager.kingdom]>
+    - define SMID <[SMLocation].proc[GenerateSMID]>
+
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.upkeep:<[amount]>
 
 
 GetSMKingdom:
@@ -408,7 +447,7 @@ SetSMArea:
 
     - define barracksArea <proc[GenerateSMArea].context[<[SMLocation]>|<[AOE]>]>
 
-    - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.AOE:<[AOE]>
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.AOESize:<[AOE]>
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.area:<[barracksArea]>
 
 

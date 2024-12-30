@@ -193,8 +193,6 @@ SquadComposition_Handler:
             totalManpower: <[totalManpower]>
             hasSpawned: false
 
-        - run flagvisualizer def.flag:<[squadMap]> def.flagName:squadMap
-
         - flag <player> datahold.armies.squadMap:<[squadMap]>
         - flag <player> noChat.armies.namingSquad
         - narrate format:callout "Please provide your squad a name (you can use spaces). Or type 'cancel':"
@@ -213,6 +211,8 @@ SquadComposition_Handler:
         - define squadMap <player.flag[datahold.armies.squadMap]>
 
         - run CreateSquadReference def.kingdom:<[kingdom]> def.SMLocation:<[SMLocation]> def.displayName:<[displayName]> def.totalManpower:<[squadMap].get[totalManpower]> def.squadComp:<[squadMap].get[squadComp]>
+
+        - narrate format:callout "Created squad with name: <[displayName].color[aqua]>."
 
         - flag <player> datahold.armies.namingSquad:!
         - flag <player> noChat.armies:!

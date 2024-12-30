@@ -61,6 +61,33 @@ GetSquadNPCs:
     - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList].if_null[<list[]>]>
 
 
+GetAllSquadNPCs:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    description:
+    - Returns a list containing all of the provided squad's NPCs including the leader.
+    - ---
+    - → [ListTag(NPCTag)]
+
+    script:
+    ## Returns a list containing all of the provided squad's NPCs including the leader.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> [ListTag<NPCTag>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get full squad list. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get full squad list. No squad exists by name: <[squadName]> in kingdom: <[kingdom]>]>
+        - determine null
+
+    - determine <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]>
+
+
 GetSquadComposition:
     type: procedure
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
@@ -194,6 +221,36 @@ GetSquadName:
         - determine null
 
     - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].filter_tag[<[filter_value].get[ID].equals[<[ID]>]>].get[1].get[name].if_null[null]>
+
+
+GetSquadSentinelName:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
+    description:
+    - Returns the name of the internal sentinel-side name used by the provided Kingdoms squad.
+    - Will return null if the action fails.
+    - ---
+    - → ?[ElementTag(String)]
+
+    script:
+    ## Returns the name of the internal sentinel-side name used by the provided Kingdoms squad.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ##
+    ## >>> ?[ElementTag<String>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad sentinel name. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get squad sentinel name. No squad exists with name: <[squadName]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.sentinelSquad]>
 
 
 GetSquadUpkeep:
@@ -391,7 +448,76 @@ SetSquadLeader:
     - flag <[npc]> soldier.isSquadLeader:true
 
 
-# TODO: It needs to be standard across KAPI for setters to return whether they were successful.
+AddSoldierToSquad:
+    type: task
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|npc[NPCTag]
+    description:
+    - Adds the provided NPC as a soldier to the provided squad.
+    - Returns null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Adds the provided NPC as a soldier to the provided squad.
+    ##
+    ## Returns null if the action fails.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ## npc       : [NPCTag]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add soldier. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add soldier. Provided kingdom: <[kingdom].color[aqua]> does not have a squad with the name: <[squadName]>]>
+        - determine null
+
+    - if <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].contains[<[npc]>]> || <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>].if_null[null]> == <[npc]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add soldier. Provided NPC: <[npc].color[red]> is already a member of this squad.]>
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList:->:<[npc]>
+
+
+RemoveSoldierFromSquad:
+    type: task
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|npc[NPCTag]
+    description:
+    - Removes the provided NPC from the provided squad.
+    - Returns null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Removes the provided NPC from the provided squad.
+    ##
+    ## Returns null if the action fails.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ## npc       : [NPCTag]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove soldier. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove soldier. Provided kingdom: <[kingdom].color[aqua]> does not have a squad with the name: <[squadName]>]>
+        - determine null
+
+    - if !<proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].contains[<[npc]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove soldier. Provided NPC: <[npc].color[red]> is not a member of this squad.]>
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList:<-:<[npc]>
+
+
 RenameSquad:
     type: task
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|newName[ElementTag(String)]
@@ -545,7 +671,7 @@ CreateSquadReference:
     - define internalName <[displayName].replace_text[ ].with[-]>
     - define squadID <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList].last.get[ID].add[1].if_null[1]>
     - define kingdomColor <proc[GetKingdomColor].context[<[kingdom]>]>
-    - define hotbar <script.data_key[data.UnitTypeHotbars.<[squadComp].keys.get[1]>]>
+    - define hotbar <script.data_key[data.UnitTypeHotbars.<[squadComp].keys.get[1]>].parsed.as[list]>
 
     - definemap squadMap:
         npcList: <list[]>
@@ -622,6 +748,45 @@ CalculateSquadUpkeep:
             archers: 30
 
 
+SetSquadUpkeep:
+    type: task
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|amount[ElementTag(Float)]
+    description:
+    - Sets the upkeep of the provided squad to the provided amount.
+    - Returns null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Sets the upkeep of the provided squad to the provided amount.
+    ##
+    ## Returns null if the action fails.
+    ##
+    ## kingdom   : [ElementTag<String>]
+    ## squadName : [ElementTag<String>]
+    ## amount    : [ElementTag<Float>]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad upkeep. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<server.has_flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad upkeep. Provided kingdom: <[kingdom].color[aqua]> does not have a squad with the name: <[squadName].color[red]>]>
+        - determine null
+
+    - if !<[amount].is_decimal>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad upkeep. Provided value: <[amount].color[red]> is not an actual decimal]>
+        - determine null
+
+    - if <[amount]> < 0:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set squad upkeep to a value below 0]>
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.upkeep:<[amount]>
+
+
 GiveSquadTools:
     type: task
     definitions: player[PlayerTag]|saveInv[ElementTag(Boolean)]
@@ -682,46 +847,3 @@ ResetSquadTools:
     - if <player.has_flag[datahold.armies.previousItemSlot]>:
         - adjust <player> item_slot:<player.flag[datahold.armies.previousItemSlot]>
         - flag <player> datahold.armies.previousItemSlot:!
-
-
-# @Deprecated
-GetSquadInfo:
-    type: task
-    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
-    description:
-    - @Deprecated [Broken]
-    - <&sp>
-    - Gets the full squad information of a given squad under the given kingdom.
-    - ---
-    - → [MapTag]
-
-    script:
-    ## Gets the full squad information of a given squad under the given kingdom.
-    ##
-    ## kingdom   : [ElementTag<String>]
-    ## squadName : [ElementTag<String>]
-    ##
-    ## >>> [MapTag]
-
-    # GlobalRef refers to the version of army data stored on the kingdoms.___.armies flag while
-    # LocalRef refers to the copy of data stored on each SM belonging to the kingdom
-    - define globalRef <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
-    - define barrackList <server.flag[kingdoms.<[kingdom]>.armies.barracks]>
-    - define barrackLocation null
-    - define localRef null
-
-    - foreach <[barrackList]> as:barrack:
-        - if <[barrack].get[stationedSquads].contains[<[squadName]>]>:
-            - define barrackLocation <[barrack].get[location]>
-            - foreach stop
-
-    - if <[barrackLocation].has_flag[squadManager]>:
-        - define localRef <[barrackLocation].flag[squadManager].deep_get[squads.squadList.<[squadName]>]>
-
-        # TODO: find a way to properly compare these maps
-        - if !<[localRef].equals[<[globalRef]>]>:
-            # - run flagvisualizer def.flag:<[localRef]> def.flagName:localRef
-            - determine <[localRef]>
-
-    # - run flagvisualizer def.flag:<[globalRef]> def.flagName:globalRef
-    - determine <[globalRef]>
