@@ -10,7 +10,6 @@
 ##ignorewarning color_code_misformat
 ## ------------------------------------------END HEADER-------------------------------------------
 
-
 FlagVisualizer:
     type: task
     debug: false
@@ -182,7 +181,7 @@ MakeTabbed:
     script:
     - define tabbedList <list[<element[¦   ].repeat[<[tabLevel].div_int[4].if_null[0]>]>|<[element]>]>
     - define unseparatedTab <[tabbedList].unseparated>
-    - define chatWidth 320
+    - define chatWidth 335
 
     - if <[unseparatedTab].text_width> <= <[chatWidth]>:
         - determine <[unseparatedTab]>
