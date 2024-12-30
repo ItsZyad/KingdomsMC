@@ -16,10 +16,10 @@ ReadOnlyChest_Handler:
         - if <server.flag[readOnlyChestLocs].contains[<context.location>]>:
             - flag server readOnlyChestLocs:<-:<context.location>
 
-        on player clicks in inventory:
+        on player clicks item in inventory:
         - ratelimit <player> 1t
 
-        - if <server.flag[readOnlyChestLocs].exists> && <context.inventory.id_holder.is_in[<server.flag[readOnlyChestLocs]>]>:
+        - if <server.has_flag[readOnlyChestLocs]> && <server.flag[readOnlyChestLocs].contains[<context.inventory.id_holder>]>:
             - if !<player.is_op> && !<player.has_permission[kingdoms.admin.adjustreadonlychest]>:
                 - if <context.item.material.name.is_in[written_book|writable_book]>:
                     - inventory close
