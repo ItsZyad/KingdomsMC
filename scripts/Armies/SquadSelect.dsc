@@ -80,15 +80,14 @@ SquadSelectionGUI:
         - adjust def:squadItem display:<gold><bold><[displayName]>
 
         - if <proc[HasSquadSpawned].context[<[kingdom]>|<[squadName]>]>:
-            - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
-            - define npcListShort <[npcList].get[1].to[4].if_null[<list[]>]>
-            - define npcListShort <[npcListShort].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]>
+            - define squadComp <proc[GetSquadComposition].context[<[kingdom]>|<[squadName]>]>
 
-            - if <[npcListShort].size> < <[npcList].size>:
-                - define remainingNpcNumber <[npcList].size.sub[<[npcListShort].size>]>
-                - define npcListShort:->:<element[And <[remainingNpcNumber]> Others...].color[gray]>
+            - definemap squadInfo:
+                1: <element[Squad Composition: ].color[gray]><[squadComp].keys.parse_tag[<[parse_value].to_titlecase>].separated_by[, ].color[light_purple]>
+                2: <element[Total Manpower: ].color[gray]><[squadComp].values.sum.add[1].color[aqua]>
+                3: <element[Upkeep: ].color[gray]><element[$<proc[GetSquadUpkeep].context[<[kingdom]>|<[squadName]>].format_number>].color[gold]><element[/Upkeep tick].color[dark_gray]>
 
-            - adjust def:squadItem lore:<[npcListShort].separated_by[<n>]>
+            - adjust def:squadItem lore:<[squadInfo].values.separated_by[<n>]>
 
         - else:
             - adjust def:squadItem "lore:<gray>Squad Not Spawned Yet."
