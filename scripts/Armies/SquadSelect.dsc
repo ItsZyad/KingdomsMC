@@ -12,14 +12,17 @@
 SquadCommand:
     type: command
     name: squad
-    usage: /squad list
-    description: "Brings up the squad selection window"
+    usage: /squad
+    description: Brings up the squad selection window
     permission: kingdoms.squads
+    tab completions:
+        1: list
+
     script:
     - define args <context.raw_args.split_args>
 
     - if <[args].get[1]> == list:
-        - run SquadSelectionGUI
+        - run SquadSelectionGUI def.player:<player>
 
 
 ExitSquadSelector_Item:
