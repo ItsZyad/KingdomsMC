@@ -114,7 +114,7 @@ FakeChat_Command:
     permission: kingdoms.admin
     description: slander
     tab completions:
-        1: <server.online_players>
+        1: <server.online_players.parse_tag[<[parse_value].name>]>
         2: [chat]
 
     script:
