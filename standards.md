@@ -160,7 +160,7 @@ Here is the format of a sample task script. All task and procedure scripts must 
 ```DenizenScript
 SampleTaskScript:
     type: task
-    definitions: someMap|someList|someInt
+    definitions: someMap[MapTag]|someList[ListTag]|someInt[ElementTag(Integer)]
     script:
     ## Here would be a short description of the script and how it interacts with the definitions
     ## provided. Note that you must make reference to all of the definitions provided in this
@@ -192,6 +192,21 @@ Formatting conventions for all type contracts are listed below:
 | Lists   | `[ListTag]` `[ListTag<*Type>]` | Multi-type or type-indeterminate lists should just be represtented with `[ListTag]`
 | Maps    | `[MapTag]` `[MapTag<*Type:*Type>]` | ^Same as above
 | All other tags | `[*Tagname+'Tag']` | Example: Locations --> `[LocationTag]` 
+
+In addition to an in-script docstring, there must also be an identical copy of the docstring under the 'description' key of the script. But do note that the Denizen VSCode extension gets very unhappy when it sees angle brackets in places that it doesn't recognize (even in description keys), so be sure to replace all square brackets with regular parentheses;
+
+```DenizenScript
+SampleTaskScript:
+    type: task
+    definitions: someMap[MapTag]|someList[ListTag]|someInt[ElementTag(Integer)]
+    description:
+    - Here would be a short description of the script and how it interacts with the definitions provided.
+    - All normal rules regarding comments also apply to docstrings.
+    - ---
+    - → [Void]
+    
+    ...
+```
 
 ## Data Scripts
 
