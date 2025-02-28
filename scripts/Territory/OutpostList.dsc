@@ -16,9 +16,10 @@ OutpostList_GUI:
     type: inventory
     gui: true
     inventory: chest
-    title: "Outpost List"
+    title: Outpost List
     procedural items:
     - determine <player.flag[outpostList]>
+
     slots:
     - [] [] [] [] [] [] [] [] []
     - [] [] [] [] [] [] [] [] []
@@ -66,6 +67,14 @@ SpecTypeToItem:
     none: Unspec_Item
 
 
+OutpostList_Handler:
+    type: world
+    events:
+        on player clicks *Spec_Item in PaginatedInterface_Window flagged:outpostList:
+        - flag <player> datahold.outpostSpec.name:<context.item.flag[name]>
+        - inventory open d:OutpostSpec_Window
+
+
 OutpostList:
     type: task
     debug: false
@@ -91,16 +100,16 @@ OutpostList:
         - define length <proc[GetOutpostArea].context[<[kingdom]>|<[outpostName]>].size.x>
         - define width <proc[GetOutpostArea].context[<[kingdom]>|<[outpostName]>].size.z>
         - define upkeep <proc[GetOutpostUpkeep].context[<[kingdom]>|<[outpostName]>]>
+        - define specialization <proc[GetOutpostSpecialization].context[<[kingdom]>|<[outpostName]>]>
         - define outpostBlock <item[Unspec_Item]>
-        - flag <[outpostBlock]> name:<[name]>
 
         # TODO: Figure out what I'm gonna do with outpost specs.
         # - define spec <[currentOutpost].get[specType]>
 
         # No specialization is represented by the tag being non-existant
-        # - if <[currentOutpost].get[specType].exists>:
-        #     - define SpecKey <script[SpecTypeToItem].data_key[<[spec]>]>
-        #     - define outpostBlock <item[<[SpecKey]>]>
+        - if <[specialization]> != None:
+            - define specKey <script[SpecTypeToItem].data_key[<[specialization]>]>
+            - define outpostBlock <item[<[specKey]>]>
 
         - definemap lore:
             1: <element[Name: ]><[name].color[green]>
@@ -109,7 +118,8 @@ OutpostList:
             4: <element[Upkeep: <red>$<[upkeep].format_number>]>
 
         - adjust def:outpostBlock lore:<[lore].values>
+        - flag <[outpostBlock]> name:<[name]>
 
         - define rawOutpostList:->:<[outpostBlock]>
 
-    - run PaginatedInterface def.itemList:<[rawOutpostList]> def.page:1 def.player:<[player]> def.title:<element[Outpost List]>
+    - run PaginatedInterface def.itemList:<[rawOutpostList]> def.page:1 def.player:<[player]> def.title:<element[Outpost List]> def.flag:outpostList

@@ -395,6 +395,7 @@ GetKingdomOutpostMaxSize:
     - determine <server.flag[kingdoms.<[kingdom]>.outposts.maxSize]>
 
 
+## @Alias
 GetKingdomMaxOutpostSize:
     type: procedure
     definitions: kingdom[ElementTag(String)]
@@ -406,6 +407,140 @@ GetKingdomMaxOutpostSize:
 
     script:
     - inject GetKingdomOutpostMaxSize
+
+
+GetOutpostSpecialization:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns the specialization of the given outpost in the given kingdom. If the outpost has no specialization, the procedure will return 'None'.
+    - Returns null if the action fails.
+    - ---
+    - → [ElementTag(String)]
+
+    script:
+    ## Returns the specialization of the given outpost in the given kingdom. If the outpost has no
+    ## specialization, the procedure will return 'None'.
+    ##
+    ## Returns null if the action fails.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## outpost : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost specialization. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<proc[DoesOutpostExist].context[<[kingdom]>|<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost specialization. Invalid outpost name provided: <[outpost].color[red]>]>
+        - determine null
+
+    - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.specType].if_null[None]>
+
+
+SetOutpostSpecialization:
+    type: task
+    definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]|spec[ElementTag(String)]
+    description:
+    - Sets the specialization of the given outpost in the given kingdom.
+    - Returns null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Sets the specialization of the given outpost in the given kingdom.
+    ##
+    ## Returns null if the action fails.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## outpost : [ElementTag<String>]
+    ## spec    : [ElementTag<String>]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set outpost specialization. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<proc[DoesOutpostExist].context[<[kingdom]>|<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set outpost specialization. Invalid outpost name provided: <[outpost].color[red]>]>
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.specType:<[spec]>
+
+
+GetOutpostSpecializationModifier:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns the specialization modifier of the given outpost in the given kingdom. The specialization modifier is the multiplier that the outpost's specialized production will increase by.
+    - Returns null if the action fails.
+    - ---
+    - → [ElementTag(String)]
+
+    script:
+    ## Returns the specialization modifier of the given outpost in the given kingdom. The
+    ## specialization modifier is the multiplier that the outpost's specialized production will
+    ## increase by.
+    ##
+    ## Returns null if the action fails.
+    ##
+    ## kingdom : [ElementTag<String>]
+    ## outpost : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost specialization modifier. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<proc[DoesOutpostExist].context[<[kingdom]>|<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost specialization modifier. Invalid outpost name provided: <[outpost].color[red]>]>
+        - determine null
+
+    - if <proc[GetOutpostSpecialization].context[<[kingdom]>|<[outpost]>].is_in[None|null]>:
+        - determine 1
+
+    - determine <server.flag[kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.specMod].if_null[null]>
+
+
+SetOutpostSpecializationModifier:
+    type: task
+    definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]|modifier[ElementTag(Float)]
+    description:
+    - Sets the specialization modifier of the given outpost in the given kingdom. The specialization modifier is the multiplier that the outpost's specialized production will increase by.
+    - Returns null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    ## Sets the specialization modifier of the given outpost in the given kingdom. The
+    ## specialization modifier is the multiplier that the outpost's specialized production will
+    ## increase by.
+    ##
+    ## Returns null if the action fails.
+    ##
+    ## kingdom  : [ElementTag<String>]
+    ## outpost  : [ElementTag<String>]
+    ## modifier : [ElementTag<Float>]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set outpost specialization modifier. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<proc[DoesOutpostExist].context[<[kingdom]>|<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set outpost specialization modifier. Invalid outpost name provided: <[outpost].color[red]>]>
+        - determine null
+
+    - if <proc[GetOutpostSpecialization].context[<[kingdom]>|<[outpost]>].is_in[None|null]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set outpost specialization modifier. Outpost provided: <[outpost].color[red]> does not have a specialization]>
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.specMod:<[modifier]>
 
 
 PlayerInWhichOutpost:
