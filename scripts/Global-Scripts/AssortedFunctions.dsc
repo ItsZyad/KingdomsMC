@@ -207,3 +207,49 @@ AffectOfflinePlayers_Handler:
 
         - foreach <server.flag[waitingForOfflinePlayer.<player.uuid>]> as:runString:
             - execute as_server "ex <[runString].include[<element[def._playerList:<list[<player>]>]>]>"
+
+
+# WARNING! This script is not mine.
+# Source repo: https://github.com/Hydroxycobalamin/Denizen-Script-Collection/blob/main/scripter_utilities/format_lore/format_lore.dsc
+FormatLore:
+    type: procedure
+    debug: false
+    definitions: script[ScriptTag]
+    description:
+    - Returns a string of formatted lore for the item script provided.
+    - Original creator: @icecapade / Icecapade#8825
+    - ---
+    - → [ElementTag(String)]
+
+    data:
+        # Set a width in pixels when the lore should split.
+        width: 250
+
+        # Add more custom tags here.
+        parseables:
+            [line]: <element[ ].repeat[<script.data_key[data.width].div[4].round_up>].strikethrough>
+
+    script:
+    ## Returns a string of formatted lore for the item script provided.
+    ## Original Creator: @icecapade / Icecapade#8825
+    ##
+    ## script : [ScriptTag]
+    ##
+    ## >>> [ElementTag(String)]
+
+    - define lore <[script].data_key[data.lore].if_null[null]>
+
+    - if <[lore]> == null:
+        - debug error "<&[error]> Script <[script].name.custom_color[emphasis]> does not have a data key with the path: <element[data.lore].custom_color[emphasis]>!"
+        - determine null
+
+    - define data <script.parsed_key[data]>
+
+    - foreach <[lore]> as:line:
+        - if <[line]> in <[data.parseables]>:
+            - define lore[<[loop_index]>]:<[data.parseables.<[line]>]>
+            - foreach next
+
+        - define lore[<[loop_index]>]:<[line].parsed.split_lines_by_width[<[data.width]>].lines_to_colored_list.separated_by[<n>]>
+
+    - determine <[lore].separated_by[<n>]>
