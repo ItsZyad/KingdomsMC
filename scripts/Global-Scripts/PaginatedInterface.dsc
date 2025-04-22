@@ -157,6 +157,14 @@ PaginatedInterface_Handler:
 
         - determine cancelled
 
+        on player clicks in PaginatedInterface_Window priority:1:
+        - if <context.clicked_inventory.id_type> == player:
+            - determine cancelled
+
+        on player drags in PaginatedInterface_Window priority:1:
+        - if <context.clicked_inventory.id_type> == player:
+            - determine cancelled
+
         on player closes PaginatedInterface_Window:
         - wait 5t
         - if <player.open_inventory> == <player.inventory>:
