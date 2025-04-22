@@ -3,7 +3,7 @@
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Jan 2023
-## @Script Ver: v1.0
+## @Script Ver: v1.1
 ## ---------------------------END HEADER----------------------------
 
 
@@ -46,7 +46,7 @@ GetTrueInterface_Proc:
 PaginatedInterface:
     type: task
     debug: false
-    definitions: itemList|page|player|footer|title|flag[ElementTag(String)]
+    definitions: itemList[ListTag(ItemTag)]|page[ElementTag(Integer)]|player[PlayerTag]|footer[InventoryTag]|title[ElementTag(String)]|flag[ElementTag(String)]|lockInv[ElementTag(Boolean) = True]
     description:
     - Generates a template paginated interface with the itemList given.
     - Note: Interface name is always: PaginatedInterface_Window.
@@ -55,18 +55,19 @@ PaginatedInterface:
     ## Generates a template paginated interface with the itemList given.
     ## Note: Interface name is always: PaginatedInterface_Window.
     ##
-    ## itemList : [ListTag<ItemTag>]
-    ## page     : [ElementTag<Integer>]
-    ## player   : [PlayerTag]
-    ## footer   : [InventoryTag]
-    ## title    : [ElementTag<String>]
-    ## flag     : [ElementTag<String>]
+    ## itemList :  [ListTag<ItemTag>]
+    ## page     :  [ElementTag<Integer>]
+    ## player   :  [PlayerTag]
+    ## footer   : ?[InventoryTag]
+    ## title    : ?[ElementTag<String>]
+    ## flag     : ?[ElementTag<String>]
+    ## lockInv  : ?[ElementTag<Boolean> = True]
     ##
     ## >>> [MapTag<ListTag,ElementTag<Integer>>]
 
-    # - flag <[player]> dataHold.paginated.itemList:<[itemList]> if:<player.has_flag[dataHold.paginated.itemList].not>
     - define itemList <[itemList].if_null[<player.flag[dataHold.paginated.itemList]>].exclude[<item[air]>]>
     - define footer <inventory[DefaultFooter_Window]> if:<[footer].exists.not>
+    - define lockInv <[lockInv].if_null[true]>
 
     - flag <[player]> dataHold.paginated.itemList:<[itemList]>
     - flag <[player]> dataHold.paginated.footer:<[footer]>
@@ -99,6 +100,8 @@ PaginatedInterface:
     - definemap determination:
         newPageContents: <[interface].list_contents.get[1].to[<[itemsPerPage]>]>
         newPageNumber: <[page]>
+
+    - flag <[player]> datahold.paginated.lockInv:<[lockInv]>
 
     - if <[flag].exists>:
         - flag <[player]> datahold.paginated.tempFlagName:<[flag]>
@@ -157,11 +160,11 @@ PaginatedInterface_Handler:
 
         - determine cancelled
 
-        on player clicks in PaginatedInterface_Window priority:1:
+        on player clicks in PaginatedInterface_Window flagged:datahold.paginated.lockInv priority:1:
         - if <context.clicked_inventory.id_type> == player:
             - determine cancelled
 
-        on player drags in PaginatedInterface_Window priority:1:
+        on player drags in PaginatedInterface_Window flagged:datahold.paginated.lockInv priority:1:
         - if <context.clicked_inventory.id_type> == player:
             - determine cancelled
 
