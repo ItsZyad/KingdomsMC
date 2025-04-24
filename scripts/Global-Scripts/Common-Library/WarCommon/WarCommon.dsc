@@ -261,6 +261,51 @@ GetWarClaimType:
     - determine <server.flag[kingdoms.wars.<[warID]>.claimType]>
 
 
+GetWarName:
+    type: procedure
+    definitions: warID[ElementTag(String)]
+    description:
+    - Returns the display name of the war with the given ID.
+    - Will return null if the action fails.
+    - ---
+    - → [ElementTag(String)]
+
+    script:
+    ## Returns the display name of the war with the given ID.
+    ## Will return null if the action fails.
+    ##
+    ## warID : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<String>]
+
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
+        - determine null
+
+    - determine <server.flag[kingdoms.wars.<[warID]>.warName].if_null[null]>
+
+
+SetWarName:
+    type: task
+    definitions: warID[ElementTag(String)]|newName[ElementTag(String)]
+    description:
+    - Will change the name of the war with the given ID to the new name provided.
+    - ---
+    - → [Void]
+
+    script:
+    ## Will change the name of the war with the given ID to the new name provided.
+    ##
+    ## warID   : [ElementTag<String>]
+    ## newName : [ElementTag<String>]
+    ##
+    ## >>> [Void]
+
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
+        - determine null
+
+    - flag server kingdoms.wars.<[warID]>.warName:<[newName]>
+
+
 GetAllKingdomLostChunks:
     type: procedure
     definitions: kingdom[ElementTag(String)]|warID[ElementTag(String)]
@@ -627,6 +672,7 @@ DeclareWar:
         progress: 0
         claimType: <[claimType]>
         claimSize: <[claimSize]>
+        warName: <element[The <[kingdom].proc[GetKingdomShortName]>-<[targetKingdom].proc[GetKingdomShortName]> War]>
 
     - if <[claimName].exists>:
         - define warMap.claimName:<[claimName]>
