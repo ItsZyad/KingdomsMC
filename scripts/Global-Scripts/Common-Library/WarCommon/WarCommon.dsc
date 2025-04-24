@@ -358,12 +358,12 @@ GetKingdomLostChunksByEnemy:
     type: procedure
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]|warID[ElementTag(String)]
     description:
-    - Returns a list containing all the chunnks lost by the provided kingdom in the war with the provided ID at the hands of the provided target kingdom.
+    - Returns a list containing all the chunks lost by the provided kingdom in the war with the provided ID at the hands of the provided target kingdom.
     - ---
     - → [ListTag(ChunkTag)]
 
     script:
-    ## Returns a list containing all the chunnks lost by the provided kingdom in the war with the
+    ## Returns a list containing all the chunks lost by the provided kingdom in the war with the
     ## provided ID at the hands of the provided target kingdom.
     ##
     ## kingdom       : [ElementTag<String>]
@@ -386,13 +386,12 @@ GetAllKingdomLostOutposts:
     type: procedure
     definitions: kingdom[ElementTag(String)]|warID[ElementTag(String)]
     description:
-    - Returns a list containing all the names of the outposts lost by this kingdom in the current war.
+    - Returns a list containing the names of the outposts lost by this kingdom in the current war.
     - ---
     - → [ListTag(ElementTag(String))]
 
     script:
-    ## Returns a list containing all the names of the outposts lost by this kingdom in the current
-    ## war.
+    ## Returns a list containing the names of the outposts lost by this kingdom in the current war.
     ##
     ## kingdom  : [ElementTag<String>]
     ## warID    : [ElementTag<String>]
@@ -406,30 +405,79 @@ GetAllKingdomLostOutposts:
     - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
         - determine <list[]>
 
-    - determine <server.flag[kingdoms.wars.<[warID]>.lostOutposts.<[kingdom]>].parse_value_tag[<[parse_value]>].values.get[1]>
+    - determine <server.flag[kingdoms.wars.<[warID]>.lostOutposts].filter_tag[<[filter_value].get[owner].equals[<[kingdom]>]>].keys.if_null[<list[]>]>
+
+
+GetAllLostOutposts:
+    type: procedure
+    definitions: warID[ElementTag(String)]
+    description:
+    - Returns a list containing MapTags where the keys are the names of outposts lost during the war with the provided warID, and the values are the kingdoms they originally belonged to.
+    - ---
+    - → [ListTag(MapTag(ElementTag(String)))]
+
+    script:
+    ## Returns a list containing MapTags where the keys are the names of outposts lost during the
+    ## war with the provided warID, and the values are the kingdoms they originally belonged to.
+    ##
+    ## warID : [ElementTag<String>]
+    ##
+    ## >>> [ListTag<ElementTag<String>>]
+
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
+        - determine <list[]>
+
+    - define outpostList <list[]>
+
+    - foreach <server.flag[kingdoms.wars.<[warID]>.lostOutposts]> key:outpostName as:outpostData:
+        - define outpostList:->:<map[<[outpostName]>=<[outpostData].get[owner]>]>
+
+    - determine <[outpostList]>
+
+
+GetLostOutpostCaptureTimes:
+    type: procedure
+    definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns a Map containing the times where squads began and finished capturing the given outpost in the war with the given warID.
+    - ---
+    - → [MapTag(DurationTag)]
+
+    script:
+    ## Returns a Map containing the times where squads began and finished capturing the given
+    ## outpost in the war with the given warID.
+    ##
+    ## warID   : [ElementTag<String>]
+    ## outpost : [ElementTag<String>]
+    ##
+    ## >>> [MapTag<DurationTag>]
+
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
+        - determine null
+
+    - if !<proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost capture times. There is no outpost by the name: <[outpost].color[red]>.]>
+        - determine null
+
+    - determine <server.flag[kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>].get_subset[start|finish]>
 
 
 GetChunkOccupier:
     type: procedure
-    definitions: kingdom[ElementTag(String)]|warID[ElementTag(String)]|chunk[ChunkTag]
+    definitions: warID[ElementTag(String)]|chunk[ChunkTag]
     description:
-    - Returns the current occupier of the provided chunk in the given war that the provided kingdom is fighting.
+    - Returns the current occupier of the provided chunk in the given war.
     - ---
     - → ?[ElementTag(String)]
 
     script:
-    ## Returns the current occupier of the provided chunk in the given war that the provided
-    ## kingdom is fighting.
+    ## Returns the current occupier of the provided chunk in the given war.
     ##
     ## kingdom : [ElementTag<String>]
     ## warID   : [ElementTag<String>]
     ## chunk   : [ChunkTag]
     ##
     ## >>> ?[ElementTag(String)]
-
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get chunk occupier. Kingdom code provided: <[kingdom].color[red]> is invalid.]>
-        - determine null
 
     - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
         - determine null
@@ -438,26 +486,35 @@ GetChunkOccupier:
         - run GenerateInternalError def.category:TypeError def.message:<element[Cannot get chunk occupier. Provided definition: <[chunk].color[red]> is not of type: ChunkTag.]>
         - determine null
 
-    - foreach <server.flag[kingdoms.wars.<[warID]>.lostChunks]> key:occupier as:chunks:
-        - if <[chunks].contains[<[chunk]>]>:
-            - determine <[occupier]>
+    - foreach <server.flag[kingdoms.wars.<[warID]>.lostChunks]> as:occupationData:
+        - foreach <[occupationData]> key:occupier as:occupiedChunks:
+            - if <[occupiedChunks].contains[<[chunk]>]>:
+                - determine <[occupier]>
 
     - determine null
 
 
 GetOutpostOccupiers:
     type: procedure
-    definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
+    definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
     description:
-    - Returns the squads that are currently occupying the provided outpost that belongs to the provided kingdom.
+    - Returns a map of the squads that are currently occupying the provided outpost, where the squad names are the keys and the kingdom they belong to are the values.
+    - Note: This refers to outposts that are *currently* being captured. If you want to find the squads that captured an already-occupied outpost use `GetOutpostControllers`.
+    - If the outpost provided is not being captured, or if the action fails in any other way, the script will return null.
     - ---
     - → [ListTag(MapTag(
     -               ElementTag(String)
     -           ))]
 
     script:
-    ## Returns the squads that are currently occupying the provided outpost that belongs to the
-    ## provided kingdom.
+    ## Returns a map of the squads that are currently occupying the provided outpost, where the
+    ## squad names are the keys and the kingdom they belong to are the values.
+    ##
+    ## Note: This refers to outposts that are *currently* being captured. If you want to find the
+    ## squads that captured an already-occupied outpost use `GetOutpostControllers`.
+    ##
+    ## If the outpost provided is not being captured, or if the action fails in any other way, the
+    ## script will return null.
     ##
     ## kingdom : [ElementTag<String>]
     ## outpost : [ElementTag<String>]
@@ -466,22 +523,52 @@ GetOutpostOccupiers:
     ##                  ElementTag<String>
     ##              >>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost occupiers. Invalid kingdom code provided: <[kingdom].color[red]>.]>
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
         - determine null
 
     - if !<proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost occupiers. There is no outpost by the name: <[outpost].color[red]>.]>
         - determine null
 
-    - define targetKingdom <proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].keys.get[1]>
-    - define warID <[kingdom].proc[GetKingdomWars].filter_tag[<[filter_value].proc[GetWarRetaliators].contains[<[targetKingdom]>]>].get[1]>
+    - determine <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads]>
 
-    - if !<[warID].is_truthy>:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost occupiers. Kingdom (<[kingdom].color[red]>) war status with provided target: <[targetKingdom].color[red]> returned null...]>
+
+GetOutpostControllers:
+    type: procedure
+    definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns a map of the squads that are currently controlling the provided outpost, where the squad names are the keys and the kingdom they belong to are the values.
+    - Note: This refers to outposts that have *already* been captured. If you want to find the squads that are currently capturing an outpost use `GetOutpostOccupiers`.
+    - If the action fails, the script will return null.
+    - ---
+    - → [ListTag(MapTag(
+    -               ElementTag(String)
+    -           ))]
+
+    script:
+    ## Returns a map of the squads that are currently controlling the provided outpost, where the
+    ## squad names are the keys and the kingdom they belong to are the values.
+    ##
+    ## Note: This refers to outposts that have *already* been captured. If you want to find the
+    ## squads that are currently capturing an outpost use `GetOutpostOccupiers`.
+    ##
+    ## If the action fails, the script will return null.
+    ##
+    ## warID   : [ElementTag<String>]
+    ## outpost : [ElementTag<String>]
+    ##
+    ## >>> [ListTag<MapTag<
+    ##                  ElementTag<String>
+    ##              >>]
+
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
         - determine null
 
-    - determine <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.squads]>
+    - if !<proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost controllers. There is no outpost by the name: <[outpost].color[red]>.]>
+        - determine null
+
+    - determine <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads]>
 
 
 GetTerritoryJustificationLevel:
@@ -920,8 +1007,8 @@ OccupyOutpost:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot occupy outpost. Invalid kingdom code provided: <[kingdom].color[red]>.]>
         - determine null
 
-    - if !<proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot occupy outpost. There is no outpost by the name: <[outpost].color[red]>.]>
+    - if !<[targetKingdom].proc[GetOutposts].keys.contains[<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot occupy outpost. There is no outpost by the name: <[outpost].color[red]> belonging to the kingdom: <[targetKingdom].color[red]>.]>
         - determine null
 
     - if <[delay].exists> && <[delay].object_type> != Duration:
@@ -935,7 +1022,7 @@ OccupyOutpost:
         - determine null
 
     - if <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads].if_null[<list[]>].contains[<[squadName]>]>:
-        - run GenerateKingdomsDebug def.message:<element[Provided squad is already claiming this outpost. Skipping...]> def.silent:true
+        - run GenerateKingdomsDebug def.message:<element[Provided squad: <[squadName].color[aqua]> is already claiming outpost: <[targetKingdom].color[red]>.<[outpost].color[red]>. Skipping...]> def.silent:true
         - stop
 
     - flag server kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads.<[squadName]>:<[kingdom]>
@@ -957,18 +1044,22 @@ OccupyOutpost:
         - if <[existingOccupationProgress].sub[<[existingOccupationDuration]>].in_seconds> > 0:
             - define occupationDelay <[occupationDelay].sub[<[existingOccupationProgress]>]>
 
+    - define squadLeader <[kingdom].proc[GetSquadLeader].context[<[squadName]>]>
+
     - flag server kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.start:<util.time_now> if:<server.has_flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.start].not>
     - flag server kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.finish:<util.time_now.add[<[occupationDelay]>]>
-    - runlater <script.name> path:OccupyOutpost_Helper id:<[kingdom]>_<[targetKingdom]>_<[outpost]>_outpost_occupy def.warID:<[warID]> def.targetKingdom:<[targetKingdom]> def.kingdom:<[kingdom]> def.outpost:<[outpost]> delay:<[occupationDelay]>
+    - runlater <script.name> path:OccupyOutpost_Helper id:<[kingdom]>_<[targetKingdom]>_<[outpost]>_outpost_occupy def.warID:<[warID]> def.targetKingdom:<[targetKingdom]> def.kingdom:<[kingdom]> def.outpost:<[outpost]> delay:<[occupationDelay]> def.squadLeader:<[squadLeader]>
 
-    - run ChunkOccupationVisualizer def.squadLeader:<[kingdom].proc[GetSquadLeader].context[<[squadname]>]> def.occupationDuration:<[occupationDelay]>
+    - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[squadLeader]>
+    - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[occupationDelay]>
 
     - determine <[occupationDelay]>
 
     OccupyOutpost_Helper:
-    - flag server kingdoms.wars.<[warID]>.lostOutposts.<[targetKingdom]>.<[kingdom]>.<[outpost]>.finish:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.finish]>
-    - flag server kingdoms.wars.<[warID]>.lostOutposts.<[targetKingdom]>.<[kingdom]>.<[outpost]>.start:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.start]>
-    - flag server kingdoms.wars.<[warID]>.lostOutposts.<[targetKingdom]>.<[kingdom]>.<[outpost]>.squads:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads]>
+    - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.finish:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.finish]>
+    - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.start:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.start]>
+    - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.squads:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads]>
+    - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.owner:<[targetKingdom]>
     - flag server kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>:!
     - flag <[squadLeader]> datahold.war.occupying:!
 
@@ -1109,7 +1200,7 @@ ReclaimOutpost:
     ReclaimOutpost_Helper:
     - foreach <server.flag[kingdoms.wars.<[warID]>.lostOutposts.<[kingdom]>]> as:outposts key:occupier:
         - if <[outposts].contains[<[outpost]>]>:
-            - flag server kingdoms.wars.<[warID]>.lostOutposts.<[kingdom]>.<[occupier]>:<-:<[outpost]>
+            - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>:!
 
     - flag server kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>:!
     - flag <[squadLeader]> datahold.war.occupying:!
