@@ -572,6 +572,34 @@ Kingdom_Command:
 
                 - inventory open d:JustificationKingdom_Window
 
+            - case progress:
+                - if <[args].get[3].exists>:
+                    - define warID <[args].get[3]>
+                    - narrate format:debug WIP
+
+                - define allWars <[kingdom].proc[GetKingdomWars]>
+                - define warList <list[]>
+
+                - foreach <[allWars]> as:warID:
+                    - define warItem <item[iron_sword]>
+
+                    - run SetWarName def.warID:<[warID]> def.newName:<element[The <[warID].proc[GetWarBelligerents].get[1].proc[GetKingdomShortName]>-<[warID].proc[GetWarRetaliators].proc[GetKingdomShortName]> War]> if:<[warID].proc[GetWarName].equals[null]>
+                    - define warName <[warID].proc[GetWarName]>
+
+                    - definemap lore:
+                        1: <element[Belligerents: ]><n><element[    - ].color[aqua]><[warID].proc[GetWarBelligerents].parse_tag[<[parse_value].proc[GetKingdomName]>].separated_by[<n>    - ].color[aqua].italicize>
+                        2: <element[Retaliators: ]><n><element[    - ].color[aqua]><[warID].proc[GetWarRetaliators].parse_tag[<[parse_value].proc[GetKingdomName]>].separated_by[<n>    - ].color[aqua].italicize>
+
+                    - adjust def:warItem display:<[warName].proc[ConvertToSkinnyLetters].color[white].bold>
+                    - adjust def:warItem lore:<[lore].values>
+                    - adjust def:warItem lore:<[warItem].lore.include[|<element[warID: <[warID]>].color[gray]>]>
+                    - adjust def:warItem hides:ALL
+                    - adjust def:warItem flag:warID:<[warID]>
+
+                    - define warList:->:<[warItem]>
+
+                - run PaginatedInterface def.itemList:<[warList]> def.page:1 def.player:<player> def.flag:warProgress def.title:<element[All Wars - <[kingdom].proc[GetKingdomShortName]>]>
+
             - case surrender:
                 - narrate WIP
 
