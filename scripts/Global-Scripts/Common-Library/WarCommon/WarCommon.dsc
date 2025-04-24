@@ -114,6 +114,24 @@ GetKingdomWarStatus:
     - determine <server.flag[kingdoms.<[kingdom]>.war.warStatus].if_null[false]>
 
 
+## @Alias
+IsKingdomAtWar:
+    type: procedure
+    debug: false
+    definitions: kingdom[ElementTag(String)]
+    description:
+    - [Alias of `GetKingdomWarStatus`]
+
+    script:
+    ## [Alias of GetKingdomWarStatus]
+    ##
+    ## kingdom : [ElementTag<String>]
+    ##
+    ## >>> [ElementTag<Boolean>]
+
+    - determine <proc[GetKingdomWarStatus].context[<[kingdom]>]>
+
+
 GetKingdomWars:
     type: procedure
     definitions: kingdom[ElementTag(String)]
