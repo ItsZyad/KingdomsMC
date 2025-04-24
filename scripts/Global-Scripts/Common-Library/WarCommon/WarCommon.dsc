@@ -329,7 +329,29 @@ GetAllKingdomLostChunks:
     - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
         - determine <list[]>
 
-    - determine <server.flag[kingdoms.wars.<[warID]>.lostChunks.<[kingdom]>].parse_value_tag[<[parse_value]>].values.get[1]>
+    - determine <server.flag[kingdoms.wars.<[warID]>.lostChunks.<[kingdom]>].parse_value_tag[<[parse_value]>].values.get[1].if_null[<list[]>]>
+
+
+GetAllLostChunks:
+    type: procedure
+    definitions: warID[ElementTag(String)]
+    description:
+    - Returns a list containing all the chunks that have been lost by any kingdom during the war with provided warID.
+    - ---
+    - → [MapTag(MapTag(ListTag(ChunkTag)))]
+
+    script:
+    ## Returns a list containing all the chunks that have been lost by any kingdom during the war
+    ## with provided warID.
+    ##
+    ## warID : [ElementTag<String>]
+    ##
+    ## >>> [MapTag<MapTag<ListTag<ChunkTag>>>]
+
+    - if !<server.has_flag[kingdoms.wars.<[warID]>.lostChunks]>:
+        - determine null
+
+    - determine <server.flag[kingdoms.wars.<[warID]>.lostChunks].if_null[<map[]>]>
 
 
 GetKingdomLostChunksByEnemy:
