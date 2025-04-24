@@ -854,7 +854,7 @@ OccupyOutpost:
 
     - flag server kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads.<[squadName]>:<[kingdom]>
     - define occupyingSquadAmount <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads].size.if_null[1]>
-    - define occupationDelay <duration[<[targetKingdom].proc[GetOutpostSize].context[<[outpost]>].div[256].round_up.mul[5].div[<[occupyingSquadAmount]>]>m]>
+    - define occupationDelay <duration[<[targetKingdom].proc[GetOutpostSize].context[<[outpost]>].div[64].round_up.mul[5].div[<[occupyingSquadAmount]>]>m]>
     - define occupationDelay <[delay]> if:<[delay].exists>
     - define existingOccupationProgress <duration[0s]>
 
@@ -995,7 +995,7 @@ ReclaimOutpost:
     - flag server kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>.squads.<[squadName]>:<[kingdom]>
 
     - define occupyingSquadAmount <server.flag[kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>.squads].size.if_null[1]>
-    - define occupationDelay <duration[<[kingdom].proc[GetOutpostSize].context[<[outpost]>].div[256].round_up.mul[5].div[<[occupyingSquadAmount]>]>m]>
+    - define occupationDelay <duration[<[kingdom].proc[GetOutpostSize].context[<[outpost]>].div[64].round_up.mul[5].div[<[occupyingSquadAmount]>]>m]>
     - define occupationDelay <[delay]> if:<[delay].exists>
     - define existingOccupationProgress <duration[0s]>
 

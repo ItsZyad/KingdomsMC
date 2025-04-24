@@ -262,9 +262,7 @@ SetOutpostArea:
         - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.cornerone:!
         - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.cornertwo:!
 
-    - define diffX <[newArea].corners.first.x.sub[<[newArea].corners.last.x>].abs>
-    - define diffZ <[newArea].corners.first.z.sub[<[newArea].corners.last.z>].abs>
-    - define size <[diffX].mul[<[diffZ]>]>
+    - define size <[newArea].size.x.mul[<[newArea].size.z>].round_up>
 
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.area:<[newArea]>
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.size:<[size].round>
@@ -336,7 +334,7 @@ SetOutpostUpkeep:
 
     - define oldUpkeep <proc[GetOutpostUpkeep].context[<[kingdom]>|<[outpost]>]>
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[outpost]>.upkeep:<[amount]>
-    - define upkeepDiff <[oldUpkeep].sub[<proc[GetOutpostSize].context[<[kingdom]>|<[outpost]>].mul[<server.flag[kingdoms.<[kingdom]>.outposts.upkeepMultiplier].if_null[1]>].round>]>
+    - define upkeepDiff <[oldUpkeep].sub[<proc[GetOutpostSize].context[<[kingdom]>|<[outpost]>].mul[3].mul[<server.flag[kingdoms.<[kingdom]>.outposts.upkeepMultiplier].if_null[1]>].round>]>
 
     - run AddUpkeep def.kingdom:<[kingdom]> def.amount:<[upkeepDiff]>
     - run CalculateTotalOutpostUpkeep def.kingdom:<[kingdom]>
@@ -619,19 +617,16 @@ CreateOutpost:
         - run GenerateInternalError def.category:TypeError def.message:<element[Cannot create outpost. Location list entries provided are not actual locations.]>
         - determine null
 
-    - define diffX <[cornerOne].x.sub[<[cornerTwo].x>].abs>
-    - define diffZ <[cornerOne].z.sub[<[cornerTwo].z>].abs>
-    - define size <[diffX].mul[<[diffZ]>]>
-
     - define outpostArea <cuboid[<player.world.name>,<[cornerOne].x>,0,<[cornerOne].z>,<[cornerTwo].x>,255,<[cornerTwo].z>]>
     - define escapedName <[outpostName].replace[ ].with[-]>
     - define noteName outpost_<[escapedName]>
+    - define size <[outpostArea].size.x.mul[<[outpostArea].size.z>].round_up>
 
     - note <[outpostArea]> as:<[noteName]>
 
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.area:<[outpostArea]>
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.noteName:<[noteName]>
-    - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size:<[size].round>
+    - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.size:<[size]>
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.upkeep:<[size].mul[<server.flag[kingdoms.<[kingdom]>.outposts.upkeepMultiplier].if_null[1]>].round>
     - flag server kingdoms.<[kingdom]>.outposts.outpostList.<[escapedName]>.name:<[outpostName]>
 
