@@ -113,3 +113,35 @@ RemoveWarp:
 
     - if <server.has_flag[kingdoms.<[kingdom]>.warps.<[warpName]>]>:
         - flag server kingdoms.<[kingdom]>.warps.<[warpName]>:!
+
+
+GetConfigNode:
+    type: procedure
+    definitions: node[ElementTag(String)]
+    description:
+    - Returns the value of the provided config node. The accepted format is [Category].[Setting] (for example: General.version).
+    - Please note that this loads nodes from the version of the config that has been loaded into memory (usually at server start), not from config file, itself.
+    - Will return null if the action fails.
+    - ---
+    - → [ObjectTag]
+
+    script:
+    ## Returns the value of the provided config node. The accepted format is [Category].[Setting]
+    ## (for example: General.version).
+    ##
+    ## Please note that this loads nodes from the version of the config that has been loaded into
+    ## memory (usually at server start), not from config file, itself.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## node : [ElementTag(String)]
+    ##
+    ## >>> [ObjectTag]
+
+    - define configMap <server.flag[kingdoms.config.nodes]>
+
+    - if !<[configMap].deep_get[<[node]>].exists>:
+        - run GenerateKingdomsDebug message:<element[Unable to find config node with the name: <[node].color[red]>. Perhaps there is a typo?]>
+        - determine null
+
+    - determine <[configMap].deep_get[<[node]>]>
