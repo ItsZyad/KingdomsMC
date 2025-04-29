@@ -319,3 +319,30 @@ GetMaxClaims:
 
         - default:
             - determine <server.flag[kingdoms.<[kingdom]>.claims.castleMax].if_null[0].add[<server.flag[kingdoms.<[kingdom]>.claims.coreMax].if_null[0]>]>
+
+
+SetMaxClaims:
+    type: task
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Integer)]|type[?ElementTag(String) = core]
+    description:
+    - Sets the maximum number of claims (of the provided type) that the provided kingdom can make to the provided amount.
+    - Will return null if the action fails.
+    - ---
+    - → [Void]
+
+    script:
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom max claims. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<[amount].is_integer>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom max claims. Provided claim amount: <[amount].color[red]> is not a valid integer]>
+        - determine null
+
+    - define type <[type].if_null[core]>
+
+    - if !<[type].is_in[core|castle]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom max claims. Provided claim type: <[type].color[red]> is invalid]>
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.claims.<[type]>Max:<[amount]>
