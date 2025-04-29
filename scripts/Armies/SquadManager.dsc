@@ -240,10 +240,8 @@ SquadManager_Handler:
         - define withinOutpost false
 
         # Check if barracks are contained within outpost cuboids
-        - foreach <server.flag[kingdoms.<[kingdom]>.outposts.outpostList].if_null[<list[]>]> key:outpostName as:outpost:
-            - define cornerOne <[outpost].get[cornerone].simple.split[,].remove[last].separated_by[,]>
-            - define cornerTwo <[outpost].get[cornertwo].simple.split[,].remove[last].separated_by[,]>
-            - define outpostCuboid <cuboid[<player.location.world.name>,<[cornerOne]>,<[cornerTwo]>]>
+        - foreach <[kingdom].proc[GetOutposts].keys> as:outpostName:
+            - define outpostCuboid <[kingdom].proc[GetOutpostArea].context[<[outpostName]>]>
 
             - if <[outpostCuboid].contains_cuboid[<[barracksArea]>]>:
                 - define withinOutpost false
