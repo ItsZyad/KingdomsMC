@@ -568,7 +568,7 @@ GetOutpostControllers:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost controllers. There is no outpost by the name: <[outpost].color[red]>.]>
         - determine null
 
-    - determine <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads]>
+    - determine <server.flag[kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.squads]>
 
 
 GetTerritoryJustificationLevel:
