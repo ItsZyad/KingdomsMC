@@ -216,6 +216,9 @@ SoldierCombat_Handler:
         - run CancelOutpostReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.outpost:<[soldier].flag[datahold.war.occupying.outpost]> if:<[soldier].has_flag[datahold.war.occupying.outpost]>
         - run CancelChunkReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[soldier].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.chunk:<[soldier].flag[datahold.war.occupying.chunk]> if:<[soldier].has_flag[datahold.war.occupying.chunk]>
 
+        - if <context.damager.has_flag[kingdom]>:
+            - run AddWarDead def.affectedKingdom:<[kingdom]> def.inflictingKingdom:<context.damager.flag[kingdom]> def.amount:1
+
         # Last soldier is killed - delete squad
         - if <[npcList].size> == 0:
             - run DeleteSquad def.kingdom:<[kingdom]> def.squadName:<[squadName]>

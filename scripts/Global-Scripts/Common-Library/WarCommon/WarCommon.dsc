@@ -1246,6 +1246,89 @@ CancelOutpostReclamation:
     - flag <[kingdom].proc[GetSquadLeader].context[<[squadName]>]> datahold.war.occupying:!
 
 
+AddWarDead:
+    type: task
+    definitions: affectedKingdom[ElemnetTag(String)]|inflictingKingdom[ElementTag(String)]|amount[ElementTag(Integer)]
+    description:
+    - Adds the specified amount of war dead to the affected kingdom provided. Using the inflicting kingdom as a reference, this task deduces the relevant war that the casualties are a part of.
+    - This task will return the new amount of war dead that the affected kingdom has after the amount provided has been applied.
+    - Note: This task accepts negative values to remove war dead.
+    - Will return null if the action fails.
+    - ---
+    - → ?[ElementTag(Integer)]
+
+    script:
+    ## Adds the specified amount of war dead to the affected kingdom provided. Using the
+    ## inflicting kingdom as a reference, this task deduces the relevant war that the casualties
+    ## are a part of.
+    ##
+    ## This task will return the new amount of war dead that the affected kingdom has after the
+    ## amount provided has been applied.
+    ##
+    ## Note: This task accepts negative values to remove war dead.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## affectedKingdom   : [ElemnetTag(String)]
+    ## inflictingKingdom : [ElementTag(String)]
+    ## amount            : [ElementTag(Integer)]
+    ##
+    ## >>> ?[ElementTag(Integer)]
+
+    - if !<proc[ValidateKingdomCode].context[<[affectedKingdom]>]> || !<proc[ValidateKingdomCode].context[<[inflictingKingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add war dead. Either one of the kingdom codes provided: <[affectedKingdom].color[red]> & <[inflictingKingdom].color[red]> are invalid.]>
+        - determine null
+
+    - if !<[amount].is_integer>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[The provided value: <[amount].color[red]> is not a valid integer amount.]>
+        - determine null
+
+    - define warID <[affectedKingdom].proc[GetKingdomWars].filter_tag[<[filter_value].proc[GetWarParticipants].contains[<[inflictingKingdom]>]>]>
+
+    - if <[warID].size> > 1:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Potential duplicate wars detected. Game state may be inconsistent! Please seek dev support ASAP!]>
+
+    - define warID <[warID].get[1]>
+
+    - flag server kingdoms.wars.<[warID]>.warDead.<[affectedKingdom]>.<[inflictingKingdom]>:+:<[amount]>
+    - determine <server.flag[kingdoms.wars.<[warID]>.warDead.<[affectedKingdom]>.<[inflictingKingdom]>]>
+
+
+GetWarDead:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|warID[ElementTag(String)]
+    description:
+    - Gets the amount of soldiers the provided kingdom lost in the war with the provided ID.
+    - This procedure returns a map breaking down the provided kingdom's losses by enemy.
+    - Will return null if the action fails.
+    - ---
+    - → ?[MapTag(ElementTag(Integer))]
+
+    script:
+    ## Gets the amount of soldiers the provided kingdom lost in the war with the provided ID.
+    ##
+    ## This procedure returns a map breaking down the provided kingdom's losses by enemy.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## kingdom : [ElementTag(String)]
+    ## warID   : [ElementTag(String)]
+    ##
+    ## >>> ?[MapTag(ElementTag(Integer))]
+
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get war dead. Invalid kingdom code provided: <[kingdom].color[red]>.]>
+        - determine null
+
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
+        - determine null
+
+    - if !<[warID].proc[GetWarParticipants].contains[<[kingdom]>]>:
+        - determine null
+
+    - determine <server.flag[kingdoms.wars.<[warID]>.warDead.<[kingdom]>].if_null[<map[]>]>
+
+
 MakeTheSquigglesGoAway:
     type: task
     enabled: false
