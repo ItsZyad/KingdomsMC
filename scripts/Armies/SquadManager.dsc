@@ -531,12 +531,15 @@ SquadManager_Handler:
         - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
 
         - if <context.location.has_inventory>:
-            - if <[SMLocation].proc[GetSMArmoryLocations].contains[<context.location>]>:
+            - if !<[SMLocation].proc[GetSMArmoryLocations].contains[<context.location>]>:
                 - run AddSMArmoryLocation def.SMLocation:<[SMLocation]> def.newArmory:<context.location>
-                - determine cancelled
-
-            - run RemoveSMArmoryLocation def.SMLocation:<[SMLocation]> def.newArmory:<context.location>
             - narrate format:callout "Designated <context.location.simple.split[,].remove[last].comma_separated.color[red].bold> as an armory <context.location.material.name>"
+
+            - else:
+                - narrate format:callout "This location has already been designated as an armory."
+
+        - else:
+            - narrate format:callout "This is not a valid armory location. The item here does not have an inventory!"
 
         - determine cancelled
 
