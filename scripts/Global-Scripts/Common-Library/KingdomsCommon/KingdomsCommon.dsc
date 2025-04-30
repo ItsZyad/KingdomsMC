@@ -21,16 +21,22 @@ KingdomRealNames:
     Names:
         jalerad: The United Duchies of Jalerad
         talpenhern: The Empire of Talpenhern
+        penaltea: The Republic of Penaltea
+        muspelheim: The Duchy of Muspelheim
 
     ShortNames:
         jalerad: Jalerad
         talpenhern: Talpenhern
+        penaltea: Penaltea
+        muspelheim: Muspelheim
 
 
 KingdomTextColors:
     type: data
     jalerad: light_blue
     talpenhern: orange
+    penaltea: red
+    muspelheim: purple
 
 # Process of adding a new kingdom:
 # Add new kingdom data to kingdoms.yml such as balance etc.
