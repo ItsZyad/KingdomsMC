@@ -112,9 +112,9 @@ Kingdoms_Command:
 
     script:
     - if <context.args.get[1]> == version:
-        - yaml load:../Kingdoms/config.yml id:config
-        - narrate format:callout <element[Kingdoms Version: <yaml[config].read[General.version].color[aqua]>]><element[ <&dq><yaml[config].read[General.version-name]><&dq>].color[red]>
-        - yaml unload id:config
+        - narrate <element[KINGDOMS: ].color[gold]><element[A Minecraft Strategy Game].color[white]><n>
+        - narrate <element[ Current Version: <proc[GetConfigNode].context[General.version].color[aqua]> <element[(Build <proc[GetConfigNode].context[General.build]>)].color[gray]>]>
+        - narrate <element[ <&dq><proc[GetConfigNode].context[General.version-name]><&dq>].color[red]>
 
     - else if <context.args.get[1]> == about:
         - narrate format:callout "Kingdoms is an expansive Minecraft project which aims to blend the worlds of strategy and roleplay gaming into a medival/fantasy world rich with story and possibilities. The game, upon completion, should allow you to do just about anything you want from commanding an army, conducting diplomacy with other kingdoms, improving the lives of your subjects and much more. Kingdoms aims to be one of the most ambitious projects in Minecraft but is currently still in early development."
