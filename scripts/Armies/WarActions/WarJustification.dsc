@@ -18,6 +18,7 @@ IronicAntiWarQuotes:
     - As long as there are sovereign nations possessing great power, war is inevitable. ~ Albert Einstein
     - The more you sweat in peace, the less you bleed in war. ~ Norman Schwarzkopf
     - All war represents a failure of diplomacy. ~ Tony Benn
+    - Politics is the skilled use of blunt objects. ~ Lester B. Pearson
 
 
 GetIronicWarQuote:
