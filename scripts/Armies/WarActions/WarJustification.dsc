@@ -267,7 +267,7 @@ WarJustification_Handler:
         - define targetKingdom <player.flag[datahold.war.justification.target]>
         - define justificationLevel <proc[GetTerritoryJustificationLevel].context[outpost]>
 
-        - if !<[kingdom].proc[GetOutposts].is_empty>:
+        - if <[kingdom].proc[GetOutposts].is_empty>:
             - narrate format:callout "You cannot justify on this kingdom's outpost territory because it does not have any outposts."
             - stop
 
