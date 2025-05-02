@@ -111,7 +111,7 @@ GetKingdomWarStatus:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom war status. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.war.warStatus].if_null[false]>
+    - determine <server.flag[kingdoms.<[kingdom]>.warStatus].if_null[false]>
 
 
 ## @Alias
@@ -788,7 +788,18 @@ DeclareWar:
 
     - flag server kingdoms.wars.<[warID]>:<[warMap]>
 
-    - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<[targetKingdom].proc[GetMembers]>].include[<server.online_ops>]>
+    - define kingdomMembers <[kingdom].proc[GetMembers]>
+    - define targetKingdomMembers <[targetKingdom].proc[GetMembers]>
+    - define kingdomMessage <element[Your kingdom is now at war with: <[targetKingdom].proc[GetKingdomName].color[<[targetKingdom].proc[GetKingdomColor]>]>.]>
+    - define targetKingdomMessage <element[After commiting to their justification, <[kingdom].proc[GetKingdomName].color[<[kingdom].proc[GetKingdomColor]>]> has decided to declare war on your kingdom.]>
+
+    - narrate targets:<[kingdomMembers].filter_tag[<[filter_value].is_online>]> <[kingdomMessage]>
+    - narrate targets:<[targetKingdomMembers].filter_tag[<[filter_value].is_online>]> <[targetKingdomMessage]>
+
+    - run AffectOfflinePlayers def.playerList:<[kingdomMembers]> def.scriptName:SendOfflinePlayersMessage def.otherDefs:<map[message=<element[Warning! A declaration of war took place while you were offline!<n><[kingdomMessage]>]>]>
+    - run AffectOfflinePlayers def.playerList:<[targetKingdomMembers]> def.scriptName:SendOfflinePlayersMessage def.otherDefs:<map[message=<element[Warning! A declaration of war took place while you were offline!<n><[targetKingdomMessage]>]>]>
+
+    - ~run SidebarLoader def.target:<[kingdomMembers].include[<[targetKingdomMembers]>].include[<server.online_ops>]>
 
 
 OccupyChunk:
