@@ -101,10 +101,21 @@ Kingdom_Command:
     - else if <[args].get[1].to_lowercase> == war:
         - if <[args].size> > 1:
             - if <[args].get[2].to_lowercase> == justify:
-                - determine <proc[GetKingdomList].context[false]>
+                - if <[args].get[3].if_null[null]> == cancel:
+                    - determine <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>
 
-            - else if <[args].get[2].to_lowercase> == progress:
-                - determine <[kingdom].proc[GetKingdomWars]>
+                - determine <list[cancel]>
+
+            # TODO:
+            # This should be reworked into a paginated menu showing all the kingdom's active wars
+            # with sub-menus for the war progress controls that are being worked on in
+            # WarManagement.dsc.
+            #
+            # For console-side access to this command, the admin can input /k war progress [warID]
+            # with another, admin-only command existing to show all the different war IDs and which
+            # wars they correspond to.
+            # - else if <[args].get[2].to_lowercase> == progress:
+            #     - determine <[kingdom].proc[GetKingdomWars].parse_tag[<[parse_value].proc[GetWarName]>]>
 
         - determine <list[justify|progress]>
 
@@ -557,18 +568,28 @@ Kingdom_Command:
                     - define target <[args].get[4]>
                     - define targetKingdomCode <[target].proc[GetKingdomCode]>
 
+                    - if !<[args].get[4].exists>:
+                        - narrate format:callout "You must specify a kingdom against whom an active justification should be cancelled."
+                        - stop
+
                     - if <[targetKingdomCode]> == null:
                         - narrate format:callout "Unrecognized kingdom name: <[target].color[red]>. Please try again."
                         - stop
 
-                    - if <player.has_flag[datahold.war.cancelJustification]>:
-                        - run CancelJustification def.kingdom:<[kingdom]> def.targetKingdom:<[targetKingdomCode]> save:result
+                    - if !<[kingdom].proc[IsJustifyingOnKingdom].context[<[targetKingdomCode]>]>:
+                        - narrate format:callout "Your kingdom is not currently justifying a claim against: <[target].color[red]>."
+                        - stop
 
-                        - if <entry[result].created_queue.determination.get[1].is_truthy>:
-                            - narrate format:callout "Cancelled justification against: <[target].color[aqua]>. The peace shall remain for now."
-                            - narrate <n>
-                            - wait 1s
-                            - narrate format:callout "<gray><italic>All war represents a failure of diplomacy. ~ Tony Benn"
+                    - run CancelJustification def.kingdom:<[kingdom]> def.targetKingdom:<[targetKingdomCode]> save:result
+                    - define result <entry[result].created_queue.determination.get[1]>
+
+                    - if !<[result].exists> || <[result]> != null:
+                        - narrate format:callout "Cancelled justification against: <[target].color[aqua]>. The peace shall remain for now."
+                        - narrate <n>
+                        - wait 1s
+                        - narrate format:callout "<gray><italic>Peace is not absence of conflict, it is the ability to handle conflict by peaceful means.. ~ Ronald Reagan"
+
+                    - stop
 
                 - inventory open d:JustificationKingdom_Window
 
