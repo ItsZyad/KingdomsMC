@@ -209,6 +209,33 @@ AffectOfflinePlayers_Handler:
             - execute as_server "ex <[runString].include[<element[def._playerList:<list[<player>]>]>]>"
 
 
+SendOfflinePlayersMessage:
+    type: task
+    definitions: _playerList[ListTag(PlayerTag)]|message[ElementTag(String)]
+    description:
+    - DO NOT RUN THIS TASK DIRECTLY! IT WILL NOT WORK.
+    - When run through the `AffectOfflinePlayers` task, it will broadcast the provided message to all online players immediately, and then send it to each offline player, individually, each time one of them joins.
+    - ---
+    - → [Void]
+
+    script:
+    ## DO NOT RUN THIS TASK DIRECTLY! IT WILL NOT WORK.
+    ##
+    ## When run through the `AffectOfflinePlayers` task, it will broadcast the provided message to
+    ## all online players immediately, and then send it to each offline player, individually, each
+    ## time one of them joins.
+    ##
+    ## _playerList : [ListTag(PlayerTag)]
+    ## message     : [ElementTag(String)]
+    ##
+    ## >>> [Void]
+
+    - if !<[_playerList].filter_tag[<[filter_value].is_player.not>].is_empty>:
+        - determine null
+
+    - narrate <[message]>
+
+
 # WARNING! This script is not mine.
 # Source repo: https://github.com/Hydroxycobalamin/Denizen-Script-Collection/blob/main/scripter_utilities/format_lore/format_lore.dsc
 FormatLore:
