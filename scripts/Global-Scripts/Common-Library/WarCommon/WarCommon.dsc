@@ -804,17 +804,17 @@ DeclareWar:
 
 OccupyChunk:
     type: task
-    definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]|chunk[ChunkTag]|squadLeader[NPCTag]|delay[DurationTag]
+    definitions: kingdom[ElementTag(String)]|chunk[ChunkTag]|squadLeader[NPCTag]|delay[DurationTag]
     description:
-    - Will occupy the provided chunk for the provided kingdom off of the target kingdom after the provided delay has elapsed.
+    - Will occupy the provided chunk for the provided kingdom after the provided delay has elapsed.
     - Chunk occupations may be cancelled after they are start by using the `CancelChunkOccupation` task.
     - Will return null if the action fails.
     - ---
     - → ?[Void]
 
     script:
-    ## Will occupy the provided chunk for the provided kingdom off of the target kingdom after the
-    ## provided delay has elapsed.
+    ## Will occupy the provided chunk for the provided kingdom after the  provided delay has
+    ## elapsed.
     ##
     ## Chunk occupations may be cancelled after they are start by using the `CancelChunkOccupation`
     ## task and providing the same parameters.
@@ -822,15 +822,14 @@ OccupyChunk:
     ## Will return null if the action fails.
     ##
     ## kingdom        : [ElementTag<String>]
-    ## targetKingdom  : [ElementTag<String>]
     ## chunk          : [ChunkTag]
     ## squadLeader    : [NPCTag]
     ## delay          : [DurationTag]
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot occupy chunk. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
+    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot occupy chunk. provided kingdom code: <[kingdom]> is invalid.]>
         - determine null
 
     - if <[chunk].object_type> != Chunk:
@@ -843,6 +842,18 @@ OccupyChunk:
 
     - if <[squadLeader].object_type> != Npc:
         - run GenerateInternalError def.category:TypeError def.message:<element[Cannot occupy chunk. Provided definition: <[squadLeader].color[red]> is not of type: NPCTag.]>
+        - determine null
+
+    - define targetKingdom null
+
+    - foreach <proc[GetKingdomList].exclude[<[kingdom]>]>:
+        - define chunkList <[value].proc[GetClaims]>
+
+        - if <[chunkList].contains[<[chunk]>]>:
+            - define targetKingdom <[value]>
+            - foreach stop
+
+    - if <[targetKingdom]> == null:
         - determine null
 
     - define warID <[kingdom].proc[GetKingdomWars].filter_tag[<[filter_value].proc[GetWarRetaliators].contains[<[targetKingdom]>]>].get[1]>
