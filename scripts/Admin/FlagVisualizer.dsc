@@ -181,7 +181,7 @@ MakeTabbed:
     script:
     - define tabbedList <list[<element[¦   ].repeat[<[tabLevel].div_int[4].if_null[0]>]>|<[element]>]>
     - define unseparatedTab <[tabbedList].unseparated>
-    - define chatWidth 335
+    - define chatWidth 320
 
     - if <[unseparatedTab].text_width> <= <[chatWidth]>:
         - determine <[unseparatedTab]>
