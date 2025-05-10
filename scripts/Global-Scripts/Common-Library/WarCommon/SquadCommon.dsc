@@ -588,7 +588,24 @@ DeleteSquad:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot delete squad. Provided parameter: <[squadSMLocation].color[red]> is not a valid squad manager location!]>
         - stop
 
-    - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList]>
+    - define squadLeader <[kingdom].proc[GetSquadLeader].context[<[squadName]>]>
+    - define npcList <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList].include[<[squadLeader]>]>
+    - define NPCInWhichOutpost <proc[GetAllOutposts].filter_tag[<[npcList].get[1].location.is_within[<[filter_value].get[area]>]>]>
+
+    - if <[NPCInWhichOutpost].is_empty>:
+        - define chunk <[squadLeader].location.chunk>
+
+        - foreach <proc[GetKingdomList]>:
+            - define kingdomClaims <[value].proc[GetClaims]>
+
+            - if <[kingdomClaims].contains[<[chunk]>]>:
+                - run CancelChunkOccupation def.kingdom:<[kingdom]> def.targetKingdom:<[value]> def.chunk:<[chunk]> def.squadLeader:<[squadLeader]>
+                - foreach stop
+
+    - else:
+        - run CancelOutpostOccupation def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.outpost:<[NPCInWhichOutpost].keys.get[1]>
+
+    - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[squadLeader]>
 
     - if <[npcList].size> > 0:
         - foreach <[npcList]> as:soldier:
