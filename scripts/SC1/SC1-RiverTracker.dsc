@@ -131,6 +131,7 @@ RecalculateTradeEfficiency:
 TradeEfficiencyUpdate_Handler:
     type: world
     debug: false
+    enabled: false
     events:
         on time 0:
         - inject RecalculateTradeEfficiency

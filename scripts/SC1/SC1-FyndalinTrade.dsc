@@ -308,6 +308,7 @@ GenerateFyndalinTradeList:
 
 FyndalinTradeRefresh_Handler:
     type: world
+    enabled: false
     events:
         on time 23:
         - define worldDay <context.world.time.full.in_days.round>

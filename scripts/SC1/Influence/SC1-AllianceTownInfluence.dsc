@@ -153,7 +153,7 @@ SC1_AllianceTownInfluence_Handler:
             - if <[item].material.name> == air:
                 - foreach next
 
-            - define marketName <[item].flag[marketName]>
+            - define marketName <script[SC1_AllianceTownNames].data_key[Names.<[item].flag[marketName]>]>
             - define influenceGraphic <[marketName].proc[SC1_InfluenceVisualizer]>
 
             - inventory adjust slot:<[loop_index]> lore:<element[Influence:<n>].color[white]><[influenceGraphic]> d:<context.inventory>
