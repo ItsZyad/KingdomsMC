@@ -325,6 +325,7 @@ SquadOptions_Handler:
         - run CreateParticleLine path:ClearParticleLineFlag def.flagName:formationLine
         - flag <player> datahold.armies.drawingFormation:!
 
+        ## OCCUPY CHUNK/OUTPOST
         on player right clicks block with:SquadOccupyTool_Item:
         - ratelimit <player> 2t
 
@@ -340,9 +341,12 @@ SquadOptions_Handler:
 
         - define chunk <[squadLeader].location.chunk>
 
+        # If the chunk that the squad leader is standing in has been claimed by another kingdom
+        # then initiate the chunk reclaim process.
         - if <[chunk].is_in[<[kingdom].proc[GetClaims]>]>:
             - foreach <[kingdom].proc[GetKingdomWars]> as:war:
                 - if <[kingdom].proc[GetAllKingdomLostChunks].context[<[war]>].contains[<[chunk]>]>:
+                    #- Debug Value -#
                     - define claimDuration <duration[5m]>
                     - narrate format:callout "Your troops have started reclaiming this chunk. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
 
@@ -352,28 +356,34 @@ SquadOptions_Handler:
                     - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[claimDuration]>
                     - stop
 
+        # If the chunk that the squad leader is standing in is part of an outpost which has been
+        # claimed by another kingdom, then initiate the outpost reclaim process.
         - else if <[kingdom].proc[GetOutposts].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].size> > 0:
-            - run ReclaimOutpost def.kingdom:<[kingdom]> def.outpost:<[kingdom].proc[GetOutposts].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].keys.get[1]> def.squadName:<[squadInfo].get[name]> save:delay
+            #- Debug Value -#
+            - run ReclaimOutpost def.kingdom:<[kingdom]> def.outpost:<[kingdom].proc[GetOutposts].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].keys.get[1]> def.squadName:<[squadInfo].get[name]> def.delay:<duration[1m]> save:delay
             - define claimDuration <entry[delay].created_queue.determination.get[1]>
 
             - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[claimDuration]>
 
-            - narrate format:callout "Your troops have started reclaiming this chunk. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
+            - narrate format:callout "Your troops have started reclaiming this outpost. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
             - stop
 
+        # All the kingdoms that the squad leader's kingdom is at war with
         - define kingdomsAtWar <proc[GetKingdomList].exclude[<[kingdom]>].filter_tag[<proc[IsAtWarWithKingdom].context[<[kingdom]>|<[filter_value]>]>]>
 
         - foreach <[kingdomsAtWar]>:
             - define outpostData <[value].proc[GetOutposts].parse_value_tag[<[parse_value].include[name=<[parse_key]>]>].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].values.get[1].if_null[null]>
 
+            # If the squad leader is standing in another kingdom's as-of-yet unclaimed chunk, then
+            # claim it for the squad leader's kingdom.
             - if <[value].proc[GetClaims].contains[<[chunk]>]>:
                 - define claimDuration <duration[5m]>
-                - narrate format:callout "Your troops have started occupying this chunk. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
                 - run OccupyChunk def.kingdom:<[kingdom]> def.targetKingdom:<[value]> def.chunk:<[chunk]> def.squadLeader:<[squadLeader]> def.delay:<[claimDuration]> save:result
 
-                - if !<entry[result].created_queue.determination.get[1].is_truthy>:
+                - if <entry[result].created_queue.determination.get[1]> == null:
                     - stop
 
+                - narrate format:callout "Your troops have started occupying this chunk. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
                 - adjust <[squadLeader]> hologram_line_height:0.25
                 - flag <[squadLeader]> datahold.war.occupying.chunk:<[chunk]>
                 - flag <[squadLeader]> datahold.war.occupying.target:<[value]>
@@ -381,6 +391,7 @@ SquadOptions_Handler:
                 - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[claimDuration]>
                 - stop
 
+            # Same as above but for outposts.
             - else if <[outpostData].is_truthy> && !<[outpostData].is_empty>:
                 - define squadLeaders <[kingdom].proc[GetKingdomSquads].parse_value_tag[<[parse_value].get[squadLeader]>].values>
                 - define otherOccupyingSquads <list[]>
@@ -403,7 +414,9 @@ SquadOptions_Handler:
                 - narrate format:callout "Your troops have started occupying this outpost. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
                 - narrate format:callout "<italic>Note: You may move in additional squads to occupy outposts faster."
 
-            - narrate format:callout <element[Failed to claim chunk!].color[red]><element[ This chunk is a part of the wilderness, and cannot be occupied during a war.]>
+            # Wilderness check. You can't claim wilderness chunks through the war interactions.
+            - else:
+                - narrate format:callout <element[Failed to claim chunk!].color[red]><element[ This area is a part of the wilderness, and cannot be occupied during a war.]>
 
         ## PREVENT WARPING WITH SQUAD TOOLS
         on warp command:
