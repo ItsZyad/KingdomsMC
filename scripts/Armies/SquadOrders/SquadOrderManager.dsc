@@ -437,7 +437,7 @@ SquadOptions_Handler:
 ChunkOccupationVisualizer:
     type: task
     debug: false
-    definitions: squadLeader[NPCTag]|occupationDuration[DurationTag]
+    definitions: squadLeader[NPCTag]|occupationDuration[DurationTag]|occupationMessages[?MapTag(ElementTag(String))]
     description:
     - Will display a small progress bar as a hologram above the head of the provided squad leader indicating how long until the chunk is fully occupied.
     - ---
@@ -447,8 +447,9 @@ ChunkOccupationVisualizer:
     ## Will display a small progress bar as a hologram above the head of the provided squad leader
     ## indicating how long until the chunk is fully occupied.
     ##
-    ## squadLeader          : [NPCTag]
-    ## occupationDuration   : [DurationTag]
+    ## squadLeader          :  [NPCTag]
+    ## occupationDuration   :  [DurationTag]
+    ## occupationMessages   : ?[MapTag(ElementTag(String))]
     ##
     ## >>> [Void]
 
@@ -464,6 +465,13 @@ ChunkOccupationVisualizer:
         - run GenerateInternalError def.type:GenericError def.message:<element[Unable to set squad leader hologram. Provided definition: <[occupationDuration].color[red]> is not of type: DurationTag.]>
         - stop
 
+    - define completeMessage <element[Chunk Occupation Complete!].color[green]>
+    - define interruptMessage <element[Chunk Occupation Interrupted!].color[red]>
+
+    - if <[occupationMessages].exists> && <[occupationMessages].contains[complete|interrupt]>:
+        - define completeMessage <[occupationMessages].get[complete]>
+        - define interruptMessage <[occupationMessages].get[interrupt]>
+
     - define startTime <util.time_now>
     - inject ChunkOccupationVisualizer path:Visualizer_Helper
 
@@ -473,7 +481,7 @@ ChunkOccupationVisualizer:
     - define progressGraphic <list[]>
 
     - if <[currentPercentage]> >= 100:
-        - adjust <[squadLeader]> hologram_lines:<map[text=<element[<&2>Chunk Occupation Complete!]>;duration=<duration[15s]>]>
+        - adjust <[squadLeader]> hologram_lines:<map[text=<element[<[completeMessage]>]>;duration=<duration[15s]>]>
         - stop
 
     - repeat <[currentPercentage].div[5].round>:
@@ -488,7 +496,7 @@ ChunkOccupationVisualizer:
 
     CancelVisualization:
     - adjust system cancel_runlater:<[squadLeader]>_occupation_visualizer
-    - adjust <[squadLeader]> hologram_lines:<map[text=<element[<&4>Chunk Occupation Interrupted!]>;duration=<duration[15s]>]>
+    - adjust <[squadLeader]> hologram_lines:<map[text=<element[<[interruptMessage]>]>;duration=<duration[15s]>]>
     - stop
 
 
