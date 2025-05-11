@@ -26,7 +26,7 @@ YAMLConfigCreator:
     ##
     ## Note: the kingdoms.config.encodedConfig flag will be ignored if it's not a binary type.
     ##
-    ## useSavedConfig : ?[ElementTag<Boolean>] = false
+    ## useSavedConfig : ?[ElementTag<Boolean> = false]
     ##
     ## >>> [Void]
 
@@ -80,6 +80,7 @@ ConfigLoader:
 
     - yaml load:../Kingdoms/config.yml id:config
     - define configMap <yaml[config].read[Config]>
+    - yaml unload id:config
 
     - foreach <[overrideMap]>:
         - if !<[configMap].deep_get[<[key]>].exists>:
