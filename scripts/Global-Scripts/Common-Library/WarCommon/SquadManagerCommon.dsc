@@ -504,6 +504,9 @@ AddSMArmoryLocation:
     - define kingdom <[SMLocation].flag[squadManager.kingdom]>
     - define SMID <[SMLocation].proc[GenerateSMID]>
 
+    - if <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.armories].contains[<[newArmory]>]>:
+        - stop
+
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.armories:->:<[newArmory]>
 
 
@@ -532,10 +535,9 @@ RemoveSMArmoryLocation:
 
     - define kingdom <[SMLocation].flag[squadManager.kingdom]>
     - define SMID <[SMLocation].proc[GenerateSMID]>
-    - define armories <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.armories]>
+    - define armories <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.armories].if_null[<list[]>]>
 
-    - if !<[armory].is_in[<[armories]>]>:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove an armory from SM. Provided location: <[armory].color[red]> is not an existing armory.]>
+    - if !<[armories].contains[<[armory]>]>:
         - determine null
 
     - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.armories:<-:<[armory]>
