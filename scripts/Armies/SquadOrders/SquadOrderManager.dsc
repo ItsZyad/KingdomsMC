@@ -507,6 +507,8 @@ ChunkOccupationVisualizer:
     - runlater ChunkOccupationVisualizer path:Visualizer_Helper id:<[squadLeader]>_occupation_visualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[occupationDuration]> def.startTime:<[startTime]> delay:5s
 
     CancelVisualization:
+    - define interruptMessage <[interruptMessage].if_null[<element[Chunk Occupation Interrupted!].color[red]>]>
+
     - adjust system cancel_runlater:<[squadLeader]>_occupation_visualizer
     - adjust <[squadLeader]> hologram_lines:<map[text=<element[<[interruptMessage]>]>;duration=<duration[15s]>]>
     - stop
