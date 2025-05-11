@@ -63,6 +63,117 @@ IsJustifyingOnKingdom:
     - determine <server.flag[kingdoms.<[kingdom]>.war.justifications].contains[<[targetKingdom]>]>
 
 
+IsOutpostBeingReclaimed:
+    type: procedure
+    definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns true if the provided outpost is currently being reclaimed by its original owner as part of the war with the provided ID.
+    - Will return null if the action fails.
+    - ---
+    - → ?[ElementTag(Boolean)]
+
+    script:
+    ## Returns true if the provided outpost is currently being reclaimed by its original owner as
+    ## part of the war with the provided ID.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## warID   : [ElementTag(String)]
+    ## outpost : [ElementTag(String)]
+    ##
+    ## >>> ?[ElementTag(Boolean)]
+
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
+        - determine null
+
+    - if !<proc[GetAllOutposts].keys.contains[<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check if outpost is reclaimed. There is no outpost by the name: <[outpost].color[red]>.]>
+        - determine null
+
+    - determine true if:<server.has_flag[kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>]>
+    - determine false
+
+
+GetOutpostReclaimers:
+    type: procedure
+    definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns a map where the keys are the names of the squads currently partaking in the reclamation of the provided outpost, and the values are the kingdom that the squads belong to.
+    - Will return null if the action fails.
+    - ---
+    - → [MapTag(ElementTag(String))]
+
+    script:
+    ## Returns a map where the keys are the names of the squads currently partaking in the
+    ## reclamation of the provided outpost, and the values are the kingdom that the squads belong
+    ## to.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## warID   : [ElementTag(String)]
+    ## outpost : [ElementTag(String)]
+    ##
+    ## >>> [MapTag(ElementTag(String))]
+
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
+        - determine null
+
+    - if !<proc[GetAllOutposts].keys.contains[<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost reclaimers. There is no outpost by the name: <[outpost].color[red]>.]>
+        - determine null
+
+    - determine <server.flag[kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>.squads]>
+
+
+GetOutpostReclamationStart:
+    type: procedure
+    definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns the time at which the reclamation of the provided outpost began.
+    - Will return null if the action fails.
+    - ---
+    - → [TimeTag]
+
+    script:
+    ## Returns the time at which the reclamation of the provided outpost began.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## warID   : [ElementTag(String)]
+    ## outpost : [ElementTag(String)]
+    ##
+    ## >>> [TimeTag]
+
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
+        - determine null
+
+    - if !<proc[GetAllOutposts].keys.contains[<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost reclamation start time. There is no outpost by the name: <[outpost].color[red]>.]>
+        - determine null
+
+    - determine <server.flag[kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>.start]>
+
+
+GetOutpostReclamationEnd:
+    type: procedure
+    definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns the time at which the reclamation of the provided outpost is set to finish.
+    - Will return null if the action fails.
+    - ---
+    - → [TimeTag]
+
+    script:
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
+        - determine null
+
+    - if !<proc[GetAllOutposts].keys.contains[<[outpost]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost reclamation end time. There is no outpost by the name: <[outpost].color[red]>.]>
+        - determine null
+
+    - determine <server.flag[kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>.finish]>
+
+
 GetJustificationCompletion:
     type: procedure
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]
