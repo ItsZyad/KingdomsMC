@@ -1183,18 +1183,27 @@ OccupyOutpost:
     - flag server kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.finish:<util.time_now.add[<[occupationDelay]>]>
     - runlater <script.name> path:OccupyOutpost_Helper id:<[kingdom]>_<[targetKingdom]>_<[outpost]>_outpost_occupy def.warID:<[warID]> def.targetKingdom:<[targetKingdom]> def.kingdom:<[kingdom]> def.outpost:<[outpost]> delay:<[occupationDelay]> def.squadLeader:<[squadLeader]>
 
-    - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[squadLeader]>
-    - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[occupationDelay]>
+    - foreach <[warID].proc[GetOutpostOccupiers].context[<[outpost]>]> key:squadName as:occupyingKingdom:
+        - define occupyingSquadLeader <[occupyingKingdom].proc[GetSquadLeader].context[<[squadName]>]>
+
+        - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[occupyingSquadLeader]>
+        - run ChunkOccupationVisualizer def.squadLeader:<[occupyingSquadLeader]> def.occupationDuration:<[occupationDelay]>
 
     - determine <[occupationDelay]>
 
     OccupyOutpost_Helper:
     - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.finish:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.finish]>
     - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.start:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.start]>
-    - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.squads:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads]>
     - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.owner:<[targetKingdom]>
     - flag server kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>:!
     - flag <[squadLeader]> datahold.war.occupying:!
+
+    - define manpowerBreakdown <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads].parse_value_tag[<map[kingdom=<[parse_value]>;manpower=<[parse_value].proc[GetSquadManpower].context[<[parse_key]>]>]>]>
+    - define totalManpower <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads].parse_value_tag[<[parse_value].proc[GetSquadManpower].context[<[parse_key]>]>].values.sum>
+
+    - foreach <[manpowerBreakdown]> key:squadName:
+        - define manpowerBreakdown.<[squadName]>.forceRatio:<[totalManpower].div[<[value].get[manpower]>]>
+        - define manpowerBreakdown.<[squadName]>.manpower:!
 
     - foreach <util.runlater_ids.find_all_matches[*_*_<[outpost]>_outpost_occupy]> as:runLater:
         - adjust system cancel_runlater:<[runLater]>
