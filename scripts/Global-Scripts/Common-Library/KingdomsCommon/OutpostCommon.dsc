@@ -387,10 +387,10 @@ GetKingdomOutpostMaxSize:
     ## >>> [ElementTag<Integer>]
 
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
-        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom maximum outpost size. Invalid kingdom code provided: <[kingdom]>]>
-        - determine 5000
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom maximum outpost size. Invalid kingdom code provided: <[kingdom]>]> def.silent:true
+        - determine <proc[GetConfigNode].context[Territory.maximum-outpost-size]>
 
-    - determine <server.flag[kingdoms.<[kingdom]>.outposts.maxSize]>
+    - determine <server.flag[kingdoms.<[kingdom]>.outposts.maxSize].if_null[<proc[GetConfigNode].context[Territory.maximum-outpost-size]>]>
 
 
 ## @Alias

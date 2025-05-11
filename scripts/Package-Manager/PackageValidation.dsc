@@ -98,13 +98,7 @@ PackageDependencyChecker_KPM:
         # Find the dependency in question. Only edge-case is if it's kingdoms- in which
         # case just find the current kingdoms version from the YAML file.
         - if <[dependency]> == kingdoms:
-            - yaml load:kingdoms.yml id:k
-            - define currentVersion <yaml[k].read[version].split[ ].get[2]>
-            - yaml id:k unload
-
-        #- Note to self: I really need to move all the last remaining essential information
-        #- out of the kingdoms.yml and into flag-based storage and do away with this
-        #- outdated convention.
+            - define currentVersion <proc[GetConfigNode].context[General.version]>
 
         - else:
             - foreach <server.flag[addons.addonList]> as:addon:

@@ -101,8 +101,7 @@ CalculateOutpostSpecializationCost:
     - define respecMultiplier 1
 
     - if <proc[GetOutpostSpecialization].context[<[kingdom]>|<[outpost]>]> != None:
-        # Note: future configurable.
-        - define respecMultiplier 1.15
+        - define respecMultiplier <proc[GetConfigNode].context[Territory.outpost-respec-multiplier]>
 
     - define outpostVol <proc[GetOutpostArea].context[<[kingdom]>|<[outpost]>].volume>
     - define scaledPrestige <proc[GetPrestige].context[<[kingdom]>].div[100].if_null[0]>

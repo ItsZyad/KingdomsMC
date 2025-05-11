@@ -165,8 +165,7 @@ OutpostWand_Handler:
         - define cornerTwo <context.location>
         - flag <player> datahold.outpost.cornerTwoDefined:<[cornerTwo]>
 
-        # Note: future configurable.
-        - define minCastleDistance 250
+        - define minCastleDistance <proc[GetConfigNode].context[Territory.minimum-outpost-distance]>
 
         # Cuboid object of the player's unfinalized outpost selection
         - define currOutpostSelection <cuboid[<player.location.world.name>,<[cornerOne].with_y[0].xyz>,<[cornerTwo].with_y[255].xyz>]>
@@ -216,7 +215,6 @@ OutpostWand_Handler:
             - define diffZ <player.flag[datahold.outpost.cornerOneDefined].z.sub[<player.flag[datahold.outpost.cornerTwoDefined].z>].abs>
             - define size <[diffX].mul[<[diffZ]>]>
 
-            # Note: Future configurable.
             - if <[size].is[LESS].than[<[kingdom].proc[GetKingdomOutpostMaxSize]>]>:
                 - narrate format:callout "Outpost exceeds maximum size of: <red><[kingdom].proc[GetKingdomOutpostMaxSize]><&6>! Attempted claim size of: <red><[size]>"
 

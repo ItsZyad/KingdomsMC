@@ -200,8 +200,7 @@ SquadOptions_Handler:
         on player clicks block with:SquadAttackTool_Item:
         - ratelimit <player> 10t
 
-        # Note: future configurable
-        - if !<player.cursor_on[100].exists>:
+        - if !<player.cursor_on[<proc[GetConfigNode].context[Armies.max-order-distance]>].exists>:
             - determine cancelled
 
         - define kingdom <player.flag[kingdom]>
@@ -636,7 +635,6 @@ OLD_SquadAttackAllOrder:
     - define npcList <[squadInfo].get[npcList]>
     - define squadLeader <[squadInfo].get[squadLeader]>
     - define unassignedFriendlies <[npcList]>
-    # Note: Future configurable
     - define nearbyNPCs <[squadLeader].location.find_npcs_within[40]>
     - define nearbySquads <map[]>
 
@@ -677,7 +675,6 @@ OLD_SquadAttackAllOrder:
     - define npcList <[squadInfo].get[npcList]>
     - define squadLeader <[squadInfo].get[squadLeader]>
     - define unassignedFriendlies <[npcList]>
-    # Note: Future configurable
     - define nearbyNPCs <[squadLeader].location.find_npcs_within[40].filter_tag[<[filter_value].flag[soldier.squad].equals[<[squadName]>].not>]>
     #- define nearbySquads <[nearbyNPCs].parse_tag[<map[<[parse_value].flag[soldier.squad]>=<[parse_value].flag[soldier.kingdom]>]>].deduplicate>
     - define nearbySquads <map[]>

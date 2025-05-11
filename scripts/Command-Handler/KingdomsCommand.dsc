@@ -169,10 +169,15 @@ Kingdoms_Command:
         - narrate "<&b>Special Thanks: <&9>Denizen Team/Alex Goodwin"
         - narrate "<gray>Learn more at: https://denizenscript.com/"
 
-    # Note: future configurable
     - else if <context.args.get[1]> == map:
+        - define mapLink <proc[GetConfigNode].context[External.Dynmap.map-link]>
+
+        - if <[mapLink]> == null:
+            - narrate <element[There is no live map for this server.].color[blue]>
+            - stop
+
         - narrate "<blue><bold>Kingdoms Live Map:"
-        - narrate format:callout <underline>http://198.244.177.62:5951/?worldname=KingdomsCurrent&mapname=flat
+        - narrate format:callout <underline><[mapLink]>
 
     - else if <context.args.get[1]> == ping:
         - define ping <player.ping>

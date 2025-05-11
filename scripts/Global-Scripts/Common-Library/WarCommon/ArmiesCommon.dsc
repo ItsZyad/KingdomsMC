@@ -73,5 +73,4 @@ GetMaxAllowedSMs:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get SM Location. Invalid kingdom code provided: <[kingdom].color[red]>]>
         - determine null
 
-    # Note: future configurable(?)
-    - determine <server.flag[kingdoms.<[kingdom]>.armies.maximumAllowedSMs].if_null[4]>
+    - determine <server.flag[kingdoms.<[kingdom]>.armies.maximumAllowedSMs].if_null[<proc[GetConfigNode].context[Armies.max-allowed-squad-managers]>]>

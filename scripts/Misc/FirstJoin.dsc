@@ -11,13 +11,6 @@
 ##ignorewarning invalid_data_line_quotes
 ## ------------------------------------------END HEADER-------------------------------------------
 
-# Note: future configurable
-CustomJoinMessages:
-    type: data
-    player_list:
-        fuzzysloth: "the trident king has returned!"
-
-
 KingdomSelection_Handler:
     type: world
     debug: false
@@ -40,7 +33,7 @@ KingdomSelection_Handler:
             - define joinColor <red>
 
         - define joinMsg null
-        - foreach <script[CustomJoinMessages].data_key[player_list]>:
+        - foreach <proc[GetConfigNode].context[Flavor.custom-player-messages]>:
             - if <[key]> == <player.name>:
                 - define joinMsg <[value]>
 

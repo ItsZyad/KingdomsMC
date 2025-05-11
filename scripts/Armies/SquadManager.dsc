@@ -213,8 +213,7 @@ SquadManager_Handler:
 
         # Closeness check to other SMs
         - foreach <[barrackLocations]> as:loc:
-            # Note: future configurable
-            - if <context.location.distance[<[loc]>]> < 200:
+            - if <context.location.distance[<[loc]>]> < <proc[GetConfigNode].context[Armies.squad-manager-min-spacing]>:
                 - narrate format:callout "Invalid location! This location is too close to another squad manager belonging to your kingdom at: <[loc].round.xyz.color[red]>. Please move at least 200 blocks away from it."
                 - determine cancelled
 
@@ -231,8 +230,7 @@ SquadManager_Handler:
                 stationCapacity: 0
             AOESize: <[AOE]>
             area: <proc[GenerateSMArea].context[<context.location>|<[AOE]>]>
-            # Note: future configurable
-            upkeep: 500
+            upkeep: <proc[GetConfigNode].context[Armies.squad-manager-upkeep]>
 
         # Generate cuboid consisting of all the kingdom's core claims
         - define coreClaimsPolygon <proc[GetClaimsPolygon].context[<[kingdom]>|<context.location.world>|core]>
@@ -260,10 +258,9 @@ SquadManager_Handler:
         - define bedCount <proc[CountBedsInSquadManagerArea].context[<context.location>]>
         - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.levels.stationCapacity:<[bedCount].proc[CalculateSMStationingCapacity]>
 
-        # Note: future configurables
         - if !<server.has_flag[PauseUpkeep]>:
-            - run AddUpkeep def.kingdom:<[kingdom]> def.amount:500
-            - run SubBalance def.kingdom:<[kingdom]> def.amount:2000
+            - run AddUpkeep def.kingdom:<[kingdom]> def.amount:<proc[GetConfigNode].context[Armies.squad-manager-upkeep]>
+            - run SubBalance def.kingdom:<[kingdom]> def.amount:<proc[GetConfigNode].context[Armies.squad-manager-upfront]>
 
             - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
@@ -446,8 +443,7 @@ SquadManager_Handler:
         - define barrackLocations <[existingBarracks].parse_value_tag[<[parse_value].get[location]>]>
 
         - foreach <[barrackLocations]> as:loc:
-            # Note: future configurable
-            - if <context.location.distance[<[loc]>]> < 200:
+            - if <context.location.distance[<[loc]>]> < <proc[GetConfigNode].context[Armies.squad-manager-min-spacing]>:
                 - narrate format:callout "Invalid location! This location is too close to another squad manager belonging to your kingdom. Try another spot..."
                 - determine cancelled
 
