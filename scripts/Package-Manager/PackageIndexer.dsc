@@ -76,7 +76,7 @@ PackageIndexer_KPM:
         - flag server addons.addonList.<[addonName]>:<[addonInfo]>
         - ~yaml unload id:descriptor
 
-    - foreach <server.flag[addons.addonList]> as:addonInfo key:addonName:
+    - foreach <server.flag[addons.addonList].if_null[<map[]>]> as:addonInfo key:addonName:
         - define rootDir <[addonInfo].get[rootDir]>
         - define descriptor <[addonInfo].get[__descriptor]>
 
