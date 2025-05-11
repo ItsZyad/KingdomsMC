@@ -1333,16 +1333,15 @@ ReclaimOutpost:
 
     - flag server kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>.start:<util.time_now> if:<server.has_flag[kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>.start].not>
     - flag server kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>.finish:<util.time_now.add[<[occupationDelay]>]>
-    - runlater <script.name> path:ReclaimOutpost_Helper id:<[kingdom]>_<[outpost]>_outpost_reclaim def.warID:<[warID]> def.kingdom:<[kingdom]> def.outpost:<[outpost]> delay:<[occupationDelay]>
+    - runlater <script.name> path:ReclaimOutpost_Helper id:<[kingdom]>_<[outpost]>_outpost_reclaim def.warID:<[warID]> def.kingdom:<[kingdom]> def.outpost:<[outpost]> def.squadLeader:<[kingdom].proc[GetSquadLeader].context[<[squadName]>]> delay:<[occupationDelay]>
 
-    - run ChunkOccupationVisualizer def.squadLeader:<[kingdom].proc[GetSquadLeader].context[<[squadname]>]> def.occupationDuration:<[occupationDelay]>
+    - run ChunkOccupationVisualizer def.squadLeader:<[kingdom].proc[GetSquadLeader].context[<[squadName]>]> def.occupationDuration:<[occupationDelay]>
 
     - determine <[occupationDelay]>
 
     ReclaimOutpost_Helper:
-    - foreach <server.flag[kingdoms.wars.<[warID]>.lostOutposts.<[kingdom]>]> as:outposts key:occupier:
-        - if <[outposts].contains[<[outpost]>]>:
-            - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>:!
+    - if <server.flag[kingdoms.wars.<[warID]>.lostOutposts].contains[<[outpost]>]>:
+        - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>:!
 
     - flag server kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>:!
     - flag <[squadLeader]> datahold.war.occupying:!
