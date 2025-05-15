@@ -709,6 +709,7 @@ KingdomWarp_Subcommand:
             - define outpostAreas <[kingdom].proc[GetOutposts].values.parse_tag[<[parse_value].get[area]>]>
             - define inWhichOutpostAreas <[outpostAreas].filter_tag[<[parse_value].contains[<player.location>]>]>
 
+            # Make sure that the new warp is within valid kingdom territory.
             - if <[warpName]> != main:
                 - if <[castleCore].contains[<player.location.chunk>]> || <[inWhichOutpostAreas].size> > 0:
                     - flag server kingdoms.<[kingdom]>.warps.<[warpName]>:<player.location.center>
@@ -718,10 +719,14 @@ KingdomWarp_Subcommand:
 
                 - stop
 
+            # If the warp being specified is the 'main' kingdom warp, then it can only be placed in
+            # castle territory...
             - if !<[castle].contains[<player.location.chunk>]>:
                 - narrate format:callout "You must place your kingdom's main warp location inside your castle territory!"
                 - stop
 
+            # ...Also, it's worth making sure that the player actually means to change the most
+            # importance warp in the kingdom.
             - clickable save:confirm_warp until:1m usages:1:
                 - flag server kingdoms.<[kingdom]>.warps.main:<player.location.center>
                 - narrate format:callout "Warp location has been set to: <aqua><player.location.round.xyz>"
@@ -747,6 +752,8 @@ KingdomWarp_Subcommand:
             - flag server kingdoms.<[kingdom]>.warps.<[warpName]>:!
             - narrate format:callout "Removed warp with the name: <[warpName].color[aqua]>"
 
+        # If the player specifies another kingdom's warp, first make sure that they've actually
+        # been allowed to warp to them (and that it exists), before sending them there.
         - else if <[param].starts_with[kingdom<&co>]>:
             - define chosenKingdomRN <[param].split[<&co>].get[2]>
             - define warpName <context.args.get[3].if_null[main]>
@@ -785,6 +792,8 @@ KingdomWarp_Subcommand:
             - foreach <server.flag[kingdoms.<[kingdom]>.warps].to_pair_lists> as:warp:
                 - narrate "<green>--<&gt> <[warp].get[1].color[aqua].bold><&co> <[warp].get[2].round.simple>"
 
+        # Clause for if the player wants to deny another kingdom access to their warps. By default
+        # kingdoms don't have access to one another's warps.
         - else if <[param]> == deny:
             - define kingdomCodeName <script[KingdomRealNames].data_key[ShortNames].invert.get[<context.args.get[3]>]>
 
@@ -796,9 +805,14 @@ KingdomWarp_Subcommand:
             - narrate format:callout "Removed kingdom: <context.args.get[3].color[red].bold> from your warp whitelist!"
 
         - else if <[param]> == allow:
+            # Players must specify a kingdom's *short* name when allowing/denying it access to
+            # warps. Dems de rules (It gets way to laborious if I also allow people to specify a
+            # kingdom's full name).
             - define kingdomRealNames <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>
             - define kingdomCodeNames <proc[GetKingdomList]>
 
+            # If the player doesn't specify a kingdom, then the command should simply just return
+            # if their kingdom has warps open at all.
             - if !<context.args.get[3].exists>:
                 - define openWarp <server.flag[kingdoms.<[kingdom]>.openWarp]>
 
@@ -808,6 +822,7 @@ KingdomWarp_Subcommand:
                 - else:
                     - narrate format:callout "Kingdoms that can access your warps:<n><server.flag[kingdoms.<[kingdom]>.openWarp].parse_tag[<proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>].separated_by[<n>]>"
 
+            # But otherwise, verify the kingdom name exists and add them to list of warp users.
             - else if <[kingdomRealNames].contains[<context.args.get[3]>]>:
                 - define index <[kingdomRealNames].find[<context.args.get[3]>]>
 
@@ -829,6 +844,8 @@ KingdomWarp_Subcommand:
 
                 - teleport <player> <server.flag[kingdoms.<[kingdom]>.warps.<[param]>]>
 
+            # By default, if a player just types /k warp, then they should be taken back to their
+            # kingdom's main warp.
             - else if <server.has_flag[kingdoms.<[kingdom]>.warps]>:
                 - narrate format:callout "Warping in 3 seconds..."
                 - chunkload add <server.flag[kingdoms.<[kingdom]>.warps.main].chunk> duration:1m
@@ -837,5 +854,6 @@ KingdomWarp_Subcommand:
 
                 - teleport <player> <server.flag[kingdoms.<[kingdom]>.warps.main]>
 
+            # ...You should really have a main warp set -_-
             - else:
                 - narrate format:callout "Your kingdom does not currently have a warp location. You may want to speak to your king about this."
