@@ -494,6 +494,7 @@ ChunkOccupationVisualizer:
     - mark SkipMessageSetters
 
     - define maxPercentage <[occupationDuration].in_seconds>
+    - define timeRemaining <[occupationDuration].sub[<util.time_now.duration_since[<[startTime]>]>]>
     - define currentPercentage <util.time_now.duration_since[<[startTime]>].in_seconds.div[<[maxPercentage]>].mul[100].if_null[0]>
     - define progressGraphic <list[]>
 
