@@ -24,6 +24,74 @@ CuboidWand_Item:
     display name: <gold><bold>Cuboid Wand
 
 
+StartCuboidDesignation:
+    type: task
+    definitions: player[`PlayerTag`]
+    description:
+    - Clears the player's inventory and gives them the cuboid wand.
+    - ---
+    - `→ [Void]`
+
+    script:
+    ## Clears the provided player's inventory and gives them the cuboid wand.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [Void]
+
+    - if !<[player].is_player>:
+        - stop
+
+    - run TempSaveInventory def.player:<[player]>
+
+    - inventory set slot:1 origin:CuboidWand_Item
+    - adjust <[player]> item_slot:1
+
+    - flag <[player]> datahold.designatingCuboid:<list[]>
+
+
+FinishCuboidDesignation:
+    type: task
+    definitions: player[`PlayerTag`]|minY[`?ElementTag(Integer)`]|maxY[`?ElementTag(Integer)`]
+    description:
+    - Returns the provided player's inventory and takes the cuboid wand. Will then return the cuboid that the player designated.
+    - Alternatively, if the `minY` & `maxY` arguments are provided, the script will shift the y-values of the appropriate corners to match the arguments.
+    - ---
+    - `→ ?[CuboidTag]`
+
+    script:
+    ## Returns the provided player's inventory and takes the cuboid wand. Will then return the
+    ## cuboid that the player designated.
+    ##
+    ## Alternatively, if the minY & maxY arguments are provided, the script will shift the
+    ## y-values of the appropriate corners to match the arguments.
+    ##
+    ## player :  [PlayerTag]
+    ## minY   : ?[ElementTag(Integer)]
+    ## maxY   : ?[ElementTag(Integer)]
+    ##
+    ## >>> ?[CuboidTag]
+
+    - if !<[player].is_player>:
+        - determine null
+
+    - run LoadTempInventory def.player:<[player]>
+
+    - define corners <player.flag[datahold.designatingCuboid]>
+    - define determination <cuboid[<[player].location.world.name>,<[corners].get[1].xyz>,<[corners].get[2].xyz>]>
+
+    - if <[minY].exists> || <[maxY].exists>:
+        - define minY <[minY].if_null[<[determination].corners.sort_by_value[y].first.y>]>
+        - define maxY <[maxY].if_null[<[determination].corners.sort_by_value[y].last.y>]>
+
+        - define determination <[determination].shrink_one_side[0,-<[maxY]>,0].shrink_one_side[0,<[minY]>,0]>
+
+    - run CancelAllShowfakes def.__player:<[player]>
+
+    - flag <[player]> datahold.designatingCuboid:!
+    - determine <[determination]>
+
+
 StartPolygonDesignation:
     type: task
     definitions: player[`PlayerTag`]
@@ -60,7 +128,11 @@ FinishPolygonDesignation:
     - `→ ?[Union[PolygonTag / ListTag(LocationTag)]]`
 
     script:
-    ## Returns the provided player's inventory and takes the polygon wand.
+    ## Returns the provided player's inventory and takes the polygon wand. Will then return the
+    ## list of corners that the player designated.
+    ##
+    ## Alternatively, if the `minY` & `maxY` arguments are provided, the task will create the
+    ## PolygonTag corresponding to the player's selection.
     ##
     ## player :  [PlayerTag]
     ## minY   : ?[ElementTag<Integer>]
@@ -103,7 +175,15 @@ RefreshPolygonPoints:
         - showfake red_stained_glass <[point]> d:100s players:<[player]>
 
 
-PolygonDesignation_Handler:
+RefreshCuboidPoints:
+    type: task
+    definitions: player[PlayerTag]
+    script:
+    - foreach <[player].flag[datahold.designatingCuboid].if_null[<list[]>]> as:point:
+        - showfake red_stained_glass <[point]> d:100s players:<[player]>
+
+
+AreaDesignation_Handler:
     type: world
     events:
         on player clicks block with:PolygonWand_Item flagged:datahold.designatingPolygon:
@@ -112,8 +192,21 @@ PolygonDesignation_Handler:
 
             - ~run RefreshPolygonPoints def.player:<player>
 
+        on player clicks block with:CuboidWand_Item flagged:datahold.designatingCuboid:
+        - if <context.location.exists>:
+            - flag <player> datahold.designatingCuboid:->:<context.location>
+
+            - ~run RefreshCuboidPoints def.player:<player>
+
         on player drops PolygonWand_Item flagged:datahold.designatingPolygon:
         - narrate format:callout "Cancelled polygon designation process!"
 
         - run FinishPolygonDesignation def.player:<player>
         - determine passively cancelled
+
+        on player drops CuboidWand_Item flagged:datahold.designatingCuboid:
+        - narrate format:callout "Cancelled cuboid designation process!"
+
+        - run FinishCuboidDesignation def.player:<player>
+        - determine passively cancelled
+
