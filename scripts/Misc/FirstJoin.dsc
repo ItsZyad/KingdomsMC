@@ -33,7 +33,7 @@ KingdomSelection_Handler:
             - define joinColor <red>
 
         - define joinMsg null
-        - foreach <proc[GetConfigNode].context[Flavor.custom-player-messages]>:
+        - foreach <proc[GetConfigNode].context[Flavor.custom-player-messages].if_null[<map[]>]>:
             - if <[key]> == <player.name>:
                 - define joinMsg <[value]>
 
