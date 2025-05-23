@@ -19,6 +19,7 @@ IronicAntiWarQuotes:
     - The more you sweat in peace, the less you bleed in war. ~ Norman Schwarzkopf
     - All war represents a failure of diplomacy. ~ Tony Benn
     - Politics is the skilled use of blunt objects. ~ Lester B. Pearson
+    - Vengeance is the most costly and dissipating of luxuries. ~ Winston Churchill
 
 
 GetIronicWarQuote:
