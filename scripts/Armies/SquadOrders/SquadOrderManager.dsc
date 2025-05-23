@@ -285,7 +285,7 @@ SquadOptions_Handler:
         - define displayName <[squadInfo].get[displayName]>
 
         # If the squad was occupying to a chunk and then moved to a different chunk.
-        - if <[squadLeader].has_flag[datahold.war.occupying]> && <[squadLeader].flag[datahold.war.occupying.chunk].contains[<[location]>]>:
+        - if <[squadLeader].has_flag[datahold.war.occupying]> && <[squadLeader].has_flag[datahold.war.occupying.chunk]> && <[squadLeader].flag[datahold.war.occupying.chunk].contains[<[location]>]>:
             - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[squadLeader]>
             - run CancelChunkOccupation def.kingdom:<[kingdom]> def.targetKingdom:<[squadLeader].flag[datahold.war.occupying.target]> def.squadLeader:<[squadLeader]> def.chunk:<[squadLeader].flag[datahold.war.occupying.chunk]>
             - run CancelOutpostOccupation def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.outpost:<[squadLeader].flag[datahold.war.occupying.outpost]> if:<[squadLeader].has_flag[datahold.war.occupying.outpost]>
@@ -362,6 +362,8 @@ SquadOptions_Handler:
             - run ReclaimOutpost def.kingdom:<[kingdom]> def.outpost:<[kingdom].proc[GetOutposts].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].keys.get[1]> def.squadName:<[squadInfo].get[name]> def.delay:<duration[1m]> save:delay
             - define claimDuration <entry[delay].created_queue.determination.get[1]>
 
+            - adjust <[squadLeader]> hologram_line_height:0.25
+
             - run ChunkOccupationVisualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[claimDuration]>
 
             - narrate format:callout "Your troops have started reclaiming this outpost. It will take them: <[claimDuration].formatted.color[aqua]> to finish occupying it. They must not be engaged in combat for this time."
@@ -395,6 +397,7 @@ SquadOptions_Handler:
                 - define squadLeaders <[kingdom].proc[GetKingdomSquads].parse_value_tag[<[parse_value].get[squadLeader]>].values>
                 - define otherOccupyingSquads <list[]>
 
+                - adjust <[squadLeader]> hologram_line_height:0.25
                 - flag <[squadLeader]> datahold.war.occupying.outpost:<[outpostData].get[name]>
 
                 - foreach <[squadLeaders]> as:leader:
