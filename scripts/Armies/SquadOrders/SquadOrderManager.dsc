@@ -477,17 +477,22 @@ ChunkOccupationVisualizer:
         - run GenerateInternalError def.type:GenericError def.message:<element[Unable to set squad leader hologram. Provided definition: <[occupationDuration].color[red]> is not of type: DurationTag.]>
         - stop
 
-    - define completeMessage <element[Chunk Occupation Complete!].color[green]>
-    - define interruptMessage <element[Chunk Occupation Interrupted!].color[red]>
+    - define startTime <util.time_now>
+    - inject ChunkOccupationVisualizer path:Visualizer_Helper
+
+    Visualizer_Helper:
+    - if <[completeMessage].exists> && <[interruptMessage].exists>:
+        - goto SkipMessageSetters
+
+    - define completeMessage <element[&2Chunk Occupation Complete!]>
+    - define interruptMessage <element[&4Chunk Occupation Interrupted!]>
 
     - if <[occupationMessages].exists> && <[occupationMessages].contains[complete|interrupt]>:
         - define completeMessage <[occupationMessages].get[complete]>
         - define interruptMessage <[occupationMessages].get[interrupt]>
 
-    - define startTime <util.time_now>
-    - inject ChunkOccupationVisualizer path:Visualizer_Helper
+    - mark SkipMessageSetters
 
-    Visualizer_Helper:
     - define maxPercentage <[occupationDuration].in_seconds>
     - define currentPercentage <util.time_now.duration_since[<[startTime]>].in_seconds.div[<[maxPercentage]>].mul[100].if_null[0]>
     - define progressGraphic <list[]>
@@ -502,12 +507,12 @@ ChunkOccupationVisualizer:
     - repeat <element[20].sub[<[currentPercentage].div[5]>].round>:
         - define progressGraphic:->:░
 
-    - adjust <[squadLeader]> hologram_lines:<list[<[progressGraphic].unseparated>|<[currentPercentage].round_to_precision[0.1]>% Occupied]>
+    - adjust <[squadLeader]> hologram_lines:<list[<[progressGraphic].unseparated>|<[currentPercentage].round_to_precision[0.1]>% Occupied|<element[Time Remaining: ]>&4<[timeRemaining].formatted>]>
 
     - runlater ChunkOccupationVisualizer path:Visualizer_Helper id:<[squadLeader]>_occupation_visualizer def.squadLeader:<[squadLeader]> def.occupationDuration:<[occupationDuration]> def.startTime:<[startTime]> delay:5s
 
     CancelVisualization:
-    - define interruptMessage <[interruptMessage].if_null[<element[Chunk Occupation Interrupted!].color[red]>]>
+    - define interruptMessage <[interruptMessage].if_null[&4<element[Chunk Occupation Interrupted!]>]>
 
     - adjust system cancel_runlater:<[squadLeader]>_occupation_visualizer
     - adjust <[squadLeader]> hologram_lines:<map[text=<element[<[interruptMessage]>]>;duration=<duration[15s]>]>
