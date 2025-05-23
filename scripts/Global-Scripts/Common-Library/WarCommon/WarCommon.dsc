@@ -573,6 +573,37 @@ GetLostOutpostCaptureTimes:
     - determine <server.flag[kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>].get_subset[start|finish]>
 
 
+GetLostOutpostManpowerBreakdown:
+    type: procedure
+    definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
+    description:
+    - Returns a Map containing where the keys are the names of the squads that contributed to the capture of the provided outpost and the values are the percentage of the total manpower it contributed to the capture and the kingdom it belongs/ed to.
+    - Will return null if the action fails.
+    - ---
+    - → [MapTag(ElementTag(String);ElementTag(Float))]
+
+    script:
+    ## Returns a Map containing where the keys are the names of the squads that contributed to the
+    ## capture of the provided outpost and the values are the percentage of the total manpower it
+    ## contributed to the capture and the kingdom it belongs/ed to.
+    ##
+    ## Will return null if the action fails.
+    ##
+    ## warID   : [ElementTag(String)]
+    ## outpost : [ElementTag(String)]
+    ##
+    ## >>> [MapTag(ElementTag(String);ElementTag(Float))]
+
+    - if <server.flag[kingdoms.wars.<[warID]>].if_null[<list[]>].is_empty>:
+        - determine null
+
+    - if !<proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].size> == 0:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost manpower breakdown. There is no outpost by the name: <[outpost].color[red]>.]>
+        - determine null
+
+    - determine <server.flag[kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.manpowerBreakdown]>
+
+
 GetChunkOccupier:
     type: procedure
     definitions: warID[ElementTag(String)]|chunk[ChunkTag]
@@ -1155,12 +1186,13 @@ OccupyOutpost:
         - determine null
 
     - if <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads].if_null[<list[]>].contains[<[squadName]>]>:
-        - run GenerateKingdomsDebug def.message:<element[Provided squad: <[squadName].color[aqua]> is already claiming outpost: <[targetKingdom].color[red]>.<[outpost].color[red]>. Skipping...]> def.silent:true
+        - run GenerateKingdomsDebug def.message:<element[Provided squad: <[squadName].color[aqua]> is already claiming outpost: <[targetKingdom].color[red]>.<[outpost].color[red]>. Skipping...]>
         - stop
 
     - flag server kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads.<[squadName]>:<[kingdom]>
-    - define occupyingSquadAmount <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads].size.if_null[1]>
-    - define occupationDelay <duration[<[targetKingdom].proc[GetOutpostSize].context[<[outpost]>].div[64].round_up.mul[5].div[<[occupyingSquadAmount]>]>m]>
+
+    - define occupyingManpower <proc[GetOutpostOccupiers].context[<[warID]>|<[outpost]>].parse_value_tag[<[parse_value].proc[GetSquadManpower].context[<[parse_key]>]>].values.sum>
+    - define occupationDelay <duration[<[targetKingdom].proc[GetOutpostSize].context[<[outpost]>].div[64].round_up.mul[5].div[<[occupyingManpower]>]>m]>
     - define occupationDelay <[delay]> if:<[delay].exists>
     - define existingOccupationProgress <duration[0s]>
 
@@ -1195,18 +1227,21 @@ OccupyOutpost:
     - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.finish:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.finish]>
     - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.start:<server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.start]>
     - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.owner:<[targetKingdom]>
-    - flag server kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>:!
     - flag <[squadLeader]> datahold.war.occupying:!
 
     - define manpowerBreakdown <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads].parse_value_tag[<map[kingdom=<[parse_value]>;manpower=<[parse_value].proc[GetSquadManpower].context[<[parse_key]>]>]>]>
     - define totalManpower <server.flag[kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>.squads].parse_value_tag[<[parse_value].proc[GetSquadManpower].context[<[parse_key]>]>].values.sum>
 
     - foreach <[manpowerBreakdown]> key:squadName:
-        - define manpowerBreakdown.<[squadName]>.forceRatio:<[totalManpower].div[<[value].get[manpower]>]>
+        - define manpowerBreakdown.<[squadName]>.forceRatio:<[value].get[manpower].div[<[totalManpower]>]>
         - define manpowerBreakdown.<[squadName]>.manpower:!
+
+    - flag server kingdoms.wars.<[warID]>.lostOutposts.<[outpost]>.manpowerBreakdown:<[manpowerBreakdown]>
 
     - foreach <util.runlater_ids.find_all_matches[*_*_<[outpost]>_outpost_occupy]> as:runLater:
         - adjust system cancel_runlater:<[runLater]>
+
+    - flag server kingdoms.wars.<[warID]>.occupiedOutposts.<[outpost]>:!
 
 
 CancelOutpostOccupation:
@@ -1235,6 +1270,8 @@ CancelOutpostOccupation:
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot cancel outpost occupation. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
+
+    - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[kingdom].proc[GetSquadLeader].context[<[squadName]>]>
 
     - adjust system cancel_runlater:<[kingdom]>_<[targetKingdom]>_<[outpost]>_outpost_occupy
     - flag <[kingdom].proc[GetSquadLeader].context[<[squadName]>]> datahold.war.occupying:!
@@ -1313,8 +1350,8 @@ ReclaimOutpost:
 
     - flag server kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>.squads.<[squadName]>:<[kingdom]>
 
-    - define occupyingSquadAmount <server.flag[kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>.squads].size.if_null[1]>
-    - define occupationDelay <duration[<[kingdom].proc[GetOutpostSize].context[<[outpost]>].div[64].round_up.mul[5].div[<[occupyingSquadAmount]>]>m]>
+    - define occupyingManpower <proc[GetOutpostReclaimers].context[<[warID]>|<[outpost]>].parse_value_tag[<[parse_value].proc[GetSquadManpower].context[<[parse_key]>]>].values.sum>
+    - define occupationDelay <duration[<[kingdom].proc[GetOutpostSize].context[<[outpost]>].div[64].round_up.mul[5].div[<[occupyingManpower]>]>m]>
     - define occupationDelay <[delay]> if:<[delay].exists>
     - define existingOccupationProgress <duration[0s]>
 
@@ -1381,6 +1418,8 @@ CancelOutpostReclamation:
     - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot cancel outpost reclamation. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
+
+    - run ChunkOccupationVisualizer path:CancelVisualization def.squadLeader:<[kingdom].proc[GetSquadLeader].context[<[squadName]>]>
 
     - adjust system cancel_runlater:<[kingdom]>_<[targetKingdom]>_<[outpost]>_outpost_reclaim
     - flag server kingdoms.wars.<[warID]>.reclaimingOutposts.<[outpost]>:!
