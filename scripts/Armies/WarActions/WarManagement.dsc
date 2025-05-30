@@ -138,13 +138,13 @@ VictoryPointInterface_Handler:
         - definemap infoLore:
             0l: <element[Friendly VPs:].color[<[friendlyColor].mix[white]>]>
             02: <[VPVisual].unseparated> <element[〰 <[VPs].round_to_precision[0.01]> / 100].color[<[friendlyColor]>]>
-            09: <element[Friendly Chunks Lost: ].proc[ConvertToSkinnyLetters].color[gray]><[friendlyKingdoms].parse_tag[<[parse_value].proc[GetAllKingdomLostChunks].context[<[warID]>].size>].sum.proc[ConvertToSkinnyLetters].color[aqua]> ▣ <element[Lost Chunks: ].proc[ConvertToSkinnyLetters].color[gray]><[enemyKingdoms].parse_tag[<[parse_value].proc[GetAllKingdomLostChunks].context[<[warID]>].size>].sum.proc[ConvertToSkinnyLetters].color[red]>
+            09: <element[Friendly Chunks Lost: ].proc[ConvertToSkinnyLetters].color[gray]><[friendlyKingdoms].parse_tag[<[parse_value].proc[GetAllKingdomLostChunks].context[<[warID]>].size>].sum.proc[ConvertToSkinnyLetters].color[aqua]>
             05: <element[Friendly Outpost Area Lost: ].proc[ConvertToSkinnyLetters].color[gray]><element[<[lostOutpostArea].format_number> / <[totalFriendlyOutpostArea].format_number>].proc[ConvertToSkinnyLetters].color[aqua]>
             5a: <element[Friendly Casualties: ].proc[ConvertToSkinnyLetters].color[gray]><element[<[friendlyKingdoms].parse_tag[<[parse_value].proc[GetWarDead].context[<[warID]>]>].sum.format_number>].proc[ConvertToSkinnyLetters].color[red]>
             06: <element[]>
             07: <element[Enemy VPs:].color[<[enemyColor].mix[white]>]>
             08: <[enemyVPVisual].unseparated> <element[〰 <[enemyVPs].round_to_precision[0.01]> / 100].color[<[enemyColor]>]>
-            03: <element[Enemy Chunks Lost: ].proc[ConvertToSkinnyLetters].color[gray]><[enemyKingdoms].parse_tag[<[parse_value].proc[GetAllKingdomLostChunks].context[<[warID]>].size>].sum.proc[ConvertToSkinnyLetters].color[aqua]> ▣ <element[Lost Chunks: ].proc[ConvertToSkinnyLetters].color[gray]><[friendlyKingdoms].parse_tag[<[parse_value].proc[GetAllKingdomLostChunks].context[<[warID]>].size>].sum.proc[ConvertToSkinnyLetters].color[red]>
+            03: <element[Enemy Chunks Lost: ].proc[ConvertToSkinnyLetters].color[gray]><[enemyKingdoms].parse_tag[<[parse_value].proc[GetAllKingdomLostChunks].context[<[warID]>].size>].sum.proc[ConvertToSkinnyLetters].color[red]>
             04: <element[Enemy Outpost Area Lost: ].proc[ConvertToSkinnyLetters].color[gray]><element[<[capturedOutpostArea].format_number> / <[totalEnemyOutpostArea].format_number>].proc[ConvertToSkinnyLetters].color[aqua]>
             9a: <element[Enemy Casualties: ].proc[ConvertToSkinnyLetters].color[gray]><element[<[enemyKingdoms].parse_tag[<[parse_value].proc[GetWarDead].context[<[warID]>]>].sum.format_number>].proc[ConvertToSkinnyLetters].color[aqua]>
             10: <element[]>
