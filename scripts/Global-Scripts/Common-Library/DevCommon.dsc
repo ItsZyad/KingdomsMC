@@ -327,33 +327,7 @@ GetColor:
 
 SkinnyLetters:
     type: data
-    All:
-        q: 𝗊
-        w: 𝗐
-        e: 𝖾
-        r: 𝗋
-        t: 𝗍
-        y: 𝗒
-        u: 𝗎
-        i: 𝗂
-        o: 𝗈
-        p: 𝗉
-        a: 𝖺
-        s: 𝗌
-        d: 𝖽
-        f: 𝖿
-        g: 𝗀
-        h: 𝗁
-        j: 𝗃
-        k: 𝗄
-        l: 𝗅
-        z: 𝗓
-        x: 𝗑
-        c: 𝖼
-        v: 𝗏
-        b: 𝖻
-        n: 𝗇
-        m: 𝗆
+    Upper:
         Q: 𝖰
         W: 𝖶
         E: 𝖤
@@ -380,6 +354,44 @@ SkinnyLetters:
         B: 𝖡
         N: 𝖭
         M: 𝖬
+    Lower:
+        q: 𝗊
+        w: 𝗐
+        e: 𝖾
+        r: 𝗋
+        t: 𝗍
+        y: 𝗒
+        u: 𝗎
+        i: 𝗂
+        o: 𝗈
+        p: 𝗉
+        a: 𝖺
+        s: 𝗌
+        d: 𝖽
+        f: 𝖿
+        g: 𝗀
+        h: 𝗁
+        j: 𝗃
+        k: 𝗄
+        l: 𝗅
+        z: 𝗓
+        x: 𝗑
+        c: 𝖼
+        v: 𝗏
+        b: 𝖻
+        n: 𝗇
+        m: 𝐦
+    Number:
+        1: 𝟣
+        2: 𝟤
+        3: 𝟥
+        4: 𝟦
+        5: 𝟧
+        6: Ꮾ
+        7: 𝟩
+        8: 𝟪
+        9: 𝟫
+        0: 𝖮
 
 
 ConvertToSkinnyLetters:
@@ -398,12 +410,25 @@ ConvertToSkinnyLetters:
     ##
     ## >>> [ElementTag<String>]
 
+    # TODO: Look into using .replace_text to convert to skinny letters without removing formats
+    - define specialChars <list[,|!|*|.|:|/|(|)]>
+    - define smallSpecialChars <list[ˏ|ǃ|∗|܂|∶|𐒃|❲|❳]>
+
     - define splitted <[text].split[]>
     - define output <list[]>
 
     - foreach <[splitted]> as:char:
-        - if <[char].is_in[<script[SkinnyLetters].data_key[All].keys>]>:
-            - define output:->:<script[SkinnyLetters].data_key[All.<[char]>]>
+        - if <script[SkinnyLetters].data_key[Lower].keys.contains_case_sensitive[<[char]>]>:
+            - define output:->:<script[SkinnyLetters].data_key[Lower.<[char]>]>
+
+        - else if <script[SkinnyLetters].data_key[Upper].keys.contains_case_sensitive[<[char]>]>:
+            - define output:->:<script[SkinnyLetters].data_key[Upper.<[char]>]>
+
+        - else if <script[SkinnyLetters].data_key[Number].keys.contains_case_sensitive[<[char]>]>:
+            - define output:->:<script[SkinnyLetters].data_key[Number.<[char]>]>
+
+        - else if <[char].is_in[<[specialChars]>]>:
+            - define output:->:<[smallSpecialChars].get[<[specialChars].find[<[char]>]>]>
 
         - else:
             - define output:->:<[char]>
