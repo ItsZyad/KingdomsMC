@@ -30,7 +30,7 @@ SurrenderWar_Item:
 OfferSurrenderWar_Item:
     type: item
     material: poppy
-    display name: <aqua><bold>Offer Surrender
+    display name: <aqua><bold>Offer Peace
     data:
         lore:
         - Allows you to offer conditional peace terms with one or more of your enemies.
@@ -64,44 +64,94 @@ VictoryPointInterface_Handler:
         - inventory open d:VictoryPoint_Interface
 
         on player opens VictoryPoint_Interface:
-        - define slot <context.inventory.find_item[TideOfWar_Item]>
         - define kingdom <player.flag[kingdom]>
+        - define warID <player.flag[datahold.armies.warProgress.warID]>
+        - define slot <context.inventory.find_item[TideOfWar_Item]>
 
-        ## These will continue to be placeholder values until I finalize this code.
-        - define index 1
-        - define VPs 14
-        - define enemyVPs 18
-        - define blockVPs <list[]>
+        # Determine which side of the war is the "friendly" side, and which side is the enemy side
+        # by looking at whether the player's kingdom is counted as one of the belligerents or
+        # retaliators.
+        - define enemyKingdoms <[warID].proc[GetWarBelligerents]>
+        - define friendlyKingdoms <[warID].proc[GetWarRetaliators]>
 
-        - repeat <[VPs]>:
-            - define blockVPs:->:<element[▌].color[<proc[GetKingdomColor].context[<[kingdom]>]>]>
+        - if <[warID].proc[GetWarBelligerents].contains[<[kingdom]>]>:
+            - define enemyKingdoms <[warID].proc[GetWarRetaliators]>
+            - define friendlyKingdoms <[warID].proc[GetWarBelligerents]>
 
-            - if <[index].mod[25]> == 0 && <[index]> != 0:
-                - define blockVPs:->:<n>
+        - define friendlyColor <[friendlyKingdoms].get[1].proc[GetKingdomColor]>
+        - define enemyColor <[enemyKingdoms].get[1].proc[GetKingdomColor]>
 
-            - define index:++
+        - define VPVisual <list[<&r><&lb.color[white]>]>
+        - define enemyVPVisual <list[<&r><&lb.color[white]>]>
+        - define VPs <[friendlyKingdoms].parse_tag[<[parse_value].proc[GenerateVictoryPointOverview].context[<[warID]>].get[totalVPs]>].sum>
+        - define enemyVPs <[enemyKingdoms].parse_tag[<[parse_value].proc[GenerateVictoryPointOverview].context[<[warID]>].get[totalVPs]>].sum>
 
-        - repeat <element[200].sub[<[VPs]>].sub[<[enemyVPs]>]>:
-            - define blockVPs:->:<element[▌].color[white]>
+        # Each square in the VP visualizer represents a +/-20 range of victory points. The
+        # visualizer will print 20 of these squares with a shaded region representing the +/-20
+        # range that the player's kingdom current lies in.
+        - repeat 20:
+            - if <[VPs].round_to_precision[20]> == <element[<[value].mul[10]>].sub[100]>:
+                - define VPVisual:->:<element[▒].color[<[friendlyColor].mix[white]>]>
 
-            - if <[index].mod[25]> == 0:
-                - define blockVPs:->:<n>
+            - else if <[VPs].round_to_precision[20]> >= <element[<[value].mul[10]>].sub[100]>:
+                - define VPVisual:->:<element[▌].color[<[friendlyColor]>]>
 
-            - define index:++
+            - else:
+                - define VPVisual:->:<element[▌].color[white]>
 
-        - repeat <[enemyVPs]>:
-            - define blockVPs:->:<element[▌].color[gray]>
+        - define VPVisual:->:]
 
-            - if <[index].mod[25]> == 0:
-                - define blockVPs:->:<n>
+        # The visualizer will also show the same for the player's enemies.
+        - repeat 20:
+            - if <[enemyVPs].round_to_precision[20]> == <element[<[value].mul[10]>].sub[100]>:
+                - define enemyVPVisual:->:<element[▒].color[<[enemyColor].mix[white]>]>
 
-            - define index:++
+            - else if <[enemyVPs].round_to_precision[20]> >= <element[<[value].mul[10]>].sub[100]>:
+                - define enemyVPVisual:->:<element[▌].color[<[enemyColor]>]>
 
-        - inventory adjust d:<context.inventory> slot:<[slot]> lore:<&r><[blockVPs].unseparated>
+            - else:
+                - define enemyVPVisual:->:<element[▌].color[white]>
 
-        on player clicks item in VictoryPoint_Interface:
-        - narrate format:debug WIP
-        - run flagvisualizer def.flag:<player.flag[datahold.armies]>
+        - define enemyVPVisual:->:]
+
+        # This section calculates the amount that each side in the war has captured from the
+        # others' outposts in terms of the area captured vs. area not captured.
+        #
+        # As mentioned in other parts of the war code, it's no good calculating outpost VP
+        # contribution using the *number* of outposts captured if a given kingdom has 10 outposts
+        # of size 1,000 each, and one massive outpost of size 10,000.
+        - define capturedOutpostArea 0
+        - define totalEnemyOutpostArea 0
+
+        - foreach <[enemyKingdoms]>:
+            - define totalEnemyOutpostArea:+:<[value].proc[GetOutposts].parse_value_tag[<[value].proc[GetOutpostSize].context[<[parse_key]>]>].values.sum>
+            - define capturedOutpostArea:+:<[value].proc[GetAllKingdomLostOutposts].context[<[warID]>].parse_tag[<[value].proc[GetOutpostSize].context[<[parse_value]>]>].sum>
+
+        - define lostOutpostArea 0
+        - define totalFriendlyOutpostArea 0
+
+        - foreach <[friendlyKingdoms]>:
+            - define totalFriendlyOutpostArea:+:<[value].proc[GetOutposts].parse_value_tag[<[value].proc[GetOutpostSize].context[<[parse_key]>]>].values.sum>
+            - define lostOutpostArea:+:<[value].proc[GetAllKingdomLostOutposts].context[<[warID]>].parse_tag[<[value].proc[GetOutpostSize].context[<[parse_value]>]>].sum>
+
+        # Big ol' info dump.
+        - definemap infoLore:
+            0l: <element[Friendly VPs:].color[<[friendlyColor].mix[white]>]>
+            02: <[VPVisual].unseparated> <element[〰 <[VPs].round_to_precision[0.01]> / 100].color[<[friendlyColor]>]>
+            09: <element[Friendly Chunks Lost: ].proc[ConvertToSkinnyLetters].color[gray]><[friendlyKingdoms].parse_tag[<[parse_value].proc[GetAllKingdomLostChunks].context[<[warID]>].size>].sum.proc[ConvertToSkinnyLetters].color[aqua]> ▣ <element[Lost Chunks: ].proc[ConvertToSkinnyLetters].color[gray]><[enemyKingdoms].parse_tag[<[parse_value].proc[GetAllKingdomLostChunks].context[<[warID]>].size>].sum.proc[ConvertToSkinnyLetters].color[red]>
+            05: <element[Friendly Outpost Area Lost: ].proc[ConvertToSkinnyLetters].color[gray]><element[<[lostOutpostArea].format_number> / <[totalFriendlyOutpostArea].format_number>].proc[ConvertToSkinnyLetters].color[aqua]>
+            5a: <element[Friendly Casualties: ].proc[ConvertToSkinnyLetters].color[gray]><element[<[friendlyKingdoms].parse_tag[<[parse_value].proc[GetWarDead].context[<[warID]>]>].sum.format_number>].proc[ConvertToSkinnyLetters].color[red]>
+            06: <element[]>
+            07: <element[Enemy VPs:].color[<[enemyColor].mix[white]>]>
+            08: <[enemyVPVisual].unseparated> <element[〰 <[enemyVPs].round_to_precision[0.01]> / 100].color[<[enemyColor]>]>
+            03: <element[Enemy Chunks Lost: ].proc[ConvertToSkinnyLetters].color[gray]><[enemyKingdoms].parse_tag[<[parse_value].proc[GetAllKingdomLostChunks].context[<[warID]>].size>].sum.proc[ConvertToSkinnyLetters].color[aqua]> ▣ <element[Lost Chunks: ].proc[ConvertToSkinnyLetters].color[gray]><[friendlyKingdoms].parse_tag[<[parse_value].proc[GetAllKingdomLostChunks].context[<[warID]>].size>].sum.proc[ConvertToSkinnyLetters].color[red]>
+            04: <element[Enemy Outpost Area Lost: ].proc[ConvertToSkinnyLetters].color[gray]><element[<[capturedOutpostArea].format_number> / <[totalEnemyOutpostArea].format_number>].proc[ConvertToSkinnyLetters].color[aqua]>
+            9a: <element[Enemy Casualties: ].proc[ConvertToSkinnyLetters].color[gray]><element[<[enemyKingdoms].parse_tag[<[parse_value].proc[GetWarDead].context[<[warID]>]>].sum.format_number>].proc[ConvertToSkinnyLetters].color[aqua]>
+            10: <element[]>
+            11: <element[A <element[-100].color[red].underline> score results in an automatic surrender,].italicize.color[gray]>
+            12: <element[while a <element[+100].color[aqua].underline> results in an automatic win.].italicize.color[gray]>
+
+        - inventory adjust d:<context.inventory> slot:<[slot]> lore:<[infoLore].values>
 
         on player closes VictoryPoint_Interface:
         - wait 10t
@@ -259,7 +309,7 @@ GetCapturedOutpostsProportion:
 
 
 GenerateVictoryPointOverview:
-    type: task
+    type: procedure
     definitions: kingdom[ElementTag(String)]|warID[ElementTag(String)]
     description:
     - Returns a MapTag containing various victory point breakdowns of each dimension of warfare progress that Kingdoms tracks such as chunks gained, chunks lost, outposts gained, outposts lost, kills, losses, etc.
@@ -281,6 +331,8 @@ GenerateVictoryPointOverview:
     - define capturedChunksRatioMap <[kingdom].proc[GetCapturedChunksProportion].context[<[warID]>]>
     - define capturedOutpostsRatioMap <[kingdom].proc[GetCapturedOutpostsProportion].context[<[warID]>]>
 
+    # TODO: Once populations are implemented, work the kill count into the VP calculation by making
+    # TODO/ a function of kills vs. total population & player count.
     - define kills 0
 
     - foreach <[warID].proc[GetWarParticipants].exclude[<[kingdom]>]> as:participant:
@@ -303,6 +355,7 @@ GenerateVictoryPointOverview:
         kills: <[kills]>
         positiveVPs: <[positiveVPs]>
         negativeVPs: <[negativeVPs]>
+        totalVPs: <[positiveVPs].sub[<[negativeVPs]>]>
 
     - determine <[determination]>
 
