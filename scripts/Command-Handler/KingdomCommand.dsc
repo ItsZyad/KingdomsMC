@@ -197,10 +197,10 @@ Kingdom_Command:
         # on the ground
 
         - if <player.is_flying>:
-            - showfake green_stained_glass <[claimsCuboid].outline_2d[<player.location.y.sub[10]>]> duration:<[persistTime]>
+            - run ParticleDisplayDurationTrigger def.players:<player> def.duration:<[persistTime].as[duration]> def.locationList:<[claimsCuboid].outline_2d[<player.location.y.sub[10]>]> def.particle:CLOUD
 
         - else:
-            - showfake red_stained_glass <[claimsCuboid].outline_2d[<player.location.y.add[20]>]> duration:<[persistTime]>
+            - run ParticleDisplayDurationTrigger def.players:<player> def.duration:<[persistTime].as[duration]> def.locationList:<[claimsCuboid].outline_2d[<player.location.y.add[20]>]> def.particle:CLOUD
 
         #------------------------------------------------------------------------------------------
 
