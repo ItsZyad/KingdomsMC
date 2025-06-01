@@ -99,8 +99,22 @@ Addon_Command:
 
         - case info:
             - define addonName <[args].get[AddonName]>
+            - definemap addonInfoMessage:
+                t: <element[                                                                             ].strikethrough>
+                1: <element[ADDON NAME: ].bold><[addonName].proc[GetAddonDisplayName].to_uppercase.color[<proc[GetColor].context[Default.orange]>].bold>
+                s: <element[                                                                             ].strikethrough>
+                2: <element[Addon Author(s): <[addonName].proc[GetAddonAuthors].separated_by[, ].color[aqua]>].color[white]>
+                3: <element[Addon Hash: <[addonName].proc[GetAddonShortHash].as[element].color[gold]>].color[white]>
+                4: <element[Addon Version: <[addonName].proc[GetAddonVersion].color[aqua]>].color[white]>
+                5: <element[Addon Missing Dependencies: <[addonName].proc[GetAddonMissingDependencies].separated_by[<element[, ].color[white]>].color[aqua]>].color[white]>
+                6: <element[Addon Root Dir: <[addonName].proc[GetAddonRoot].color[aqua]>].color[white]>
+                7: <element[Addon Loaded: <[addonName].proc[IsAddonLoaded].if_true[<element[Yes].color[green]>].if_false[<element[No].color[red]>]>]>
+                f: <element[                                                                             ].strikethrough>
 
-            - narrate format:debug WIP
+            - if <[addonName].proc[GetAddonMissingDependencies].size> == 0:
+                - define addonInfoMessage.5 <element[Addon Dependencies: <element[None].color[gray]>].color[white]>
+
+            - narrate <[addonInfoMessage].values.separated_by[<n>]>
 
         - case help:
             - narrate format:debug "Insert help string here later."
