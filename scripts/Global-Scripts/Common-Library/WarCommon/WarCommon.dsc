@@ -11,6 +11,7 @@
 
 IsAtWarWithKingdom:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]
     description:
     - Returns true if the provided kingdom is at war with the other provided kingdom.
@@ -42,6 +43,7 @@ IsAtWarWithKingdom:
 
 IsJustifyingOnKingdom:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]
     description:
     - Returns true if the provided kingdom is justifying on the provided target kingdom.
@@ -65,6 +67,7 @@ IsJustifyingOnKingdom:
 
 IsOutpostBeingReclaimed:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns true if the provided outpost is currently being reclaimed by its original owner as part of the war with the provided ID.
@@ -96,6 +99,7 @@ IsOutpostBeingReclaimed:
 
 GetOutpostReclaimers:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns a map where the keys are the names of the squads currently partaking in the reclamation of the provided outpost, and the values are the kingdom that the squads belong to.
@@ -127,6 +131,7 @@ GetOutpostReclaimers:
 
 GetOutpostReclamationStart:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns the time at which the reclamation of the provided outpost began.
@@ -156,6 +161,7 @@ GetOutpostReclamationStart:
 
 GetOutpostReclamationEnd:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns the time at which the reclamation of the provided outpost is set to finish.
@@ -176,6 +182,7 @@ GetOutpostReclamationEnd:
 
 GetJustificationCompletion:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]
     description:
     - Will return the time at which the justification made by the provided kingdom against the provided target kingdom will be complete.
@@ -245,6 +252,7 @@ IsKingdomAtWar:
 
 GetKingdomWars:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Returns a list of the ids of all the active wars that the kingdom with the provided name is currently involved in.
@@ -269,6 +277,7 @@ GetKingdomWars:
 
 GetWarBelligerents:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]
     description:
     - Returns the names of all the kingdoms that initiated the war with the provided ID.
@@ -290,6 +299,7 @@ GetWarBelligerents:
 
 GetWarRetaliators:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]
     description:
     - Returns the names of all the kingdoms that were declared on in the war with the provided ID.
@@ -311,6 +321,7 @@ GetWarRetaliators:
 
 GetWarParticipants:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]
     description:
     - Returns the names of all the kingdoms involved in the war with the provided ID.
@@ -332,6 +343,7 @@ GetWarParticipants:
 
 GetWarStartDate:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]
     description:
     - Returns the names of all the kingdoms involved in the war with the provided ID.
@@ -353,6 +365,7 @@ GetWarStartDate:
 
 GetWarClaimType:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]
     description:
     - Returns the type of territory that this war was started over.
@@ -374,6 +387,7 @@ GetWarClaimType:
 
 GetWarName:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]
     description:
     - Returns the display name of the war with the given ID.
@@ -397,6 +411,7 @@ GetWarName:
 
 SetWarName:
     type: task
+    debug: false
     definitions: warID[ElementTag(String)]|newName[ElementTag(String)]
     description:
     - Will change the name of the war with the given ID to the new name provided.
@@ -419,6 +434,7 @@ SetWarName:
 
 GetAllKingdomLostChunks:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|warID[ElementTag(String)]
     description:
     - Returns a list containing all the chunks lost by this kingdom in the current war.
@@ -445,6 +461,7 @@ GetAllKingdomLostChunks:
 
 GetAllLostChunks:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]
     description:
     - Returns a list containing all the chunks that have been lost by any kingdom during the war with provided warID.
@@ -467,6 +484,7 @@ GetAllLostChunks:
 
 GetKingdomLostChunksByEnemy:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]|warID[ElementTag(String)]
     description:
     - Returns a list containing all the chunks lost by the provided kingdom in the war with the provided ID at the hands of the provided target kingdom.
@@ -495,6 +513,7 @@ GetKingdomLostChunksByEnemy:
 
 GetAllKingdomLostOutposts:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|warID[ElementTag(String)]
     description:
     - Returns a list containing the names of the outposts lost by this kingdom in the current war.
@@ -521,6 +540,7 @@ GetAllKingdomLostOutposts:
 
 GetAllLostOutposts:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]
     description:
     - Returns a list containing MapTags where the keys are the names of outposts lost during the war with the provided warID, and the values are the kingdoms they originally belonged to.
@@ -548,6 +568,7 @@ GetAllLostOutposts:
 
 GetLostOutpostCaptureTimes:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns a Map containing the times where squads began and finished capturing the given outpost in the war with the given warID.
@@ -575,6 +596,7 @@ GetLostOutpostCaptureTimes:
 
 GetLostOutpostManpowerBreakdown:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns a Map containing where the keys are the names of the squads that contributed to the capture of the provided outpost and the values are the percentage of the total manpower it contributed to the capture and the kingdom it belongs/ed to.
@@ -606,6 +628,7 @@ GetLostOutpostManpowerBreakdown:
 
 GetChunkOccupier:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]|chunk[ChunkTag]
     description:
     - Returns the current occupier of the provided chunk in the given war.
@@ -638,6 +661,7 @@ GetChunkOccupier:
 
 GetOutpostOccupiers:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns a map of the squads that are currently occupying the provided outpost, where the squad names are the keys and the kingdom they belong to are the values.
@@ -677,6 +701,7 @@ GetOutpostOccupiers:
 
 GetOutpostControllers:
     type: procedure
+    debug: false
     definitions: warID[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns a map of the squads that are currently controlling the provided outpost, where the squad names are the keys and the kingdom they belong to are the values.
@@ -715,6 +740,7 @@ GetOutpostControllers:
 
 GetTerritoryJustificationLevel:
     type: procedure
+    debug: false
     definitions: territoryType[ElementTag(String)]
     description:
     - Each type of territory in kingdoms is required to have a numerical id which indicates its precedence in the heirarchy of territory required by the justification system.
@@ -744,6 +770,7 @@ GetTerritoryJustificationLevel:
 
 GetKingdomHighestJustificationLevel:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]
     description:
     - Kingdoms are not allowed to justify on another's territory if they have not already fought a war over a lesser type of territory.
@@ -782,6 +809,7 @@ GetKingdomHighestJustificationLevel:
 
 StartJustification:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]|claimSize[ElementTag(Integer)]|claimType[ElementTag(String)]|claimTime[DurationTag]|claimName[?ElementTag(String)]
     description:
     - Will start justifications for a war between the two provided kingdoms with the targetKingdom as a retaliator, eventually leading to an automatically triggered war declaration after the provided claim time has elapsed.
@@ -843,6 +871,7 @@ StartJustification:
 
 CancelJustification:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]
     description:
     - Will cancel the justification made by the provided kingdom against the provided target kingdom.
@@ -872,6 +901,7 @@ CancelJustification:
 
 DeclareWar:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]|claimSize[ElementTag(Integer)]|claimType[ElementTag(String)]|claimName[?ElementTag(String)]
     description:
     - Will officially start a war between the two kingdoms provided, with the initial kingdom being the belligerent and the target kingdom being the retaliator.
@@ -946,6 +976,7 @@ DeclareWar:
 
 OccupyChunk:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|chunk[ChunkTag]|squadLeader[NPCTag]|delay[DurationTag]
     description:
     - Will occupy the provided chunk for the provided kingdom after the provided delay has elapsed.
@@ -1019,6 +1050,7 @@ OccupyChunk:
 
 CancelChunkOccupation:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]|squadLeader[NPCTag]|chunk[ChunkTag]
     description:
     - Cancels the occupation of the provided chunk by the provided kingdom in a war against the provided targetKingdom.
@@ -1054,6 +1086,7 @@ CancelChunkOccupation:
 
 ReclaimChunk:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]|squadLeader[NPCTag]|chunk[ChunkTag]|delay[DurationTag]
     description:
     - Will reclaim the provided chunk for the provided kingdom off of the target kingdom after the provided delay has elapsed.
@@ -1110,6 +1143,7 @@ ReclaimChunk:
 
 CancelChunkReclamation:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]|squadLeader[NPCTag]|chunk[ChunkTag]
     description:
     - Cancels the reclamation of the provided chunk by the provided kingdom in a war against the provided targetKingdom.
@@ -1145,6 +1179,7 @@ CancelChunkReclamation:
 
 OccupyOutpost:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]|outpost[ElementTag(String)]|squadName[ElementTag(String)]|delay[?DurationTag]
     description:
     - Will occupy the provided outpost for the provided kingdom after the an amount of time corresponding to the number of squads that are occupying it has elapsed.
@@ -1246,6 +1281,7 @@ OccupyOutpost:
 
 CancelOutpostOccupation:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Cancels the occupation of the provided outpost by the provided kingdom's given squad.
@@ -1279,6 +1315,7 @@ CancelOutpostOccupation:
 
 ReclaimOutpost:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]|squadName[ElementTag(String)]|delay[?DurationTag]
     description:
     - Will reclaim the the provided outpost for the provided kingdom if it belonged to it originally and is currently being occupied by another kingdom.
@@ -1389,6 +1426,7 @@ ReclaimOutpost:
 
 CancelOutpostReclamation:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|targetKingdom[ElementTag(String)]|squadName[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Cancels the occupation of the provided outpost by the provided kingdom's given squad.
@@ -1428,6 +1466,7 @@ CancelOutpostReclamation:
 
 AddWarDead:
     type: task
+    debug: false
     definitions: affectedKingdom[ElemnetTag(String)]|inflictingKingdom[ElementTag(String)]|amount[ElementTag(Integer)]
     description:
     - Adds the specified amount of war dead to the affected kingdom provided. Using the inflicting kingdom as a reference, this task deduces the relevant war that the casualties are a part of.
@@ -1476,6 +1515,7 @@ AddWarDead:
 
 GetWarDead:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|warID[ElementTag(String)]
     description:
     - Gets the amount of soldiers the provided kingdom lost in the war with the provided ID.
@@ -1511,8 +1551,8 @@ GetWarDead:
 
 MakeTheSquigglesGoAway:
     type: task
-    enabled: false
     debug: false
+    enabled: false
     script:
     - inject OccupyOutpost path:OccupyOutpost_Helper
     - inject ReclaimOutpost path:ReclaimOutpost_Helper

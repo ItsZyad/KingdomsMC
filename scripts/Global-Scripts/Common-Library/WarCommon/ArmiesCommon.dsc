@@ -10,6 +10,7 @@
 
 GetKingdomSquadManagers:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets all of a given kingdom's squad managers.
@@ -32,6 +33,7 @@ GetKingdomSquadManagers:
 
 GetKingdomSquads:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets all squads belonging to a kingdom.
@@ -54,6 +56,7 @@ GetKingdomSquads:
 
 GetMaxAllowedSMs:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Gets the maximum amount of squad managers that a kingdom is allowed to posses.

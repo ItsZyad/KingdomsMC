@@ -214,6 +214,7 @@ RemoveClaim:
 
 GetClaimsCuboid:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|type[?ElementTag(String)]
     description:
     - Returns a nested cuboid of the given kingdom's claims. Should a claim type not be specified

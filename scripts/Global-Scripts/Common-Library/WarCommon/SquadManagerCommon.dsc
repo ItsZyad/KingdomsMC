@@ -11,6 +11,7 @@
 
 GenerateSMID:
     type: procedure
+    debug: false
     definitions: location[LocationTag]
     description:
     - Generates the ID used to refer to SMs in the kingdom flag using the location of the SM.
@@ -33,6 +34,7 @@ GenerateSMID:
 
 GetSMLocation:
     type: procedure
+    debug: false
     definitions: SMID[ElementTag(Integer)]|kingdom[ElementTag(String)]
     description:
     - Gets the location of a specific squad manager, provided the SM's kingdom and ID.
@@ -56,6 +58,7 @@ GetSMLocation:
 
 GetSMName:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets the internal name of the squad manager.
@@ -80,6 +83,7 @@ GetSMName:
 
 SetSMName:
     type: task
+    debug: false
     definitions: SMLocation[LocationTag]|newName[ElementTag(String)]
     description:
     - Sets the internal name of the squad manager with the provided location.
@@ -113,6 +117,7 @@ SetSMName:
 
 GetSMUpkeep:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets the upkeep of the given squad manager.
@@ -138,6 +143,7 @@ GetSMUpkeep:
 
 SetSMUpkeep:
     type: task
+    debug: false
     definitions: SMLocation[LocationTag]|amount[ElementTag(Float)]
     description:
     - Sets the upkeep of the given squad manager to the provided value.
@@ -177,6 +183,7 @@ SetSMUpkeep:
 
 GetSMKingdom:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets the squad manager's kingdom affiliation.
@@ -198,6 +205,7 @@ GetSMKingdom:
 
 GetMaxSMAOESize:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets the maximum size that a squad manager's AOE can be at its current level.
@@ -223,6 +231,7 @@ GetMaxSMAOESize:
 
 GetSquadLimit:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets the maximum amount of squads that can be stationed under this squad manager.
@@ -248,6 +257,7 @@ GetSquadLimit:
 
 GetMaxSquadSize:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets the maximum size squad that can be created using this squad manager's composer.
@@ -273,6 +283,7 @@ GetMaxSquadSize:
 
 GetStationingCapacity:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets the maximum size of squads that can be stationed under this squad manager.
@@ -297,6 +308,7 @@ GetStationingCapacity:
 
 CalculateSMStationingCapacity:
     type: procedure
+    debug: false
     definitions: bedCount[ElementTag(Integer)]
     script:
     # Station count equation:
@@ -307,6 +319,7 @@ CalculateSMStationingCapacity:
 
 SetStationingCapacity:
     type: task
+    debug: false
     definitions: SMLocation[LocationTag]|newCapacity[ElementTag(Integer)]
     description:
     - Changes the maximum size of squads that can be stationed in the SM at the given location.
@@ -336,6 +349,7 @@ SetStationingCapacity:
 
 GetSMAOESize:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets the current size of a squad manager's AOE.
@@ -360,6 +374,7 @@ GetSMAOESize:
 
 GetSMArea:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets the CuboidTag representing a squad manager's AOE.
@@ -385,6 +400,7 @@ GetSMArea:
 
 GenerateSMArea:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]|AOE[ElementTag(Integer)]
     description:
     - Returns the cuboid representing the area of effect of a squad manager.
@@ -411,6 +427,7 @@ GenerateSMArea:
 
 SetSMArea:
     type: task
+    debug: false
     definitions: SMLocation[LocationTag]|AOE[ElementTag(Integer)]|bypassMaxAOE[ElementTag(Boolean) = false]
     description:
     - Sets the area of effect for squad manager at the provided location to the provided AOE value.
@@ -453,6 +470,7 @@ SetSMArea:
 
 GetSMArmoryLocations:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets a list of all the locations assigned as armories in this squad manager.
@@ -477,6 +495,7 @@ GetSMArmoryLocations:
 
 AddSMArmoryLocation:
     type: task
+    debug: false
     definitions: SMLocation[LocationTag]|newArmory[LocationTag]
     description:
     - Adds a new location to the list of armories associated with the SM at the provided location.
@@ -512,6 +531,7 @@ AddSMArmoryLocation:
 
 RemoveSMArmoryLocation:
     type: task
+    debug: false
     definitions: SMLocation[LocationTag]|armory[LocationTag]
     description:
     - Removes a location from the list of armories associated with the SM at the provided location.
@@ -545,6 +565,7 @@ RemoveSMArmoryLocation:
 
 GetSMSquads:
     type: procedure
+    debug: false
     definitions: SMLocation[LocationTag]
     description:
     - Gets a list of all the squads stationed at a certain SM.
@@ -574,6 +595,7 @@ GetSMSquads:
 
 GetSquadSMLocation:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the SM associated with the squad provided.

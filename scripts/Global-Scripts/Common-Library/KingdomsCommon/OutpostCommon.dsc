@@ -11,6 +11,7 @@
 
 DoesOutpostExist:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns true if the provided outpost exists as a part of the provided kingdom.
@@ -37,6 +38,7 @@ DoesOutpostExist:
 
 GetAllOutpostsByKingdom:
     type: procedure
+    debug: false
     description:
     - Generates a MapTag representing the outpost information of every kingdom.
     - ---
@@ -66,6 +68,7 @@ GetAllOutpostsByKingdom:
 
 GetAllOutposts:
     type: procedure
+    debug: false
     description:
     - Returns a list of all outposts there are on the server, across all kingdoms. The kingdom that each outpost belongs to is added to the outpost data MapTag.
     - Will return null if the action fails.
@@ -91,6 +94,7 @@ GetAllOutposts:
 
 GetOutposts:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Generates a MapTag of all the kingdom's outposts with an additional key added for the
@@ -121,6 +125,7 @@ GetOutposts:
 
 GetOutpostSize:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns the number of blocks on just one y-level of the provided outpost's cuboid area.
@@ -151,6 +156,7 @@ GetOutpostSize:
 
 GetOutpostNote:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns a cuboid representing the noted area of the provided outpost in the provided kingdom.
@@ -182,6 +188,7 @@ GetOutpostNote:
 
 GetOutpostArea:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns the CuboidTag which designates the provided outpost's area.
@@ -221,6 +228,7 @@ GetOutpostArea:
 
 SetOutpostArea:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]|newArea[CuboidTag]
     description:
     - Sets the area of the outpost in the provided kingdom to the newArea provided.
@@ -272,6 +280,7 @@ SetOutpostArea:
 
 GetOutpostUpkeep:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns the daily upkeep of the provided outpost.
@@ -302,6 +311,7 @@ GetOutpostUpkeep:
 
 SetOutpostUpkeep:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Sets the upkeep for the provided outpost in the provided kingdom.
@@ -343,6 +353,7 @@ SetOutpostUpkeep:
 
 GetOutpostDisplayName:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns the display name of the provided outpost in the provided kingdom.
@@ -373,6 +384,7 @@ GetOutpostDisplayName:
 
 GetKingdomOutpostMaxSize:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Returns the maximum size that the provided kingdom's outposts can be in blocks.
@@ -396,6 +408,7 @@ GetKingdomOutpostMaxSize:
 ## @Alias
 GetKingdomMaxOutpostSize:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - `[This procedure is an alias of GetKingdomOutpostMaxSize]`
@@ -409,6 +422,7 @@ GetKingdomMaxOutpostSize:
 
 GetOutpostSpecialization:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns the specialization of the given outpost in the given kingdom. If the outpost has no specialization, the procedure will return 'None'.
@@ -440,6 +454,7 @@ GetOutpostSpecialization:
 
 SetOutpostSpecialization:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]|spec[ElementTag(String)]
     description:
     - Sets the specialization of the given outpost in the given kingdom.
@@ -471,6 +486,7 @@ SetOutpostSpecialization:
 
 GetOutpostSpecializationModifier:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Returns the specialization modifier of the given outpost in the given kingdom. The specialization modifier is the multiplier that the outpost's specialized production will increase by.
@@ -506,6 +522,7 @@ GetOutpostSpecializationModifier:
 
 SetOutpostSpecializationModifier:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]|modifier[ElementTag(Float)]
     description:
     - Sets the specialization modifier of the given outpost in the given kingdom. The specialization modifier is the multiplier that the outpost's specialized production will increase by.
@@ -543,6 +560,7 @@ SetOutpostSpecializationModifier:
 
 PlayerInWhichOutpost:
     type: procedure
+    debug: false
     definitions: player[PlayerTag]
     description:
     - Checks if a player is in one of their own kingdom's outposts.
@@ -579,6 +597,7 @@ PlayerInWhichOutpost:
 
 CreateOutpost:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|cornerList[ListTag(LocationTag)]|outpostName[ElementTag(String)]
     description:
     - Creates a new outpost with the provided name for the provided kingdom in the area between the first two points provided in the corner list.
@@ -635,6 +654,7 @@ CreateOutpost:
 
 RemoveOutpost:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|outpost[ElementTag(String)]
     description:
     - Removes the outpost with the provided name from the provided kingdom and returns all of its data.
@@ -673,6 +693,7 @@ RemoveOutpost:
 
 GetTotalOutpostUpkeep:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Returns the total amount of upkeep required of every outpost that a given kingdom has.
@@ -695,6 +716,7 @@ GetTotalOutpostUpkeep:
 
 CalculateTotalOutpostUpkeep:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Sets the total amount of upkeep required of every outpost that a given kingdom has.

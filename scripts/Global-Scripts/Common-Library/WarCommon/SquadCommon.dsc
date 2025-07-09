@@ -17,6 +17,7 @@
 
 HasSquadSpawned:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Returns true if the squad has been spawned at least once before.
@@ -36,6 +37,7 @@ HasSquadSpawned:
 
 GetSquadNPCs:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets a list of the NPCs constituting this squad.
@@ -63,6 +65,7 @@ GetSquadNPCs:
 
 GetAllSquadNPCs:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Returns a list containing all of the provided squad's NPCs including the leader.
@@ -90,6 +93,7 @@ GetAllSquadNPCs:
 
 GetSquadComposition:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the composition map of the squad provided.
@@ -117,6 +121,7 @@ GetSquadComposition:
 
 GetSquadManpower:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the total manpower of the squad provided.
@@ -144,6 +149,7 @@ GetSquadManpower:
 
 GetSquadLeader:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the npc currently acting as the leader of the squad provided.
@@ -175,6 +181,7 @@ GetSquadLeader:
 
 GetSquadID:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the given squad's numerical ID.
@@ -202,6 +209,7 @@ GetSquadID:
 
 GetSquadName:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|ID[ElementTag(Integer)]
     description:
     - Gets the given squad's internal name.
@@ -225,6 +233,7 @@ GetSquadName:
 
 GetSquadSentinelName:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Returns the name of the internal sentinel-side name used by the provided Kingdoms squad.
@@ -255,6 +264,7 @@ GetSquadSentinelName:
 
 GetSquadUpkeep:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the upkeep for the squad with the given name and kingdom.
@@ -285,6 +295,7 @@ GetSquadUpkeep:
 
 GetSquadDisplayName:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Gets the given squad's display name.
@@ -312,6 +323,7 @@ GetSquadDisplayName:
 
 GetSquadEquipment:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Returns a map of the given squad's standard equipment in the following format
@@ -369,6 +381,7 @@ GetSquadEquipment:
 
 GetSquadStation:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Returns the location of the squad manager that the given squad is stationed in. If the squad does not exist, the procedure will return null.
@@ -406,6 +419,7 @@ GetSquadStation:
 
 SetSquadLeader:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|npc[NPCTag]
     description:
     - Sets the provided NPC as the squad leader of the provided squad.
@@ -450,6 +464,7 @@ SetSquadLeader:
 
 AddSoldierToSquad:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|npc[NPCTag]
     description:
     - Adds the provided NPC as a soldier to the provided squad.
@@ -485,6 +500,7 @@ AddSoldierToSquad:
 
 RemoveSoldierFromSquad:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|npc[NPCTag]
     description:
     - Removes the provided NPC from the provided squad.
@@ -520,6 +536,7 @@ RemoveSoldierFromSquad:
 
 RenameSquad:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|newName[ElementTag(String)]
     description:
     - Renames the squad with the provided name to a new name. Will return true if the action was successful.
@@ -563,6 +580,7 @@ RenameSquad:
 
 DeleteSquad:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Removes the provided squad from all flag structures that contain it as well as the actual NPCs that comprise it.
@@ -616,6 +634,7 @@ DeleteSquad:
 
 DeleteSquadReference:
     type: task
+    debug: false
     definitions: SMLocation[Location]|kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     description:
     - Removes the provided squad from all flag structures that contain it.
@@ -647,6 +666,7 @@ DeleteSquadReference:
 
 CreateSquadReference:
     type: task
+    debug: false
     definitions: SMLocation[LocationTag]|kingdom[ElementTag(String)]|displayName[ElementTag(String)]|squadComp[MapTag]|totalManpower[ElementTag(Integer)]
     description:
     - Creates a new squad reference in the kingdoms.___.armies flag and the squadManager flag attached to the provided SMLocation. But does not create NPCs
@@ -719,6 +739,7 @@ CreateSquadReference:
 
 CalculateSquadUpkeep:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadComp[MapTag(ElementTag(Integer))]
     description:
     - Generates a daily upkeep cost for the squad with the provided kingdom and composition.
@@ -767,6 +788,7 @@ CalculateSquadUpkeep:
 
 SetSquadUpkeep:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]|amount[ElementTag(Float)]
     description:
     - Sets the upkeep of the provided squad to the provided amount.
@@ -806,6 +828,7 @@ SetSquadUpkeep:
 
 GiveSquadTools:
     type: task
+    debug: false
     definitions: player[PlayerTag]|saveInv[ElementTag(Boolean)]
     description:
     - Replaces the provided player's hotbar with squad management tools.
@@ -842,6 +865,7 @@ GiveSquadTools:
 
 ResetSquadTools:
     type: task
+    debug: false
     definitions: player[PlayerTag]
     description:
     - Gives the player back the inventory they had before selecting the squad tools.

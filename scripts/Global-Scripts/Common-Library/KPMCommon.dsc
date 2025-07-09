@@ -10,6 +10,7 @@
 
 DoesAddonExist:
     type: procedure
+    debug: false
     definitions: name[ElementTag(String)]
     description:
     - Checks if the provided name is the name of a currently indexed addon.
@@ -28,6 +29,7 @@ DoesAddonExist:
 
 IsAddonLoaded:
     type: procedure
+    debug: false
     definitions: name[ElementTag(String)]
     description:
     - Returns true if the provided addon is currently loaded and running on the server.
@@ -50,6 +52,7 @@ IsAddonLoaded:
 
 GetAllAddonNames:
     type: procedure
+    debug: false
     description:
     - Will return a list of all the names of all currently indexed addons.
     - ---
@@ -65,6 +68,7 @@ GetAllAddonNames:
 
 GetAddonDisplayName:
     type: procedure
+    debug: false
     definitions: name[ElementTag(String)]
     description:
     - Gets the display name of the addon with the provided name.
@@ -90,6 +94,7 @@ GetAddonDisplayName:
 
 GetAddonMissingDependencies:
     type: procedure
+    debug: false
     definitions: name[ElementTag(String)]
     description:
     - Returns a list of the provided addon's currently unsatisfied dependencies.
@@ -112,6 +117,7 @@ GetAddonMissingDependencies:
 
 GetAddonNameByHash:
     type: procedure
+    debug: false
     definitions: hash[*BinaryTag]|shortHash[*ElementTag(String)]
     description:
     - Gets the name of an addon using its SHA256 hash or a shortened version of it.
@@ -144,6 +150,7 @@ GetAddonNameByHash:
 
 GetAddonVersion:
     type: procedure
+    debug: false
     definitions: name[ElementTag(String)]
     description:
     - Gets the current version of the provided addon.
@@ -166,6 +173,7 @@ GetAddonVersion:
 
 GetAddonHash:
     type: procedure
+    debug: false
     definitions: name[ElementTag(String)]
     description:
     - Gets the SHA256 hash of the provided addon.
@@ -188,6 +196,7 @@ GetAddonHash:
 
 GetAddonRoot:
     type: procedure
+    debug: false
     definitions: name[ElementTag(String)]
     description:
     - Gets the root directory of the addon with the provided name.
@@ -210,6 +219,7 @@ GetAddonRoot:
 
 GetAddonAuthors:
     type: procedure
+    debug: false
     definitions: name[ElementTag(String)]
     description:
     - Gets a list of authors for the provided addon.
@@ -232,6 +242,7 @@ GetAddonAuthors:
 
 GetAddonShortHash:
     type: procedure
+    debug: false
     definitions: name[ElementTag(String)]
     description:
     - Gets the shortened version of the SHA256 hash used to identify addons.

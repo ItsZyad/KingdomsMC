@@ -11,6 +11,7 @@
 
 GetSoldierMissingStandardEquipment:
     type: procedure
+    debug: false
     definitions: soldier[NPCTag]
     description:
     - Returns a list of all the squad-standard equipment missing from the provided soldier.
@@ -50,6 +51,7 @@ GetSoldierMissingStandardEquipment:
 
 GiveSoldierItemFromArmory:
     type: task
+    debug: false
     definitions: soldier[NPCTag]|squadName[ElementTag(String)]|kingdom[ElementTag(String)]|armories[?ListTag(LocationTag)]|item[ItemTag]
     description:
     - Gives the provided soldier an item from their squad's armory if it exists.
