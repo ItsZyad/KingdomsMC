@@ -311,7 +311,7 @@ FyndalinTradeRefresh_Handler:
     enabled: false
     events:
         on time 23:
-        - define worldDay <context.world.time.full.in_days.round>
+        - define worldDay <context.world.time_full.in_days.round>
 
         - if <[worldDay].mod[7]> == 0:
             - foreach <proc[GetKingdomList]> as:kingdom:

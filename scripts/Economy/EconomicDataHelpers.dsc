@@ -112,8 +112,8 @@ PriceExtrapolationHelper_Command:
         - determine cancelled
 
     - narrate <n>
-    - narrate "<element[ACCEPT FINAL OUTPUT].color[green].bold.underline.on_click[<entry[accept_final].command>].on_hover[This will write the above data to price-info.yml]>"
-    - narrate "<element[REJECT FINAL OUTPUT].color[red].bold.underline.on_click[<entry[reject_final].command>]>"
+    - narrate <element[ACCEPT FINAL OUTPUT].color[green].bold.underline.on_click[<entry[accept_final].command>].on_hover[This will write the above data to price-info.yml]>
+    - narrate <element[REJECT FINAL OUTPUT].color[red].bold.underline.on_click[<entry[reject_final].command>]>
 
     AcceptFinalOutput:
     - yaml load:economy_data/price-info.yml id:prices
@@ -184,7 +184,7 @@ PriceExtrapolationHelper_Command:
 
         - foreach <yaml[prices].read[price_info.items].keys> as:key:
             - if <yaml[prices].contains[price_info.items.<[key]>.<[entry]>]>:
-                - define itemInfo "<yaml[prices].read[price_info.items.<[key]>.<[entry]>].to_list[ : ].separated_by[<n>]>"
+                - define itemInfo <yaml[prices].read[price_info.items.<[key]>.<[entry]>].to_list[ : ].separated_by[<n>]>
                 - foreach stop
 
         - yaml id:prices unload
@@ -192,7 +192,7 @@ PriceExtrapolationHelper_Command:
         - narrate "<element[[Remove Item]].on_click[<entry[item_clickable].command>].color[red].underline> <element[[Weight]].on_click[<entry[weight_item].command>].color[aqua].underline>.....<[entry].color[gray].italicize.underline.on_hover[<[itemInfo]>]>.....<element[Weight: ].color[aqua]><[weights].get[<[entry]>].if_null[1]>"
 
     - narrate <n>
-    - narrate "<element[Calculate New Item Averages].color[green].bold.underline.on_click[<entry[save_new_items].command>]>"
+    - narrate <element[Calculate New Item Averages].color[green].bold.underline.on_click[<entry[save_new_items].command>]>
     - inject PriceExtrapolationHelper_Command path:AddItemToExtrapolation
     - define clickableList:<-:<entry[save_new_items].id>
 
@@ -213,7 +213,7 @@ PriceExtrapolationHelper_Command:
             - flag <player> newItem:!
             - inject PriceExtrapolationHelper_Command path:WriteItemList
 
-    - narrate "<element[Add New Item].color[green].bold.underline.on_click[<entry[add_item].command>]>"
+    - narrate <element[Add New Item].color[green].bold.underline.on_click[<entry[add_item].command>]>
 
     script:
     - if <context.args.get[1]> == help:

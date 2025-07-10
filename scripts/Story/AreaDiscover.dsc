@@ -26,7 +26,7 @@ AreaAlert_Handler:
 
             - else:
                 - playsound sound:ui_toast_in <player> volume:0.5 pitch:0.6
-                - title "subtitle:<bold><element[You Have Discovered: <[realName]>].color[gold]>" targets:<player>
+                - title subtitle:<bold><element[You Have Discovered: <[realName]>].color[gold]> targets:<player>
 
                 - if !<server.has_flag[PreGameStart]>:
                     - flag <player> foundAreas:->:<context.area>

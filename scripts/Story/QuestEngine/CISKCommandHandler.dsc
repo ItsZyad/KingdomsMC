@@ -14,7 +14,7 @@ GenerateRecursiveStructures_CISK:
     definitions: splitted[ListTag(ElementTag(String))]
     DEBUG_GenerateSplittedList:
     - define text <element[<&lt>state get player health<&gt>]>
-    - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
+    - run SplitKeep def.text:<[text]> def.delimiters:<list[<&gt>|<&lt>|<&co>| ]> def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
     script:
@@ -53,8 +53,8 @@ CommandMapGenerator_CISK:
     debug: false
     definitions: splitted[ListTag(ElementTag(String))]
     DEBUG_GenerateSplittedList:
-    - define text "<element[<&lt>state get player:<&lt>dataget t:player n:ref<&gt> location<&gt>]>"
-    - run SplitKeep def.text:<[text]> "def.delimiters:<list[<&gt>|<&lt>|<&co>| ]>" def.splitType:seperate save:split
+    - define text <element[<&lt>state get player:<&lt>dataget t:player n:ref<&gt> location<&gt>]>
+    - run SplitKeep def.text:<[text]> def.delimiters:<list[<&gt>|<&lt>|<&co>| ]> def.splitType:seperate save:split
     - define splitted <entry[split].created_queue.determination.get[1].filter_tag[<[filter_value].regex_matches[\s*].not>].parse_tag[<[parse_value].trim>]>
 
     script:

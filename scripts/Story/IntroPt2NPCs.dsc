@@ -7,7 +7,7 @@
 ## @Date: Jan 2022
 ## @Script Ver: Indev
 ##
-##ignorewarning invalid_data_line_quotes
+##ignorewarning bad_quotes
 ## ----------------END HEADER-----------------
 
 MerchantTutorial_Handler:
@@ -49,7 +49,7 @@ IntroTwoNPCs:
         - flag InteractingWith expire:20s
 
     default constants:
-        default_script: "IntroTwoNPCs_I"
+        default_script: IntroTwoNPCs_I
         default_step: 1
 
     interact scripts:
@@ -106,8 +106,6 @@ IntroTwoNPCs_HelpAccepted2:
             - narrate "<gray><italic>Tip: Use <blue>/quests <gray>to learn more about your current objectives."
 
     script:
-    # TODO: Change out for switch-case statements later
-
     # If the player asks for the market
     - if <[HelpAcceptedType]> == 1:
         - narrate format:npctalk "Oh! That would be the Alderon market, of course! It's all covered in those pretty colored tents; can't miss it!"

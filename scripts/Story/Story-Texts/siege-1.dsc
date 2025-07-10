@@ -1,4 +1,4 @@
-siege-1:
+siege_1:
   author: Claud
   signed: true
   text:
@@ -10,7 +10,7 @@ siege-1:
   - city's location. Hard to say in hindsight.<n>Whatever happens, happens. Perhaps this will all boil over, and they will come to an agreement. Or perhaps the siege will come to a boiling point and end in
   title: Letter Addressed to 'Mother'
   type: book
-siege-1c:
+siege_1c:
   author: Claud
   signed: true
   text:
@@ -20,7 +20,7 @@ siege-1c:
   - urgency to send you another letter.<n><n>I am joining the fight.<n><n>At the time of writing, I am waiting for the armourer to fit me with a
   title: Letter Addressed to 'Mother'
   type: book
-siege-1b:
+siege_1b:
   author: Claud
   signed: true
   text:
@@ -32,7 +32,7 @@ siege-1b:
   - you after all of this is over. We've been sharing our rations and working on recipes that only require bread and fish - I think their spirits are still high.<n><n>With
   title: Letter Addressed to 'Mother'
   type: book
-siege-1d:
+siege_1d:
   author: Karr
   signed: true
   text:

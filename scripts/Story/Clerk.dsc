@@ -1,4 +1,5 @@
 ##ignorewarning invalid_data_line_quotes
+##ignorewarning bad_quotes
 
 ClerkNPC:
     type: assignment

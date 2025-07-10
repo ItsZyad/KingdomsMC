@@ -76,7 +76,7 @@ SC1_Food_Handler:
         - flag server kingdoms.scenario-1.onlinePlayersToday:!
 
         after time 23:
-        - define worldDay <context.world.time.full.in_days.round>
+        - define worldDay <context.world.time_full.in_days.round>
 
         - foreach <proc[GetKingdomList]> as:kingdom:
             - if <server.flag[kingdoms.scenario-1.kingdomList.<[kingdom]>.starvingMonths]> > 3:
@@ -129,7 +129,7 @@ SC1_Food_Command:
 SC1_PopulationGrowthTick:
     type: task
     script:
-    - define daysPassed <context.world.time.full.in_days.round>
+    - define daysPassed <context.world.time_full.in_days.round>
 
     - if <server.flag[kingdoms.scenario-1.onlinePlayersToday].is_empty>:
         - stop
@@ -179,7 +179,7 @@ SC1_NextFoodTickCalculator:
     type: procedure
     definitions: world[WorldTag]
     script:
-    - define daysPassed <[world].time.full.in_days.round>
+    - define daysPassed <[world].time_full.in_days.round>
     - define tickProgress <[daysPassed].mod[30].div[30].mul[100].round>
     - define tickGraphic <list[]>
 

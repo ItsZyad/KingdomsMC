@@ -187,6 +187,8 @@ AdminTools_Command:
                 - else:
                     - narrate format:admincallout "No kingdom found for: <[value].name>"
 
+        # TODO: Consider packaging this as a task script and putting in DynmapHandler.dsc
+        ## I feel like this makes more logical sense as to where things should go.
         - case dynmap:
             - define action <[args].get[2].to_lowercase>
 
@@ -364,7 +366,7 @@ AddEssentialsWorthItems:
     #- narrate format:debug ALL:<[allItems]>
 
     - foreach <[allItems]> as:item:
-        - if <[item].worth.exists>:
+        - if <[item].essentials_worth.exists>:
             #- narrate format:debug ITM:<[item].worth>
             #- yaml id:prices set price_info.items.<[item].material.name>.price:<[item].worth>
             - yaml id:prices set price_info.items.<[item].material.name>.base:<yaml[prices].read[price_info.items.<[item].material.name>.price]>

@@ -122,7 +122,7 @@ simplesitcommand:
                 - clickable simplesitteleport def:<[player]> for:<player> save:teleport_<[player]>
 
             - narrate "<yellow>Players sitting:" format:simplesitformat
-            - narrate "<[player_list].parse_tag[<dark_aqua><&n><[parse_value].name.on_click[<entry[teleport_<[parse_value]>].command>].on_hover[Teleport to <[parse_value].name>'s sit location]><gray>].comma_separated>"
+            - narrate <[player_list].parse_tag[<dark_aqua><&n><[parse_value].name.on_click[<entry[teleport_<[parse_value]>].command>].on_hover[Teleport to <[parse_value].name>'s sit location]><gray>].comma_separated>
 
         - case 2:
             - if <context.args.first> != kick:

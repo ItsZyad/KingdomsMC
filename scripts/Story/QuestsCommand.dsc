@@ -36,9 +36,9 @@ Quests_Command:
                 - narrate format:debug DESC:<[descList]>
                 - narrate ------------
 
-                - define loreName "<element[<aqua>Name: <&r><bold><[name]>]>"
+                - define loreName <element[<aqua>Name: <&r><bold><[name]>]>
                 - define loreDesc <element[<aqua>Description:]>
-                - define loreExp "<element[<aqua>Time to Finish: <[expires]>]>"
+                - define loreExp <element[<aqua>Time to Finish: <[expires]>]>
 
                 - define loreList <list[<[loreName]>|<[loreDesc]>|<[loreExp]>]>
                 - define loreList <[loreList].insert[<[descList]>].at[3]>

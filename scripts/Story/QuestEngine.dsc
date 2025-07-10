@@ -103,7 +103,7 @@ OptionsParser_CISK:
                 - flag <player> clickedOption
 
         - else if <[action].starts_with[/goto]>:
-            - define gotoScript "<[action].split[/goto ].get[2].replace_text[/].with[]>"
+            - define gotoScript <[action].split[/goto ].get[2].replace_text[/].with[]>
 
             - yaml load:quest_schemas/<[file]> id:quest
             - define playerDefinedBlock <yaml[quest].read[<[schema]>.branches.<[gotoScript]>]>

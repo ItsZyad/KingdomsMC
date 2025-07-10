@@ -15,6 +15,7 @@ WarpCooldownEndMessage:
     script:
     - narrate targets:<[player1]>|<[player2]> "<red>You are no longer in combat mode!<&6> You can use warps again."
 
+
 WarpCooldown:
     type: world
     debug: false

@@ -260,7 +260,7 @@ MinerGeneration_Handler:
                 - if <[miner].location.world> != <context.world>:
                     - foreach next
 
-                - if <[miner].get[refreshTime].div[1000].round.if_null[0]> != <context.world.time.full.in_minutes.mod[20].round>:
+                - if <[miner].get[refreshTime].div[1000].round.if_null[0]> != <context.world.time_full.in_minutes.mod[20].round>:
                     - foreach next
 
                 - run MinerItemGenerator def.npc:<[miner]>

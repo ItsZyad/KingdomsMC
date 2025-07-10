@@ -10,6 +10,7 @@
 ## @Date: Jan 2022
 ## @Script Ver: Indev
 ##
+##ignorewarning bad_quotes
 ## ----------------END HEADER-----------------
 
 SailorBartender:

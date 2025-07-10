@@ -22,7 +22,7 @@ SC1_JaleradKingChecker_Handler:
         - if <proc[GetMembers].context[jalerad].filter_tag[<[filter_value].is_online>].is_empty>:
             - stop
 
-        - define worldDay <context.world.time.full.in_days>
+        - define worldDay <context.world.time_full.in_days>
 
         - if <[worldDay].mod[7]> != 0:
             - stop

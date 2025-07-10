@@ -209,7 +209,7 @@ GuardInterface_Handler:
             - define IncNum <[report].get[incNumber].if_null[1]>
             - define kingdomName <proc[GetKingdomName].context[<[report].get[kingdom]>]>
 
-            - adjust def:incItem "lore:|<element[Date of Inc: ].bold.color[white]><[dateFormatted].color[aqua]>|<element[Player: ].bold.color[white]><[playerName].color[aqua]>|<element[From Kingdom: ].bold.color[white]><[kingdomName].color[aqua]>|<element[Number of Incursions: ].bold.color[white]><[incNum].color[aqua]>"
+            - adjust def:incItem lore:|<element[Date of Inc: ].bold.color[white]><[dateFormatted].color[aqua]>|<element[Player: ].bold.color[white]><[playerName].color[aqua]>|<element[From Kingdom: ].bold.color[white]><[kingdomName].color[aqua]>|<element[Number of Incursions: ].bold.color[white]><[incNum].color[aqua]>
             - define incursionItemList:->:<[incItem]>
 
         - flag <player> incursionItems:<[incursionItemList]>
@@ -452,10 +452,10 @@ GuardEngagement_Handler:
             - define kingdom <[value].flag[kingdom]>
 
             - if <[guard].flag[targetInfo.whichAttack].contains[<[kingdom]>]>:
-                - inventory adjust d:<[kingdomEngagementWindow]> slot:<[loop_index]> "lore:<element[Engaging members of this kingdom].color[red].bold>"
+                - inventory adjust d:<[kingdomEngagementWindow]> slot:<[loop_index]> lore:<element[Engaging members of this kingdom].color[red].bold>
 
             - else:
-                - inventory adjust d:<[kingdomEngagementWindow]> slot:<[loop_index]> "lore:<element[Not engaging members of this kingdom].color[white].bold>"
+                - inventory adjust d:<[kingdomEngagementWindow]> slot:<[loop_index]> lore:<element[Not engaging members of this kingdom].color[white].bold>
 
         - inventory open d:<[kingdomEngagementWindow]>
 
@@ -517,10 +517,10 @@ GuardKingdomEngagement_Handler:
             - define kingdom <[value].flag[kingdom]>
 
             - if <[guard].flag[targetInfo.whichAttack].contains[<[kingdom]>]>:
-                - inventory adjust d:<[kingdomEngagementWindow]> slot:<[loop_index]> "lore:<element[Engaging members of this kingdom].color[red].bold>"
+                - inventory adjust d:<[kingdomEngagementWindow]> slot:<[loop_index]> lore:<element[Engaging members of this kingdom].color[red].bold>
 
             - else:
-                - inventory adjust d:<[kingdomEngagementWindow]> slot:<[loop_index]> "lore:<element[Not engaging members of this kingdom].color[white].bold>"
+                - inventory adjust d:<[kingdomEngagementWindow]> slot:<[loop_index]> lore:<element[Not engaging members of this kingdom].color[white].bold>
 
         - inventory open d:<[kingdomEngagementWindow]>
 
