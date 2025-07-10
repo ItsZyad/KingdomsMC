@@ -107,15 +107,9 @@ Kingdom_Command:
                 - determine <list[cancel]>
 
             # TODO:
-            # This should be reworked into a paginated menu showing all the kingdom's active wars
-            # with sub-menus for the war progress controls that are being worked on in
-            # WarManagement.dsc.
-            #
             # For console-side access to this command, the admin can input /k war progress [warID]
             # with another, admin-only command existing to show all the different war IDs and which
             # wars they correspond to.
-            # - else if <[args].get[2].to_lowercase> == progress:
-            #     - determine <[kingdom].proc[GetKingdomWars].parse_tag[<[parse_value].proc[GetWarName]>]>
 
         - determine <list[justify|progress]>
 
