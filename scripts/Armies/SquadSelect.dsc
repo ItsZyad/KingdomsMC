@@ -447,9 +447,7 @@ SpawnSquadNPCs:
             - inject <script.name> path:SpawnSoldiers
 
         - else:
-            # TODO: Make it so that it gives the player the placement/soldier wand and allow them
-            # TODO/ to determine the intial spawn location.
-            - narrate WIP
+            - run GenerateInternalError def.type:GenericError def.message:<element[Could not spawn squad: <[squadName].color[red]>. There is no provided spawn location, and <element[atManager].color[gray]> parameter is set to <&dq>false<&dq>.]> def.silent:false
 
     FindSpacesAroundSM:
     - define areasAroundSM <list[<[SMLocation].left[1]>|<[SMLocation].right[1]>|<[SMLocation].forward[1]>|<[SMLocation].backward[1]>]>
