@@ -278,8 +278,6 @@ Kingdom_Command:
 
                 - flag <player> datahold.duchies.confirmDuchyDeletion:!
 
-            # TODO: (Later) I may need to set a cooldown for both of these subcommands. I can see
-            # TODO/ them being abused quite easily.
             - case setduke:
                 - if !<player.proc[IsPlayerKing]>:
                     - stop
@@ -290,12 +288,17 @@ Kingdom_Command:
                     - narrate format:callout "Please provide the name of a valid player to make duke of this duchy."
                     - stop
 
+                - if <server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.dukeAssignmentCooldown]>:
+                    - narrate format:callout "Your kingdom has adjusted the ownership of this duchy <server.flag_expiration[kingdoms.<[kingdom]>.duchies.<[duchy]>.dukeAssignmentCooldown].from_now.formatted.color[red]> ago. You may not readjust this duchy's ownership until this duration ha elapsed."
+                    - stop
+
                 - run SetDuke def.kingdom:<[kingdom]> def.duchy:<[duchy]> def.player:<[player].as[player]> save:res
 
                 - if <entry[res].created_queue.determination.get[1].if_null[success]> == null:
                     - stop
 
                 - narrate format:callout "Successfully set player: <[player].color[aqua]> as the duke of <[duchy].color[aqua]>."
+                - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.dukeAssignmentCooldown expire:24h
 
             - case removeduke:
                 - if !<player.proc[IsPlayerKing]>:
@@ -307,12 +310,17 @@ Kingdom_Command:
                     - narrate format:callout "The provided duchy already does not have a duke!"
                     - stop
 
+                - if <server.has_flag[kingdoms.<[kingdom]>.duchies.<[duchy]>.dukeAssignmentCooldown]>:
+                    - narrate format:callout "Your kingdom has adjusted the ownership of this duchy <server.flag_expiration[kingdoms.<[kingdom]>.duchies.<[duchy]>.dukeAssignmentCooldown].from_now.formatted.color[red]> ago. You may not readjust this duchy's ownership until this duration ha elapsed."
+                    - stop
+
                 - run RemoveDuke def.kingdom:<[kingdom]> def.duchy:<[duchy]> save:res
 
                 - if <entry[res].created_queue.determination.get[1].if_null[success]> == null:
                     - stop
 
                 - narrate format:callout "Successfully removed player: <[player].color[aqua]> from their role as the duke of <[duchy].color[aqua]>."
+                - flag server kingdoms.<[kingdom]>.duchies.<[duchy]>.dukeAssignmentCooldown expire:24h
 
             - case tax:
                 - if <[args].size> < 4:
