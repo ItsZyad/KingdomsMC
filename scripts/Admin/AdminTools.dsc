@@ -57,7 +57,7 @@ AdminTools_Command:
                 - determine <list[server|world|player|[flaggable object]]>
 
             - else if <context.args.size> <= 2:
-                - if <[object].regex_matches[^<&lt>.*\<&lb>.*\<&rb><&gt>$]>:
+                - if <[object].starts_with[<&lt>]> && <[object].ends_with[<&gt>]> && <context.raw_args.ends_with[ ]>:
                     - define flagList <[object].parsed.list_flags>
                     - define flagList <server.list_flags[]> if:<[object].equals[server]>
                     - determine <[flagList].if_null[<list[]>]>
@@ -89,7 +89,7 @@ AdminTools_Command:
                         - define currentKey * if:<context.args.get[3].ends_with[.]>
 
                         - define keys <[object].parsed.flag[<[adjustedKeyList]>].keys.filter_tag[<[filter_value].advanced_matches[<[currentKey]>].or[<[filter_value].starts_with[<[currentKey]>]>]>].if_null[null]>
-                        - define keys <server.flag[<[adjustedKeyList]>].keys.filter_tag[<[filter_value].advanced_matches[<[currentKey]>].or[<[filter_value].starts_with[<[currentKey]>]>]>]> if:<[object].equals[server]>
+                        - define keys <server.flag[<[adjustedKeyList]>].keys.filter_tag[<[filter_value].advanced_matches[<[currentKey]>].or[<[filter_value].starts_with[<[currentKey]>]>]>].if_null[<list[]>]> if:<[object].equals[server]>
 
                         - if <[keys]> != null:
                             - determine <[keys].parse_tag[<[adjustedKeyList]>.<[parse_value]>]>
@@ -104,8 +104,11 @@ AdminTools_Command:
                         - if <[object]> == server:
                             - define keys <server.flag[<[currentKey]>].keys>
 
+                        - else if <[object]> == world:
+                            - define keys <player.location.world.flag[<[currentKey]>].keys.if_null[<list[]>]>
+
                         - else:
-                            - define keys <element[<[object]>].parsed.flag[<[currentKey]>].keys>
+                            - define keys <element[<&lt><[object]><&gt>].parsed.flag[<[currentKey]>].keys.if_null[<list[]>]>
 
                         - if <[keys].is_truthy> && <[keys].exists>:
                             - determine <[keys].parse_tag[<[keyList].separated_by[.]>.<[parse_value]>]>
@@ -114,7 +117,7 @@ AdminTools_Command:
                             - determine <list[]>
 
                 - else:
-                    - if <[object].regex_matches[^<&lt>.*\<&lb>.*\<&rb><&gt>$]>:
+                    - if <[object].starts_with[<&lt>]> && <[object].ends_with[<&gt>]> && <context.raw_args.ends_with[ ]>:
                         - define flagList <[object].parsed.list_flags>
                         - define flagList <server.list_flags[]> if:<[object].equals[server]>
                         - determine <[flagList].if_null[<list[]>]>
@@ -124,6 +127,12 @@ AdminTools_Command:
 
                     - else if <[object]> == player:
                         - determine <player.list_flags>
+
+                    - else if <[object]> == world:
+                        - determine <player.location.world.list_flags>
+
+                    - else:
+                        - determine <list[server|world|player|[flaggable object]]>
 
         - case dynmap:
             - define args <context.raw_args.to_lowercase.split_args>
