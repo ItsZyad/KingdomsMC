@@ -21,7 +21,8 @@ SoldierManager_Assignment:
         - define kingdom <npc.flag[soldier.kingdom]>
         - define squadName <npc.flag[soldier.squad]>
 
-        - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
+        # - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
+        - flag <player> datahold.squadName:<[squadName]>
 
         - if <player.flag[kingdom]> != <[kingdom]>:
             - determine cancelled
@@ -29,7 +30,7 @@ SoldierManager_Assignment:
         - inventory close
         - wait 3t
         - run GiveSquadTools def.player:<player>
-        - run ActionBarToggler def.player:<player> def.message:<element[Now Commanding: <player.flag[datahold.squadInfo.displayName].color[red].bold>]> def.toggleType:true
+        - run ActionBarToggler def.player:<player> def.message:<element[Now Commanding: <proc[GetSquadDisplayName].context[<[kingdom]>|<[squadName]>].color[red].bold>]> def.toggleType:true
 
 
 SquadRecall_Item:
@@ -142,9 +143,9 @@ SquadOptions_Handler:
         ## RECALL SQUAD
         on player right clicks block with:SquadRecall_Item:
         - define kingdom <player.flag[kingdom]>
-        - define squadName <player.flag[datahold.squadInfo.name]>
+        - define squadName <player.flag[datahold.squadName]>
         - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]>
-        - define stationInfo <server.flag[kingdoms.<[kingdom]>.armies.barracks].parse_value_tag[<[parse_value].get[stationedSquads]>]>
+        - define stationInfo <proc[GetKingdomSquadManagers].parse_value_tag[<[parse_value].get[stationedSquads]>]>
         - define barrackID 0
 
         - foreach <[stationInfo]>:
@@ -153,12 +154,13 @@ SquadOptions_Handler:
                 - foreach stop
 
         - if <[barrackID]> == 0:
-            - narrate format:debug "<red>[Internal Error SQA111] <&gt><&gt> <gold>Cannot associate squad with barrack."
+            - run GenerateInternalError def.message:<element[Cannot associate squad with squad manager. Has admin tampered with code?]> def.type:GenericError def.silent:false
             - determine cancelled
 
         - run ResetSquadTools def.player:<player>
 
-        - define SMLocation <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.location]>
+        # - define SMLocation <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.location]>
+        - define SMLocation <proc[GetSMLocation].context[<[barrackID]>|<[kingdom]>]>
         - inject SpawnSquadNPCs path:FindSpacesAroundSM
 
         - foreach <[npcList]> as:npc:
@@ -176,10 +178,9 @@ SquadOptions_Handler:
         - ratelimit <player> 10t
 
         - define kingdom <player.flag[kingdom]>
-        - define squadInfo <player.flag[datahold.squadInfo]>
-        - define squadName <[squadInfo].get[name]>
-        - define squadLeader <[squadInfo].get[squadLeader]>
-        - define npcList <[squadInfo].get[npcList]>
+        - define squadName <player.flag[datahold.squadName]>
+        - define squadLeader <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>
+        - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
 
         # If the squad already has the attackAll order
         - if <[squadLeader].has_flag[soldier.order]> && <[squadLeader].flag[soldier.order]> == attackAll:
@@ -204,13 +205,9 @@ SquadOptions_Handler:
             - determine cancelled
 
         - define kingdom <player.flag[kingdom]>
-
-        # TODO(High): Replace all of these player.flag[datahold.squadInfo] with actual KAPI calls.
-        # TODO/ You shouldn't need to juggle a flag around just to access basic squad information.
-        - define squadInfo <player.flag[datahold.squadInfo]>
-        - define squadName <[squadInfo].get[name]>
-        - define squadLeader <[squadInfo].get[squadLeader]>
-        - define npcList <[squadInfo].get[npcList]>
+        - define squadName <player.flag[datahold.squadName]>
+        - define squadLeader <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>
+        - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
 
         - if <[squadLeader].has_flag[soldier.order]> && <[squadLeader].flag[soldier.order]> == attackSquad:
             - flag <[squadLeader]> datahold.armies.particles:!
@@ -236,10 +233,9 @@ SquadOptions_Handler:
         - ratelimit <player> 1s
 
         - define kingdom <player.flag[kingdom]>
-        - define squadInfo <player.flag[datahold.squadInfo]>
-        - define squadName <[squadInfo].get[name]>
-        - define squadLeader <[squadInfo].get[squadLeader]>
-        - define npcList <[squadInfo].get[npcList]>
+        - define squadName <player.flag[datahold.squadName]>
+        - define squadLeader <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>
+        - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
 
         - if <[squadLeader].has_flag[soldier.order]> && <[squadLeader].flag[soldier.order]> == attackMonsters:
             - flag <[squadLeader]> datahold.armies.particles:!
@@ -260,9 +256,8 @@ SquadOptions_Handler:
         - ratelimit <player> 1s
 
         - define kingdom <player.flag[kingdom]>
-        - define squadInfo <player.flag[datahold.squadInfo]>
-        - define squadName <[squadInfo].get[name]>
-        - define squadLeader <[squadInfo].get[squadLeader]>
+        - define squadName <player.flag[datahold.squadName]>
+        - define squadLeader <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>
 
         - flag <[squadLeader]> datahold.armies.particles:!
         - flag <[squadLeader]> soldier.order:!
@@ -278,11 +273,10 @@ SquadOptions_Handler:
 
         - define kingdom <player.flag[kingdom]>
         - define location <player.cursor_on_solid[50]>
-        - define squadInfo <player.flag[datahold.squadInfo]>
-        - define squadName <[squadInfo].get[name]>
-        - define npcList <[squadInfo].get[npcList]>
-        - define squadLeader <[squadInfo].get[squadLeader]>
-        - define displayName <[squadInfo].get[displayName]>
+        - define squadName <player.flag[datahold.squadName]>
+        - define squadLeader <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>
+        - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
+        - define displayName <proc[GetSquadDisplayName].context[<[kingdom]>|<[squadName]>]>
 
         # If the squad was occupying to a chunk and then moved to a different chunk.
         - if <[squadLeader].has_flag[datahold.war.occupying]> && <[squadLeader].has_flag[datahold.war.occupying.chunk]> && <[squadLeader].flag[datahold.war.occupying.chunk].contains[<[location]>]>:
@@ -302,10 +296,10 @@ SquadOptions_Handler:
         - determine passively cancelled
 
         - define kingdom <player.flag[kingdom]>
-        - define squadInfo <player.flag[datahold.squadInfo]>
-        - define squadName <[squadInfo].get[name]>
-        - define npcList <[squadInfo].get[npcList]>
-        - define squadLeader <[squadInfo].get[squadLeader]>
+        - define squadName <player.flag[datahold.squadName]>
+        - define squadLeader <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>
+        - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
+
         - define pointTwo <player.flag[datahold.armies.drawingFormation.pointTwo]>
         - define pointOne <player.flag[datahold.armies.drawingFormation.pointOne]>
 
@@ -330,9 +324,9 @@ SquadOptions_Handler:
 
         - determine passively cancelled
 
-        - define squadInfo <player.flag[datahold.squadInfo]>
-        - define squadLeader <[squadInfo].get[squadLeader]>
-        - define kingdom <[squadLeader].flag[soldier.kingdom]>
+        - define kingdom <player.flag[kingdom]>
+        - define squadName <player.flag[datahold.squadName]>
+        - define squadLeader <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>
 
         - if !<[kingdom].proc[GetKingdomWarStatus]>:
             - narrate format:callout "You cannot occupy this chunk or outpost! Your kingdom is not at war."
@@ -359,7 +353,7 @@ SquadOptions_Handler:
         # claimed by another kingdom, then initiate the outpost reclaim process.
         - else if <[kingdom].proc[GetOutposts].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].size> > 0:
             #- Debug Value -#
-            - run ReclaimOutpost def.kingdom:<[kingdom]> def.outpost:<[kingdom].proc[GetOutposts].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].keys.get[1]> def.squadName:<[squadInfo].get[name]> def.delay:<duration[1m]> save:delay
+            - run ReclaimOutpost def.kingdom:<[kingdom]> def.outpost:<[kingdom].proc[GetOutposts].filter_tag[<[filter_value].get[area].contains[<[squadLeader].location>]>].keys.get[1]> def.squadName:<[squadName]> def.delay:<duration[1m]> save:delay
             - define claimDuration <entry[delay].created_queue.determination.get[1]>
 
             - adjust <[squadLeader]> hologram_line_height:0.25
@@ -428,7 +422,7 @@ SquadOptions_Handler:
 
         ## EXITS ORDERS
         on player clicks block with:ExitSquadControls_Item:
-        - flag <player> datahold.squadInfo:!
+        - flag <player> datahold.squadName:!
         - flag <player> datahold.armies.squadTools:!
         - run ResetSquadTools def.player:<player>
         - run ActionBarToggler def.player:<player> def.toggleType:false
