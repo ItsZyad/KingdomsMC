@@ -527,7 +527,7 @@ SquadManager_Handler:
         - if <context.location.has_inventory>:
             - if !<[SMLocation].proc[GetSMArmoryLocations].contains[<context.location>]>:
                 - run AddSMArmoryLocation def.SMLocation:<[SMLocation]> def.newArmory:<context.location>
-            - narrate format:callout "Designated <context.location.simple.split[,].remove[last].comma_separated.color[red].bold> as an armory <context.location.material.name>"
+                - narrate format:callout "Designated <context.location.simple.split[,].remove[last].comma_separated.color[red].bold> as an armory <context.location.material.name>"
 
             - else:
                 - narrate format:callout "This location has already been designated as an armory."
