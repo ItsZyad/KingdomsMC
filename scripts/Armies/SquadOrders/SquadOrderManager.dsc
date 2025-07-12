@@ -554,7 +554,7 @@ SoldierParticleGenerator:
 
 SquadEquipmentChecker:
     type: task
-    definitions: squadName|kingdom
+    definitions: squadName[ElementTag(String)]|kingdom[ElementTag(String)]
     script:
     ## Checks that a given squad has its standard equipment. If not this task will assign as many
     ## soldiers as possible their gear from the barracks' assigned armory.
@@ -585,7 +585,7 @@ SquadEquipmentChecker:
 
 FindClickedSquad:
     type: task
-    definitions: location|kingdom|range
+    definitions: location[LocationTag]|kingdom[ElementTag(String)]|range[?ElementTag(Float)]
     script:
     ## Finds the nearest squad to the location provided within the range provided. If no range
     ## argument is provided, it will default to 10.
@@ -610,7 +610,7 @@ FindClickedSquad:
 DEBUG_ClearSquadEquipment:
     type: task
     enabled: false
-    definitions: squadName|kingdom
+    definitions: squadName[ElementTag(String)]|kingdom[ElementTag(String)]
     script:
     - define npcList <proc[GetAllSquadNPCs].context[<[kingdom]>|<[squadName]>]>
 
@@ -624,7 +624,7 @@ DEBUG_ClearSquadEquipment:
 
 WalkSoldierToSM_Helper:
     type: task
-    definitions: npc|location
+    definitions: npc[NPCTag]|location[LocationTag]
     script:
     - walk <[npc]> <[location]> auto_range
     - waituntil <[npc].is_navigating.not> rate:1s
@@ -634,7 +634,7 @@ WalkSoldierToSM_Helper:
 OLD_SquadAttackAllOrder:
     type: task
     enabled: false
-    definitions: kingdom|squadName
+    definitions: kingdom[ElementTag(String)]|squadName[ElementTag(String)]
     DEBUG_OldApproach:
     - define squadInfo <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
     - define npcList <[squadInfo].get[npcList]>
