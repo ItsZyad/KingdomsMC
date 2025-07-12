@@ -188,6 +188,7 @@ ArmoryWand_Item:
 
 SquadManager_Handler:
     type: world
+    debug: false
     events:
         ## Crafts SM
         on SquadManager_Item recipe formed:
@@ -248,6 +249,10 @@ SquadManager_Handler:
         - if !<[coreClaimsPolygon].proc[ContainsAllLocations].context[<[barracksArea].corners>]> && !<[withinOutpost]> && !<player.proc[IsInOwnDuchy]>:
             - narrate format:callout "Please ensure that the squad manager is at least 20 blocks within your kingdom's core/outpost claims."
             - narrate format:callout "<italic>Note: Barracks cannot be placed inside your kingdom's castle territory."
+
+            - flag <player> datahold.armies.showAOE expire:5s
+            - run ShowSquadManagerAOE def.area:<[outpostCuboid]> def.player:<player>
+
             - determine cancelled
 
         - flag server kingdoms.<[kingdom]>.armies.barracks.<[SMID]>:<[squadManagerData]>
