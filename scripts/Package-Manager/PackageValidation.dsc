@@ -82,9 +82,6 @@ PackageDependencyChecker_KPM:
     ##
     ## >>> [Void]
 
-    # TODO: (future configurable) Add a config option which lets you prevent the loading of any
-    # TODO/ addon with unsatisfied dependencies.
-
     - if !<[descriptor].keys.get[1]> == package:
         - run GenerateInternalError def.category:GenericError def.message:<element[Package.yml file at path: <[path].color[red]> is invalid. Cannot find <&sq>package<&sq> key.]> def.silent:false
         - stop
