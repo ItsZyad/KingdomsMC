@@ -220,7 +220,7 @@ AdminTools_Command:
                     - narrate format:admincallout "Territory generation complete. Use <element[/kadmin dynmap refresh].color[gray]> to see any changes reflected onto the dynmap."
                     - stop
 
-                - else if !<[kingdom].proc[ValidateKingdomCode]>:
+                - else if !<[kingdom].proc[IsKingdomCodeValid]>:
                     - narrate format:admincallout "You must specify a valid kingdom for which to generate dynmap data."
                     - stop
 

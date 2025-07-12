@@ -79,7 +79,7 @@ GetKingdomDuchies:
     ##
     ## >>> [ListTag<ElementTag<String>>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom duchies. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine <list[]>
 
@@ -104,7 +104,7 @@ GetDuke:
     ##
     ## >>> ?[PlayerTag]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -134,7 +134,7 @@ SetDuke:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -171,7 +171,7 @@ RemoveDuke:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot unset duke. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -198,7 +198,7 @@ GetDuchyTerritory:
     ##
     ## >>> [ListTag?<ChunkTag>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine <list[]>
 
@@ -225,7 +225,7 @@ AddDuchy:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create duchy. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -254,7 +254,7 @@ RemoveDuchy:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove duchy. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -284,7 +284,7 @@ AddDuchyClaim:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -334,7 +334,7 @@ RemoveDuchyClaim:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -366,7 +366,7 @@ GetDuchyBalance:
     ##
     ## >>> [ElementTag<Float>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duchy balance. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine 0
 
@@ -396,7 +396,7 @@ SetDuchyBalance:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duchy balance. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -428,7 +428,7 @@ GetDuchyTaxRate:
     ##
     ## >>> [ElementTag<Float>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove duchy territory. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine 0
 
@@ -458,7 +458,7 @@ SetDuchyTaxRate:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set duchy tax rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -495,7 +495,7 @@ GetDuchyDisplayName:
     ##
     ## >>> ?[ElementTag<String>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get duchy display name. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 

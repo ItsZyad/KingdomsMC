@@ -24,7 +24,7 @@ GetKingdomSquadManagers:
     ##
     ## >>> [MapTag]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom squad managers. Invalid kingdom code provided: <[kingdom].color[red]>]>
         - determine null
 
@@ -47,7 +47,7 @@ GetKingdomSquads:
     ##
     ## >>> [ListTag<MapTag>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom squads. Invalid kingdom code provided: <[kingdom].color[red]>]>
         - determine null
 
@@ -70,7 +70,7 @@ GetMaxAllowedSMs:
     ##
     ## >>> [ElementTag<Integer>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError message:<element[Cannot get SM Location. Invalid kingdom code provided: <[kingdom].color[red]>]>
         - determine null
 

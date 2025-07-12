@@ -18,7 +18,7 @@ Scripts under this category get and change data relating to one or all kingdoms.
 
 ---
 
-### `ValidateKingdomCode(Procedure)`
+### `IsKingdomCodeValid(Procedure)`
 #### Description: Checks id the kingdom code provided is a valid one.
 ```
     Definitions:

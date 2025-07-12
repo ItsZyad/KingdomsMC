@@ -26,11 +26,11 @@ IsAtWarWithKingdom:
     ##
     ## >>> [ElementTag<Boolean>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check if kingdom is at war. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - if !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check if kingdom is at war. Invalid kingdom code provided: <[targetKingdom]>]>
         - determine null
 
@@ -58,7 +58,7 @@ IsJustifyingOnKingdom:
     ##
     ## >>> [ElementTag<Boolean>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom justification status. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -198,7 +198,7 @@ GetJustificationCompletion:
     ##
     ## >>> [TimeTag]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom justification completion. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -225,7 +225,7 @@ GetKingdomWarStatus:
     ##
     ## >>> [ElementTag<Boolean>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom war status. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -267,7 +267,7 @@ GetKingdomWars:
     ##
     ## >>> [ListTag<ElementTag<String>>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom war list. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -449,7 +449,7 @@ GetAllKingdomLostChunks:
     ##
     ## >>> [ListTag<ChunkTag>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom<&sq>s lost chunks. Kingdom code provided: <[kingdom].color[red]> is invalid.]>
         - determine <list[]>
 
@@ -501,7 +501,7 @@ GetKingdomLostChunksByEnemy:
     ##
     ## >>> [ListTag<ChunkTag>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom<&sq>s lost chunks. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine <list[]>
 
@@ -528,7 +528,7 @@ GetAllKingdomLostOutposts:
     ##
     ## >>> [ListTag<ElementTag<String>>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom<&sq>s lost chunks. Kingdom code provided: <[kingdom].color[red]> is invalid.]>
         - determine <list[]>
 
@@ -795,7 +795,7 @@ GetKingdomHighestJustificationLevel:
     ##
     ## >>> [ElementTag<Integer>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom justification status. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -837,7 +837,7 @@ StartJustification:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot intitate war justification. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -890,7 +890,7 @@ CancelJustification:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot intitate war justification. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -923,7 +923,7 @@ DeclareWar:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot intitate war declaration. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -1001,7 +1001,7 @@ OccupyChunk:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot occupy chunk. provided kingdom code: <[kingdom]> is invalid.]>
         - determine null
 
@@ -1068,7 +1068,7 @@ CancelChunkOccupation:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot cancel chunk occupation. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -1112,7 +1112,7 @@ ReclaimChunk:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot reclaim chunk. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -1161,7 +1161,7 @@ CancelChunkReclamation:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot cancel chunk occupation. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -1202,7 +1202,7 @@ OccupyOutpost:
     ##
     ## >>> ?[DurationTag]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot occupy outpost. Invalid kingdom code provided: <[kingdom].color[red]>.]>
         - determine null
 
@@ -1303,7 +1303,7 @@ CancelOutpostOccupation:
 
     - define targetKingdom <proc[GetAllOutpostsByKingdom].filter_tag[<[filter_value].contains[<[outpost]>]>].keys.get[1]>
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot cancel outpost occupation. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -1344,7 +1344,7 @@ ReclaimOutpost:
     ##
     ## >>> ?[DurationTag]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot reclaim outpost. Invalid kingdom code provided: <[kingdom].color[red]>.]>
         - determine null
 
@@ -1453,7 +1453,7 @@ CancelOutpostReclamation:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot reclaim outpost. The provided warID: <[warID].color[red]> does not belong to any active war.]>
         - determine null
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot cancel outpost reclamation. Either one of the kingdom codes provided: <[kingdom]> & <[targetKingdom]> are invalid.]>
         - determine null
 
@@ -1494,7 +1494,7 @@ AddWarDead:
     ##
     ## >>> ?[ElementTag(Integer)]
 
-    - if !<proc[ValidateKingdomCode].context[<[affectedKingdom]>]> || !<proc[ValidateKingdomCode].context[<[inflictingKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[affectedKingdom]>]> || !<proc[IsKingdomCodeValid].context[<[inflictingKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add war dead. Either one of the kingdom codes provided: <[affectedKingdom].color[red]> & <[inflictingKingdom].color[red]> are invalid.]>
         - determine null
 
@@ -1536,7 +1536,7 @@ GetWarDead:
     ##
     ## >>> ?[MapTag(ElementTag(Integer))]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get war dead. Invalid kingdom code provided: <[kingdom].color[red]>.]>
         - determine null
 

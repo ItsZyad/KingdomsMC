@@ -29,7 +29,7 @@ DoesOutpostExist:
     ##
     ## >>> ?[ElementTag<Boolean>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check if outpost exists. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -110,7 +110,7 @@ GetOutposts:
     ##
     ## >>> [MapTag<CuboidTag;ElementTag;>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -143,7 +143,7 @@ GetOutpostSize:
     ##
     ## >>> [ElementTag<Integer>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost size. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -175,7 +175,7 @@ GetOutpostNote:
     ##
     ## >>> ?[CuboidTag]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost note. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -206,7 +206,7 @@ GetOutpostArea:
     ##
     ## >>> ?[CuboidTag]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost area. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -252,7 +252,7 @@ SetOutpostArea:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set outpost area. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -298,7 +298,7 @@ GetOutpostUpkeep:
     ##
     ## >>> ?[ElementTag<Float>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost upkeep. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -330,7 +330,7 @@ SetOutpostUpkeep:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set outpost upkeep. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -371,7 +371,7 @@ GetOutpostDisplayName:
     ##
     ## >>> [ElementTag<String>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost display name. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -398,7 +398,7 @@ GetKingdomOutpostMaxSize:
     ##
     ## >>> [ElementTag<Integer>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom maximum outpost size. Invalid kingdom code provided: <[kingdom]>]> def.silent:true
         - determine <proc[GetConfigNode].context[Territory.maximum-outpost-size]>
 
@@ -441,7 +441,7 @@ GetOutpostSpecialization:
     ##
     ## >>> [ElementTag<String>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost specialization. Invalid kingdom code provided: <[kingdom].color[red]>]>
         - determine null
 
@@ -473,7 +473,7 @@ SetOutpostSpecialization:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set outpost specialization. Invalid kingdom code provided: <[kingdom].color[red]>]>
         - determine null
 
@@ -506,7 +506,7 @@ GetOutpostSpecializationModifier:
     ##
     ## >>> [ElementTag<String>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get outpost specialization modifier. Invalid kingdom code provided: <[kingdom].color[red]>]>
         - determine null
 
@@ -543,7 +543,7 @@ SetOutpostSpecializationModifier:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set outpost specialization modifier. Invalid kingdom code provided: <[kingdom].color[red]>]>
         - determine null
 
@@ -582,7 +582,7 @@ PlayerInWhichOutpost:
 
     - define kingdom <[player].flag[kingdom]>
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check kingdom claims. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -617,7 +617,7 @@ CreateOutpost:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create outpost. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -673,7 +673,7 @@ RemoveOutpost:
     ##
     ## >>> ?[MapTag]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot delete outpost upkeep. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -707,7 +707,7 @@ GetTotalOutpostUpkeep:
     ##
     ## >>> [ElementTag<Float>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get total outpost upkeep. Invalid kingdom code provided: <[kingdom]>]> def.silent:true
         - determine 0
 
@@ -733,7 +733,7 @@ CalculateTotalOutpostUpkeep:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set total outpost upkeep. Invalid kingdom code provided: <[kingdom]>]> def.silent:true
         - determine null
 

@@ -59,7 +59,7 @@ GetKingdomPopulation:
     ##
     ## >>> [ElementTag<Integer>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot get kingdom population. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -83,7 +83,7 @@ SetKingdomPopulation:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom population. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
@@ -111,7 +111,7 @@ AddKingdomPopulation:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom population. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
@@ -143,7 +143,7 @@ GetKingdomPopGrowth:
     ##
     ## >>> [ElementTag<Float>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot get kingdom population growth. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -167,7 +167,7 @@ SetKingdomPopulationGrowth:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom population growth rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
@@ -197,7 +197,7 @@ AddKingdomPopulationGrowth:
     ##
     ## >>> ?[ElementTag<Float>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom population growth rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
@@ -227,7 +227,7 @@ GetKingdomFoodConsumption:
     ##
     ## >>> ?[ElementTag<Integer>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot get kingdom food consumption rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -256,7 +256,7 @@ SetKingdomFoodConsumption:
     ##
     ## >>> ?[Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom food consumption rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -287,7 +287,7 @@ GetKingdomFoodReserves:
     ##
     ## >>> [ElementTag<Integer>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot get kingdom population growth. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine null
 
@@ -312,7 +312,7 @@ SetKingdomFoodReserves:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom food reserves. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
@@ -342,7 +342,7 @@ AddKingdomFoodReserves:
     ##
     ## >>> ?[ElementTag<Integer>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot set kingdom food reserves. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - stop
 
@@ -392,7 +392,7 @@ GetKingdomTradeEfficiency:
     ##
     ## >>> [ElementTag<Float>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[[PACK/SC1] Cannot get river obstrustion rate. Invalid kingdom code provided: <[kingdom]>]> def.silent:false
         - determine 0
 

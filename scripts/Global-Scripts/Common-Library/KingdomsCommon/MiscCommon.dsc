@@ -25,7 +25,7 @@ OpenWarpsToKingdom:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot modify kingdom warps. Invalid kingdom code(s) provided: <[kingdom]>/<[targetKingdom]>]>
         - determine cancelled
 
@@ -49,7 +49,7 @@ CloseWarpsToKingdom:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]> || !<proc[ValidateKingdomCode].context[<[targetKingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]> || !<proc[IsKingdomCodeValid].context[<[targetKingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot modify kingdom warps. Invalid kingdom code(s) provided: <[kingdom]>/<[targetKingdom]>]>
         - determine cancelled
 
@@ -77,7 +77,7 @@ AddWarp:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot modify kingdom warps. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
@@ -108,7 +108,7 @@ RemoveWarp:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot modify kingdom warps. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 

@@ -92,7 +92,7 @@ CalculateOutpostSpecializationCost:
     ##
     ## >>> ?[ElementTag(Float)]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - determine null
 
     - if !<proc[DoesOutpostExist].context[<[kingdom]>|<[outpost]>]>:

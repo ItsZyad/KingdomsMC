@@ -118,7 +118,7 @@ Letter_Command:
     - define isUnsigned <[args].get[2].if_null[true]>
     - define title <[args].get[3].if_null[null]>
 
-    - if !<[kingdom].proc[ValidateKingdomCode]>:
+    - if !<[kingdom].proc[IsKingdomCodeValid]>:
         - narrate format:callout <element[The provided kingdom: <[kingdom].color[red]> is not a valid kingdom!]>
         - stop
 

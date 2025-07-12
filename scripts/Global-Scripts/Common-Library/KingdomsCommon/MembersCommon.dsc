@@ -23,7 +23,7 @@ GetMembers:
     ##
     ## >>> [ListTag<PlayerTag>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom members. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -46,7 +46,7 @@ AddMember:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot add kingdom member. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
@@ -75,7 +75,7 @@ RemoveMember:
     ##
     ## >>> [Void]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot remove kingdom member. Invalid kingdom code provided: <[kingdom]>]>
         - determine cancelled
 
@@ -121,7 +121,7 @@ GetKing:
     ##
     ## >>> ?[PlayerTag]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get king. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -144,7 +144,7 @@ IsPlayerInKingdom:
     ##
     ## >>> [ElementTag<Boolean>]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check player-kingdom relationship. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
@@ -174,7 +174,7 @@ IsPlayerKing:
 
     - define kingdom <player.flag[kingdom]>
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot check if a player is king. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 

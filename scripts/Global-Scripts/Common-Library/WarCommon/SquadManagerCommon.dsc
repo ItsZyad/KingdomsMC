@@ -49,7 +49,7 @@ GetSMLocation:
     ##
     ## >>> ?[LocationTag]
 
-    - if !<proc[ValidateKingdomCode].context[<[kingdom]>]>:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get SM Location. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
