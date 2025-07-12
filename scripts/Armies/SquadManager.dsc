@@ -307,8 +307,6 @@ SquadManager_Handler:
         on player clicks SquadListInfo_Item in SquadManager_Interface:
         - run SquadSelectionGUI def.player:<player>
 
-        # TODO(Low): Do something about code duplication
-
         ## Breaks Bed in SM Area
         on player breaks *_bed:
         - define SMLocation <proc[BedSMLocation].context[<player>|<context.location>]>
