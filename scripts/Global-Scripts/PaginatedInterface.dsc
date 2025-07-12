@@ -136,7 +136,6 @@ PaginatedInterface_Handler:
     - define footer <player.flag[dataHold.paginated.footer]>
     - define title <player.flag[dataHold.paginated.title]>
 
-    #Todo: add custom events that fire when player changes page
     events:
         on player clicks Page_Back in PaginatedInterface_Window priority:0:
         - inject <script.name> path:InitializeVariables
@@ -146,6 +145,8 @@ PaginatedInterface_Handler:
 
         - else:
             - run PaginatedInterface def.itemList:<[itemList]> def.page:<[maxPages]> def.player:<player> def.title:<[title]> def.footer:<[footer]>
+
+        - customevent PaginatedInvNextPge context:<map[new_page=<[pageNum].sub[1]>;item_list=<[itemList]>;footer=<[footer]>]>
 
         - determine cancelled
 
@@ -157,6 +158,8 @@ PaginatedInterface_Handler:
 
         - else:
             - run PaginatedInterface def.itemList:<[itemList]> def.page:1 def.player:<player> def.title:<[title]> def.footer:<[footer]>
+
+        - customevent PaginatedInvNextPge context:<map[new_page=<[pageNum].add[1]>;item_list=<[itemList]>;footer=<[footer]>]>
 
         - determine cancelled
 
