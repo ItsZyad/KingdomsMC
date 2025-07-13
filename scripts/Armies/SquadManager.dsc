@@ -823,10 +823,24 @@ CalculateSMCost:
     ##
     ## >>> [ElementTag<Float>]
 
-    # TODO: Temp calculation-- make sure you come back to this later and factor in prestige!
-    - define maxAllowedSMs <server.flag[kingdoms.<[kingdom]>.armies.maximumAllowedSMs].if_null[4]>
+    - define maxAllowedSMs <proc[GetMaxAllowedSMs].context[<[kingdom]>].if_null[5]>
     - define SMCount <proc[GetKingdomSquadManagers].context[<[kingdom]>].size>
-    - determine <element[2000].mul[<[maxAllowedSMs].mul[<[SMCount].sqrt>]>]>
+
+    # l = 500 * log[1.2](m + 1)
+    # where: m : maxAllowedSMs
+    - define costLimit <element[<[maxAllowedSMs].add[1].log[1.2]>].mul[500]>
+
+    - define divisor <element[<[SMCount].sqrt.add[1]>].mul[50000]>
+    - define fraction <[costLimit].div[<[divisor]>]>
+    - define prestige <[kingdom].proc[GetPrestige]>
+    - define ePower <util.e.power[<element[0.024].mul[<[prestige]>]>]>
+
+    # y = l - (l / 50000(1 + sqrt(c))) * s * e^0.024p
+    # where: m : maxAllowedSMs
+    #        c : SMCount
+    #        p : prestige
+    #        l : costLimit
+    - determine <[costLimit].sub[<[fraction].mul[4100].mul[<[ePower]>]>]>
 
 
 BedSMLocation:
