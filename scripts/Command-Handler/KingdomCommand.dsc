@@ -62,8 +62,19 @@ Kingdom_Command:
         2: help
 
     tab complete:
-    - define kingdom <player.flag[kingdom]>
-    - define args <context.raw_args.split_args.if_null[<list[null]>]>
+    - define args <context.raw_args.split_args>
+
+    - if <player.exists>:
+        - define kingdom <player.flag[kingdom]>
+
+    - else:
+        - define kingdom <[args].filter_tag[<[filter_value].starts_with[kingdom:]>].get[1].split[:].get[2].if_null[null]>
+        - define args <[args].exclude[kingdom:<[kingdom]>]>
+
+        - run flagvisualizer def.flag:<[args]>
+
+    - if <[args].is_empty>:
+        - determine <script.data_key[tab completions.1].as[list]>
 
     - if <[args].size> >= 1 && <[args].get[1]> == warp:
         - if <[args].get[2].is_in[allow|deny].if_null[false]>:
@@ -114,10 +125,16 @@ Kingdom_Command:
         - determine <list[justify|progress]>
 
     script:
-    - define kingdom <player.flag[kingdom]>
     - define args <context.raw_args.split_args>
 
-    - if <[args].get[2]> == help:
+    - if <context.source_type> != PLAYER:
+        - define kingdom <[args].filter_tag[<[filter_value].starts_with[kingdom:]>].get[1].split[:].get[2]>
+        - define args <[args].exclude[kingdom:<[kingdom]>]>
+
+    - else:
+        - define kingdom <player.flag[kingdom]>
+
+    - if <[args].get[2].if_null[null]> == help:
         - if <script[Help_Strings].data_key[CommandHelpStrings].list_keys[].contains[<context.args.get[1]>]>:
             - narrate format:callout <script[Help_Strings].data_key[CommandHelpStrings.<context.args.get[1]>].parsed>
 
