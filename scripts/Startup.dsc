@@ -107,6 +107,16 @@ Startup_Handler:
     type: world
     events:
         on server start priority:1:
+        - if <proc[GetKingdomList].contains[null]> || <proc[GetKingdomList].context[false].contains[null]>:
+            - debug LOG <element[]>
+            - debug LOG <element[]>
+            - run GenerateInternalError def.type:GenericError def.message:<element[HOLD IT! You are not allowed to use the word <&dq>null<&dq> to name any kingdom! The server will not start until you change this.]>
+            - debug LOG <element[]>
+            - debug LOG <element[]>
+
+            - adjust server shutdown
+            - stop
+
         - yaml id:dConfig load:config.yml
 
         - if !(<yaml[dConfig].read[Commands.File.Allow Write]> && <yaml[dConfig].read[Commands.File.Allow Read]>):
