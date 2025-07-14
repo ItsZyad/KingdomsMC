@@ -615,7 +615,10 @@ Kingdom_Command:
             - case progress:
                 - if <[args].get[3].exists>:
                     - define warID <[args].get[3]>
-                    - narrate format:debug WIP
+
+                    - if <context.source_type> != PLAYER:
+                        - narrate <proc[GenerateWarOverviewInfoLore].context[<[kingdom]>|<[warID]>|true].values.separated_by[<n>]>
+                        - stop
 
                 - define allWars <[kingdom].proc[GetKingdomWars]>
                 - define warList <list[]>
