@@ -440,29 +440,35 @@ ConvertToSkinnyLetters:
 
 debug:
     type: format
+    debug: false
     format: <gray>[Kingdoms Debug] <&gt><&gt> <[text]>
 
 
 admincallout:
     type: format
+    debug: false
     format: <light_purple>[Kingdoms Admin] <&gt><&gt><white> <[text]>
 
 
 callout:
     type: format
+    debug: false
     format: <white>[Kingdoms] <&gt><&gt> <&6><[text]>
 
 
 warning:
     type: format
+    debug: false
     format: <red>[Kingdoms] <&gt><&gt><white> <[text]>
 
 
 notice:
     type: format
+    debug: false
     format: <yellow>[Kingdoms] <&gt><&gt><white> <[text]>
 
 
 npctalk:
     type: format
+    debug: false
     format: <light_purple><bold>[NPC] <&r><red>-<&gt> <light_purple><bold>[YOU]: <white><[text]>
