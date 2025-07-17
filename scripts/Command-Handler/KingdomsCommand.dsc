@@ -83,6 +83,20 @@ Kingdoms_Command:
     usage: /kingdoms
     name: kingdoms
     description: Umbrella command for kingdoms
+    data:
+        Credits:
+            Lead-Developer: <element[Zyad Osman].color[aqua]> <element[(ZyadTheBoss)].color[blue]>
+            Builders:
+            - <element[Claude Capellini].color[aqua]> <element[(Spaggyboidotcom)].color[blue]>
+            - <element[Alex Raymont].color[aqua]> <element[(lyx3)].color[blue]>
+            - <element[Max Chapman].color[aqua]> <element[(Mxchapz)].color[blue]>
+            - <element[Ben Tcazuck].color[aqua]> <element[(EchosBattalion)].color[blue]>
+            - <element[CJ Howard].color[aqua]> <element[(Shadow31911)].color[blue]>
+            Additional-Code-Courtesy-Of:
+            - <element[@icecapade / Icecapade#8825].color[gold]><element[ For: ]><element[SimpleSit].click_url[https://github.com/Hydroxycobalamin/Denizen-Script-Collection/blob/main/external/SitScript/SitScript.dsc].underline>
+            - <element[@0tickpulse / (0TickPulse#0296)].color[gold]><element[ For: ]><element[Command Manager].click_url[https://github.com/0tickpulse/TickMC/blob/master/plugins/Denizen/scripts/tickutil/tickutil_commands.dsc].underline>
+            - <element[@mrm / (MrM#9999)].color[gold]><element[ For: ]><element[Dynmap Polygon Tracer].click_url[https://paste.denizenscript.com/View/111717].underline>
+
     aliases:
         - ks
 
@@ -127,44 +141,19 @@ Kingdoms_Command:
         - narrate format:callout "Rules and Guidelines Doc: https://docs.google.com/document/d/1U3_uZp75n77k9t58M0aKWwaUE7wIHL4PyioKMFv3vaQ/edit?usp=sharing"
 
     - else if <context.args.get[1]> == credits:
-        - narrate "<&b>Lead Developer: <aqua>Zyad Osman <&9>(ZyadTheBoss)"
-        - wait 1s
+        - foreach <script.data_key[data.Credits]>:
+            - narrate <&sp>
+            - narrate <light_purple><[key].replace[-].with[ ]><&co>
 
-        - narrate <&sp>
-        - narrate "<&b>Builders: <aqua>Ben Tcazuck <&9>(EchosBattalion),"
-        - wait 1s
+            - foreach <[value]> as:creditLine:
+                - define parsedCreditLine <[creditLine].parsed>
 
-        - narrate "            <aqua>Claude <&9>(Spaggyboidotcom),"
-        - wait 1s
+                - if <[creditLine].contains_text[.click_url<&lb>]> && <context.source_type> != PLAYER:
+                    - define url <[creditLine].split[.click_url<&lb>].get[2].split[<&rb>].get[1]>
+                    - define parsedCreditLine <[parsedCreditLine]><element[ (<[url]>)]>
 
-        - narrate "            <aqua>Cydnee Howard <&9>(Shadow31911)"
-        - wait 1s
-
-        - narrate "            <aqua>Alex Raymont <&9>(lyx3)"
-        - wait 1s
-
-        - narrate "            <aqua>Max Chapman <&9>(Mxchapz)"
-        - wait 1s
-
-        - narrate <&sp>
-        - narrate "<&b>Writing Contributions: <aqua>Claude <&9>(Spaggyboidotcom),"
-        - wait 1s
-
-        - narrate "                           <aqua>Philip Harker <&9>(Philidips),"
-        - wait 1s
-
-        - narrate <&sp>
-        - narrate "<&b>Additional Code<n>Courtesy Of: <aqua>@icecapade <&9>(Icecapade#8825),"
-        - narrate "<gray>For: <blue><element[SimpleSit].click_url[https://github.com/Hydroxycobalamin/Denizen-Script-Collection/blob/main/external/SitScript/SitScript.dsc].underline>"
-        - wait 1s
-
-        - narrate "             <aqua>@0tickpulse <&9>(0TickPulse#0296),"
-        - narrate "<gray>For: <blue><element[Command Manager].click_url[https://github.com/0tickpulse/TickMC/blob/master/plugins/Denizen/scripts/tickutil/tickutil_commands.dsc].underline>"
-        - wait 1s
-
-        - narrate "             <aqua>@mrm <&9>(MrM#9999),"
-        - narrate "<gray>For: <blue><element[Dynmap Polygon Tracer].click_url[https://paste.denizenscript.com/View/111717].underline>"
-        - wait 1s
+                - narrate <element[- <[parsedCreditLine]>]>
+                - wait 10t
 
         - narrate <&sp>
         - narrate "<&b>Special Thanks: <&9>Denizen Team/Alex Goodwin"
