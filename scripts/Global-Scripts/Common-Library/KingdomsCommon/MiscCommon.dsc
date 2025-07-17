@@ -118,6 +118,7 @@ RemoveWarp:
 
 GetConfigNode:
     type: procedure
+    debug: false
     definitions: node[ElementTag(String)]
     description:
     - Returns the value of the provided config node. The accepted format is [Category].[Setting] (for example: General.version).
