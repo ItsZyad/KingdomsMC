@@ -382,7 +382,13 @@ ReloadVerbosity_Handler:
     debug: false
     events:
         on ex command:
-        - if <context.source_type> == PLAYER && <context.args.get[1]> == reload && <context.args.size> == 1:
+        - if <context.args.get[1]> != reload:
+            - stop
+
+        - if <context.args.size> != 1:
+            - stop
+
+        - if <context.source_type> == PLAYER:
             - determine passively cancelled
             - narrate "<yellow>[Kingdoms Backend] <&gt><&gt> <white>Reloading Scripts..."
             - define timeBeforeReload <util.current_time_millis>
