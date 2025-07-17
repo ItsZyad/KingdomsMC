@@ -71,8 +71,6 @@ Kingdom_Command:
         - define kingdom <[args].filter_tag[<[filter_value].starts_with[kingdom:]>].get[1].split[:].get[2].if_null[null]>
         - define args <[args].exclude[kingdom:<[kingdom]>]>
 
-        - run flagvisualizer def.flag:<[args]>
-
     - if <[args].is_empty>:
         - determine <script.data_key[tab completions.1].as[list]>
 
