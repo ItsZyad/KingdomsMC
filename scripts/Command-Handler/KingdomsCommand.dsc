@@ -79,6 +79,7 @@ Kingdom_Ideas:
 
 Kingdoms_Command:
     type: command
+    debug: false
     usage: /kingdoms
     name: kingdoms
     description: Umbrella command for kingdoms
@@ -180,7 +181,22 @@ Kingdoms_Command:
         - narrate format:callout <underline><[mapLink]>
 
     - else if <context.args.get[1]> == ping:
-        - define ping <player.ping>
+        - if <context.source_type> != PLAYER && <context.args.size> < 2:
+            - narrate format:callout "You must specify the name of a player."
+            - stop
+
+        - define target <context.args.get[2].if_null[<player>].as[player]>
+
+        - if !<[target].is_online>:
+            - narrate format:callout "Cannot get offline players' ping. Please enter the name of an online player."
+            - stop
+
+        - if <context.source_type> == PLAYER && <[target]> != <player>:
+            - if !<player.has_permission[kingdoms.ping.otherplayers]>:
+                - narrate format:callout "You do not have permission to view the ping of other players."
+                - stop
+
+        - define ping <[target].ping>
         - define color blue
 
         - if <[ping].is[OR_MORE].than[900]>:
@@ -192,7 +208,7 @@ Kingdoms_Command:
         - else if <[ping].is[OR_MORE].than[50]>:
             - define color green
 
-        - narrate <element[Ping: ].color[gold].bold><element[<[ping]>ms].color[<[color]>]>
+        - narrate <element[<[target].name.color[red]><&sq>s ping: ].color[gold].bold><element[<[ping]>ms].color[<[color]>]>
 
     - else if <context.args.get[1]> == travel:
         - if <context.args.size.is[OR_MORE].than[2]>:
