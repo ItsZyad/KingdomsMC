@@ -133,7 +133,8 @@ Kingdoms_Command:
 
     - else if <context.args.get[1]> == about:
         - narrate format:callout "Kingdoms is an expansive Minecraft project which aims to blend the worlds of strategy and roleplay gaming into a medival/fantasy world rich with story and possibilities. The game, upon completion, should allow you to do just about anything you want from commanding an army, conducting diplomacy with other kingdoms, improving the lives of your subjects and much more. Kingdoms aims to be one of the most ambitious projects in Minecraft but is currently still in early development."
-        - narrate format:callout "Made with ❤ using Denizen©"
+        - narrate format:callout "Made with ❤ using Denizen©" if:<context.source_type.equals[SERVER].not>
+        - narrate format:callout "Made with <&lt>3 using Denizen©" if:<context.source_type.equals[SERVER]>
 
     # Note: future configurable
     #       or maybe just nix this completely when it goes into prod.
@@ -162,8 +163,12 @@ Kingdoms_Command:
     - else if <context.args.get[1]> == map:
         - define mapLink <proc[GetConfigNode].context[External.Dynmap.map-link]>
 
+        - if !<server.plugins.contains[<plugin[dynmap]>]>:
+            - narrate format:callout "Dynmap is not installed on this server."
+            - stop
+
         - if <[mapLink]> == null:
-            - narrate <element[There is no live map for this server.].color[blue]>
+            - narrate format:callout "There is no live map for this server."
             - stop
 
         - narrate "<blue><bold>Kingdoms Live Map:"
@@ -200,6 +205,10 @@ Kingdoms_Command:
         - narrate <element[<[target].name.color[red]><&sq>s ping: ].color[gold].bold><element[<[ping]>ms].color[<[color]>]>
 
     - else if <context.args.get[1]> == travel:
+        - if <context.source_type> != PLAYER:
+            - narrate format:callout "You must be logged-in as a player to use this command!"
+            - stop
+
         - if <context.args.size.is[OR_MORE].than[2]>:
             - inject FastTravel
 
@@ -207,4 +216,8 @@ Kingdoms_Command:
             - narrate format:callout "You must specify a location to fast travel to!"
 
     - else if <context.args.get[1]> == chunkmap:
+        - if <context.source_type> != PLAYER:
+            - narrate format:callout "You must be logged-in as a player to use this command!"
+            - stop
+
         - inject ChunkMap
