@@ -11,6 +11,7 @@
 
 Addon_Command:
     type: command
+    debug: false
     name: addon
     usage: /addon [load|unload|list|info|help] (AddonName) [~f]
     description: Blanket command for managing Kingdoms add-ons.
