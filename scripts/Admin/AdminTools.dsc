@@ -17,7 +17,7 @@ AdminTools_Command:
     description: Umbrella command for all things kingdoms admin.
     permission: kingdoms.admin
     tab completions:
-        1: id|influence|loans|purgeflag|seeflag|buildplayerlists|dynmap
+        1: buildmemberlists|dynmap|id|restartclock|seeflag
 
     tab complete:
     - define mostFlags <list[]>
@@ -170,18 +170,40 @@ AdminTools_Command:
                 - flag player AdminTools.id
                 - narrate format:admincallout "Entered ID Checker"
 
-        - case influence:
-            - inventory open d:AdminOverallInfluence
+        - case restartclock:
+            - yaml load:../../spigot.yml id:spigot
+            - define hasRestartScript false
+            - define hasRestartScript true if:<yaml[spigot].read[settings.restart-script].exists.or[<yaml[spigot].read[settings.restart-script].length.equals[0].not>]>
 
-        - case loans:
-            - inventory open d:LoanAdmin_Window
+            - yaml unload id:spigot
 
-        - case buildplayerlists:
+            - if !<[hasRestartScript]>:
+                - narrate format:admincallout "Warning! Your server is not configured with a dedicated restart script. Please navigate to your spigot.yml and change <element[settings.restart-script].color[gray]> to a valid start script."
+
+                - if <proc[GetConfigNode].context[Debug.allow-restart-countdown-without-script].if_null[false]>:
+                    - narrate format:admincallout "Nevermind, non-strict restart countdown is set to true. Bypassing check..."
+
+                - else:
+                    - narrate format:admincallout "Alternatively, you can set <element[Debug.allow-restart-countdown-without-script].color[gray]> to true in the Kingdoms config.yml to allow use of this subcommand without a restart script. However, you will have to start your server manually after the shutdown sequence is complete."
+                    - stop
+
+            - if <[args].get[2].exists> && <[args].get[2].to_lowercase> == cancel:
+                - flag server restartTimer:!
+                - stop
+
+            - define duration <[args].get[2].if_null[1m].as[duration]>
+            - define restartTime <util.time_now.add[<[duration]>]>
+            - flag server restartTimer
+
+            - narrate format:admincallout "Set a restart countdown for: <[duration].formatted.color[red]>."
+            - run RestartClock def.restartTime:<[restartTime]>
+
+        - case buildmemberlists:
             - foreach <server.players>:
                 - if <[value].has_flag[kingdom]>:
                     - define kingdom <[value].flag[kingdom]>
 
-                    - flag server <[kingdom]>.members:->:<[value]>
+                    - run AddMember def.kingdom:<[kingdom]> def.player:<[value]>
                     - narrate format:admincallout "Added player: <[value].name> to kingdom flag: <[kingdom]>"
 
                 - else:
@@ -308,6 +330,61 @@ AdminTools_Command:
 
             - else:
                 - narrate format:admincallout "This subcommand can only be used by server developers!"
+
+
+RestartClock:
+    type: task
+    debug: false
+    definitions: restartTime[TimeTag]
+    description:
+    - Recursively calls itself each second the restartTimer server flag is active and keeps track of how much time is left until the server restarts.
+    - ---
+    - → [Void]
+
+    script:
+    ## Recursively calls itself each second the restartTimer server flag is active and keeps track
+    ## of how much time is left until the server restarts.
+    ##
+    ## restartTime : [TimeTag]
+    ##
+    ## >>> [Void]
+
+    - define timeStart <util.time_now>
+
+    - if !<[restartTime].exists> || <[restartTime].object_type> != Time:
+        - stop
+
+    - if !<server.has_flag[restartTimer]>:
+        - announce format:callout "Server restart aborted by admin!"
+        - debug LOG "Server restart aborted by admin!"
+        - stop
+
+    - define timeUntilRestart <[restartTime].from_now>
+
+    - if <[timeUntilRestart].in_seconds.round> < 11:
+        - announce format:callout "<[timeUntilRestart].in_seconds.round.color[red]> seconds remaining until server restart!"
+        - debug LOG "<[timeUntilRestart].in_seconds.round.color[red]> seconds remaining until server restart!"
+
+        - if <[timeUntilRestart].in_seconds.round> <= 0:
+            - announce format:callout "Server restarting now!"
+            - debug LOG "Server restarting now!"
+            - kick <server.online_players.exclude[<server.online_ops>]> "reason:Server restart commenced by admin! Please check back in a couple minutes, Thank you!"
+            - flag server restartTimer:!
+            - stop
+            - adjust server restart
+
+    - else if <[timeUntilRestart].in_seconds.round> < 60 && <[timeUntilRestart].in_seconds.round.mod[15]> == 0:
+        - announce format:callout "<[timeUntilRestart].in_seconds.round.color[gold]> seconds remaining until server restart!"
+        - debug LOG "<[timeUntilRestart].in_seconds.round.color[gold]> seconds remaining until server restart!"
+
+    - else if <[timeUntilRestart].in_seconds.round.mod[60]> == 0:
+        - announce format:callout "<[timeUntilRestart].in_minutes.round.color[aqua]> minute(s) remaining until server restart!"
+        - debug LOG "<[timeUntilRestart].in_minutes.round.color[aqua]> minute(s) remaining until server restart!"
+
+    - define timeDiff <[timeStart].from_now.in_ticks>
+    - wait <element[20].sub[<[timeDiff]>]>t
+
+    - run <script.name> def.restartTime:<[restartTime]>
 
 
 KingdomSwitcher_Command:
