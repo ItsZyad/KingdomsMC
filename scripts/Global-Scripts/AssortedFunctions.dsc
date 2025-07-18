@@ -241,7 +241,7 @@ SendOfflinePlayersMessage:
 FormatLore:
     type: procedure
     debug: false
-    definitions: script[ScriptTag]
+    definitions: script[*ScriptTag]|loreRaw[*ListTag(ElementTag(String))]
     description:
     - Returns a string of formatted lore for the item script provided.
     - Original creator: @icecapade / Icecapade#8825
@@ -260,11 +260,12 @@ FormatLore:
     ## Returns a string of formatted lore for the item script provided.
     ## Original Creator: @icecapade / Icecapade#8825
     ##
-    ## script : [ScriptTag]
+    ## script : *[ScriptTag]
+    ## lore   : *[ListTag(ElementTag(String))]
     ##
     ## >>> [ElementTag(String)]
 
-    - define lore <[script].data_key[data.lore].if_null[null]>
+    - define lore <[loreRaw].if_null[<[script].data_key[data.lore].if_null[null]>]>
 
     - if <[lore]> == null:
         - debug error "<&[error]> Script <[script].name.custom_color[emphasis]> does not have a data key with the path: <element[data.lore].custom_color[emphasis]>!"
