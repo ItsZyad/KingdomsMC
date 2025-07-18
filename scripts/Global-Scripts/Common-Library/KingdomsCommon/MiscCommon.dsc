@@ -156,6 +156,7 @@ GetConfigNode:
                 default-max-core-chunks: 50
             Debug:
                 show-internal-debug-messages: true
+                allow-restart-countdown-without-script: false
             External:
                 Dynmap:
                     map-link: null
