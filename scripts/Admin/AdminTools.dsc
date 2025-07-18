@@ -4,10 +4,10 @@
 ## @Author: Zyad (ITSZYAD#9280)
 ## @Date: Aug 2020
 ## @Updated: Jul 2022
-## @Script Ver: v1.0
+## @Script Ver: v1.1
 ##
 ##ignorewarning invalid_data_line_quotes
-## ----------------END HEADER-----------------
+## ------------------------------------------END HEADER-------------------------------------------
 
 AdminTools_Command:
     type: command
@@ -23,32 +23,8 @@ AdminTools_Command:
     - define mostFlags <list[]>
 
     - choose <context.args.get[1].if_null[null]>:
-        - case purgeflag:
-            - if <context.args.size> >= 2:
-                - define target <context.args.get[2]>
-
-                - if <[target]> == *:
-                    - foreach <server.players> as:player:
-                        - define flagList <[player].list_flags>
-
-                        - if <[flagList].size.is[MORE].than[<[mostFlags].size>]>:
-                            - define mostFlags <[flagList]>
-
-                    - determine <[mostFlags].include[*]>
-
-                - else:
-                    - if <context.args.get[3].ends_with[,]>:
-                        - define concatFlags <list[]>
-
-                        - foreach <[target].as[player].list_flags.exclude[<context.args.get[3].replace_text[,].with[|].as[list]>]>:
-                            - define concatFlags:->:<list[<context.args.get[3]>|<[value]>].unseparated>
-
-                        - determine <[concatFlags]>
-
-                    - else:
-                        - determine <context.args.get[2].as[player].list_flags.include[*]>
-
-            - determine <server.players.parse_tag[<[parse_value].name>].include[*]>
+        - case restartclock:
+            - determine <list[[Denizen-Standard Duration]|cancel]>
 
         - case seeflag:
             - define object <context.args.get[2]> if:<context.args.size.is[OR_MORE].than[2]>
@@ -209,8 +185,6 @@ AdminTools_Command:
                 - else:
                     - narrate format:admincallout "No kingdom found for: <[value].name>"
 
-        # TODO: Consider packaging this as a task script and putting in DynmapHandler.dsc
-        ## I feel like this makes more logical sense as to where things should go.
         - case dynmap:
             - define action <[args].get[2].to_lowercase>
 
