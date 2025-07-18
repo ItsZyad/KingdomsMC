@@ -256,7 +256,7 @@ Tags:
     # Settings for tags like cuboid.blocks, location.find.blocks, ...
     Block tags:
         # How many blocks can be read, max, before stopping the tag in place
-        Max blocks: 1000000
+        Max blocks: 4000000
     Chat history:
         # How many player messages will be stored for each player (<player.chat_history>, etc.)
         Max messages: 10
