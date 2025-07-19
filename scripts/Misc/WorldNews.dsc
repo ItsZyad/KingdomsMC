@@ -239,7 +239,7 @@ WorldNewsInterface_Handler:
 
 Mailbox_Item:
     type: item
-    material: chest
+    material: beehive
     display name: <gold><bold>Mailbox
     recipes:
         1:
@@ -256,10 +256,10 @@ Mailbox_Handler:
         on player places Mailbox_Item:
         - flag <context.location> mailbox:<player.flag[kingdom]>
 
-        on player breaks chest location_flagged:mailbox:
+        on player breaks block location_flagged:mailbox:
         - flag <context.location> mailbox:!
 
-        on player right clicks chest location_flagged:mailbox:
+        on player right clicks block location_flagged:mailbox:
         - ratelimit <player> 2t
         - determine passively cancelled
 
