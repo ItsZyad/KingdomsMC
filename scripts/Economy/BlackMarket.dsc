@@ -315,7 +315,7 @@ BMMerchant_Handler:
 
                                 #- narrate format:debug "excess: <[newTradeQuota].sub[<[currAmount]>].abs>"
 
-                                - run BMInfluenceRecalculate def:<[value].get[3]>|<[newTradeQuota].sub[<[currAmount]>].abs>|<[currFaction]>
+                                # - run BMInfluenceRecalculate def:<[value].get[3]>|<[newTradeQuota].sub[<[currAmount]>].abs>|<[currFaction]>
                                 - flag server promisedTrade<[kingdom]>:!
                                 - yaml id:bmf unload
 

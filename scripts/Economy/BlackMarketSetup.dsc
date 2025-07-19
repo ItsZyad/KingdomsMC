@@ -143,7 +143,7 @@ GenerateMerchantItemList:
         - define chance <yaml[bmf].read[merchant_items.<[whichMerchant]>.items.<[value]>]>
         - define price <yaml[bmf].read[prices.<[value]>]>
         - define item <[value].as_item>
-        - adjust def:item "lore:<element[Price: ].bold.color[aqua]><[price].bold.color[white]>|<element[Spawn Chance: ].bold.color[aqua]><[chance].bold.color[white]>"
+        - adjust def:item lore:<element[Price: ].bold.color[aqua]><[price].bold.color[white]>|<element[Spawn Chance: ].bold.color[aqua]><[chance].bold.color[white]>
 
         - define merchantData:->:<[item]>
 
