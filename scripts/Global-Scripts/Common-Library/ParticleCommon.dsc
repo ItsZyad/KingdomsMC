@@ -186,6 +186,42 @@ GenerateParticleVortex:
     - determine <[pointList]>
 
 
+GenerateParticleSphere:
+    type: procedure
+    debug: false
+    definitions: center[LocationTag]|radius[ElementTag(Float)]|spread[?ElementTag(Float) = 1]
+    description:
+    - Returns a pyramid of particles of the provided type between the two positions provided. Each particle is spread out one block apart by default, but this distance can be changed by specifying a custom `spread`.
+    - Will return null if the action fails.
+    - ---
+    - → [ListTag(LocationTag)]
+
+    script:
+    - if <[center].object_type> != Location:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Unable to generate particle sphere. The provided center location: <[center].color[red]> is invalid.]>
+        - determine null
+
+    - if !<[spread].is_decimal>:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Unable to generate particle sphere. Provided particle spread value: <[spread].color[red]> must be a decimal.]>
+        - determine null
+
+    - define sphereRadius <[radius]>
+    - define thetaIncrements 10
+    - define oneTheta <element[90].div[<[thetaIncrements]>]>
+    - define location <[center]>
+    - define pointList <list[]>
+
+    - repeat <[thetaIncrements]>:
+        - define theta <[oneTheta].mul[<[value]>]>
+        - define circleRadius <[theta].to_radians.cos.mul[<[sphereRadius]>]>
+        - define heightAboveLocation <[theta].to_radians.sin.mul[<[sphereRadius]>]>
+
+        - define pointList <[pointList].include[<[location].up[<[heightAboveLocation]>].points_around_y[radius=<[circleRadius]>;points=<[circleRadius].mul[2].mul[<util.pi>]>]>]>
+        - define pointList <[pointList].include[<[location].up[0.5].down[<[heightAboveLocation]>].points_around_y[radius=<[circleRadius]>;points=<[circleRadius].mul[2].mul[<util.pi>]>]>]>
+
+    - determine <[pointList]>
+
+
 ##### PARTICLE DISPLAY TRIGGERS
 #################################################
 
