@@ -163,7 +163,7 @@ DrawLineFormationWalk:
             - flag <[closestSquadMember]> dataHold.formationPathfinding:<[pos].add[0,1,0].with_yaw[<[directionFacing]>]>
             - define unsentSoldiers:<-:<[closestSquadMember]>
 
-            - walk <[closestSquadMember]> <[pos].add[0,1,0].with_yaw[<[directionFacing]>]>
+            - run StaggeredPathfind def.npc:<[closestSquadMember]> def.endLocation:<[pos].add[0,1,0].with_yaw[<[directionFacing]>]> def.speed:1.15
 
         # Shifts the entire line back two blocks relative to the player's yaw
         - define pointOne <[pointOne].with_yaw[<[directionFacing]>].backward_flat[2.5]>
