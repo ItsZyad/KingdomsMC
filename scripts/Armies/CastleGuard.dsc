@@ -670,9 +670,16 @@ GuardTargetSelection:
         - execute as_server "sentinel forgive --id <[guard].id>" silent
 
 
+#- This is less shit now but still kinda shit. I really don't know what else Denizen wants me to do
+#- when there are not one but two mechanisms that *should* improve pathfinding accuracy that
+#- actually do fuck all :\ (McMonkey, fix distance_margin and path_distance_margin, you fucker)
+#-
+#- ~Zyad 19/Aug/'25
+
 StaggeredPathfind:
     type: task
-    definitions: npc[NPCTag]|endLocation[LocationTag]|recursionDepth[ElementTag(Integer)]|speed[?ElementTag(Integer)]
+    debug: false
+    definitions: npc[NPCTag]|endLocation[LocationTag]|recursionDepth[?ElementTag(Integer)]|speed[?ElementTag(Integer)]
     description:
     - Will make the provided NPC walk to the provided endLocation in a series of 20 block intervals to avoid having Minecraft's default pathfinding teleport them to far away places.
     - ---
@@ -684,16 +691,26 @@ StaggeredPathfind:
     ##
     ## npc            :  [NPCTag]
     ## endLocation    :  [LocationTag]
-    ## speed          :  [ElementTag<Integer>]
+    ## speed          : ?[ElementTag<Integer>]
     ## recursionDepth : ?[ElementTag<Integer>]
     ##
     ## >>> [Void]
 
     - define recursionDepth <[recursionDepth].if_null[0]>
     - define speed <[speed].if_null[1]>
-    - define path <[npc].location.find_path[<[endLocation]>]>
-    - narrate format:debug REC:<[recursionDepth]>
+    - define shortPos false
 
+    # I can only hope that the Denizen team will fix these one day, so I'll leave this here.
+    - adjust <[npc]> distance_margin:0
+    - adjust <[npc]> path_distance_margin:0
+
+    - inject <script.name> path:PathfindLoop
+
+    PathfindLoop:
+    - define path <[npc].location.find_path[<[endLocation]>]>
+
+    # At some point this check should no longer be necessary, but for now I need to trust this task
+    # a whole lot more before that happens.
     - if <[recursionDepth].is[MORE].than[49]>:
         - teleport <[npc]> <[endLocation]>
         - narrate format:debug targets:<server.online_ops> "Recursion Depth Exceeded <[recursionDepth]> Steps! Killing Queue: <script.name>_<script.queues.get[1].numeric_id>"
@@ -701,16 +718,28 @@ StaggeredPathfind:
 
     - else:
         - define walkPos <[path].get[20].if_null[<[path].last>]>
-        - walk <[npc]> <[walkPos]> auto_range speed:<[speed]>
-        - narrate format:debug <[path]>
-        - waituntil !<[npc].is_navigating>
 
-        - if <[npc].location.distance[<[endLocation]>].is[MORE].than[3.5]>:
-            - narrate format:debug <[npc].location.distance[<[endLocation]>]>
-            - run StaggeredPathfind def.npc:<[npc]> def.endLocation:<[endLocation]> def.recursionDepth:<[recursionDepth].add[1]> def.speed:<[speed]>
+        # This will intentionally send the NPC about two blocks behind the intended target so that
+        # they can be later "pushed" forward the appropriate number of blocks to compensate for the
+        # fact that Citizens NPCs always fall short of their intended target location when using
+        # default pathfinding.
+        - if <[npc].location.distance[<[endLocation]>].is[OR_LESS].than[20]>:
+            - define walkPos <[endLocation].backward_flat[2]>
+            - define shortPos true
 
+        # Maybe if efficiency starts becoming a problem, push the rate up to 15t or even 1s.
+        - waituntil !<[npc].is_navigating> rate:10t
+        - ~walk <[npc]> <[walkPos]> speed:<[speed]>
+
+        - if !<[shortPos]> && <[npc].location.distance[<[endLocation]>].is[MORE].than[2.5]>:
+            - run StaggeredPathfind path:PathfindLoop def.npc:<[npc]> def.endLocation:<[endLocation]> def.recursionDepth:<[recursionDepth].add[1]> def.speed:<[speed]>
+
+        # Take the NPC the last little bit (this is the "push" I referred to above) to the intended
+        # target location and then correct their pitch and yaw to match the original endLocation
+        # parameter.
         - else:
-            - teleport <[npc]> <[endLocation]>
+            - ~walk <[npc]> <[endLocation].forward_flat[1]>
+            - teleport <[npc]> <[npc].location.with_yaw[<[endLocation].yaw>].with_pitch[<[endLocation].pitch>]>
 
 
 GuardTickEvent_Handler:
