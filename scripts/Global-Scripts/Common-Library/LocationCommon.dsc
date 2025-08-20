@@ -34,7 +34,7 @@ RoundCoordinates:
         - run GenerateInternalError def.category:TypeError def.message:<element[Cannot round coordinate. Provided parameter: <[location].color[red]> is not a LocationTag.]>
         - determine null
 
-    - determine <[location].round.with_pitch[<[location].pitch>].with_yaw[<[location].yaw>]>
+    - determine <[location].round_down.with_pitch[<[location].pitch>].with_yaw[<[location].yaw>]>
 
 
 TruncateLocation:
@@ -161,7 +161,7 @@ ChessForward:
 
     - define amount <[amount].if_null[1]>
     - define round <[round].if_null[true]>
-    - define adjustedLocation <[location].center.with_pitch[0].with_yaw[<[location].yaw.round_to_precision[45]>]>
+    - define adjustedLocation <[location].center.with_y[<[location].y>].with_pitch[0].with_yaw[<[location].yaw.round_to_precision[45]>]>
 
     - if <[adjustedLocation].direction.contains[north]>:
         - define adjustedLocation <[adjustedLocation].add[0,0,<[amount].proc[Invert]>]>
@@ -279,7 +279,7 @@ ChessRight:
 
     - define amount <[amount].if_null[1]>
     - define round <[round].if_null[true]>
-    - define adjustedLocation <[location].center.with_pitch[0].with_yaw[<[location].yaw.round_to_precision[45]>]>
+    - define adjustedLocation <[location].center.with_y[<[location].y>].with_pitch[0].with_yaw[<[location].yaw.round_to_precision[45]>]>
 
     - if <[adjustedLocation].direction.contains[north]>:
         - define adjustedLocation <[adjustedLocation].add[<[amount]>,0,0]>
