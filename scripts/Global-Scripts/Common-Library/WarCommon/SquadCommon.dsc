@@ -568,9 +568,12 @@ RenameSquad:
 
     - define squadInfo <server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
     - define squadInfo <[squadInfo].with[name].as[<[newInternalName]>].with[displayName].as[<[newName]>]>
+    - define stationSMID <proc[GetSquadStation].context[<[kingdom]>|<[squadName]>].proc[GenerateSMID]>
 
     - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[newInternalName]>:<[squadInfo]>
     - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>:!
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[stationSMID]>:<-:<[squadName]>
+    - flag server kingdoms.<[kingdom]>.armies.barracks.<[stationSMID]>:->:<[newInternalName]>
 
     - foreach <[squadInfo].get[npcList].include[<[squadInfo].get[squadLeader]>]> as:soldier:
         - flag <[soldier]> soldier.squad:<[newInternalName]>

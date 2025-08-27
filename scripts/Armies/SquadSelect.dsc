@@ -251,14 +251,17 @@ SquadSelection_Handler:
 
         ## PLAYER TYPES NEW SQUAD NAME
         on player chats flagged:noChat.armies.renamingSquad:
+        - define kingdom <player.flag[kingdom]>
+        - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
+        - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
+
         - if <context.message.to_lowercase> == cancel:
             - narrate format:callout "Cancelled squad renaming."
 
-        - else:
-            - define kingdom <player.flag[kingdom]>
-            - define SMLocation <player.flag[datahold.armies.squadManagerLocation]>
-            - define squadName <player.flag[datahold.armies.squadInfo.internalName]>
+        - else if <proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>:
+            - narrate format:callout "Cannot rename a squad actively under command! Recall squad to barracks and try again."
 
+        - else:
             - run RenameSquad def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.newName:<context.message> def.SMLocation:<[SMLocation]> save:rename
             - define renameSuccessful <entry[rename].created_queue.determination.get[1]>
 
