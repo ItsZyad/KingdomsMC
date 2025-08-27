@@ -731,7 +731,7 @@ StaggeredPathfind:
         - waituntil !<[npc].is_navigating> rate:10t
         - ~walk <[npc]> <[walkPos]> speed:<[speed]>
 
-        - if !<[shortPos]> && <[npc].location.distance[<[endLocation]>].is[MORE].than[2.5]>:
+        - if !<[shortPos].if_null[false]> && <[npc].location.distance[<[endLocation]>].is[MORE].than[2.5]>:
             - run StaggeredPathfind path:PathfindLoop def.npc:<[npc]> def.endLocation:<[endLocation]> def.recursionDepth:<[recursionDepth].add[1]> def.speed:<[speed]>
 
         # Take the NPC the last little bit (this is the "push" I referred to above) to the intended
