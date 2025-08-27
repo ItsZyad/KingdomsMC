@@ -72,35 +72,36 @@ FormationWalk:
     # Note: adding one to the npcList size to account for squad leader;
     - define rows <[npcList].size.add[1].div[<[npcsPerRow]>].round_up>
     #- define verticalSpacing <[lineLength].div[<[npcsPerRow]>]>
-    - define verticalSpacing 2
+    - define verticalSpacing 3
     - define sentNPCs <list[<[squadLeader]>]>
 
     - repeat <[rows]> as:row:
         - define formationLinePoints <proc[DiagonalLineHelper].context[<[finalLocation].backward_flat[<[row].sub[1].mul[<[verticalSpacing]>]>]>|<[lineLength]>]>
         - define formationLine <[formationLinePoints].get[1].points_between[<[formationLinePoints].get[2]>].include[<[formationLinePoints]>]>
         # - define spacing <[formationLine].size.div[<[npcsPerRow]>].round>
-        - define spacing 3
+        - define spacing 2
 
-        - showfake green_wool <[formationLine]> players:<[player]>
+        # - showfake green_wool <[formationLine]> players:<[player]>
 
         - repeat <[npcsPerRow]> as:col:
             - if <[npcList].exclude[<[sentNPCs]>].is_empty>:
                 - repeat stop
 
             - if <[row]> == 1 && <[col]> == <[npcsPerRow].div[2].round>:
-                - walk <[squadLeader]> <[finalLocation].with_y[<[finalLocation].y.add[1]>]>
+                - walk <[squadLeader]> <[finalLocation].center.with_y[<[finalLocation].y.add[1]>]>
                 - flag <[squadLeader]> dataHold.formationPathfinding:<[finalLocation].with_y[<[finalLocation].y.add[1]>]>
-                - showfake red_wool <[finalLocation]> players:<[player]>
+                - showfake red_wool <[finalLocation].center.with_y[<[finalLocation].y.add[1]>]> players:<[player]>
 
             - else:
                 - define lineDistanceVector <[formationLinePoints].get[1].sub[<[formationLinePoints].get[1].direction.vector.mul[<[col].sub[1].mul[<[spacing]>]>]>]>
-                - define lineDistanceVector <[lineDistanceVector].with_y[<[lineDistanceVector].y.add[1]>]>
+                - define lineDistanceVector <[lineDistanceVector].center.with_y[<[lineDistanceVector].y.add[1]>]>
 
                 - define locOnLine <[formationLine].get[<[col].mul[<[spacing]>]>]>
                 - run ClosestSquadMember def.npcList:<[npcList].exclude[<[sentNPCs]>]> def.location:<[lineDistanceVector]> save:closest
                 - define closestSquadMember <entry[closest].created_queue.determination.get[1]>
 
                 - walk <[closestSquadMember]> <[lineDistanceVector]>
+                - showfake green_wool <[lineDistanceVector]> players:<[player]>
 
                 - flag <[closestSquadMember]> dataHold.formationPathfinding:<[lineDistanceVector]>
                 - define sentNPCs:->:<[closestSquadMember]>
@@ -132,8 +133,8 @@ DrawLineFormationWalk:
     ## >>> [Void]
 
     - define npcList <[npcList].include[<[squadLeader]>]>
-    - define formationLine <[pointOne].points_between[<[pointTwo]>].include[<[pointOne]>|<[pointTwo]>]>
     - define soliderSpacing 2 if:<[soldierSpacing].exists.not>
+    - define formationLine <[pointOne].points_between[<[pointTwo]>].include[<[pointOne]>|<[pointTwo]>]>
     - define soldiersPerLine <[formationLine].size.div[<[soldierSpacing]>].round_down>
     - define lines <[npcList].size.div[<[soldiersPerLine]>].round_up>
     - define directionFacing <[player].location.yaw>
@@ -163,9 +164,21 @@ DrawLineFormationWalk:
             - flag <[closestSquadMember]> dataHold.formationPathfinding:<[pos].add[0,1,0].with_yaw[<[directionFacing]>]>
             - define unsentSoldiers:<-:<[closestSquadMember]>
 
-            - run StaggeredPathfind def.npc:<[closestSquadMember]> def.endLocation:<[pos].add[0,1,0].with_yaw[<[directionFacing]>]> def.speed:1.15
+            - run StaggeredPathfind def.npc:<[closestSquadMember]> def.endLocation:<[pos].center.add[0,1,0].with_yaw[<[directionFacing]>]> def.speed:1.15
 
         # Shifts the entire line back two blocks relative to the player's yaw
-        - define pointOne <[pointOne].with_yaw[<[directionFacing]>].backward_flat[2.5]>
-        - define pointTwo <[pointTwo].with_yaw[<[directionFacing]>].backward_flat[2.5]>
+        - define pointOne <[pointOne].with_yaw[<[directionFacing]>].backward_flat[2]>
+        - define pointTwo <[pointTwo].with_yaw[<[directionFacing]>].backward_flat[2]>
         - define formationLine <[pointOne].points_between[<[pointTwo]>].include[<[pointOne]>|<[pointTwo]>]>
+
+        - if <[unsentSoldiers].is_empty>:
+            - stop
+
+        - define avgSecondLineDistance -1
+
+        - while <[avgSecondLineDistance]> < 4:
+            - if <[loop_index]> > 5:
+                - while stop
+
+            - define avgSecondLineDistance <[unsentSoldiers].parse_tag[<[parse_value].location.distance[<[closestSquadMember].location>]>].average>
+            - wait 1s
