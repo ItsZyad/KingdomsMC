@@ -617,9 +617,13 @@ DEBUG_ClearSquadEquipment:
 
 WalkSoldierToSM_Helper:
     type: task
+    debug: false
     definitions: npc[NPCTag]|location[LocationTag]
     script:
-    - walk <[npc]> <[location]> auto_range
+    - if !<[npc].is_spawned>:
+        - stop
+
+    - run StaggeredPathfind def.npc:<[npc]> def.endLocation:<[location]> def.speed:1.15
     - waituntil <[npc].is_navigating.not> rate:1s
     - despawn <[npc]>
 
