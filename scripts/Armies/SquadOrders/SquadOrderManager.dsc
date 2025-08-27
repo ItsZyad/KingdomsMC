@@ -281,8 +281,9 @@ SquadOptions_Handler:
 
         - define npcsPerRow <player.flag[datahold.armies.npcsPerRow].if_null[3]>
         - define lineLength <player.flag[datahold.armies.lineLength].div[2].if_null[6]>
+        - define center <[location].center.with_yaw[<player.location.yaw.round_to_precision[22.5]>]>
 
-        - run FormationWalk def.npcList:<[npcList]> def.squadLeader:<[squadLeader]> def.npcsPerRow:<[npcsPerRow]> def.finalLocation:<[location].with_yaw[<player.location.yaw.round_to_precision[5]>]> def.lineLength:<[lineLength]> def.player:<player>
+        - run DrawLineFormationWalk def.npcList:<[npcList]> def.soldierSpacing:3 def.squadLeader:<[squadLeader]> def.player:<player> def.pointOne:<[center].left[<[lineLength].add[0.5]>]> def.pointTwo:<[center].right[<[lineLength].add[0.5]>]>
 
         ## LINE MOVE SQUAD
         on player left clicks block with:FormationLineTool_Item flagged:datahold.armies.drawingFormation.pointTwo:
@@ -304,7 +305,7 @@ SquadOptions_Handler:
             - run CancelOutpostReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[squadLeader].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.outpost:<[squadLeader].flag[datahold.war.occupying.outpost]> if:<[squadLeader].has_flag[datahold.war.occupying.outpost]>
             - run CancelChunkReclamation def.kingdom:<[kingdom]> def.targetKingdom:<[squadLeader].flag[datahold.war.occupying.target]> def.squadName:<[squadName]> def.chunk:<[squadLeader].flag[datahold.war.occupying.chunk]> if:<[squadLeader].has_flag[datahold.war.occupying.chunk]>
 
-        - run DrawLineFormationWalk def.npcList:<[npcList]> def.soldierSpacing:3 def.squadLeader:<[squadLeader]> def.player:<player> def.pointOne:<[pointOne]> def.pointTwo:<[pointTwo]>
+        - run DrawLineFormationWalk def.npcList:<[npcList]> def.soldierSpacing:3 def.squadLeader:<[squadLeader]> def.player:<player> def.pointOne:<[pointOne].center> def.pointTwo:<[pointTwo].center>
 
         - wait 1s
 
