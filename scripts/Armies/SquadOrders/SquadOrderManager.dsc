@@ -145,22 +145,15 @@ SquadOptions_Handler:
         - define kingdom <player.flag[kingdom]>
         - define squadName <player.flag[datahold.squadName]>
         - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>].include[<proc[GetSquadLeader].context[<[kingdom]>|<[squadName]>]>]>
-        - define stationInfo <proc[GetKingdomSquadManagers].parse_value_tag[<[parse_value].get[stationedSquads]>]>
-        - define barrackID 0
+        - define SMID <proc[GetSquadSMLocation].context[<[kingdom]>|<[squadName]>].proc[GenerateSMID]>
 
-        - foreach <[stationInfo]>:
-            - if <[value].contains[<[squadName]>]>:
-                - define barrackID <[key]>
-                - foreach stop
-
-        - if <[barrackID]> == 0:
+        - if !<[SMID].is_truthy>:
             - run GenerateInternalError def.message:<element[Cannot associate squad with squad manager. Has admin tampered with code?]> def.type:GenericError def.silent:false
             - determine cancelled
 
         - run ResetSquadTools def.player:<player>
 
-        # - define SMLocation <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.location]>
-        - define SMLocation <proc[GetSMLocation].context[<[barrackID]>|<[kingdom]>]>
+        - define SMLocation <proc[GetSMLocation].context[<[SMID]>|<[kingdom]>]>
         - inject SpawnSquadNPCs path:FindSpacesAroundSM
 
         - foreach <[npcList]> as:npc:
@@ -169,7 +162,7 @@ SquadOptions_Handler:
         - run SquadEquipmentChecker def.squadName:<[squadName]> def.kingdom:<[kingdom]>
         - run ActionBarToggler def.player:<player> def.toggleType:false
 
-        - narrate format:callout "Stashing squad at barracks: <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[barrackID]>.name].color[red]>..."
+        - narrate format:callout "Stashing squad at barracks: <server.flag[kingdoms.<[kingdom]>.armies.barracks.<[SMID]>.name].color[red]>..."
         - narrate format:callout "To respawn the squad click on their icon in the squad list option in your SM."
         - determine cancelled
 
