@@ -100,6 +100,17 @@ Letter_Command:
     description: Admin command for managing world news
     permissions: kingdoms.admin.news
     tab complete:
+    # TODO: Perhaps make it possible for vagabonds/kingdomless to send messages...
+    #- It's just that, presumably one would need an address and mail infrastructure to send letters
+    #- to other kingdoms- which vagabonds obviously don't have. Perhaps I could add the limitation
+    #- that vagabonds are the only players on a Kingdoms server that can actually *open* other
+    #- people's mailboxes, but only to physically put a letter inside (they wouldn't be able to see
+    #- anything inside obviously).
+
+    - if <player.proc[IsPlayerKingdomless]>:
+        - narrate format:callout "You cannot use this command, you are not a member of a kingdom!"
+        - stop
+
     - define args <context.raw_args.split_args>
 
     - choose <[args].size>:
@@ -254,14 +265,26 @@ Mailbox_Handler:
     type: world
     events:
         on player places Mailbox_Item:
+        - if <player.proc[IsPlayerKingdomless]>:
+            - determine cancelled
+
         - flag <context.location> mailbox:<player.flag[kingdom]>
 
         on player breaks block location_flagged:mailbox:
+        - if <player.proc[IsPlayerKingdomless]>:
+            - determine cancelled
+
+        - if <context.location.flag[mailbox]> != <player.flag[kingdom]>:
+            - determine cancelled
+
         - flag <context.location> mailbox:!
 
         on player right clicks block location_flagged:mailbox:
         - ratelimit <player> 2t
         - determine passively cancelled
+
+        - if <player.proc[IsPlayerKingdomless]>:
+            - stop
 
         - if <player.flag[kingdom]> == <context.location.flag[mailbox]> || <player.has_permission[kingdoms.admin.mailbox]>:
             - flag <player> dataHold.viewingNews

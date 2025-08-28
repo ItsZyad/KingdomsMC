@@ -22,10 +22,10 @@ SetInitialSidebar:
         - if !<player.has_flag[sidebar.mode]>:
             - flag <player> sidebar.mode:Default
 
-        - ~run SidebarLoader def.target:<list[<player>]>
+        - if <player.proc[IsPlayerKingdomLess]>:
+            - stop
 
-        - if !<player.has_flag[kingdom]>:
-            - narrate format:callout "<yellow><bold>WARNING: <&r>Player kingdom flag not set! Using kingdom functions may have unexpected/untested side-effects"
+        - ~run SidebarLoader def.target:<list[<player>]>
 
 
 GenerateUpkeepSidebarLine:
@@ -142,6 +142,10 @@ SidebarLoader:
     - define target <[target].as[list].deduplicate.filter_tag[<[filter_value].is_online>]>
 
     - foreach <[target]> as:player:
+        - if <player.proc[IsPlayerKingdomLess]>:
+            - run GenerateKingdomsDebug def.message:<element[Attempted to set player: <[target].color[red]><&sq>s sidebar, however player is not a part of a kingdom. Skipping...]>
+            - foreach next
+
         - if !<[player].sidebar_lines.exists> && !<[overrideHiddenSidebar]>:
             - foreach next
 

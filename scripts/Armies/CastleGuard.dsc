@@ -24,6 +24,9 @@ CastleGuard_I:
         1:
             click trigger:
                 script:
+                - if <player.proc[IsPlayerKingdomless]>:
+                    - stop
+
                 - if <player.flag[kingdom]> == <npc.flag[kingdom]>:
                     - inventory open d:Guard_Window
                     - flag <player> clickedNPC:<npc>

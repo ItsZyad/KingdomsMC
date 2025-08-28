@@ -150,6 +150,43 @@ IsKingdomBankrupt:
     - determine false
 
 
+IsPlayerKingdomless:
+    type: procedure
+    definitions: player[PlayerTag]
+    description:
+    - Returns true if the provided player is not a member of any kingdom.
+    - ---
+    - → [ElementTag(Boolean)]
+
+    script:
+    ## Returns true if the provided player is not a member of any kingdom.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [ElementTag(Boolean)]
+
+    - if !<[player].is_player>:
+        - debug ERROR "Provided argument: <[player].color[red]> is not a valid player object."
+        - determine false
+
+    - define allMembers <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetMembers]>].combine>
+
+    - if <[player].has_flag[kingdom]>:
+        - define kingdom <[player].flag[kingdom]>
+
+        - if <[allMembers].contains[<[player]>]>:
+            - determine true
+
+        - else:
+            - determine false
+
+    - else:
+        - if <[allMembers].contains[<[player]>]>:
+            - determine true
+
+        - determine false
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ## ATOMIC VALUES
 ##_________________________________________________________________________________________________

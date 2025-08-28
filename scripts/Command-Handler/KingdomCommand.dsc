@@ -64,12 +64,12 @@ Kingdom_Command:
     tab complete:
     - define args <context.raw_args.split_args>
 
-    - if <player.exists>:
-        - define kingdom <player.flag[kingdom]>
-
-    - else:
+    - if !<player.exists>:
         - define kingdom <[args].filter_tag[<[filter_value].starts_with[kingdom:]>].get[1].split[:].get[2].if_null[null]>
         - define args <[args].exclude[kingdom:<[kingdom]>]>
+
+    - if <player.proc[IsPlayerKingdomless]>:
+        - determine <list[]>
 
     - if <[args].is_empty>:
         - determine <script.data_key[tab completions.1].as[list]>
@@ -123,6 +123,10 @@ Kingdom_Command:
         - determine <list[justify|progress]>
 
     script:
+    - if <player.proc[IsPlayerKingdomless]>:
+        - narrate format:callout "You cannot use this command, you are not a member of a kingdom!"
+        - stop
+
     - define args <context.raw_args.split_args>
 
     - if <context.source_type> != PLAYER:

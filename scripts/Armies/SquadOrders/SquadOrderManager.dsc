@@ -18,14 +18,17 @@ SoldierManager_Assignment:
         - if !<npc.has_flag[soldier]>:
             - determine cancelled
 
-        - define kingdom <npc.flag[soldier.kingdom]>
-        - define squadName <npc.flag[soldier.squad]>
+        - if <player.proc[IsPlayerKingdomless]>:
+            - determine cancelled
 
-        # - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
-        - flag <player> datahold.squadName:<[squadName]>
+        - define kingdom <npc.flag[soldier.kingdom]>
 
         - if <player.flag[kingdom]> != <[kingdom]>:
             - determine cancelled
+
+        - define squadName <npc.flag[soldier.squad]>
+        # - flag <player> datahold.squadInfo:<server.flag[kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>]>
+        - flag <player> datahold.squadName:<[squadName]>
 
         - inventory close
         - wait 3t

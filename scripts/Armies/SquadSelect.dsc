@@ -19,6 +19,10 @@ SquadCommand:
         1: list
 
     script:
+    - if <player.proc[IsPlayerKingdomless]>:
+        - narrate format:callout "You cannot use this command, you are not a member of a kingdom!"
+        - stop
+
     - define args <context.raw_args.split_args>
 
     - if <[args].get[1]> == list:

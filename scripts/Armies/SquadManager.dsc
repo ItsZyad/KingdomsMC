@@ -202,6 +202,10 @@ SquadManager_Handler:
 
         ## Places SM
         on player places SquadManager_Item flagged:!datahold.armies.movingSM:
+        - if <player.proc[IsPlayerKingdomless]>:
+            - narrate format:callout "You cannot place down squad managers when you're not part of a kingdom!"
+            - determine cancelled
+
         - define kingdom <player.flag[kingdom]>
 
         - if <[kingdom].proc[GetBalance]> < 2000:
@@ -271,6 +275,9 @@ SquadManager_Handler:
 
         ## Clicks SM
         on player clicks lodestone location_flagged:squadManager:
+        - if <player.proc[IsPlayerKingdomless]>:
+            - determine cancelled
+
         - if <context.location.flag[squadManager.kingdom]> != <player.flag[kingdom]>:
             - determine cancelled
 
@@ -610,6 +617,9 @@ SquadManager_Handler:
 
         ## Player Breaks SM
         on player breaks lodestone location_flagged:squadManager:
+        - if <player.proc[IsPlayerKingdomless]>:
+            - determine cancelled
+
         - define kingdom <player.flag[kingdom]>
         - define SMInfo <context.location.flag[squadManager]>
         - define SMLocation <context.location>

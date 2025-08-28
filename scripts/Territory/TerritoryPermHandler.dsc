@@ -5,7 +5,7 @@
 ## @Date: Jun 2021
 ## @Update 1: Oct 2023
 ## @Update 2: Jun 2024
-## @Script Ver: v3.1
+## @Script Ver: v3.2
 ##
 ## ------------------------------------------END HEADER-------------------------------------------
 
@@ -24,6 +24,9 @@ IsInOwnDuchy:
     ## player : [PlayerTag]
     ##
     ## >>> [ElementTag<Boolean>]
+
+    - if <player.proc[IsPlayerKingdomless]>:
+        - determine false
 
     - define kingdom <[player].flag[kingdom]>
 
@@ -52,6 +55,9 @@ IsInAnyDuchy:
     ##
     ## >>> [ElementTag<Boolean>]
 
+    - if <player.proc[IsPlayerKingdomless]>:
+        - determine false
+
     - define kingdom <[player].flag[kingdom]>
 
     - foreach <[kingdom].proc[GetKingdomDuchies]> as:duchy:
@@ -71,8 +77,6 @@ DoorInteractCode:
     - if !<proc[GetAllClaims].contains[<context.location.chunk>]>:
         - stop
 
-    - define kingdom <player.flag[kingdom]>
-
     - if <player.proc[IsInOwnDuchy]>:
         - stop
 
@@ -81,16 +85,35 @@ DoorInteractCode:
         # TODO/ their land.
         - determine cancelled
 
+    # If the player is kingdomless and has done an action within *any* kingdom's claims or outposts
+    # then immediately cancel the behaviour.
+    - if <player.proc[IsPlayerKingdomless]>:
+        - if <proc[GetAllClaims].contains[<player.location.chunk>]>:
+            - determine cancelled
+
+        - foreach <proc[GetAllOutposts].parse_value_tag[<[parse_value].get[area]>].values>:
+            - if <[value].contains[<player.location>]>:
+                - determine cancelled
+
+    - define kingdom <player.flag[kingdom]>
+
+    # If the player is within their own kingdom's claims then ignore.
     - if <proc[GetClaims].context[<[kingdom]>].contains[<player.location.chunk>]>:
         - stop
 
+    # If the player is within the claims or outposts of any kingdom other than their own then
+    # cancel the action.
     - foreach <proc[GetKingdomList].exclude[<[kingdom]>]>:
+
+        # Skip if the player is not in the chunk.
         - if !<proc[GetClaims].context[<[kingdom]>|core].is_in[<player.location.chunk>]>:
             - foreach next
 
         - if !<[value].proc[GetKingdomWarStatus]>:
             - determine cancelled
 
+        # If the player's kingdom is at war with the kingdom that owns the current chunk then
+        # ignore and allow them to tamper with their doors.
         - else:
             - foreach <[value].proc[GetKingdomWars]> as:warID:
                 - if <[warID].proc[GetWarParticipants].contains[<[value]>]>:
@@ -98,6 +121,7 @@ DoorInteractCode:
 
             - determine cancelled
 
+    # If the player is in their own outpost territory then ignore.
     - foreach <[kingdom].proc[GetOutposts].keys.if_null[<list[]>]>:
         - if <cuboid[<[value]>].players.contains[<player>]>:
             - stop
@@ -122,9 +146,8 @@ TerritoryHandler:
         - inject DoorInteractCode
 
         on player damaged by entity:
-        # If player has taken damage within their own core/castle
-        # territory or within their own outpost then cancel the
-        # damage event.
+        #- If player has taken damage within their own core/castle territory or within their own
+        #- outpost then cancel the damage event.
 
         - if !<context.entity.is_player>:
             - stop
@@ -133,7 +156,7 @@ TerritoryHandler:
         - define belligerentKingdom <context.entity.flag[kingdom]>
         - define castleCore <[belligerentKingdom].proc[GetClaims]>
 
-        - if !<player.has_flag[kingdom]>:
+        - if <player.proc[IsPlayerKingdomless]>:
             - stop
 
         - define kingdom <player.flag[kingdom]>
@@ -152,10 +175,9 @@ TerritoryHandler:
                 - determine cancelled
 
         on player empties bucket:
-        - define kingdom <player.flag[kingdom]>
 
-        # - if <player.has_permission[kingdoms.admin.bypassrc]>:
-        #     - stop
+        - if <player.has_permission[kingdoms.admin.bypassrc]>:
+            - stop
 
         - if <player.proc[IsInAnyDuchy]>:
             - if <player.proc[IsInOwnDuchy]>:
@@ -163,8 +185,20 @@ TerritoryHandler:
 
             # TODO: Insert logic for checking if the player has been allowed by the duke to use
             # TODO/ their land.
+
             - determine cancelled
 
+        # If the player is kingdomless and has done an action within *any* kingdom's claims or outposts
+        # then immediately cancel the behaviour.
+        - if <player.proc[IsPlayerKingdomless]>:
+            - if <proc[GetAllClaims].contains[<player.location.chunk>]>:
+                - determine cancelled
+
+            - foreach <proc[GetAllOutposts].parse_value_tag[<[parse_value].get[area]>].values>:
+                - if <[value].contains[<player.location>]>:
+                    - determine cancelled
+
+        - define kingdom <player.flag[kingdom]>
         - define castleCore <[kingdom].proc[GetClaims]>
         - define inOwnTerritory false
 
@@ -187,8 +221,15 @@ TerritoryHandler:
         - if <player.has_permission[kingdoms.admin.bypassrc]>:
             - stop
 
-        - if !<player.has_flag[kingdom]>:
-            - determine cancelled
+        # If the player is kingdomless and has done an action within *any* kingdom's claims or outposts
+        # then immediately cancel the behaviour.
+        - if <player.proc[IsPlayerKingdomless]>:
+            - if <proc[GetAllClaims].contains[<player.location.chunk>]>:
+                - determine cancelled
+
+            - foreach <proc[GetAllOutposts].parse_value_tag[<[parse_value].get[area]>].values>:
+                - if <[value].contains[<player.location>]>:
+                    - determine cancelled
 
         - define kingdom <player.flag[kingdom]>
         - define castleCore <[kingdom].proc[GetClaims]>
@@ -199,6 +240,7 @@ TerritoryHandler:
 
             # TODO: Insert logic for checking if the player has been allowed by the duke to use
             # TODO/ their land.
+
             - determine cancelled
 
         - if <context.location.chunk.is_in[<[castleCore]>]>:
@@ -229,8 +271,15 @@ TerritoryHandler:
         - if <player.has_permission[kingdoms.admin.bypassrc]>:
             - stop
 
-        - if !<player.has_flag[kingdom]>:
-            - determine cancelled
+        # If the player is kingdomless and has done an action within *any* kingdom's claims or outposts
+        # then immediately cancel the behaviour.
+        - if <player.proc[IsPlayerKingdomless]>:
+            - if <proc[GetAllClaims].contains[<player.location.chunk>]>:
+                - determine cancelled
+
+            - foreach <proc[GetAllOutposts].parse_value_tag[<[parse_value].get[area]>].values>:
+                - if <[value].contains[<player.location>]>:
+                    - determine cancelled
 
         - define kingdom <player.flag[kingdom]>
         - define castleCore <[kingdom].proc[GetClaims]>

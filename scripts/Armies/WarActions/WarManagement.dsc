@@ -411,7 +411,7 @@ PlayerWarDeath_Handler:
     debug: false
     events:
         on player dies:
-        - if !<player.has_flag[kingdom]>:
+        - if <player.proc[IsPlayerKingdomless]>:
             - stop
 
         - define kingdom <player.flag[kingdom]>

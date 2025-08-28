@@ -36,6 +36,10 @@ Outpost_Command:
                 - determine Outpost<&sp>Name<&sp>[Spaces<&sp>Allowed]
 
     script:
+    - if <player.proc[IsPlayerKingdomless]>:
+        - narrate format:callout "You cannot use this command, you are not a member of a kingdom!"
+        - stop
+
     - if <server.has_flag[PreGameStart]> && !<player.is_op>:
         - determine cancelled
 
