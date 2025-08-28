@@ -683,10 +683,10 @@ Kingdom_Command:
         #------------------------------------------------------------------------------------------
 
         Guards:
-        - if <context.args.get[2]> == list || <context.args.size> == 1:
+        - if <context.args.size> == 1 || <context.args.get[2]> == list:
             - define kingdomGuardList <list[]>
 
-            - foreach <server.flag[kingdoms.<[kingdom]>.castleGuards]> as:guard:
+            - foreach <server.flag[kingdoms.<[kingdom]>.castleGuards].if_null[<list[]>]> as:guard:
                 - if <[guard].flag[kingdom]> == <[kingdom]>:
                     - define guardItem <item[GuardList_Item]>
                     - define kingdomColor <proc[GetKingdomColor].context[<[kingdom]>]>
@@ -698,11 +698,13 @@ Kingdom_Command:
 
                     - define kingdomGuardList:->:<[guardItem]>
 
-            - run New_Paginate_Task def.itemList:<[kingdomGuardList]> def.itemsPerPage:36 def.page:1 save:paginate
-            - define paginatedGuardList <entry[paginate].created_queue.determination.get[1]>
+            - if !<[kingdomGuardList].is_empty>:
+                - run New_Paginate_Task def.itemList:<[kingdomGuardList]> def.itemsPerPage:36 def.page:1 save:paginate
+                - define paginatedGuardList <entry[paginate].created_queue.determination.get[1]>
 
-            - flag <player> guardListPage:1
-            - flag <player> kingdomGuardItems:<[paginatedGuardList]>
+                - flag <player> guardListPage:1
+                - flag <player> kingdomGuardItems:<[paginatedGuardList]>
+
             - inventory open d:KingdomGuardList_Window
 
 
