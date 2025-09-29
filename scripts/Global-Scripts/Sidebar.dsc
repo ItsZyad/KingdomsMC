@@ -139,7 +139,16 @@ SidebarLoader:
         false: <green>
 
     - define overrideHiddenSidebar <[overrideHiddenSidebar].if_null[true]>
-    - define target <[target].as[list].deduplicate.filter_tag[<[filter_value].is_online>]>
+
+    - if <[target].object_type> == List && <[target].get[1].object_type> == Player:
+        - define target <[target].deduplicate.filter_tag[<[filter_value].is_online>]>
+
+    - else if <[target].object_type> == Player:
+        - define target <list[<[target]>].deduplicate.filter_tag[<[filter_value].is_online>]>
+
+    - else:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Invalid argument passed to <script.name.color[aqua]>. Target must either be a player or list of players.]>
+        - stop
 
     - foreach <[target]> as:player:
         - if <player.proc[IsPlayerKingdomLess]>:
