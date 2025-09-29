@@ -150,6 +150,58 @@ IsKingdomBankrupt:
     - determine false
 
 
+CreateKingdom:
+    type: task
+    definitions: kingdomShortName[ElementTag(String)]|kingdomLongName[ElementTag(String)]|codeName[?ElementTag(String)]
+    description:
+    - [Experimental]
+    - Creates a new kingdom and returns the code name assigned to it.
+    - Requires 'short' and 'long' names, and optionally a pre-set code name. Kingdoms must have a short and long name, however they can be both set to the same name.
+    - If a kingdom's long name is, for example, 'The United Duchies of Jalerad', its short name would just be 'Jalerad'. Alternatively, a player could choose to have both names simply be 'Jalerad'.
+    - A code name is then automatically generated from the first word of the short name, if no custom code name is provided.
+    - ---
+    - → [ElementTag(String)]
+
+    script:
+    ## [Experimental]
+    ## Creates a new kingdom and returns the code name assigned to it.
+    ## Requires 'short' and 'long' names, and optionally a pre-set code name. Kingdoms must have a
+    ## short and long name, however they can be both set to the same name.
+    ##
+    ## If a kingdom's long name is, for example, 'The United Duchies of Jalerad', its short name
+    ## would just be 'Jalerad'. Alternatively, a player could choose to have both names simply be
+    ## 'Jalerad'.
+    ##
+    ## A code name is then automatically generated from the first word of the short name, if no custom code name is provided.
+    ##
+    ## kingdomShortName :  [ElementTag(String)]
+    ## kingdomLongName  :  [ElementTag(String)]
+    ## codeName         : ?[ElementTag(String)]
+    ##
+    ## >>> [ElementTag(String)]
+
+    - if <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>].contains[<[kingdomShortName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create new kingdom. Kingdom with provided name: <[kingdomShortName].color[red]> already exists.]>
+        - determine null
+
+    - if <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomName]>].contains[<[kingdomLongName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create new kingdom. Kingdom with provided name: <[kingdomLongName].color[red]> already exists.]>
+        - determine null
+
+    - if <[codeName].exists> && <proc[GetKingdomList].contains[<[codeName]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot create new kingdom. Provided with custom code name that already exists: <[codeName].color[red]>.]>
+        - determine null
+
+    # Extracts the first word of the shortName and makes that the code name. If the first word is
+    # 'The', it is ignored and the next valid word is selected.
+    - define codeName <[codeName].if_null[<[kingdomShortName].split[ ].filter_tag[<[filter_value].to_lowercase.equals[the].not>].get[1].to_lowercase>]>
+
+    - flag server kingdoms.kingdomList.<[codeName]>.shortName:<[kingdomShortName]>
+    - flag server kingdoms.kingdomList.<[codeName]>.name:<[kingdomLongName]>
+
+    - determine <[codeName]>
+
+
 IsPlayerKingdomless:
     type: procedure
     definitions: player[PlayerTag]
