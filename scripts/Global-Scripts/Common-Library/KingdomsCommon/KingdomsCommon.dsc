@@ -388,7 +388,12 @@ GetUpkeep:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom balance. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - determine <server.flag[kingdoms.<[kingdom]>.upkeep].if_null[0]>
+    - definemap allUpkeep:
+        coreClaimsCost: <proc[GetClaims].context[<[kingdom]>|core].size.mul[<proc[GetConfigNode].context[Territory.core-chunk-upkeep]>]>
+        castleClaimsCost: <proc[GetClaims].context[<[kingdom]>|castle].size.mul[<proc[GetConfigNode].context[Territory.castle-chunk-upkeep]>]>
+        standaloneUpkeep: <server.flag[kingdoms.<[kingdom]>.upkeep].if_null[0]>
+
+    - determine <[allUpkeep].values.sum>
 
 
 SetUpkeep:
