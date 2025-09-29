@@ -6,8 +6,8 @@
 ## @Update 1: Jul 2023
 ## @Update 2: Apr 2024
 ## **** Note: This update converted the previous Claim_Command into a task script that can be
-## ****       called from the KingdomCommand.dsc file with all the relevant parameters needed 
-## ****       for chunk claiming.
+## ****       called from the KingdomCommand.dsc file with all the relevant parameters needed for
+## ****       chunk claiming.
 ##
 ## @Script Ver: v3.0
 ##
@@ -90,10 +90,7 @@ TerritoryClaim:
                 - determine cancelled
 
             - else:
-                # Core Plot Price Equation #
-                - define realPrestige <element[100].sub[<[kingdom].proc[GetPrestige]>]>
-                - define prestigeMultiplier <util.e.power[<element[0.02186].mul[<[realPrestige]>]>].sub[0.9]>
-                - define corePrice <[prestigeMultiplier].mul[100].round_to_precision[100]>
+                - define corePrice <proc[GetClaimCost].context[<[kingdom]>|core]>
 
                 - if <[balance].is[LESS].than[<[corePrice]>]>:
                     - narrate format:callout "You do not have enough money to buy this plot of land! You need a total of: <bold>$<[corePrice]>"
@@ -101,16 +98,8 @@ TerritoryClaim:
 
                 - else:
                     - run AddClaim def.kingdom:<[kingdom]> def.type:core def.chunk:<[chunk]>
-
-                    - if <server.has_flag[PreGameStart]>:
-                        - run SubBalance def.kingdom:<[kingdom]> def.amount:<[corePrice].div[2]>
-
-                        - if <proc[GetClaims].context[<[kingdom]>|core].size> < 20:
-                            - run AddUpkeep def.kingdom:<[kingdom]> def.amount:5
-
-                    - else:
-                        - run SubBalance def.kingdom:<[kingdom]> def.amount:<[corePrice]>
-                        - run AddUpkeep def.kingdom:<[kingdom]> def.amount:30
+                    - run SubBalance def.kingdom:<[kingdom]> def.amount:<[corePrice]>
+                    - narrate format:callout Claimed!
 
             - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
@@ -124,7 +113,10 @@ TerritoryClaim:
                 - determine cancelled
 
             - else:
+                - define castlePrice <proc[GetClaimCost].context[<[kingdom]>|castle]>
+
                 - run AddClaim def.kingdom:<[kingdom]> def.type:castle def.chunk:<[chunk]>
+                - run SubBalance def.kingdom:<[kingdom]> def.amount:<[castlePrice]>
                 - narrate format:callout Claimed!
 
             - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
