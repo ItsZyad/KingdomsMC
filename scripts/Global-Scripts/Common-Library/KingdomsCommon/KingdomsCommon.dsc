@@ -219,7 +219,7 @@ IsPlayerKingdomless:
 
     - if !<[player].is_player>:
         - debug ERROR "Provided argument: <[player].color[red]> is not a valid player object."
-        - determine false
+        - determine true
 
     - define allMembers <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetMembers]>].combine>
 
@@ -227,16 +227,16 @@ IsPlayerKingdomless:
         - define kingdom <[player].flag[kingdom]>
 
         - if <[allMembers].contains[<[player]>]>:
-            - determine true
-
-        - else:
             - determine false
 
     - else:
-        - if <[allMembers].contains[<[player]>]>:
             - determine true
 
+    - else:
+        - if <[allMembers].contains[<[player]>]>:
         - determine false
+
+        - determine true
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
