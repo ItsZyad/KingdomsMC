@@ -5,6 +5,7 @@
 ##
 ## @Author: Zyad (@itszyad / ITSZYAD#9280)
 ## @Date: Aug 2020
+## <------------------<-->---------------------->
 ## @Update 1: Mar 2021
 ## @Update 2: Apr-Jun 2022
 ## @Update 3: Dec 2023
@@ -12,6 +13,7 @@
 ## ****       sub-files containing each of the separate sub-commands (or sub-command groups) of the
 ## ****       /k and /ks command handlers. All of the subcommand should be found in their respecti-
 ## ****       -ve files under this folder.
+## <------------------<-->---------------------->
 ##
 ## @Script Ver: v3.2
 ##
@@ -19,34 +21,7 @@
 #-          implement something like a wand that lets you claim chunks, or some sort of a visual
 #-          system involving a GUI...
 ##
-## ------------------------------------------END HEADER-------------------------------------------
-
-
-Help_Strings:
-    type: data
-    CommandHelpStrings:
-        # coreclaim: Claims <element[core territory].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]> for your kingdom. You need to the King or Vizier to do this action!
-        # castleclaim: Claims <element[castle territory].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]> for your kingdom. You need to the King to do this action!
-        claim: Can be used to claim the two types of contigious territory in Kingdoms: core and castle.<n> Use: <element[/k claim <element[core].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]>].color[gray]> or <element[/k claim <element[castle].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]>].color[gray]>
-        unclaim: Unclaims the chunk you are standing in if it is a part of your claims. You are refunded for its full upkeep value but not its upfront value.
-        balance: Shows the joint kingdom bank account.
-        deposit: Adds the specified amount of money to your kingdom's balance.
-        duchy: Subcommand which handles all matters relating to the mangement of your kingdom's duchies- adding and removing them, setting dukes and managing their permissions.
-        withdraw: Transfers the specified amount of money from the kingdom's balance to your personal account.
-        trade: Initiates a trade with the specified player.
-        rename: Renames the kingdom. <element[This command is restricted!].color[red].on_hover[Only the king can use this command with the the Game Czar's approval.]>
-        npc: Use /k npc spawn to open the spawn menu for kingdom NPCs.
-        warp: Takes you to your kingdom's private warp location. <red>Note that there is a 30 sec cooldown for this command.
-        war: Subcommand which handles all aspects related to waging war against other kingdoms.
-        ideas: Shows your kingdom's ideas. These are a number of buffs and debuffs that apply to kingdom depending on its character and history.
-        outline: You can specify either 'castle' or 'core' to show you the bounds of both of those territorial units in your kingdom.
-        guards: Will open your kingdom's guard window which will show all your guard NPCs, their location, status, and other information.
-        help: That's so meta...
-
-        travel: Upon selecting one of the options from the tab menu you will be teleported to that fast-travel location's designated waypoint. However you must discover an area first, before you travel to it.
-        map: Displays the Kingdoms live map.
-        rules: Displays the Kingdoms rules document.
-        chunkmap: Displays an in-chat map of the surrounding chunks and their claim status.
+## |------------------------------------------END HEADER------------------------------------------|
 
 
 Kingdom_Command:
@@ -54,12 +29,27 @@ Kingdom_Command:
     debug: false
     usage: /kingdom
     name: kingdom
-    description: Umbrella command for managing your own kingdom
+    description: Umbrella command for managing your own kingdom. Use '/k help' or '/k [command] help' for more info.
+    data:
+        CommandHelpStrings:
+            claim: Can be used to claim the two types of contigious territory in Kingdoms: core and castle.<n> Use: <element[/k claim <element[core].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]>].color[gray]> or <element[/k claim <element[castle].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]>].color[gray]>
+            unclaim: Unclaims the chunk you are standing in if it is a part of your claims. You are refunded for its full upkeep value but not its upfront value.
+            balance: Shows the joint kingdom bank account.
+            deposit: Adds the specified amount of money to your kingdom's balance.
+            duchy: Subcommand which handles all matters relating to the mangement of your kingdom's duchies- adding and removing them, setting dukes and managing their permissions.
+            withdraw: Transfers the specified amount of money from the kingdom's balance to your personal account.
+            trade: Initiates a trade with the specified player.
+            rename: Renames the kingdom. <element[This command is restricted!].color[red].on_hover[Only the king can use this command with the the Game Czar's approval.]>
+            npc: Use /k npc spawn to open the spawn menu for kingdom NPCs.
+            warp: Takes you to your kingdom's private warp location. <red>Note that there is a 30 sec cooldown for this command.
+            war: Subcommand which handles all aspects related to waging war against other kingdoms.
+            ideas: Shows your kingdom's ideas. These are a number of buffs and debuffs that apply to kingdom depending on its character and history.
+            outline: You can specify either 'castle' or 'core' to show you the bounds of both of those territorial units in your kingdom.
+            guards: Will open your kingdom's guard window which will show all your guard NPCs, their location, status, and other information.
+            help: That's so meta...
+
     aliases:
         - k
-    tab completions:
-        1: help|claim|unclaim|balance|guards|deposit|withdraw|trade|rename|npc|warp|ideas|outline|influence|duchy|war
-        2: help
 
     tab complete:
     - define args <context.raw_args.split_args>
@@ -71,10 +61,13 @@ Kingdom_Command:
     - if <player.proc[IsPlayerKingdomless]>:
         - determine <list[]>
 
-    - if <[args].is_empty>:
-        - determine <script.data_key[tab completions.1].as[list]>
+    - else:
+        - define kingdom <player.flag[kingdom]>
 
-    - if <[args].size> >= 1 && <[args].get[1]> == warp:
+    - if <[args].size> == 0:
+        - determine <script.data_key[data.CommandHelpStrings].keys>
+
+    - if <[args].get[1]> == warp && <context.raw_args.ends_with[ ]>:
         - if <[args].get[2].is_in[allow|deny].if_null[false]>:
             - determine <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>]>
 
@@ -122,23 +115,25 @@ Kingdom_Command:
 
         - determine <list[justify|progress]>
 
+    - if <[args].size> == 1 && <context.raw_args.ends_with[ ]>:
+        - determine <list[help]>
+
     script:
-    - if <player.proc[IsPlayerKingdomless]>:
-        - narrate format:callout "You cannot use this command, you are not a member of a kingdom!"
-        - stop
-
-    - define args <context.raw_args.split_args>
-
     - if <context.source_type> != PLAYER:
         - define kingdom <[args].filter_tag[<[filter_value].starts_with[kingdom:]>].get[1].split[:].get[2]>
         - define args <[args].exclude[kingdom:<[kingdom]>]>
 
-    - else:
+    - else if <player.proc[IsPlayerKingdomless]>:
+        - define args <context.raw_args.split_args>
         - define kingdom <player.flag[kingdom]>
 
+        - if <[args].get[1]> != create:
+            - narrate format:callout "You cannot use this command, you are not a member of a kingdom!"
+            - stop
+
     - if <[args].get[2].if_null[null]> == help:
-        - if <script[Help_Strings].data_key[CommandHelpStrings].list_keys[].contains[<context.args.get[1]>]>:
-            - narrate format:callout <script[Help_Strings].data_key[CommandHelpStrings.<context.args.get[1]>].parsed>
+        - if <script.data_key[data.HelpStrings].keys.contains[<context.args.get[1]>]>:
+            - narrate format:callout <script.data_key[data.HelpStrings.<context.args.get[1]>].parsed>
 
         - determine cancelled
 
@@ -166,6 +161,38 @@ Kingdom_Command:
                 - narrate format:callout "<[args].get[1].color[red]> is not a recognized sub-command."
 
     SubCommands:
+        Create:
+        - define shortName <[args].get[2]>
+        - define longName <[args].get[3].if_null[<[shortName]>]>
+        - define codeName <[args].get[4].if_null[null]>
+
+        - if <player.has_permission[kingdoms.canspecifycodenames]> && <[codeName].is_truthy>:
+            - narrate format:debug "Creating kingdom: <[shortName].color[aqua]> with provided code name: <[codeName].color[gold]>..."
+
+            - run CreateKingdom def.kingdomShortName:<[shortName]> def.kingdomLongName:<[longName]> def.codeName:<[codeName]>
+            - narrate format:debug <element[Done!]>
+
+        - if <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomShortName]>].contains[<[kingdomShortName]>]>:
+            - narrate format:callout <element[Cannot create new kingdom. Kingdom with provided name: <[kingdomShortName].color[red]> already exists.]>
+            - stop
+
+        - if <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetKingdomName]>].contains[<[kingdomLongName]>]>:
+            - narrate format:callout <element[Cannot create new kingdom. Kingdom with provided name: <[kingdomLongName].color[red]> already exists.]>
+            - stop
+
+        - if <[codeName].exists> && <proc[GetKingdomList].contains[<[codeName]>]>:
+            - narrate format:callout <element[Cannot create new kingdom. Provided with custom code name that already exists: <[codeName].color[red]>.]>
+            - stop
+
+        - run CreateKingdom def.kingdomShortName:<[shortName]> def.kingdomLongName:<[longName]> save:codeName
+        - define kingdom <entry[codeName].created_queue.determination.get[1]>
+
+        - run AddMember def.kingdom:<[kingdom]> def.player:<player>
+        - run SetMaxClaims def.kingdom:<[kingdom]> def.amount:<proc[GetConfigNode].context[Territory.default-max-core-chunks]> def.type:core
+        - run SetMaxClaims def.kingdom:<[kingdom]> def.amount:<proc[GetConfigNode].context[Territory.default-max-castle-chunks]> def.type:castle
+
+        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+
         Outline:
         - define param <[args].get[2]>
         - define hasTerritoryType false
@@ -489,6 +516,10 @@ Kingdom_Command:
         Deposit:
         - define amount <context.args.get[2]>
 
+        - if !<[amount].exists>:
+            - narrate format:callout "You must specify and amount to deposit!"
+            - stop
+
         - if <player.money.is[OR_MORE].than[<[amount]>]>:
             - run AddBalance def.kingdom:<[kingdom]> def.amount:<[amount]>
             - money take from:<player> quantity:<[amount]>
@@ -512,6 +543,10 @@ Kingdom_Command:
 
         Withdraw:
         - define amount <context.args.get[2]>
+
+        - if !<[amount].exists>:
+            - narrate format:callout "You must specify and amount to deposit!"
+            - stop
 
         - if <[kingdom].proc[GetBalance].is[OR_MORE].than[<[amount]>]>:
             - money give to:<player> quantity:<[amount]>
