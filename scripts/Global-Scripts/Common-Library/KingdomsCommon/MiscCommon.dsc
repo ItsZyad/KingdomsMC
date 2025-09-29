@@ -154,6 +154,8 @@ GetConfigNode:
                 maximum-outpost-size: 3000
                 default-max-castle-chunks: 25
                 default-max-core-chunks: 50
+                core-chunk-cost: 75
+                castle-chunk-upkeep: 25
             Debug:
                 show-internal-debug-messages: true
                 allow-restart-countdown-without-script: false
