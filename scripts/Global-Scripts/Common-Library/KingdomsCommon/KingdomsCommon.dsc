@@ -229,12 +229,12 @@ IsPlayerKingdomless:
         - if <[allMembers].contains[<[player]>]>:
             - determine false
 
-    - else:
+        - else:
             - determine true
 
     - else:
         - if <[allMembers].contains[<[player]>]>:
-        - determine false
+            - determine false
 
         - determine true
 
