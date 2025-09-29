@@ -128,6 +128,43 @@ GetClaims:
             - determine <server.flag[kingdoms.<[kingdom]>.claims.castle].if_null[<list[]>].include[<server.flag[kingdoms.<[kingdom]>.claims.core].if_null[<list[]>]>]>
 
 
+GetClaimCost:
+    type: procedure
+    definitions: kingdom[ElementTag(String)]|type[ElementTag(String)]
+    description:
+    - Returns, based on relevant kingdom data like prestige and existing territory size, the cost of claiming a chunk of the provided type for the provided kingdom.
+    - ---
+    - → [ElementTag(Float)]
+
+    script:
+    ## Returns, based on relevant kingdom data like prestige and existing territory size, the cost
+    ## of claiming a chunk of the provided type for the provided kingdom.
+    ##
+    ## kingdom : [ElementTag(String)]
+    ## type    : [ElementTag(String)]
+    ##
+    ## >>> [ElementTag(Float)]
+
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claim cost. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine null
+
+    - if !<[type].exists> || !<[type].is_in[core|castle]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom claim cost. Invalid claim type provided: <[type].color[red]>]>
+        - determine null
+
+    - choose <[type]>:
+        - case castle:
+            - define castlePrice <proc[GetConfigNode].context[Territory.castle-chunk-cost]>
+            - define castlePrice <[castlePrice].add[<proc[GetClaims].context[<[kingdom]>|castle].sub[20]>]> if:<proc[GetClaims].context[<[kingdom]>|castle].is[MORE].than[20]>
+            - determine <[castlePrice]>
+
+        - case core:
+            - define realPrestige <element[100].sub[<[kingdom].proc[GetPrestige]>]>
+            - define prestigeMultiplier <util.e.power[<element[0.02186].mul[<[realPrestige]>]>].sub[0.9]>
+            - determine <proc[GetConfigNode].context[Territory.core-chunk-cost].add[<proc[GetClaims].context[<[kingdom]>|core]>].mul[<[prestigeMultiplier]>]>
+
+
 AddClaim:
     type: task
     definitions: kingdom[ElementTag(String)]|type[ElementTag(String)]|chunk[?ElementTag(String)]
