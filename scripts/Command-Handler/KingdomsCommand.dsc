@@ -97,6 +97,12 @@ Kingdoms_Command:
             - <element[@0tickpulse / (0TickPulse#0296)].color[gold]><element[ For: ]><element[Command Manager].click_url[https://github.com/0tickpulse/TickMC/blob/master/plugins/Denizen/scripts/tickutil/tickutil_commands.dsc].underline>
             - <element[@mrm / (MrM#9999)].color[gold]><element[ For: ]><element[Dynmap Polygon Tracer].click_url[https://paste.denizenscript.com/View/111717].underline>
 
+        CommandHelpStrings:
+            travel: Upon selecting one of the options from the tab menu you will be teleported to that fast-travel location's designated waypoint. However you must discover an area first, before you travel to it.
+            map: Displays the Kingdoms live map.
+            rules: Displays the Kingdoms rules document.
+            chunkmap: Displays an in-chat map of the surrounding chunks and their claim status.
+
     aliases:
         - ks
 
@@ -105,8 +111,8 @@ Kingdoms_Command:
 
     tab complete:
     - if <context.args.size> > 1 && <context.args.get[2]> == help:
-        - if <script[Help_Strings].list_keys[].contains[<context.args.get[1]>]>:
-            - narrate format:callout <script[Help_Strings].data_key[<context.args.get[1]>].parsed>
+        - if <script.data_key[data.CommandHelpStrings].keys.contains[<context.args.get[1]>]>:
+            - narrate format:callout <script.data_key[data.CommandHelpStrings.<context.args.get[1]>].parsed>
 
         - determine cancelled
 
