@@ -832,6 +832,33 @@ GetKingdomColor:
     - determine <[outputColor]>
 
 
+SetKingdomColor:
+    type: task
+    definitions: kingdom[ElementTag(String)]|color[ColorTag]
+    description:
+    - Sets the provided kingdom's official color.
+    - ---
+    - → [Void]
+
+    script:
+    ## Sets the provided kingdom's official color.
+    ##
+    ## kingdom : [ElementTag(String)]
+    ## color   : [ColorTag]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set kingdom color. Invalid kingdom code provided: <[kingdom]>]>
+        - determine null
+
+    - if <[color].object_type> != Color:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot set kingdom color. Provided parameter: <[color].color[red]> is not a valid ColorTag.]>
+        - determine null
+
+    - flag server kingdoms.<[kingdom]>.color:<[color]>
+
+
 GetKingdomMaxDuchyCount:
     type: procedure
     definitions: kingdom[ElementTag(String)]
