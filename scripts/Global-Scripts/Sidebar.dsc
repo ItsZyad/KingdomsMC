@@ -48,7 +48,7 @@ GenerateUpkeepSidebarLine:
     - define totalOutpostUpkeep <[kingdom].proc[GetTotalOutpostUpkeep]>
 
     - if !<server.has_flag[PauseUpkeep]>:
-        - determine <element[Upkeep: <yellow>$<[kingdom].proc[GetUpkeep].add[<[totalOutpostUpkeep].if_null[0]>].round_down.format_number>]>
+        - determine <element[Upkeep: <yellow>$<[kingdom].proc[GetUpkeep].add[<[totalOutpostUpkeep].if_null[0]>].round_down.format_number> <element[/ IRL Day].color[<proc[GetKingdomColor].context[<[kingdom]>]>]>]>
 
     - determine <element[Upkeep: <aqua>Frozen!]>
 
@@ -92,6 +92,7 @@ SidebarLine_Data:
             - <proc[GeneratePrestigeDegSidebarLine].context[<[kingdom]>]>
             - <element[Outpost Count: <[kingdom].proc[GetOutposts].size.if_null[0]>]>
             - <element[Duchy Count: <[kingdom].proc[GetKingdomDuchies].size.if_null[0]>]>
+            - <element[King: <[kingdom].proc[GetKing].name.if_null[None].color[<[kingdom].proc[GetKingdomColor]>]>]>
 
         Duchy:
             title: <element[   <[duchy].proc[ConvertToSkinnyLetters].bold.color[aqua]>   ]>
