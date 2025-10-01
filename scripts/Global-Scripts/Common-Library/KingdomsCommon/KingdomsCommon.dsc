@@ -47,7 +47,7 @@ KingdomTextColors:
 GetKingdomList:
     type: procedure
     debug: false
-    definitions: isCodeNames[?ElementTag(Boolean)]
+    definitions: isCodeNames[?ElementTag(Boolean) = true]
     description:
     - Generates a list of all the valid kingdom code names.
     - When isCodeNames is set to false the procedure generates a list of the full/real kingdom names.
@@ -59,12 +59,12 @@ GetKingdomList:
     ## Generates a list of all the valid kingdom code names. When isCodeNames is set to false
     ## the procedure generates a list of the full/real kingdom names. isCodeNames is true by default
     ##
-    ## isCodeNames : ?[ElementTag<Boolean>]
+    ## isCodeNames : ?[ElementTag<Boolean> = true]
     ##
     ## >>> [ListTag<ElementTag<String>>]
 
-    - define kingdomRealNames <script[KingdomRealNames].data_key[Names].values>
-    - define kingdomCodeNames <script[KingdomRealNames].data_key[Names].keys>
+    - define kingdomCodeNames <server.flag[kingdoms.kingdomList].keys.if_null[<list[]>]>
+    - define kingdomRealNames <server.flag[kingdoms.kingdomList].parse_value_tag[<[parse_value].get[name]>].values.if_null[<list[]>]>
     - define isCodeNames <[isCodeNames].if_null[true]>
 
     - if <[isCodeNames]>:
@@ -91,9 +91,10 @@ GetKingdomCode:
     ##
     ## >>> ?[ElementTag<String>]
 
-    - define kingdomRealNames <script[KingdomRealNames].data_key[]>
+    - define kingdomRealNames <server.flag[kingdoms.kingdomList].parse_value_tag[<[parse_value].get[name]>].values.if_null[<list[]>]>
+    - define kingdomRealShortNames <server.flag[kingdoms.kingdomList].parse_value_tag[<[parse_value].get[shortName]>].values.if_null[<list[]>]>
 
-    - if <[kingdomName].is_in[<[kingdomRealNames].get[ShortNames].values>]>:
+    - if <[kingdomName].is_in[<[kingdomRealShortNames].get[ShortNames].values>]>:
         - determine <[kingdomRealNames].get[ShortNames].invert.get[<[kingdomName]>]>
 
     - else if <[kingdomName].is_in[<[kingdomRealNames].get[Names].values>]>:
@@ -800,7 +801,7 @@ GetKingdomName:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom name. Invalid kingdom code provided: <[kingdomCode]>]>
         - determine null
 
-    - determine <script[KingdomRealNames].data_key[Names.<[kingdomCode]>]>
+    - determine <server.flag[kingdoms.kingdomList.<[kingdomCode]>.name]>
 
 
 GetKingdomShortName:
@@ -825,7 +826,7 @@ GetKingdomShortName:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom name. Invalid kingdom code provided: <[kingdomCode]>]>
         - determine null
 
-    - determine <script[KingdomRealNames].data_key[ShortNames.<[kingdomCode]>]>
+    - determine <server.flag[kingdoms.kingdomList.<[kingdomCode]>.shortName]>
 
 
 GetKingdomColor:
@@ -848,7 +849,7 @@ GetKingdomColor:
         - run GenerateInternalError def.category:GenericError def.message:<element[Cannot get kingdom color. Invalid kingdom code provided: <[kingdom]>]>
         - determine null
 
-    - define rawKingdomColor <script[KingdomTextColors].data_key[<[kingdom]>]>
+    - define rawKingdomColor <server.flag[kingdoms.<[kingdom]>.color].if_null[<color[#ffffff]>]>
     - define outputColor <color[#ffffff]>
 
     - if <[rawKingdomColor].as[color].exists>:
