@@ -32,21 +32,30 @@ Kingdom_Command:
     description: Umbrella command for managing your own kingdom. Use '/k help' or '/k [command] help' for more info.
     data:
         CommandHelpStrings:
-            claim: Can be used to claim the two types of contigious territory in Kingdoms: core and castle.<n> Use: <element[/k claim <element[core].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]>].color[gray]> or <element[/k claim <element[castle].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]>].color[gray]>
-            unclaim: Unclaims the chunk you are standing in if it is a part of your claims. You are refunded for its full upkeep value but not its upfront value.
             balance: Shows the joint kingdom bank account.
-            deposit: Adds the specified amount of money to your kingdom's balance.
-            duchy: Subcommand which handles all matters relating to the mangement of your kingdom's duchies- adding and removing them, setting dukes and managing their permissions.
-            withdraw: Transfers the specified amount of money from the kingdom's balance to your personal account.
-            trade: Initiates a trade with the specified player.
-            rename: Renames the kingdom. <element[This command is restricted!].color[red].on_hover[Only the king can use this command with the the Game Czar's approval.]>
-            npc: Use /k npc spawn to open the spawn menu for kingdom NPCs.
-            warp: Takes you to your kingdom's private warp location. <red>Note that there is a 30 sec cooldown for this command.
-            war: Subcommand which handles all aspects related to waging war against other kingdoms.
-            ideas: Shows your kingdom's ideas. These are a number of buffs and debuffs that apply to kingdom depending on its character and history.
-            outline: You can specify either 'castle' or 'core' to show you the bounds of both of those territorial units in your kingdom.
+            claim: Can be used to claim the two types of contigious territory in Kingdoms: core and castle.<n> Use: <element[/k claim <element[core].color[red].on_hover[Territory classed as 'core' is always protected from other players except during times of war.]>].color[gray]> or <element[/k claim <element[castle].color[red].on_hover[Your castle will always be protected from other players unless another kingdom has successfully escalated a war after sieging your core territory.]>].color[gray]>
+            color: Changes the kingdom's color.
+            create: Creates a new kingdom with the attached player as king. Can only be used by kingdomless players.
+            credits: Shows the Kingdoms development credits.
+            chunkmap: Displays an in-chat map of the surrounding chunks and their claim status.
+            delete: Deletes the player's kingdom. Requires confirmation. Can only be used by the king.
+            deposit: Displays an interface which lets you add resources to your kingdom vault. Beware, however, some resources can only be deposited a certain number of times per day.
+            description: Displays or sets your kingdom's description line. Use: <element[/k description [description]].color[gray]> to set.
             guards: Will open your kingdom's guard window which will show all your guard NPCs, their location, status, and other information.
             help: That's so meta...
+            info: Displays your server's Kingdoms information document (external link).
+            invite: Allows a member to invite a player to their kingdom. Use: <element[/k invite [player name]].color[gray]>.
+            join: Allows a player to accept an invite request made to them by a kingdom. Use: <element[/k join [kingdom name]].color[gray]> to specify which kingdom to join.
+            leave: Allows a member to leave the kingdom they are currently a part of.
+            # map: Displays the Kingdoms live map.
+            members: Displays a list of the players who are currently members of your kingdom.
+            npc: Use /k npc spawn to open the spawn menu for kingdom NPCs.
+            outline: You can specify either 'castle' or 'core' to show you the bounds of both of those territorial units in your kingdom.
+            promote: Promotes a player to replace the current king. Only the king of a kingdom can do this action by using <element[/k promote [player]].color[gray]>.
+            rename: Renames your kingdom to the provided name. Only the king can use this command.
+            unclaim: Unclaims the chunk you are standing in if it is a part of your claims. You are refunded for its full upkeep value but not its upfront value.
+            war: Subcommand which handles all aspects related to waging war against other kingdoms.
+            warp: Takes you to your kingdom's private warp location. <red>Note that there is a 30 sec cooldown for this command.
 
     aliases:
         - k
@@ -59,7 +68,7 @@ Kingdom_Command:
         - define args <[args].exclude[kingdom:<[kingdom]>]>
 
     - if <player.proc[IsPlayerKingdomless]>:
-        - determine <list[]>
+        - determine <list[create|help|info|list]>
 
     - else:
         - define kingdom <player.flag[kingdom]>
@@ -80,6 +89,18 @@ Kingdom_Command:
 
     - else if <[args].get[1].to_lowercase> == claim:
         - determine <list[core|castle]>
+
+    - else if <[args].get[1].to_lowercase> == invite:
+        - determine <server.online_players.exclude[<[kingdom].proc[GetMembers]>].parse_tag[<[parse_value].name>]>
+
+    - else if <[args].get[1].to_lowercase> == delete:
+        - determine <list[cancel]>
+
+    - else if <[args].get[1].to_lowercase> == join:
+        - determine <player.flag[kingdomInvite].if_null[<list[]>].parse_tag[<[parse_value].proc[GetKingdomName]>]>
+
+    - else if <[args].get[1].to_lowercase> == color:
+        - determine <util.color_names.include[[#Hex Code]].exclude[transparent]>
 
     - else if <[args].get[1].to_lowercase> == duchy:
         - if <[args].size> == 1:
@@ -127,7 +148,7 @@ Kingdom_Command:
         - define args <context.raw_args.split_args>
         - define kingdom <player.flag[kingdom]>
 
-        - if <[args].get[1]> != create:
+        - if !<[args].get[1].to_lowercase.is_in[create|info|help]>:
             - narrate format:callout "You cannot use this command, you are not a member of a kingdom!"
             - stop
 
@@ -192,6 +213,42 @@ Kingdom_Command:
         - run SetMaxClaims def.kingdom:<[kingdom]> def.amount:<proc[GetConfigNode].context[Territory.default-max-castle-chunks]> def.type:castle
 
         - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+
+        #------------------------------------------------------------------------------------------
+
+        Delete:
+        - if <[kingdom].proc[GetKing]> != <player>:
+            - narrate format:callout <element[Access denied! Only the leader of the kingdom can use this command.]>
+            - stop
+
+        - if <[args].get[2].to_lowercase> == cancel:
+            - narrate format:callout <element[Kingdom deletion cancelled!]>
+            - stop
+
+        - if <[kingdom].proc[GetBalance]> < 0:
+            - narrate format:callout <element[You cannot use this action when your kingdom is in the red.]>
+            - stop
+
+        - if <player.has_flag[kingdomDeletionConfirm]>:
+            - foreach <[kingdom].proc[GetMembers]>:
+                - run RemoveMember def.kingdom:<[kingdom]> def.player:<[value]>
+
+            - flag server kingdoms.<[kingdom]>:!
+            - flag <player> kingdomDeletionConfirm:!
+
+            - run SidebarLoader def.target:<server.online_players>
+
+        - else:
+            - narrate <&sp>
+            - narrate <element[WARNING!].bold.color[red]>
+            - narrate format:callout <element[Are you ABSOLUTELY sure that you want to delete your kingdom? This will kick all members of <[kingdom].proc[GetKingdomName].color[red]> and delete any money currently in the kingdom<&sq> vault!]>
+            - narrate format:uttgccallout <element[If you are doing this because you are no longer able to play on the server, consider nominating a new king from the kingdom<&sq>s ranks instead.]>
+            - narrate format:callout <element[If you are still sure about deleting your kingdom, you may type this command again to confirm. If you have changed your mind type <element[/k delete cancel].color[aqua]>.]>
+            - narrate <&sp>
+
+            - flag <player> kingdomDeletionConfirm
+
+        #------------------------------------------------------------------------------------------
 
         Outline:
         - define param <[args].get[2]>
@@ -741,6 +798,154 @@ Kingdom_Command:
                 - flag <player> kingdomGuardItems:<[paginatedGuardList]>
 
             - inventory open d:KingdomGuardList_Window
+
+        #------------------------------------------------------------------------------------------
+
+        Color:
+        - define color <[args].get[2]>
+
+        - if <[color].is_in[<util.color_names>]>:
+            - if <[color]> == transparent:
+                - narrate format:callout <element[Cannot set kingdom color. <[color].color[red]> is not a valid color. Please try again.]>
+                - stop
+
+            - run SetKingdomColor def.kingdom:<[kingdom]> def.color:<[color].as[color]>
+
+        - else if <[color].as[color].exists>:
+            - run SetKingdomColor def.kingdom:<[kingdom]> def.color:<[color].as[color]>
+
+        - else:
+            - narrate format:callout <element[Cannot set kingdom color. <[color].color[red]> is not a valid color. Please try again.]>
+
+        - run SidebarLoader def.target:<proc[GetMembers].context[<[kingdom]>].include[<server.online_ops>]>
+
+        #------------------------------------------------------------------------------------------
+
+        Join:
+        - define targetKingdomName <[args].get[2]>
+
+        - if <proc[GetKingdomCode].context[<[targetKingdomName]>]> == null:
+            - narrate format:callout <element[The kingdom name you have provided: <[targetKingdomName].color[red]> is either invalid or does not exist.]>
+            - stop
+
+        - define targetKingdom <[targetKingdomName].proc[GetKingdomCode]>
+
+        - if !<proc[IsKingdomCodeValid]>:
+            - run GenerateInternalError def.GenericError def.message:<element[Provided kingdom name: <[targetKingdomName].color[red]> is valid but generated kingdom code: <[targetKingdom].color[red]> is not. Something has gone very wrong! Please report this error to an administrator or developer.]>
+            - stop
+
+        - if <player.has_flag[kingdomInvite.<[targetKingdom]>]>:
+            - run AddMember def.kingdom:<[targetKingdom]> def.player:<player>
+            - flag <player> kingdom:<[targetKingdom]>
+
+            - narrate format:callout <element[Joined kingdom!]>
+
+        - else:
+            - narrate format:callout <element[The provided kingdom: <[kingdomName].color[red]> has not sent you an invite :/]>
+            - wait 1s
+            - narrate format:callout <element[...Maybe if you ask nicely?]>
+
+        #------------------------------------------------------------------------------------------
+
+        Invite:
+        - define playerName <[args].get[2]>
+        - define validPlayerList <server.players.parse_tag[<[parse_value].name>]>
+
+        - if !<[playerName].is_in[<[validPlayerList]>]>:
+            - narrate format:callout <element[Cannot create invite. Provided parameter: <[playerName].color[red]> is not a valid player name. Please try again.]>
+            - stop
+
+        - define player <[playerName].as[player]>
+
+        - if !<[player].is_online>:
+            - narrate format:callout <element[Cannot create invite. Provided player: <[player].name.color[red]> is not online. Please wait until they have joined the game before sending an invite.]>
+            - stop
+
+        - if !<[player].proc[IsPlayerKingdomless]>:
+            - narrate format:callout <element[Cannot create invite. Provided player: <[player].name.color[red]> is already a member of another kingdom.]>
+            - stop
+
+        - if <[player].has_flag[kingdomInvite.<[kingdom]>]>:
+            - narrate format:callout <element[You have already sent an invite to this player! Please wait <[player].flag_expiration[kingdomInvite.<[kingdom]>].from_now.formatted.color[red]> longer before sending another invite!]>
+            - stop
+
+        # Stuff that happens to the sender player
+        - narrate format:callout <element[Sent invite to <[player].name>!]>
+
+        # Stuff that happens to the target player
+        - narrate format:callout <element[<player.name.color[aqua]> has invited you to join their kingdom: <player.flag[kingdom].proc[GetKingdomName].color[aqua]>!]> targets:<[player]>
+        - narrate format:callout <element[You may type <element[/k join <player.flag[kingdom].proc[GetKingdomName]>].color[gray]> to accept this invite.]> targets:<[player]>
+        - narrate format:callout <element[This invite will expire in 10 minutes.]> targets:<[player]>
+
+        - flag <[player]> kingdomInvite.<[kingdom]> expire:10m
+
+        #------------------------------------------------------------------------------------------
+
+        Leave:
+        - if <player.proc[IsPlayerKing]>:
+            - narrate format:callout <element[You are the king, you cannot leave your own kingdom!]>
+            - stop
+
+        - run RemoveMember def.kingdom:<[kingdom]> def.player:<player>
+        - narrate format:callout <element[Left kingdom! You<&sq>re on your own now...]>
+
+        #------------------------------------------------------------------------------------------
+
+        Promote:
+        - if <[kingdom].proc[GetKing]> != <player>:
+            - narrate format:callout <element[Access denied! Only the leader of the kingdom can use this command.]>
+            - stop
+
+        - define newKing <[args].get[2]>
+
+        - if !<[newKing].is_in[<[validPlayerList]>]>:
+            - narrate format:callout <element[Cannot promote member. Provided parameter: <[newKing].color[red]> is not a valid player name. Please try again.]>
+            - stop
+
+        - define player <[newKing].as[player]>
+
+        - if !<[player].is_in[<[kingdom].proc[GetMembers]>]>:
+            - narrate format:callout <element[Cannot promote member. The provided player: <[player].name.color[red]> is not a part of your kingdom!]>
+            - stop
+
+        - if <[args].get[2].to_lowercase> == cancel:
+            - narrate format:callout <element[Player promotion cancelled!]>
+            - stop
+
+        - if <player.has_flag[kingdomPromotionConfirm]>:
+            - define player <player.flag[kingdomPromotionConfirm]>
+            - narrate format:callout <element[Promoted <[player].name.color[aqua]> to be the new king!]>
+
+            - run SetKing def.kingdom:<[kingdom]> def.player:<[player]>
+            - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+
+            - flag <player> kingdomPromotionConfirm:!
+
+        - else:
+            - narrate <&sp>
+            - narrate <element[WARNING!].bold.color[red]>
+            - narrate format:callout <element[Are you sure you would like to promote <[newKing].color[red]> to replace you as king? To confirm type <element[/k promote].color[aqua]> again. To cancel type <element[/k promote cancel].color[aqua]>.]>
+            - narrate <&sp>
+
+            - flag <player> kingdomPromotionConfirm:<[player]>
+
+        #------------------------------------------------------------------------------------------
+
+        Members:
+        - define memberList <[kingdom].proc[GetMembers].alphabetical>
+        - define formattedMemberList <list[]>
+
+        - foreach <[memberList]> as:member:
+            - if <[kingdom].proc[GetKing]> == <[member]>:
+                - define formattedMemberList:->:<element[<[member].name.bold> (king)].color[<[kingdom].proc[GetKingdomColor].mix[<white>]>]>
+
+            - else:
+                - define formattedMemberList:->:<element[<[member].name.italicize>]>
+
+        - narrate <element[Member list for: <[kingdom].proc[GetKingdomShortName].bold.color[<[kingdom].proc[GetKingdomColor].mix[<white>]>]>]>
+        - narrate <element[    - <[formattedMemberList].separated_by[<n>    - ]>]>
+        - narrate <&sp>
+
 
 
 KingdomWarp_Subcommand:
