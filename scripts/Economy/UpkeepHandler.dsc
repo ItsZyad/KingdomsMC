@@ -10,7 +10,7 @@
 KingdomUpkeepHandler:
     type: world
     events:
-        on system time hourly every:48:
+        on system time hourly every:24:
         - if <server.has_flag[PauseUpkeep]>:
             - stop
 
