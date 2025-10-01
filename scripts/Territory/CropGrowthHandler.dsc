@@ -44,24 +44,87 @@ CropGrowthConstants:
         BaseFormula: <element[<element[0.1].mul[<element[<util.pi.mul[20]>].div[<[maxTemp].sub[<[minTemp]>]>]>].mul[<[temp].mul[<[waveStretch]>].sub[<[minTemp]>]>].sub[<[waveShift]>]>].sin.mul[<element[0.45].add[<[chanceBonus]>]>].add[0.55].add[<[chanceBonus]>]>
 
         CropTypes:
-            carrots:
+            carrot:
                 WaveShift: 1.9
                 MinTemp: 4.33
                 MaxTemp: 23.89
 
-            beetroots:
+            beetroot:
                 WaveShift: 0.7
                 MinTemp: -5
                 MaxTemp: 30
                 ChanceBonus: 0.034
                 WaveStretch: 0.863
 
-            potatoes:
+            potato:
                 WaveShift: 1.1
                 MinTemp: -10
                 MaxTemp: 32
                 ChanceBonus: 0.11
                 WaveStretch: 0.832
+
+            sweet_berries:
+                WaveShift: 1.2
+                MinTemp: -21
+                MaxTemp: 10
+                ChanceBonus: 0.03
+                WaveStretch: 0.8
+
+            wheat:
+                WaveShift: -0.2
+                MinTemp: 12
+                MaxTemp: 32
+                ChanceBonus: 0.16
+                WaveStretch: 0.8
+
+            oak_sapling:
+                WaveShift: 0.4
+                MinTemp: 9
+                MaxTemp: 40
+                ChanceBonus: 0.14
+                WaveStretch: 0.9
+
+            dark_oak_sapling:
+                WaveShift: 0.4
+                MinTemp: 9
+                MaxTemp: 40
+                ChanceBonus: 0.14
+                WaveStretch: 0.9
+
+            acacia_sapling:
+                WaveShift: 1.3
+                MinTemp: 24
+                MaxTemp: 46
+                ChanceBonus: 0.14
+                WaveStretch: 0.9
+
+            spruce_sapling:
+                WaveShift: 1.7
+                MinTemp: -8
+                MaxTemp: 5.6
+                ChanceBonus: 0.15
+                WaveStretch: 0.5
+
+            birch_sapling:
+                WaveShift: 0.5
+                MinTemp: 0
+                MaxTemp: 30
+                ChanceBonus: 0.14
+                WaveStretch: 0.9
+
+            jungle_sapling:
+                WaveShift: 0.4
+                MinTemp: 0
+                MaxTemp: 50
+                ChanceBonus: 0.19
+                WaveStretch: 0.76
+
+            cherry_sapling:
+                WaveShift: 2.9
+                MinTemp: -5
+                MaxTemp: 40
+                ChanceBonus: 0.16
+                WaveStretch: 1.24
 
 
 TemperatureAtAltitude:
@@ -83,18 +146,16 @@ TemperatureAtAltitude:
 
     - define roundedLocation <[location].with_x[<[location].x.round_to_precision[10]>].with_z[<[location].z.round_to_precision[10]>]>
 
-    - define baseTempWobble <script[CropGrowthConstants].data_key[GlobalConstants.BaseTemperatureWobble]>
     - define tempMultiplier <script[CropGrowthConstants].data_key[GlobalConstants.MinecraftTempToCelciusMultiplier]>
     - define baseTempLapse <script[CropGrowthConstants].data_key[GlobalConstants.StandardTempLapse]>
     - define biomeSpecificMod <script[CropGrowthConstants].data_key[GlobalConstants.BiomeSpecificModifiers.<[roundedLocation].biome.name>].if_null[0]>
     - define baseSunSky <element[1].sub[<[roundedLocation].world.time.sub[7500].abs.div[7000].add[0.1]>]>
     - define baseHighNoonMod <script[CropGrowthConstants].data_key[GlobalConstants.HighNoonModifier]>
 
-    - define tempWobble <[roundedLocation].with_y[<[roundedLocation].world.sea_level>].simplex_3d.mul[<[baseTempWobble]>]>
     - define tempLapse <[roundedLocation].y.sub[<[roundedLocation].world.sea_level>].div[1000].mul[<[baseTempLapse]>]>
-    - define HighNoonModifier <[roundedLocation].biome.temperature.mul[<[baseHighNoonMod].mul[<[baseSunSky]>].round_down_to_precision[0.001]>]>
+    - define HighNoonModifier <[roundedLocation].biome.base_temperature.mul[<[baseHighNoonMod].mul[<[baseSunSky]>].round_down_to_precision[0.001]>]>
 
-    - determine <[roundedLocation].biome.temperature.mul[<[tempMultiplier]>].add[<[biomeSpecificMod]>].add[<[tempWobble]>].sub[<[tempLapse]>].add[<[HighNoonModifier]>].round_to_precision[0.001]>
+    - determine <[roundedLocation].biome.temperature_at[<[roundedLocation]>].mul[<[tempMultiplier]>].add[<[biomeSpecificMod]>].sub[<[tempLapse]>].add[<[HighNoonModifier]>].round_to_precision[0.001]>
 
 
 ShouldCropGrow:
@@ -131,3 +192,15 @@ ShouldCropGrow:
         - define formula <[cropData].get[CustomFormula].parsed>
 
     - determine <util.random_chance[<[formula].mul[100]>]>
+
+
+CropGrowth_Handler:
+    type: world
+    debug: false
+    events:
+        on block grows:
+        - if !<script[CropGrowthConstants].data_key[CropFormulas.CropTypes].keys.contains[<context.material.name>]>:
+            - stop
+
+        - if !<proc[ShouldCropGrow].context[<context.material.name>|<context.location>]>:
+            - determine cancelled
