@@ -483,6 +483,123 @@ SubUpkeep:
     - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
 
+## |-------------------------------------------------------------------------------------------| ##
+## *--- IMPORTANT NOTICE!                                                                        ##
+## *--- The scripts in the enclosed section are testing an experimental feature which reworks a  ##
+## *--- fundemental system in Kingdoms - upkeep.                                                 ##
+## |-------------------------------------------------------------------------------------------| ##
+
+AddUpkeepObject:
+    type: task
+    definitions: kingdom[ElementTag(String)]|amount[ElementTag(Float)]|object[ObjectTag]|objectInfo[ListTag(ObjectTag)]
+    description:
+    - [Experimental]
+    - Alternative way of managing kingdom upkeep. Pre-coded 'objects' that upkeep can be 'attached' to must be provided to the `object` parameter as well as the kingdom and upkeep amount.
+    - Later, if upkeep needs to be removed from a kingdom (upkeep object no longer exists - e.g. squad is deleted, or territory is unclaimed).
+    - In addition to the object, additional information about the object may be provided in the form of a ListTag - for example if the object is a claimed chunk, objectInfo may be provided in the form [233,76,world]
+    - ---
+    - → [Void]
+
+    script:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot change kingdom upkeep. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine cancelled
+
+    - if !<[amount].is_decimal>:
+        - run GenerateInternalError def.category:TypeError def.message:<element[Cannot change kingdom upkeep. Provided amount value: <[amount].color[red]> is not a valid decimal.]>
+        - determine cancelled
+
+    - if !<[object].is_in[<script.data_key[ObjectBehavior].keys>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot change kingdom upkeep. Provided value: <[object].color[red]> is not a valid upkeep object. Unclassified upkeep can be filed under the <element[<&sq>generic<&sq>].color[aqua]> object]>
+        - determine cancelled
+
+    - inject <script> path:ObjectBehavior.<[object].to_titlecase>
+
+    # Each valid object should have a subpath here which stores and handles its information
+    # accordingly.
+    ObjectBehavior:
+        Claim:
+        - define objectInfo <[objectInfo].if_null[<list[]>]>
+
+        - if <[objectInfo].is_empty>:
+            - run GenerateInternalError def.category:GenericError def.message:<element[Cannot change kingdom upkeep. ObjectInfo required!]>
+            - determine cancelled
+
+        - if <[objectInfo].get[1].object_type> != Chunk:
+            - run GenerateInternalError def.category:TypeError def.message:<element[Cannot change kingdom upkeep. Provided chunk information is not valid or incorrectly formatted!]>
+            - determine cancelled
+
+        - flag server kingdoms.<[kingdom]>.upkeepData.claims.<[objectInfo].get[1]>:<[amount]>
+
+
+RemoveUpkeepObject:
+    type: task
+    definitions: kingdom[ElementTag(String)]|object[ObjectTag]|objectInfo[ListTag(ObjectTag)]
+    description:
+    - [Experimental]
+    - Searches the provided kingdom for the provided upkeep object and removes it. Automatically recalculates total upkeep.
+    - ---
+    - → [Void]
+
+    script:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot change kingdom upkeep. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine cancelled
+
+    - if !<[object].is_in[<script.data_key[ObjectBehavior].keys>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot change kingdom upkeep. Provided value: <[object].color[red]> is not a valid upkeep object. Unclassified upkeep can be filed under the <element[<&sq>generic<&sq>].color[aqua]> object]>
+        - determine cancelled
+
+    - inject <script> path:ObjectBehavior.<[object].to_titlecase>
+
+    # Each valid object should have a subpath here which stores and handles its information
+    # accordingly.
+    ObjectBehavior:
+        Claim:
+        - define objectInfo <[objectInfo].if_null[<list[]>]>
+
+        - if <[objectInfo].is_empty>:
+            - run GenerateInternalError def.category:GenericError def.message:<element[Cannot change kingdom upkeep. ObjectInfo required!]>
+            - determine cancelled
+
+        - if <[objectInfo].get[1].object_type> != Chunk:
+            - run GenerateInternalError def.category:TypeError def.message:<element[Cannot change kingdom upkeep. Provided chunk information is not valid or incorrectly formatted!]>
+            - determine cancelled
+
+        - if <server.has_flag[kingdoms.<[kingdom]>.upkeepData.claims.<[objectInfo].get[1]>]>:
+            - flag server kingdoms.<[kingdom]>.upkeepData.claims.<[objectInfo].get[1]>:!
+
+
+RecalculateKingdomUpkeep:
+    type: task
+    definitions: kingdom[ElementTag(String)]|upkeepData[ObjectTag]
+    description:
+    - [Experimental]
+    - Adds together all of the provided kingdom's upkeep objects and returns the sum.
+    - ---
+    - → [ElementTag(Float)]
+
+    script:
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot calculate kingdom upkeep. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine cancelled
+
+    - define runningTotal 0
+
+    - if <[upkeepData].object_type.is_in[List|Map]>:
+        - foreach <[upkeepData]>:
+            - run <script.name> def.kingdom:<[kingdom]> def.upkeepData:<[value]> save:recurTotal
+            - define runningTotal:+:<entry[recurTotal].created_queue.determination.get[1]>
+
+    - else:
+        - define runningTotal:+:<[upkeepData]>
+
+    - narrate format:debug <[runningTotal]>
+    - determine <[runningTotal]>
+
+
+## |-------------------------------------------------------------------------------------------| ##
+
 GetPrestige:
     type: procedure
     debug: false
