@@ -34,6 +34,9 @@ NegativeBalanceAlert:
     debug: false
     events:
         on player joins:
+        - if <player.proc[IsPlayerKingdomless]>:
+            - stop
+
         - wait 10t
         - define kingdom <player.flag[kingdom]>
 
