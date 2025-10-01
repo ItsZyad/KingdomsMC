@@ -102,6 +102,7 @@ Kingdoms_Command:
             map: Displays the Kingdoms live map.
             rules: Displays the Kingdoms rules document.
             chunkmap: Displays an in-chat map of the surrounding chunks and their claim status.
+            list: Shows a list of all the kingdoms in the game.
 
     aliases:
         - ks
@@ -227,3 +228,31 @@ Kingdoms_Command:
             - stop
 
         - inject ChunkMap
+
+    - else if <context.args.get[1].to_lowercase> == list:
+        - define kingdomItemList <list[]>
+        - define kingdomList <proc[GetKingdomList]>
+
+        - if <[kingdomList].is_empty>:
+            - narrate format:callout <element[No one has created a kingdom yet. Perhaps you could be the first?]>
+            - stop
+
+        - foreach <[kingdomList]>:
+            - define kingdomItem <item[Unspec_Item]>
+
+            - define balanceRangeLow <[kingdom].proc[GetBalance].sub[<[kingdom].proc[GetBalance].div[<util.random.int[<util.random.int[4].to[8]>].to[11]>]>].round_down.format_number>
+            - define balanceRangeHigh <[kingdom].proc[GetBalance].add[<[kingdom].proc[GetBalance].div[<util.random.int[<util.random.int[4].to[8]>].to[11]>]>].round_down.format_number>
+
+            - definemap kingdomInfo:
+                name: <element[Name: <[value].proc[GetKingdomName].color[<[value].proc[GetKingdomColor].mix[white]>]>]>
+                balance: <element[Balance: <element[$<[balanceRangeLow]> - $<[balanceRangeHigh]>].color[<[value].proc[GetKingdomColor].mix[white]>]>]>
+                claims: <element[Claims: <proc[GetClaims].context[<[value]>].size.if_null[0].color[<[value].proc[GetKingdomColor].mix[white]>]>]>
+                king: <element[King: <[value].proc[GetKing].name.if_null[None].color[<[value].proc[GetKingdomColor].mix[white]>]>]>
+
+            - adjust def:kingdomItem lore:<[kingdomInfo].values>
+            - adjust def:kingdomItem display:<element[Kingdom Entry].color[gray].bold>
+
+            - define kingdomItemList:->:<[kingdomItem]>
+
+        - run PaginatedInterface def.itemList:<[kingdomItemList]> def.page:1 def.player:<player> def.title:<element[Kingdom List]>
+
