@@ -54,9 +54,12 @@ AddMember:
         - run GenerateInternalError def.category:ValueError def.message:<element[No player exists with matcher: <[player]>]>
         - determine cancelled
 
+    - if <[player].is_in[<[kingdom].proc[GetMembers]>]>:
+        - determine cancelled
+
     - flag <[player]> kingdom:<[kingdom]>
     - flag server kingdoms.<[kingdom]>.members:->:<[player]>
-    - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+    - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
 
 
 RemoveMember:
@@ -85,7 +88,8 @@ RemoveMember:
 
     - if <proc[GetMembers].context[<[kingdom]>].contains[<[player]>]>:
         - flag server kingdoms.<[kingdom]>.members:<-:<[player]>
-        - ~run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>]>
+        - flag <[player]> kingdom:!
+        - run SidebarLoader def.target:<[kingdom].proc[GetMembers].include[<server.online_ops>].include[<[player]>]>
 
 
 GetAllMembers:
@@ -101,6 +105,38 @@ GetAllMembers:
     ## >>> [ListTag<PlayerTag>]
 
     - determine <proc[GetKingdomList].parse_tag[<server.flag[kingdoms.<[parse_value]>.members]>].combine.deduplicate>
+
+
+SetKing:
+    type: task
+    definitions: kingdom[ElementTag(String)]|player[PlayerTag]
+    description:
+    - Sets a player as king of the provided kingdom. However the provided player must already be a member of the provided kingdom.
+    - ---
+    - → [Void]
+
+    script:
+    ## Sets a player as king of the provided kingdom. However the provided player must already be a
+    ## member of the provided kingdom.
+    ##
+    ## kingdom : [ElementTag(String)]
+    ## player  : [PlayerTag]
+    ##
+    ## >>> [Void]
+
+    - if !<proc[IsKingdomCodeValid].context[<[kingdom]>]>:
+        - run GenerateInternalError def.category:GenericError def.message:<element[Cannot set king. Invalid kingdom code provided: <[kingdom].color[red]>]>
+        - determine cancelled
+
+    - if !<[player].as[player].is_in[<server.players>]>:
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot set king. No player exists with matcher: <[player].color[red]>]>
+        - determine cancelled
+
+    - if !<[player].as[player].is_in[<[kingdom].proc[GetMembers]>]>:
+        - run GenerateInternalError def.category:ValueError def.message:<element[Cannot set king. Provided player: <[player].color[red]> is not a member of the provided kingdom: <[kingdom].color[aqua]>]>
+        - determine cancelled
+
+    - flag server kingdoms.<[kingdom]>.king:<[player]>
 
 
 GetKing:
