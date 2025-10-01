@@ -123,6 +123,7 @@ Outpost_Command:
         - give to:<player.inventory> slot:<player.held_item_slot> OutpostWand_Item
 
         - narrate format:callout "Use the outpost wand in your hotbar to define this outpost by clicking the intended corner blocks with it."
+        - narrate format:callout "Alternatively, you can drop the wand to cancel the process."
 
     #------------------------------------------------------------------------------------------------------------------------
 
@@ -140,6 +141,7 @@ Outpost_Command:
             - flag <player> datahold.outpost.redefiningOutpost:<[name]>
 
             - narrate format:callout "Use the outpost wand in your hotbar to redefine this outpost by clicking the intended corner blocks with it."
+            - narrate format:callout "Alternatively, you can drop the wand to cancel the process."
 
         - else:
             - narrate format:callout "There exists no outpost by the name: <red><[name]>"
@@ -147,13 +149,25 @@ Outpost_Command:
 
 OutpostWand_Item:
     type: item
-    material: blaze_rod
+    material: spectral_arrow
     display name: <gold><bold>Outpost Wand
 
 
 OutpostWand_Handler:
     type: world
     events:
+        on player drops OutpostWand_Item:
+        - flag <player> datahold.outpost.cornerOneDefined:!
+        - flag <player> datahold.outpost.cornerTwoDefined:!
+
+        - run LoadTempInventory def:<player>
+
+        on player clicks OutpostWand_Item in inventory:
+        - determine cancelled
+
+        on player drags OutpostWand_Item in inventory:
+        - determine cancelled
+
         on player clicks block with:OutpostWand_Item:
         - if !<player.has_flag[datahold.outpost.cornerOneDefined]>:
             - ratelimit <player> 1s
@@ -167,9 +181,9 @@ OutpostWand_Handler:
         - define kingdom <player.flag[kingdom]>
         - define cornerOne <player.flag[datahold.outpost.cornerOneDefined]>
         - define cornerTwo <context.location>
-        - flag <player> datahold.outpost.cornerTwoDefined:<[cornerTwo]>
-
         - define minCastleDistance <proc[GetConfigNode].context[Territory.minimum-outpost-distance]>
+
+        - flag <player> datahold.outpost.cornerTwoDefined:<[cornerTwo]>
 
         # Cuboid object of the player's unfinalized outpost selection
         - define currOutpostSelection <cuboid[<player.location.world.name>,<[cornerOne].with_y[0].xyz>,<[cornerTwo].with_y[255].xyz>]>
@@ -190,9 +204,7 @@ OutpostWand_Handler:
 
                 - stop
 
-        - define outpostList <proc[GetAllOutposts]>
-
-        - foreach <[outpostList]> key:outpostName as:outpost:
+        - foreach <proc[GetAllOutposts]> key:outpostName as:outpost:
             - if <[outpostName]> == <player.flag[datahold.outpost.redefiningOutpost].replace[ ].with[-]>:
                 - foreach next
 
@@ -212,14 +224,14 @@ OutpostWand_Handler:
                 - narrate format:callout "This selection overlaps with another outpost. Please select another location"
 
                 - run LoadTempInventory def:<player>
-                - foreach stop
+                - stop
 
         - if <player.has_flag[datahold.outpost.cornerOneDefined]> && <player.has_flag[datahold.outpost.cornerTwoDefined]>:
             - define diffX <player.flag[datahold.outpost.cornerOneDefined].x.sub[<player.flag[datahold.outpost.cornerTwoDefined].x>].abs>
             - define diffZ <player.flag[datahold.outpost.cornerOneDefined].z.sub[<player.flag[datahold.outpost.cornerTwoDefined].z>].abs>
             - define size <[diffX].mul[<[diffZ]>]>
 
-            - if <[size].is[LESS].than[<[kingdom].proc[GetKingdomOutpostMaxSize]>]>:
+            - if <[size].is[MORE].than[<[kingdom].proc[GetKingdomOutpostMaxSize]>]>:
                 - narrate format:callout "Outpost exceeds maximum size of: <red><[kingdom].proc[GetKingdomOutpostMaxSize]><&6>! Attempted claim size of: <red><[size]>"
 
                 - flag <player> datahold.outpost.cornerOneDefined:!
@@ -248,7 +260,7 @@ OutpostWand_Handler:
             - flag <player> noChat.outposts.definingOutpost
             - flag <player> datahold.outpost.canNameOutpost
 
-            - narrate format:callout "Please type in chat the name you would like to give this outpost (or type 'cancel'):"
+            - narrate format:callout "Please type in chat the name you would like to give this outpost or type 'cancel' (You can use spaces in the name):"
 
             - flag <player> datahold.outpost.outpostCost:<[outpostCost]>
             - flag <player> datahold.outpost.size:<[size]>
@@ -306,15 +318,16 @@ OutpostEntry_Handler:
     type: world
     debug: false
     events:
-        on player enters area:
+        on player enters cuboid:
         - define outpostHandlerQueue <util.queues.parse_tag[<[parse_value].script.name.equals[<script.name>]>].get[1].if_null[null]>
 
         - if <[outpostHandlerQueue]> != null:
             - queue stop <[outpostHandlerQueue]>
 
-        - narrate format:debug <context.area>
-
         - if !<context.area.note_name.starts_with[outpost]>:
+            - stop
+
+        - if <player.proc[IsPlayerKingdomless]>:
             - stop
 
         - define kingdom <player.flag[kingdom]>
@@ -335,13 +348,16 @@ OutpostEntry_Handler:
                 - actionbar "You are now entering the outpost: <[outpost].color[<proc[GetKingdomColor].context[<[whichKingdom]>]>]>"
                 - wait 1s
 
-        on player exits area:
+        on player exits cuboid:
         - define outpostHandlerQueue <util.queues.parse_tag[<[parse_value].script.name.equals[<script.name>]>].get[1].if_null[null]>
 
         - if <[outpostHandlerQueue]> != null:
             - queue stop <[outpostHandlerQueue]>
 
         - if !<context.area.note_name.starts_with[outpost]>:
+            - stop
+
+        - if <player.proc[IsPlayerKingdomless]>:
             - stop
 
         - define kingdom <player.flag[kingdom]>
