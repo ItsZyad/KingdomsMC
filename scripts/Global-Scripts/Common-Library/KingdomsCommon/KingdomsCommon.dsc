@@ -151,6 +151,33 @@ IsKingdomBankrupt:
     - determine false
 
 
+IsPlayerKingdomless:
+    type: procedure
+    definitions: player[PlayerTag]
+    description:
+    - Returns true if the provided player is not a member of any kingdom.
+    - ---
+    - → [ElementTag(Boolean)]
+
+    script:
+    ## Returns true if the provided player is not a member of any kingdom.
+    ##
+    ## player : [PlayerTag]
+    ##
+    ## >>> [ElementTag(Boolean)]
+
+    - if !<[player].is_player>:
+        - debug ERROR "Provided argument: <[player].color[red]> is not a valid player object."
+        - determine true
+
+    - define allMembers <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetMembers]>].combine>
+
+    - if <[allMembers].contains[<[player]>]>:
+        - determine false
+
+    - determine true
+
+
 CreateKingdom:
     type: task
     definitions: kingdomShortName[ElementTag(String)]|kingdomLongName[ElementTag(String)]|codeName[?ElementTag(String)]
@@ -202,62 +229,6 @@ CreateKingdom:
 
     - determine <[codeName]>
 
-
-IsPlayerKingdomless:
-    type: procedure
-    definitions: player[PlayerTag]
-    description:
-    - Returns true if the provided player is not a member of any kingdom.
-    - ---
-    - → [ElementTag(Boolean)]
-
-    script:
-    ## Returns true if the provided player is not a member of any kingdom.
-    ##
-    ## player : [PlayerTag]
-    ##
-    ## >>> [ElementTag(Boolean)]
-
-    - if !<[player].is_player>:
-        - debug ERROR "Provided argument: <[player].color[red]> is not a valid player object."
-        - determine true
-
-    - define allMembers <proc[GetKingdomList].parse_tag[<[parse_value].proc[GetMembers]>].combine>
-
-    - if <[player].has_flag[kingdom]>:
-        - define kingdom <[player].flag[kingdom]>
-
-        - if <[allMembers].contains[<[player]>]>:
-            - determine false
-
-        - else:
-            - determine true
-
-    - else:
-        - if <[allMembers].contains[<[player]>]>:
-            - determine false
-
-        - determine true
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-## ATOMIC VALUES
-##_________________________________________________________________________________________________
-##
-## Get/Set/Add/Sub
-## - Balance
-## - Upkeep
-## - Prestige
-##
-## Get/Set
-## - Description
-##
-## Get
-## - Name/ShortName
-## - Color
-## - War Status
-##
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 GetBalance:
     type: procedure
