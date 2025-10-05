@@ -220,6 +220,17 @@ ToggleSidebar_Command:
     script:
     - define args <context.raw_args.to_lowercase.split_args>
 
+    - if <[args].is_empty>:
+        - if !<player.has_flag[sidebar.hide]>:
+            - flag <player> sidebar.hide
+            - sidebar remove
+
+        - else:
+            - flag <player> sidebar.hide:!
+            - ~run SidebarLoader def.target:<player> def.overrideHiddenSidebar:true
+
+        - stop
+
     - if <[args].get[1]> == hide:
         - flag <player> sidebar.hide
         - sidebar remove
