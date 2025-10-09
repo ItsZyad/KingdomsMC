@@ -94,11 +94,11 @@ GetKingdomCode:
     - define kingdomRealNames <server.flag[kingdoms.kingdomList].parse_value_tag[<[parse_value].get[name]>].values.if_null[<list[]>]>
     - define kingdomRealShortNames <server.flag[kingdoms.kingdomList].parse_value_tag[<[parse_value].get[shortName]>].values.if_null[<list[]>]>
 
-    - if <[kingdomName].is_in[<[kingdomRealShortNames].get[ShortNames].values>]>:
-        - determine <[kingdomRealNames].get[ShortNames].invert.get[<[kingdomName]>]>
+    - if <[kingdomName].is_in[<[kingdomRealShortNames]>]>:
+        - determine <[kingdomRealNames].get[<[kingdomName]>]>
 
-    - else if <[kingdomName].is_in[<[kingdomRealNames].get[Names].values>]>:
-        - determine <[kingdomRealNames].get[Names].invert.get[<[kingdomName]>]>
+    - else if <[kingdomName].is_in[<[kingdomRealNames]>]>:
+        - determine <[kingdomRealNames].get[<[kingdomName]>]>
 
     - determine null
 
