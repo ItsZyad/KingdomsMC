@@ -417,7 +417,7 @@ SquadOptions_Handler:
             - determine passively cancelled
             - narrate format:callout "You cannot warp while using army/squad tools. Please exit the squad interface before warping."
 
-        ## EXITS ORDERS
+        ## EXITS ORDERS MANUALLY
         on player clicks block with:ExitSquadControls_Item:
         - flag <player> datahold.squadName:!
         - flag <player> datahold.armies.squadTools:!
@@ -426,18 +426,29 @@ SquadOptions_Handler:
 
         - determine cancelled
 
+        ## LEAVES SERVER WITH SQUAD TOOLS
         on player quits flagged:datahold.armies.squadTools:
         - run ActionBarToggler def.player:<player> def.toggleType:false
         - run ResetSquadTools def.player:<player>
 
-        on player places ExitSquadControl_Item:
+        ## PLACES ITEM WITH SQUAD TOOLS
+        on player places item flagged:datahold.armies.squadTools:
         - determine cancelled
 
-        on player drops SquadMoveTool_Item:
+        ## DROPS SQUAD TOOLS
+        on player drops item flagged:datahold.armies.squadTools:
         - determine cancelled
 
-        on player drops ExitSquadControls_Item:
-        - determine cancelled
+        ## SERVER SHUTDOWN WHILE PLAYERS ARE USING SQUAD TOOLS
+        on shutdown:
+        - foreach <server.online_players> as:player:
+            - if !<[player].has_flag[datahold.armies.squadTools]>:
+                - foreach next
+
+            - flag <player> datahold.squadName:!
+            - flag <player> datahold.armies.squadTools:!
+            - run ResetSquadTools def.player:<player>
+            - run ActionBarToggler def.player:<player> def.toggleType:false
 
 
 ChunkOccupationVisualizer:
