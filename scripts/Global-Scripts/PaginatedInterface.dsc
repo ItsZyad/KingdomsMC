@@ -177,3 +177,6 @@ PaginatedInterface_Handler:
             - customevent id:PaginatedInvClose
             - flag <player> <player.flag[datahold.paginated.tempFlagName]>:! if:<player.has_flag[datahold.paginated.tempFlagName]>
             - flag <player> dataHold.paginated:!
+
+        on custom event id:PaginatedInvClose:
+        - flag <player> dataHold.paginated:!
