@@ -203,6 +203,7 @@ SquadSelection_Handler:
         on player clicks SquadInterface_Item in PaginatedInterface_Window flagged:viewingSquads:
         - inventory open d:SquadOptions_Window
         - flag <player> datahold.armies.squadInfo:<context.item.flag[squadInfo]>
+        - flag <player> datahold.squadName:<context.item.flag[squadInfo.internalName]>
 
         ## CLICK SQUAD ORDERS
         on player clicks SquadOrders_Item in SquadOptions_Window:
@@ -594,3 +595,10 @@ SoldierIgnoreKingdomPlayers:
 
     - if <[entity].is_player> && <[entity].flag[kingdom]> == <[context].flag[kingdom]>:
         - determine true
+
+
+Debug_HOLYFUCKHOLYSHIT:
+    type: task
+    script:
+    - foreach <util.queues> as:queue:
+        - queue stop <[queue]>
