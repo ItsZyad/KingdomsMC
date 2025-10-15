@@ -152,6 +152,16 @@ TerritoryHandler:
         - if !<context.entity.is_player>:
             - stop
 
+        - else if <context.entity.proc[IsPlayerKingdomless]>:
+            - if <proc[GetAllClaims].contains[<player.location.chunk>]>:
+                - determine cancelled
+
+            - foreach <proc[GetAllOutposts].parse_value_tag[<[parse_value].get[area]>].values>:
+                - if <[value].contains[<player.location>]>:
+                    - determine cancelled
+
+            - stop
+
         - define belligerent <context.entity>
         - define belligerentKingdom <context.entity.flag[kingdom]>
         - define castleCore <[belligerentKingdom].proc[GetClaims]>
@@ -175,7 +185,6 @@ TerritoryHandler:
                 - determine cancelled
 
         on player empties bucket:
-
         - if <player.has_permission[kingdoms.admin.bypassrc]>:
             - stop
 
@@ -197,6 +206,8 @@ TerritoryHandler:
             - foreach <proc[GetAllOutposts].parse_value_tag[<[parse_value].get[area]>].values>:
                 - if <[value].contains[<player.location>]>:
                     - determine cancelled
+
+            - stop
 
         - define kingdom <player.flag[kingdom]>
         - define castleCore <[kingdom].proc[GetClaims]>
@@ -230,6 +241,8 @@ TerritoryHandler:
             - foreach <proc[GetAllOutposts].parse_value_tag[<[parse_value].get[area]>].values>:
                 - if <[value].contains[<player.location>]>:
                     - determine cancelled
+
+            - stop
 
         - define kingdom <player.flag[kingdom]>
         - define castleCore <[kingdom].proc[GetClaims]>
@@ -280,6 +293,8 @@ TerritoryHandler:
             - foreach <proc[GetAllOutposts].parse_value_tag[<[parse_value].get[area]>].values>:
                 - if <[value].contains[<player.location>]>:
                     - determine cancelled
+
+            - stop
 
         - define kingdom <player.flag[kingdom]>
         - define castleCore <[kingdom].proc[GetClaims]>
