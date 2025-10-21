@@ -175,6 +175,9 @@ Kingdom_Command:
             - execute as_player influence
 
         - default:
+            - if <[args].get[1].to_lowercase> != leave && <player.has_flag[datahold.kingdomLeaveConfirm]>:
+                - flag <player> datahold.kingdomLeaveConfirm:!
+
             - if <[args].get[1].to_lowercase.is_in[<script.data_key[SubCommands].keys.parse_tag[<[parse_value]>]>]>:
                 - inject <script.name> path:SubCommands.<[args].get[1].to_titlecase>
 
@@ -886,8 +889,19 @@ Kingdom_Command:
             - narrate format:callout <element[You are the king, you cannot leave your own kingdom!]>
             - stop
 
-        - run RemoveMember def.kingdom:<[kingdom]> def.player:<player>
-        - narrate format:callout <element[Left kingdom! You<&sq>re on your own now...]>
+        - if <player.has_flag[datahold.kingdomLeaveConfirm]>:
+            - if <[args].get[2].to_lowercase> == cancel:
+                - narrate format:callout <element[Operation cancelled!]>
+                - stop
+
+            - run RemoveMember def.kingdom:<[kingdom]> def.player:<player>
+            - narrate format:callout <element[Left kingdom! You<&sq>re on your own now...]>
+
+            - flag <player> datahold.kingdomLeaveConfirm:!
+
+        - else:
+            - narrate format:callout <element[Are you sure that you want to leave your kingdom? If you are sure, type this command again. If you change your mind, type <element[/k leave cancel].color[aqua]>]>
+            - flag <player> datahold.kingdomLeaveConfirm
 
         #------------------------------------------------------------------------------------------
 
