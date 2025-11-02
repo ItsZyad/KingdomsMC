@@ -133,7 +133,8 @@ Startup_Handler:
 
         - if !<util.has_file[../Kingdoms/config.yml]>:
             - run YAMLConfigCreator save:configMap
-            - run ConfigLoader
+
+        - run ConfigLoader
 
         - if !<util.has_file[../Kingdoms/addons]>:
             - yaml id:tempPackage create
