@@ -22,13 +22,13 @@ WarpCooldown:
     events:
         on player damaged by player:
         - if <context.final_damage> != 0:
-            - if !<context.player.has_flag[combatMode]> && !<context.entity.has_flag[combatMode]>:
+            - if !<context.damager.has_flag[combatMode]> && !<context.entity.has_flag[combatMode]>:
                 - flag <context.entity> combatMode expire:30s
-                - flag <context.player> combatMode expire:30s
+                - flag <context.damager> combatMode expire:30s
 
-                - runlater WarpCooldownEndMessage def:<context.entity>|<context.player> delay:30s
+                - runlater WarpCooldownEndMessage def:<context.entity>|<context.damager> delay:30s
 
-                - narrate targets:<context.entity>|<context.player> format:callout "<red>You are in combat mode!<&6> You may not use warps for the next 30 seconds!"
+                - narrate targets:<context.entity>|<context.damager> format:callout "<red>You are in combat mode!<&6> You may not use warps for the next 30 seconds!"
 
         # Note to self: Should this be converted to a task script and added onto the end of the
         # handler for /kingdom warp and /warp?
