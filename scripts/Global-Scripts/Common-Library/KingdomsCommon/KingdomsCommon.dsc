@@ -153,6 +153,7 @@ IsKingdomBankrupt:
 
 IsPlayerKingdomless:
     type: procedure
+    debug: false
     definitions: player[PlayerTag]
     description:
     - Returns true if the provided player is not a member of any kingdom.
