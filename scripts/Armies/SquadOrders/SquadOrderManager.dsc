@@ -21,6 +21,10 @@ SoldierManager_Assignment:
         - if <player.proc[IsPlayerKingdomless]>:
             - determine cancelled
 
+        - if <npc.has_flag[datahold.armies.recallingToBase]>:
+            - narrate format:callout "Cannot command a squad when it is recalling to base."
+            - determine cancelled
+
         - define kingdom <npc.flag[soldier.kingdom]>
 
         - if <player.flag[kingdom]> != <[kingdom]>:
@@ -637,6 +641,9 @@ WalkSoldierToSM_Helper:
     script:
     - if !<[npc].is_spawned>:
         - stop
+
+    - flag <[npc]> datahold.armies.recallingToBase
+    - flag <[npc]> datahold.armies.pathfinding:->:<queue>
 
     - run StaggeredPathfind def.npc:<[npc]> def.endLocation:<[location]> def.speed:1.15
     - waituntil <[npc].is_navigating.not> rate:1s
