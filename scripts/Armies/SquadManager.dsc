@@ -321,6 +321,9 @@ SquadManager_Handler:
 
         ## Breaks Bed in SM Area
         on player breaks *_bed:
+        - if <player.proc[IsPlayerKingdomless]>:
+            - stop
+
         - define SMLocation <proc[BedSMLocation].context[<player>|<context.location>]>
 
         - if <[SMLocation].exists> && <[SMLocation].world> == <player.location.world>:
@@ -331,6 +334,9 @@ SquadManager_Handler:
 
         ## Places Bed in SM Area
         on player places *_bed:
+        - if <player.proc[IsPlayerKingdomless]>:
+            - stop
+
         - define SMLocation <proc[BedSMLocation].context[<player>|<context.location>]>
 
         - if <[SMLocation].exists> && <[SMLocation].world> == <player.location.world>:
