@@ -57,11 +57,16 @@ ChunkMap:
                 - define chunkList:->:<element[P].color[white].on_hover[<[currentChunk]>]>
 
     - define chunkList <[chunkList].sub_lists[19]>
-    - define chunkList[1]:<[chunkList].get[1].include[<element[⮙ - North]>]>
+    - define chunkList[1]:<[chunkList].get[1].include[<element[<gold>| ⮙ North]>]>
+    - define chunkList[3]:<[chunkList].get[3].include[<element[<white>| - : <gray>Wilderness]>]>
+    - define chunkList[4]:<[chunkList].get[4].include[<element[<white>| X : <gray>Kingdom Core]>]>
+    - define chunkList[5]:<[chunkList].get[5].include[<element[<white>| Y : <gray>Kingdom Castle]>]>
+    - define chunkList[6]:<[chunkList].get[6].include[<element[<white>| P : <gray>Player]>]>
+    - define chunkList[7]:<[chunkList].get[7].include[<element[<white>| O : <gray>Kingdom Outpost]>]>
 
-    - narrate <gold>|<element[                        ].strikethrough><element[ Chunk Map ].color[#f7c64b]><element[                         ].strikethrough>|
+    - narrate <gold>|<element[                             ].strikethrough><element[ Chunk Map ].color[#f7c64b]><element[                              ].strikethrough>|
     - narrate <[chunkList].parse_tag[<[parse_value].space_separated>].separated_by[<n>]>
-    - narrate "<white>- : <gray>Wilderness      | <white>P : <gray>Player"
-    - narrate "<white>X : <gray>Kingdom Castle | <white>O : <gray>Kingdom Outpost (Approx.)"
-    - narrate "<white>Y : <gray>Kingdom Core   | <white>Chunks coded to respective kingdom color."
-    - narrate <gold>|<element[                                                                ].strikethrough>|
+    - narrate <element[                                                         ].strikethrough>
+    - narrate "<white>- Chunks coded to respective kingdom color."
+    - narrate "<white>- Kingdom outpost areas are approximated to<n>  nearest chunk."
+    - narrate <gold>|<element[                                                                         ].strikethrough>|
