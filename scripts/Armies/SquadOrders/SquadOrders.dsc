@@ -194,7 +194,9 @@ SoldierCombat_Handler:
     debug: false
     events:
         on npc dies:
-        - if !(<context.entity.traits.contains[sentinel]> && <context.entity.has_flag[soldier]>):
+        # Yes, I know. Non-standard usage of `not` instead of `!`, the highlighting didn't pick it
+        # up and I don't want to take chances, sue me.
+        - if not ( <context.entity.traits.contains[sentinel]> && <context.entity.has_flag[soldier]> ):
             - stop
 
         - define soldier <context.entity>
@@ -202,7 +204,7 @@ SoldierCombat_Handler:
         - define squadName <[soldier].flag[soldier.squad]>
         - define SMLocation <proc[GetSquadSMLocation].context[<[kingdom]>|<[squadName]>]>
 
-        - flag server kingdoms.<[kingdom]>.armies.squads.squadList.<[squadName]>.npcList:<-:<[soldier]>
+        - run RemoveSoldierFromSquad def.kingdom:<[kingdom]> def.squadName:<[squadName]> def.npc:<[soldier]>
         - define npcList <proc[GetSquadNPCs].context[<[kingdom]>|<[squadName]>]>
 
         - if !<[soldier].flag[soldier.isSquadLeader].if_null[false]>:
@@ -224,6 +226,7 @@ SoldierCombat_Handler:
             - run DeleteSquad def.kingdom:<[kingdom]> def.squadName:<[squadName]>
 
         # Promote a soldier to become squad leader
+        # TODO: When solider XP is implemented this should pick the soldier with the highest XP.
         - else:
             - define firstSoldier <[npcList].first>
             - run SetSquadLeader def.kingdom:<[kingdom]> def.npc:<[firstSoldier]> def.squadName:<[squadName]>
