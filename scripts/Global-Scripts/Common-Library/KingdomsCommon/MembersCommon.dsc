@@ -10,6 +10,7 @@
 
 GetMembers:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Returns a list of all the members currently in the kingdom.
@@ -32,6 +33,7 @@ GetMembers:
 
 AddMember:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|player[PlayerTag]
     description:
     - Adds a player to a given kingdom.
@@ -64,6 +66,7 @@ AddMember:
 
 RemoveMember:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|player[PlayerTag]
     description:
     - Removes the given player from a kingdom if they are a member.
@@ -94,6 +97,7 @@ RemoveMember:
 
 GetAllMembers:
     type: procedure
+    debug: false
     description:
     - Returns a list of all the members in all kingdoms.
     - ---
@@ -109,6 +113,7 @@ GetAllMembers:
 
 SetKing:
     type: task
+    debug: false
     definitions: kingdom[ElementTag(String)]|player[PlayerTag]
     description:
     - Sets a player as king of the provided kingdom. However the provided player must already be a member of the provided kingdom.
@@ -141,6 +146,7 @@ SetKing:
 
 GetKing:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]
     description:
     - Returns the PlayerTag associated with the person currently kin of the provided kingdom.
@@ -166,6 +172,7 @@ GetKing:
 
 IsPlayerInKingdom:
     type: procedure
+    debug: false
     definitions: kingdom[ElementTag(String)]|player[PlayerTag]
     description:
     - Returns true if the provided player is in the provided kingdom.
@@ -195,6 +202,7 @@ IsPlayerInKingdom:
 
 IsPlayerKing:
     type: procedure
+    debug: false
     definitions: player[PlayerTag]
     description:
     - Returns true if the provided player is the king of their kingdom.
