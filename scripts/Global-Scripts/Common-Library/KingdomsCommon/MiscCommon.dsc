@@ -155,7 +155,10 @@ GetConfigNode:
                 default-max-castle-chunks: 25
                 default-max-core-chunks: 50
                 core-chunk-cost: 75
+                castle-chunk-cost: 100
+                core-chunk-upkeep: 50
                 castle-chunk-upkeep: 25
+                discount-first-ten-chunks: false
             Debug:
                 show-internal-debug-messages: true
                 allow-restart-countdown-without-script: false
@@ -163,7 +166,7 @@ GetConfigNode:
                 Dynmap:
                     map-link: null
             Flavor:
-                custom-player-messages: null
+                custom-player-messages: <map[]>
 
     script:
     ## Returns the value of the provided config node. The accepted format is [Category].[Setting]
